@@ -1122,20 +1122,32 @@ export default function Dashboard() {
                                                  { tab: 'documentos', label: '📄 Documentos' },
                                                  { tab: 'comunidad', label: '👥 Comunidad Chat' },
                                                  { tab: 'configuracion', label: '⚙️ Ajustes / Cuenta' }
-                                             ].map(item => (
-                                                 <button
-                                                     key={item.tab}
-                                                     onClick={() => setMobileTab(item.tab)}
-                                                     className={`w-full text-left px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
-                                                         mobileTab === item.tab 
-                                                             ? 'bg-[#72B043] text-white shadow shadow-[#72B043]/10' 
-                                                             : 'text-slate-400 hover:bg-slate-900 hover:text-white'
-                                                     }`}
-                                                 >
-                                                     {item.label}
-                                                 </button>
-                                             ))}
+                                             ].map(item => {
+                                                  const isReservasLocked = simulatedMoroso && item.tab === 'reservas';
+                                                  return (
+                                                      <button
+                                                          key={item.tab}
+                                                          onClick={() => {
+                                                              if (isReservasLocked) {
+                                                                  setShowMorosidadModal(true);
+                                                              } else {
+                                                                  setMobileTab(item.tab);
+                                                              }
+                                                          }}
+                                                          className={`w-full text-left px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                                                              isReservasLocked
+                                                                  ? 'bg-rose-950/20 text-rose-500 border border-rose-950/20 hover:bg-rose-950/30'
+                                                                  : mobileTab === item.tab 
+                                                                  ? 'bg-[#72B043] text-white shadow shadow-[#72B043]/10' 
+                                                                  : 'text-slate-400 hover:bg-slate-900 hover:text-white'
+                                                          }`}
+                                                      >
+                                                          {isReservasLocked ? '📅 Reservas 🔒' : item.label}
+                                                      </button>
+                                                  );
+                                              })}
                                          </div>
+                                    </div>
 
                                      {/* Sidebar Footer Controls */}
                                     <div className="space-y-3 pt-4 border-t border-slate-900">
@@ -2368,13 +2380,34 @@ export default function Dashboard() {
                                 </button>
                                 
                                 <button 
-                                    onClick={() => setMobileTab('reservas')}
-                                    className={`flex flex-col items-center justify-center w-12 h-full transition-colors ${mobileTab === 'reservas' ? 'text-[#72B043] font-bold' : 'text-slate-500 hover:text-slate-350'}`}
+                                    onClick={() => {
+                                        if (simulatedMoroso) {
+                                            setShowMorosidadModal(true);
+                                        } else {
+                                            setMobileTab('reservas');
+                                        }
+                                    }}
+                                    className={`flex flex-col items-center justify-center w-12 h-full transition-colors ${
+                                        simulatedMoroso 
+                                            ? 'text-rose-500 hover:text-rose-400' 
+                                            : mobileTab === 'reservas' 
+                                            ? 'text-[#72B043] font-bold' 
+                                            : 'text-slate-500 hover:text-slate-350'
+                                    }`}
                                 >
-                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15z" />
-                                    </svg>
-                                    <span className="text-[8px] font-bold mt-0.5 font-sans">Reservas</span>
+                                    {simulatedMoroso ? (
+                                        <>
+                                            <span className="text-sm">🔒</span>
+                                            <span className="text-[8px] font-bold mt-0.5 font-sans text-rose-500">Reservas</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15z" />
+                                            </svg>
+                                            <span className="text-[8px] font-bold mt-0.5 font-sans">Reservas</span>
+                                        </>
+                                    )}
                                 </button>
                                 
                                 {/* Floating central + button in bottom nav */}
