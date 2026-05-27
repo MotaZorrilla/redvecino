@@ -353,6 +353,8 @@ export default function Dashboard() {
 
     // Resident View (MiVecino) state hooks
     const [mobileTab, setMobileTab] = useState('home');
+    const [simulatedMoroso, setSimulatedMoroso] = useState(false);
+    const [showMorosidadModal, setShowMorosidadModal] = useState(false);
     
     // Resident interactive states
     const [residentCondo, setResidentCondo] = useState('Condominio Parque Central');
@@ -1134,7 +1136,6 @@ export default function Dashboard() {
                                                  </button>
                                              ))}
                                          </div>
-                                         </div>
 
                                      {/* Sidebar Footer Controls */}
                                     <div className="space-y-3 pt-4 border-t border-slate-900">
@@ -1171,6 +1172,22 @@ export default function Dashboard() {
                                             <p className="text-[10px] text-slate-450 dark:text-slate-555 mt-0.5">Gestión operativa en tiempo real del {residentCondo}.</p>
                                         </div>
                                         <div className="flex items-center gap-3">
+                                            <button 
+                                                onClick={() => {
+                                                    setSimulatedMoroso(!simulatedMoroso);
+                                                    if (!simulatedMoroso) {
+                                                        setMobileTab('home');
+                                                    }
+                                                }}
+                                                className={`px-2.5 py-1 text-[10px] font-bold rounded-md uppercase tracking-wider border transition-all duration-300 flex items-center gap-1.5 ${
+                                                    simulatedMoroso 
+                                                        ? 'bg-rose-500/10 border-rose-500/35 text-rose-500 hover:bg-rose-500/20 shadow-sm shadow-rose-500/5' 
+                                                        : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-450 hover:bg-slate-200 dark:hover:bg-slate-750'
+                                                }`}
+                                            >
+                                                <span className={`h-1.5 w-1.5 rounded-full ${simulatedMoroso ? 'bg-rose-500 animate-pulse' : 'bg-slate-400'}`} />
+                                                {simulatedMoroso ? '🔴 Morosidad Simulada ⚠️' : '⚪ Simular Morosidad'}
+                                            </button>
                                             <span className="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-bold rounded-md uppercase tracking-wider">
                                                 Conexión SQLite Segura
                                             </span>
@@ -1179,41 +1196,90 @@ export default function Dashboard() {
 
                                     {/* Main Scrollable Workstation */}
                                     <div className="flex-1 overflow-y-auto p-8 space-y-6">
-                                        
+
                                         {/* Widescreen Tab Views */}
                                         {mobileTab === 'home' && (
                                             <div className="space-y-6 animate-scale-up text-xs">
                                                 {/* Header Welcome banner */}
-                                                <div className="p-6 bg-gradient-to-r from-[#72B043] to-[#85c851] rounded-2xl text-white flex justify-between items-center shadow-md">
+                                                <div className={`p-6 rounded-2xl text-white flex justify-between items-center shadow-md transition-all duration-500 ${
+                                                    simulatedMoroso 
+                                                        ? 'bg-gradient-to-r from-rose-600 to-rose-500 shadow-rose-500/10' 
+                                                        : 'bg-gradient-to-r from-[#72B043] to-[#85c851] shadow-emerald-500/10'
+                                                }`}>
                                                     <div className="space-y-1">
-                                                        <h3 className="text-lg font-black font-sans">¡Qué bueno verte, {user.name}!</h3>
-                                                        <p className="text-xs text-emerald-100">Tienes todos tus servicios comunitarios al día. Revisa comunicados destacados aquí.</p>
+                                                        <h3 className="text-lg font-black font-sans">
+                                                            {simulatedMoroso ? `⚠️ ¡ALERTA DE MOROSIDAD - Depto 202!` : `¡Qué bueno verte, ${user.name}!`}
+                                                        </h3>
+                                                        <p className="text-xs text-emerald-100">
+                                                            {simulatedMoroso 
+                                                                ? 'Tu unidad registra 3 meses de gastos comunes pendientes de pago ($495.000). Tus derechos de reserva han sido inhabilitados.' 
+                                                                : 'Tienes todos tus servicios comunitarios al día. Revisa comunicados destacados aquí.'}
+                                                        </p>
                                                     </div>
-                                                    <span className="text-4xl">🏡</span>
+                                                    <span className="text-4xl">{simulatedMoroso ? '⚠️' : '🏡'}</span>
                                                 </div>
 
                                                 <div className="grid md:grid-cols-3 gap-6">
-                                                    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-5 rounded-2xl shadow-sm flex flex-col justify-between h-36">
-                                                        <div>
-                                                            <span className="text-[8px] font-black text-[#72B043] uppercase tracking-widest block">Mi Gasto Común</span>
-                                                            <h4 className="text-2xl font-black text-slate-800 dark:text-white mt-1">
-                                                                {residentExpenses.status === 'completed' ? '$0' : '$165.000'}
-                                                            </h4>
-                                                        </div>
-                                                        <button onClick={() => setMobileTab('pagos')} className="w-full py-2 bg-[#72B043] hover:bg-[#629b37] text-white text-[10px] font-bold rounded-xl shadow-sm transition-all text-center">
-                                                            {residentExpenses.status === 'completed' ? 'Ver Comprobante' : 'Realizar Pago QR'}
-                                                        </button>
-                                                    </div>
+                                                    <div className={`border p-5 rounded-2xl shadow-sm flex flex-col justify-between h-36 transition-all duration-300 ${
+                                                         simulatedMoroso 
+                                                             ? 'bg-rose-50/20 dark:bg-rose-950/10 border-rose-200 dark:border-rose-900/50' 
+                                                             : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'
+                                                     }`}>
+                                                         <div>
+                                                             <span className={`text-[8px] font-black uppercase tracking-widest block ${simulatedMoroso ? 'text-rose-500' : 'text-[#72B043]'}`}>Mi Gasto Común</span>
+                                                             <h4 className="text-2xl font-black text-slate-800 dark:text-white mt-1">
+                                                                 {residentExpenses.status === 'completed' ? '$0' : (simulatedMoroso ? '$495.000' : '$165.000')}
+                                                             </h4>
+                                                             {simulatedMoroso && (
+                                                                 <span className="text-[9px] text-rose-500 font-bold block mt-0.5 animate-pulse">⚠️ 3 meses impagos</span>
+                                                             )}
+                                                         </div>
+                                                         <button 
+                                                             onClick={() => setMobileTab('pagos')} 
+                                                             className={`w-full py-2 text-white text-[10px] font-bold rounded-xl shadow-sm transition-all text-center ${
+                                                                 simulatedMoroso 
+                                                                     ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-550/10' 
+                                                                     : 'bg-[#72B043] hover:bg-[#629b37]'
+                                                             }`}
+                                                         >
+                                                             {residentExpenses.status === 'completed' ? 'Ver Comprobante' : (simulatedMoroso ? 'Pagar Saldo Pendiente' : 'Realizar Pago QR')}
+                                                         </button>
+                                                     </div>
 
-                                                    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-5 rounded-2xl shadow-sm flex flex-col justify-between h-36">
-                                                        <div>
-                                                            <span className="text-[8px] font-black text-[#EC7A08] uppercase tracking-widest block">Mis Reservaciones</span>
-                                                            <h4 className="text-2xl font-black text-slate-800 dark:text-white mt-1">1 Activa</h4>
-                                                        </div>
-                                                        <button onClick={() => setMobileTab('reservas')} className="w-full py-2 bg-[#EC7A08] hover:bg-[#cf6a06] text-white text-[10px] font-bold rounded-xl shadow-sm transition-all text-center">
-                                                            Reservar Nueva Instalación
-                                                        </button>
-                                                    </div>
+                                                     <div className={`border p-5 rounded-2xl shadow-sm flex flex-col justify-between h-36 transition-all duration-300 ${
+                                                         simulatedMoroso 
+                                                             ? 'bg-slate-50/50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-850 opacity-75' 
+                                                             : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'
+                                                     }`}>
+                                                         <div>
+                                                             <span className="text-[8px] font-black text-[#EC7A08] uppercase tracking-widest block">Mis Reservaciones</span>
+                                                             <h4 className="text-2xl font-black text-slate-800 dark:text-white mt-1">
+                                                                 {simulatedMoroso ? 'Inhabilitadas' : '1 Activa'}
+                                                             </h4>
+                                                         </div>
+                                                         <button 
+                                                             onClick={() => {
+                                                                 if (simulatedMoroso) {
+                                                                     setShowMorosidadModal(true);
+                                                                 } else {
+                                                                     setMobileTab('reservas');
+                                                                 }
+                                                             }} 
+                                                             className={`w-full py-2 text-white text-[10px] font-bold rounded-xl shadow-sm transition-all text-center flex items-center justify-center gap-1 ${
+                                                                 simulatedMoroso 
+                                                                     ? 'bg-slate-550 dark:bg-slate-800 text-slate-400 border border-slate-300 dark:border-slate-700 cursor-not-allowed hover:bg-slate-600' 
+                                                                     : 'bg-[#EC7A08] hover:bg-[#cf6a06]'
+                                                             }`}
+                                                         >
+                                                             {simulatedMoroso ? (
+                                                                 <>
+                                                                     <span>🔒 Reservas Bloqueadas</span>
+                                                                 </>
+                                                             ) : (
+                                                                 'Reservar Nueva Instalación'
+                                                             )}
+                                                         </button>
+                                                     </div>
 
                                                     <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-5 rounded-2xl shadow-sm flex flex-col justify-between h-36">
                                                         <div>
@@ -1660,6 +1726,22 @@ export default function Dashboard() {
                                             Mi<span className="text-emerald-100">Vecino</span>
                                         </h3>
                                     </div>                                     <div className="flex items-center gap-2">
+                                         <button 
+                                             onClick={() => {
+                                                 setSimulatedMoroso(!simulatedMoroso);
+                                                 if (!simulatedMoroso) {
+                                                     setMobileTab('home');
+                                                 }
+                                             }}
+                                             className={`px-2 py-0.5 text-[8px] font-bold rounded border transition-all duration-300 ${
+                                                 simulatedMoroso 
+                                                     ? 'bg-rose-600 text-white border-rose-500 animate-pulse' 
+                                                     : 'bg-white/10 border-white/20 text-white hover:bg-white/20'
+                                             }`}
+                                             title="Simular Estado Moroso"
+                                         >
+                                             {simulatedMoroso ? '⚠️ Moroso' : '💸 Simular'}
+                                         </button>
                                          {isDesktop && (
                                              <button
                                                  onClick={() => setForceMobileView(false)}
@@ -1722,17 +1804,23 @@ export default function Dashboard() {
                                         </div>
 
                                         {/* Outstanding Expense Summary card */}
-                                        <div className="bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-850 p-5 rounded-2xl flex justify-between items-center shadow-sm">
+                                        <div className={`border p-5 rounded-2xl flex justify-between items-center shadow-sm transition-colors duration-300 ${
+                                            simulatedMoroso 
+                                                ? 'bg-rose-50/15 dark:bg-rose-950/10 border-rose-200 dark:border-rose-900/40' 
+                                                : 'bg-slate-50 dark:bg-slate-950 border-slate-100 dark:border-slate-850'
+                                        }`}>
                                             <div className="space-y-1">
-                                                <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#72B043]">Gasto Común Mayo</span>
+                                                <span className={`text-[9px] font-extrabold uppercase tracking-widest ${simulatedMoroso ? 'text-rose-500' : 'text-[#72B043]'}`}>
+                                                    {simulatedMoroso ? '⚠️ Deuda Acumulada' : 'Gasto Común Mayo'}
+                                                </span>
                                                 <div className="flex items-baseline gap-1">
                                                     <span className="text-2xl font-black text-slate-900 dark:text-white">
-                                                        {residentExpenses.status === 'completed' ? '$0' : '$165.000'}
+                                                        {residentExpenses.status === 'completed' ? '$0' : (simulatedMoroso ? '$495.000' : '$165.000')}
                                                     </span>
                                                     <span className="text-[10px] text-slate-450">CLP</span>
                                                 </div>
                                                 <p className="text-[10px] text-slate-500">
-                                                    {residentExpenses.status === 'completed' ? '¡Tu cuenta está al día!' : `Vence el ${residentExpenses.dueDate}`}
+                                                    {residentExpenses.status === 'completed' ? '¡Tu cuenta está al día!' : (simulatedMoroso ? '⚠️ Bloqueo por 3 meses impagos' : `Vence el ${residentExpenses.dueDate}`)}
                                                 </p>
                                             </div>
                                             <div>
@@ -1746,9 +1834,13 @@ export default function Dashboard() {
                                                 ) : (
                                                     <button 
                                                         onClick={() => setMobileTab('pagos')}
-                                                        className="px-4 py-2 bg-[#72B043] hover:bg-[#629b37] text-white text-xs font-bold rounded-xl shadow-md shadow-[#72B043]/10 hover:shadow-[#72B043]/20 transition-all flex items-center gap-1"
+                                                        className={`px-4 py-2 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1 ${
+                                                            simulatedMoroso 
+                                                                ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-500/10' 
+                                                                : 'bg-[#72B043] hover:bg-[#629b37] shadow-[#72B043]/10 hover:shadow-[#72B043]/20'
+                                                        }`}
                                                     >
-                                                        Ir a Pagar
+                                                        {simulatedMoroso ? 'Ir a Pagar' : 'Ir a Pagar'}
                                                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                                             <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                                                         </svg>
@@ -1768,19 +1860,34 @@ export default function Dashboard() {
                                                     { tab: 'incidencias', label: 'Incidencias', color: 'bg-rose-50/80 hover:border-rose-500/30 text-rose-650 border-rose-100 dark:bg-slate-950 dark:border-slate-850 dark:text-rose-400', icon: '🛠️', desc: 'Reportar avería' },
                                                     { tab: 'documentos', label: 'Documentos', color: 'bg-cyan-50/80 hover:border-cyan-500/30 text-cyan-650 border-cyan-100 dark:bg-slate-950 dark:border-slate-850 dark:text-cyan-400', icon: '📄', desc: 'Reglamentos y actas' },
                                                     { tab: 'comunidad', label: 'Comunidad', color: 'bg-amber-50/80 hover:border-amber-500/30 text-amber-650 border-amber-100 dark:bg-slate-950 dark:border-slate-850 dark:text-amber-400', icon: '👥', desc: 'Mensajería y Conserje' }
-                                                ].map(item => (
-                                                    <button 
-                                                        key={item.tab}
-                                                        onClick={() => setMobileTab(item.tab)}
-                                                        className={`p-4 border rounded-2xl text-left transition-all hover:scale-[1.02] shadow-sm flex flex-col justify-between aspect-[1.1] sm:aspect-auto ${item.color}`}
-                                                    >
-                                                        <span className="text-2xl">{item.icon}</span>
-                                                        <div className="mt-2 text-left">
-                                                            <span className="text-xs font-bold block">{item.label}</span>
-                                                            <span className="text-[8px] text-slate-450 block mt-0.5 leading-tight">{item.desc}</span>
-                                                        </div>
-                                                    </button>
-                                                ))}
+                                                ].map(item => {
+                                                    const isReservasLocked = simulatedMoroso && item.tab === 'reservas';
+                                                    return (
+                                                        <button 
+                                                            key={item.tab}
+                                                            onClick={() => {
+                                                                if (isReservasLocked) {
+                                                                    setShowMorosidadModal(true);
+                                                                } else {
+                                                                    setMobileTab(item.tab);
+                                                                }
+                                                            }}
+                                                            className={`p-4 border rounded-2xl text-left transition-all hover:scale-[1.02] shadow-sm flex flex-col justify-between aspect-[1.1] sm:aspect-auto ${
+                                                                isReservasLocked 
+                                                                    ? 'bg-rose-50/10 border-rose-200 text-rose-700 opacity-70 dark:bg-slate-950 dark:border-rose-950/40 dark:text-rose-450' 
+                                                                    : item.color
+                                                            }`}
+                                                        >
+                                                            <span className="text-2xl">{isReservasLocked ? '🔒' : item.icon}</span>
+                                                            <div className="mt-2 text-left">
+                                                                <span className="text-xs font-bold block">{isReservasLocked ? 'Reservas 🔒' : item.label}</span>
+                                                                <span className="text-[8px] text-slate-450 block mt-0.5 leading-tight">
+                                                                    {isReservasLocked ? 'Suspendido por deuda' : item.desc}
+                                                                </span>
+                                                            </div>
+                                                        </button>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
 
@@ -2406,6 +2513,77 @@ export default function Dashboard() {
                                 </button>
                             </div>
                         )}
+                    </div>
+                </div>
+            )}
+
+            {/* ======================================================== */}
+            {/* 🔴 SUSPENSIÓN DE BENEFICIOS (MOROSIDAD MODAL)            */}
+            {/* ======================================================== */}
+            {showMorosidadModal && (
+                <div 
+                    className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+                    onClick={() => setShowMorosidadModal(false)}
+                >
+                    <div 
+                        className="relative max-w-sm w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl animate-scale-up font-sans text-slate-850 dark:text-slate-200 text-left"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Close button */}
+                        <button 
+                            onClick={() => setShowMorosidadModal(false)}
+                            className="absolute top-4 right-4 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-950 text-slate-500 transition-all"
+                        >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+
+                        <div className="text-center space-y-4">
+                            <div className="h-14 w-14 bg-rose-500/10 border border-rose-500/30 text-rose-500 rounded-full flex items-center justify-center mx-auto text-2xl animate-bounce">
+                                🔒
+                            </div>
+                            <div className="space-y-1.5">
+                                <span className="text-[9px] font-mono text-rose-500 font-bold uppercase tracking-widest block">Restricción de Servicios Comunes</span>
+                                <h3 className="text-base font-black text-slate-900 dark:text-white">Beneficios Suspendidos</h3>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 px-3">
+                                    De acuerdo con el Reglamento de Copropiedad de <strong>{residentCondo}</strong>, las unidades con <strong>3 o más meses</strong> de gastos comunes impagos pierden el acceso a reservas de áreas comunes y automatizaciones de portón.
+                                </p>
+                            </div>
+                            
+                            <div className="p-4 bg-rose-50/30 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-950 rounded-2xl text-[10px] space-y-1.5 text-left font-mono">
+                                <div className="flex justify-between">
+                                    <span className="text-slate-500">Unidad Afectada:</span>
+                                    <span className="font-bold text-slate-800 dark:text-slate-350">Departamento 202</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-slate-500">Períodos Impagos:</span>
+                                    <span className="font-bold text-slate-800 dark:text-slate-350">Marzo, Abril, Mayo 2026</span>
+                                </div>
+                                <div className="flex justify-between text-rose-600 dark:text-rose-450 font-bold border-t border-rose-100 dark:border-rose-900 pt-1 mt-1">
+                                    <span>Saldo en Mora:</span>
+                                    <span>$495.000 CLP</span>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-2">
+                                <button 
+                                    onClick={() => setShowMorosidadModal(false)}
+                                    className="flex-1 py-2 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-450 text-xs font-bold rounded-xl shadow-sm transition-colors"
+                                >
+                                    Cerrar
+                                </button>
+                                <button 
+                                    onClick={() => {
+                                        setShowMorosidadModal(false);
+                                        setMobileTab('pagos');
+                                    }}
+                                    className="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md shadow-rose-500/10 transition-colors"
+                                >
+                                    Ir a Pagar Deuda
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
