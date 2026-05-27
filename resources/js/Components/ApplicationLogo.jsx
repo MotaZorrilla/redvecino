@@ -51,7 +51,7 @@ export default function ApplicationLogo({ size = 'medium', showSubtext = true, b
                   
                   {isRedVecino ? (
                       <img 
-                          src="/images/Logo Redvecino.png" 
+                          src="/images/logo_redvecino.png" 
                           alt="RedVecino Logo" 
                           className="object-contain w-full h-full rounded-lg p-0.5"
                           onError={(e) => {
@@ -61,7 +61,7 @@ export default function ApplicationLogo({ size = 'medium', showSubtext = true, b
                       />
                   ) : (
                       <img 
-                          src="/images/Mi Vecino.png" 
+                          src="/images/logo_mivecino.png" 
                           alt="MiVecino Logo" 
                           className="object-contain w-full h-full rounded-lg p-0.5"
                           onError={(e) => {
