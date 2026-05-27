@@ -71,6 +71,52 @@ class DashboardController extends Controller
             ->where('is_read', false)
             ->count();
 
+        $allUsers = User::with('roles')->get()->map(function($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'rut' => $user->rut,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'status' => $user->status,
+                'roles' => $user->roles->pluck('name'),
+            ];
+        });
+
+        $allProperties = Property::with(['condominium', 'owners.user', 'residents.user'])->get()->map(function($prop) {
+            return [
+                'id' => $prop->id,
+                'condominium_id' => $prop->condominium_id,
+                'condo_name' => $prop->condominium->name ?? 'Condominio Demo',
+                'type' => $prop->type,
+                'number' => $prop->number,
+                'block' => $prop->block,
+                'floor' => $prop->floor,
+                'area_sqm' => $prop->area_sqm,
+                'status' => $prop->status,
+                'owners' => $prop->owners->map(function($profile) {
+                    return $profile->user->name ?? 'Sin asignar';
+                }),
+                'residents' => $prop->residents->map(function($profile) {
+                    return $profile->user->name ?? 'Sin asignar';
+                }),
+            ];
+        });
+
+        $allMessages = Message::with(['sender', 'receiver'])->latest()->get()->map(function($msg) {
+            return [
+                'id' => $msg->id,
+                'sender_id' => $msg->sender_id,
+                'sender_name' => $msg->sender->name ?? 'Usuario de Baja',
+                'receiver_id' => $msg->receiver_id,
+                'receiver_name' => $msg->receiver->name ?? 'Usuario de Baja',
+                'content' => $msg->content,
+                'is_read' => $msg->is_read,
+                'time' => $msg->created_at ? $msg->created_at->format('H:i') : now()->format('H:i'),
+                'date' => $msg->created_at ? $msg->created_at->format('d/m/Y') : now()->format('d/m/Y'),
+            ];
+        });
+
         return Inertia::render('Dashboard', [
             'stats' => [
                 'users' => [
@@ -105,6 +151,9 @@ class DashboardController extends Controller
             'recentAnnouncements' => $recentAnnouncements,
             'recentPayments' => $recentPayments,
             'upcomingExpenses' => $upcomingExpenses,
+            'allUsers' => $allUsers,
+            'allProperties' => $allProperties,
+            'allMessages' => $allMessages,
         ]);
     }
 }

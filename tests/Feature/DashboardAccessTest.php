@@ -37,6 +37,12 @@ class DashboardAccessTest extends TestCase
         $response = $this->actingAs($user)->get('/dashboard');
 
         $response->assertStatus(200);
+        $response->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+            ->component('Dashboard')
+            ->has('allUsers')
+            ->has('allProperties')
+            ->has('allMessages')
+        );
     }
 
     public function test_residente_can_access_dashboard_with_resident_roles(): void

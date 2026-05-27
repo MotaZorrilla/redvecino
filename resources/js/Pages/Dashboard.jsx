@@ -260,8 +260,10 @@ function RoleTransitionLoader({ user, fadeOut }) {
 }
 
 export default function Dashboard() {
-    const { stats, recentTickets, recentAnnouncements, recentPayments, upcomingExpenses } = usePage().props;
-    const user = usePage().props.auth.user;
+    const { stats, recentTickets, recentAnnouncements, recentPayments, upcomingExpenses, allUsers = [], allProperties = [], allMessages = [] } = usePage().props;
+    const loggedInUser = usePage().props.auth.user;
+    const [impersonatedUser, setImpersonatedUser] = useState(null);
+    const user = impersonatedUser || loggedInUser;
 
     const [showTransition, setShowTransition] = useState(true);
     const [fadeOut, setFadeOut] = useState(false);
@@ -276,7 +278,7 @@ export default function Dashboard() {
     const [simulationMode, setSimulationMode] = useState(false);
     
     // Check if the current render should be Admin view or Resident view
-    const renderAdminView = isActuallyAdmin && !simulationMode;
+    const renderAdminView = isActuallyAdmin && !simulationMode && !impersonatedUser;
 
     // Layout simulation states
     const [forceMobileView, setForceMobileView] = useState(false);
@@ -328,6 +330,39 @@ export default function Dashboard() {
     };
 
     const [devOpsActive, setDevOpsActive] = useState(false);
+    const [tiActiveTab, setTiActiveTab] = useState('devops');
+    const [globalMaintenanceMode, setGlobalMaintenanceMode] = useState(false);
+    const [packages, setPackages] = useState([
+        { id: 'PKG-1002', tracking: 'SX-883921-CL', carrier: 'Starken', resident: 'Residente Demo', property: 'Depto 202', status: 'pending', date: '27/05/2026 14:30' },
+        { id: 'PKG-1001', tracking: 'CH-203921-CL', carrier: 'Chilexpress', resident: 'Propietario Demo', property: 'Depto 101', status: 'completed', date: '26/05/2026 11:15' }
+    ]);
+    const [ocrScanning, setOcrScanning] = useState(false);
+    const [searchUserQuery, setSearchUserQuery] = useState('');
+    const [roleUserFilter, setRoleUserFilter] = useState('all');
+    const [selectedAuditChat, setSelectedAuditChat] = useState('Residente Demo');
+    const [chatAuditReply, setChatAuditReply] = useState('');
+    const [auditedMessagesState, setAuditedMessagesState] = useState([
+        { id: 1, sender_id: 3, sender_name: 'Residente Demo', receiver_id: 5, receiver_name: 'Conserje Principal', content: 'Hola, llegó mi paquete?', time: '18:10', date: '27/05/2026', is_read: true },
+        { id: 2, sender_id: 5, sender_name: 'Conserje Principal', receiver_id: 3, receiver_name: 'Residente Demo', content: 'Sí Carlos, te llegó Starken.', time: '18:12', date: '27/05/2026', is_read: true }
+    ]);
+
+    useEffect(() => {
+        if (allMessages && allMessages.length > 0) {
+            // Group and structure messages from seeder
+            const mapped = allMessages.map(m => ({
+                id: m.id,
+                sender_id: m.sender_id,
+                sender_name: m.sender_name,
+                receiver_id: m.receiver_id,
+                receiver_name: m.receiver_name,
+                content: m.content,
+                time: m.time,
+                date: m.date,
+                is_read: m.is_read
+            }));
+            setAuditedMessagesState(mapped);
+        }
+    }, [allMessages]);
     
     // DevOps Telemetry Stats
     const [cpuLoad, setCpuLoad] = useState(14);
@@ -581,6 +616,46 @@ export default function Dashboard() {
         return <RoleTransitionLoader user={user} fadeOut={fadeOut} />;
     }
 
+    if (globalMaintenanceMode && !isActuallyAdmin) {
+        return (
+            <div className="min-h-screen bg-[#090d16] flex flex-col items-center justify-center font-sans p-6 text-white text-center">
+                <div className="max-w-md w-full space-y-8 bg-slate-900/40 backdrop-blur-xl border border-slate-800/80 p-10 rounded-[32px] shadow-2xl relative overflow-hidden animate-fade-in">
+                    <div className="absolute -top-10 -left-10 w-40 h-40 bg-[#00A896]/10 rounded-full blur-3xl pointer-events-none" />
+                    <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+                    
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="h-20 w-20 bg-amber-500/10 text-amber-500 flex items-center justify-center rounded-[24px] border border-amber-500/20 shadow-lg shadow-amber-950/20 shrink-0 animate-bounce">
+                            <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                            </svg>
+                        </div>
+                        <h1 className="text-2xl font-black tracking-tight text-slate-100">
+                            Mantenimiento Programado
+                        </h1>
+                        <p className="text-sm text-slate-400">
+                            Estamos realizando mejoras en el portal de RedVecino & MiVecino para brindarte un servicio más robusto y veloz. Volveremos muy pronto.
+                        </p>
+                    </div>
+
+                    <div className="border-t border-slate-800/60 pt-6 space-y-4">
+                        <div className="flex items-center gap-3 bg-slate-950/50 p-4 rounded-2xl border border-slate-800/60">
+                            <span className="flex h-2.5 w-2.5 relative shrink-0">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00A896] opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00A896]"></span>
+                            </span>
+                            <span className="text-xs text-slate-400 text-left">
+                                Estado de Infraestructura: <strong className="font-bold text-[#00A896]">Despliegue Activo</strong>
+                            </span>
+                        </div>
+                        <p className="text-[10px] text-slate-500 leading-normal">
+                            Si tienes alguna emergencia, por favor comunícate directamente con la conserjería o administración de tu condominio.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <AuthenticatedLayout
             hideNav={!renderAdminView}
@@ -649,17 +724,42 @@ export default function Dashboard() {
         >
             <Head title={renderAdminView ? 'Dashboard RedVecino' : 'Portal MiVecino'} />
 
+            {/* Impersonation Banner */}
+            {impersonatedUser && (
+                <div className="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 text-white px-4 py-3 shadow-lg flex items-center justify-between font-sans sticky top-0 z-50 border-b border-orange-500 animate-pulse">
+                    <div className="flex items-center gap-3">
+                        <span className="flex h-3 w-3 relative shrink-0">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+                        </span>
+                        <span className="text-sm font-black uppercase tracking-wider">
+                            ⚠️ MODO DE IMPERSONACIÓN ACTIVO
+                        </span>
+                        <span className="hidden md:inline text-xs font-medium border-l border-white/20 pl-3">
+                            Estás viendo el portal como: <strong className="font-bold underline">{impersonatedUser.name}</strong> ({impersonatedUser.email}) &bull; Rol: {impersonatedUser.roles?.[0] || 'Residente'}
+                        </span>
+                    </div>
+                    <button
+                        onClick={() => setImpersonatedUser(null)}
+                        className="px-4 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 text-xs font-bold rounded-lg transition-all"
+                    >
+                        ❌ Salir de Impersonación
+                    </button>
+                </div>
+            )}
+
             {/* ======================================================== */}
             {/* 🔵 ADMIN / TI VIEW - CORPORATE REDVECINO (PRESERVED)     */}
             {/* ======================================================== */}
             {renderAdminView && (
-                <div className="py-8 animate-fade-in font-sans">
-                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
+                <div className="py-8 animate-fade-in font-sans selection:bg-[#00A896]/30">
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
                         
-                        {/* DevOps TI Control Banner */}
-                        <div className="flex flex-col sm:flex-row items-center justify-between p-6 bg-slate-900 border border-slate-800 rounded-2xl gap-4 shadow-sm">
-                            <div className="flex items-center gap-4">
-                                <div className="h-12 w-12 bg-indigo-500/10 text-indigo-400 flex items-center justify-center rounded-xl border border-indigo-500/20 shrink-0">
+                        {/* DevOps TI Top Banner */}
+                        <div className="flex flex-col sm:flex-row items-center justify-between p-6 bg-slate-900 border border-slate-800 rounded-2xl gap-4 shadow-sm relative overflow-hidden">
+                            <div className="absolute -top-10 -left-10 w-40 h-40 bg-[#00A896]/10 rounded-full blur-3xl pointer-events-none" />
+                            <div className="flex items-center gap-4 relative z-10">
+                                <div className="h-12 w-12 bg-[#00A896]/10 text-[#00A896] flex items-center justify-center rounded-xl border border-[#00A896]/20 shrink-0">
                                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 010 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.43l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 010-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0Z" />
@@ -669,184 +769,693 @@ export default function Dashboard() {
                                     <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
                                         Consola de Operaciones DevOps TI
                                         <span className="px-2 py-0.5 bg-[#00A896]/10 border border-[#00A896]/20 text-[#00A896] text-[10px] font-bold rounded">
-                                            Modo Pruebas
+                                            Estación DevOps
                                         </span>
                                     </h3>
-                                    <p className="text-xs text-slate-400 mt-1">Monitorea la salud del servidor, interactúa con logs en vivo y configura los permisos Spatie de los roles.</p>
+                                    <p className="text-xs text-slate-400 mt-1">Navega por los submódulos de telemetría, gestión de ocupación, auditoría de mensajería e integración OCR.</p>
                                 </div>
                             </div>
                             <button
                                 onClick={() => setDevOpsActive(!devOpsActive)}
-                                className={`px-5 py-2.5 rounded-xl font-bold text-xs shadow transition-all ${
+                                className={`px-5 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all z-10 border ${
                                     devOpsActive
-                                        ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-900/10'
-                                        : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-900/10'
+                                        ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border-rose-500/30'
+                                        : 'bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border-indigo-500/30'
                                 }`}
                             >
                                 {devOpsActive ? 'Desactivar Consola TI' : 'Activar Consola TI'}
                             </button>
                         </div>
 
-                        {/* DevOps Console Panel */}
-                        {devOpsActive && (
-                            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-6 shadow-xl animate-fade-in text-slate-350">
-                                <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-                                    <h3 className="text-base font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                                        <span className="h-2 w-2 rounded-full bg-[#00A896] animate-pulse" />
-                                        Centro de Control Técnico & Telemetría
-                                    </h3>
-                                    <span className="text-[10px] font-mono text-slate-500">Root Access &bull; database.sqlite</span>
-                                </div>
+                        {devOpsActive ? (
+                            <div className="flex bg-slate-950/80 backdrop-blur-xl border border-slate-800/80 rounded-[32px] overflow-hidden shadow-2xl h-[700px] transition-colors duration-300 relative text-slate-350">
+                                {/* 1. LEFT SIDEBAR */}
+                                <div className="w-64 bg-slate-900/90 border-r border-slate-800/80 p-6 flex flex-col justify-between shrink-0 font-sans">
+                                    <div className="space-y-6">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-9 w-9 rounded-xl bg-gradient-to-r from-[#0F2557] to-[#00A896] flex items-center justify-center shadow-lg shadow-cyan-950/30">
+                                                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-base font-black text-slate-100 tracking-tight flex items-center gap-1.5">
+                                                    Red<span className="text-[#00A896]">Vecino</span>
+                                                    <span className="flex h-2 w-2 relative">
+                                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00A896] opacity-75"></span>
+                                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00A896]"></span>
+                                                    </span>
+                                                </h3>
+                                                <p className="text-[9px] text-slate-500 uppercase tracking-widest font-mono">DevOps Workstation</p>
+                                            </div>
+                                        </div>
 
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800/80">
-                                        <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider block">Carga de CPU</span>
-                                        <span className="text-xl font-black text-white block mt-1 flex items-center gap-2">
-                                            {cpuLoad}%
-                                            <span className="flex h-2 w-2 relative">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                            </span>
-                                        </span>
-                                        <span className="text-[9px] text-slate-500 block mt-1">Carga balanceada</span>
-                                    </div>
-                                    <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800/80">
-                                        <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider block">Uso de RAM</span>
-                                        <span className="text-xl font-black text-white block mt-1">{ramUsage} MB</span>
-                                        <span className="text-[9px] text-slate-500 block mt-1">De 512 MB de alocación</span>
-                                    </div>
-                                    <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800/80">
-                                        <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider block">Base de Datos</span>
-                                        <span className="text-xl font-black text-white block mt-1 flex items-center gap-2">
-                                            SQLite
-                                            <span className="px-1.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[8px] font-bold rounded">
-                                                ACTIVE
-                                            </span>
-                                        </span>
-                                        <span className="text-[9px] text-slate-500 block mt-1">Normalizado & Integridad OK</span>
-                                    </div>
-                                    <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800/80">
-                                        <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wider block">Latencia de API</span>
-                                        <span className="text-xl font-black text-white block mt-1">{latency} ms</span>
-                                        <span className="text-[9px] text-slate-500 block mt-1">Tiempo medio de respuesta</span>
-                                    </div>
-                                </div>
-
-                                <div className="grid lg:grid-cols-12 gap-6 items-start">
-                                    <div className="lg:col-span-8 space-y-2">
-                                        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Bitácora Transaccional (Live Syslog)</span>
-                                        <div className="bg-black/90 p-4 rounded-2xl border border-slate-800/80 font-mono text-[10px] sm:text-xs text-[#00A896] max-h-[220px] overflow-y-auto space-y-1.5 shadow-inner">
-                                            {terminalLogs.map((log, i) => (
-                                                <div key={i} className="whitespace-pre-wrap break-all leading-relaxed">
-                                                    {log}
-                                                </div>
+                                        <nav className="space-y-1">
+                                            {[
+                                                { id: 'devops', name: '💻 DevOps & Telemetría', desc: 'Monitoreo e Infraestructura' },
+                                                { id: 'users', name: '👥 Usuarios Globales', desc: 'Spatie Roles & Impersonación' },
+                                                { id: 'map', name: '🏢 Mapa de Ocupación', desc: 'Grid de Departamentos' },
+                                                { id: 'chats', name: '💬 Auditoría de Chats', desc: 'Centro de Comunicaciones' },
+                                                { id: 'ocr', name: '📦 Correspondencia OCR', desc: 'Simulador de Paquetes' }
+                                            ].map((tab) => (
+                                                <button
+                                                    key={tab.id}
+                                                    type="button"
+                                                    onClick={() => setTiActiveTab(tab.id)}
+                                                    className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex flex-col gap-0.5 border ${
+                                                        tiActiveTab === tab.id
+                                                            ? 'bg-slate-800 border-slate-700 text-white shadow-md'
+                                                            : 'border-transparent hover:bg-slate-800/40 text-slate-400 hover:text-slate-200'
+                                                    }`}
+                                                >
+                                                    <span className={`text-xs font-bold ${tiActiveTab === tab.id ? 'text-[#00A896]' : 'text-slate-300'}`}>
+                                                        {tab.name}
+                                                    </span>
+                                                    <span className="text-[10px] text-slate-500 font-medium">
+                                                        {tab.desc}
+                                                    </span>
+                                                </button>
                                             ))}
-                                        </div>
+                                        </nav>
                                     </div>
 
-                                    <div className="lg:col-span-4 space-y-3">
-                                        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Herramientas DevOps Rápidas</span>
-                                        <div className="grid grid-cols-2 gap-2 text-center text-[10px] font-mono font-bold">
-                                            <button 
-                                                onClick={() => runDevOpsCmd('cache:clear', '[CACHE] Flushed configurations, route mappings, and view caches.')}
-                                                className="p-3 bg-slate-950 border border-slate-850 rounded-xl text-slate-350 hover:border-indigo-500/40 hover:text-white transition-all shadow"
+                                    {/* Maintenance Control */}
+                                    <div className="bg-slate-950/60 p-4 rounded-2xl border border-slate-800/80 space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Modo Mantenimiento</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setGlobalMaintenanceMode(!globalMaintenanceMode)}
+                                                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                                                    globalMaintenanceMode ? 'bg-orange-600' : 'bg-slate-800'
+                                                }`}
                                             >
-                                                Limpiar Caché
-                                            </button>
-                                            <button 
-                                                onClick={() => runDevOpsCmd('migrate --force', '[DB] Verified database tables integrity. 0 migrations pending.')}
-                                                className="p-3 bg-slate-950 border border-slate-850 rounded-xl text-slate-350 hover:border-indigo-500/40 hover:text-white transition-all shadow"
-                                            >
-                                                Migrar BD
-                                            </button>
-                                            <button 
-                                                onClick={() => runDevOpsCmd('optimize', '[INFRA] Rebuilt optimized configuration cache and route mappings.')}
-                                                className="p-3 bg-slate-950 border border-slate-850 rounded-xl text-slate-350 hover:border-indigo-500/40 hover:text-white transition-all shadow"
-                                            >
-                                                Optimizar
-                                            </button>
-                                            <button 
-                                                onClick={() => runDevOpsCmd('backup:run', '[INFRA] backup_2026-05-25_1635.zip generated successfully (14.2MB).')}
-                                                className="p-3 bg-slate-950 border border-slate-850 rounded-xl text-slate-350 hover:border-indigo-500/40 hover:text-white transition-all shadow"
-                                            >
-                                                Forzar Backup
+                                                <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                                    globalMaintenanceMode ? 'translate-x-4' : 'translate-x-0'
+                                                }`} />
                                             </button>
                                         </div>
-                                        <div className="bg-slate-950 p-4 border border-slate-800 rounded-2xl flex items-center gap-3 text-xs text-slate-400">
-                                            <svg className="w-5 h-5 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                            </svg>
-                                            <span>Interactúa en caliente con las variables del entorno del servidor y optimiza la latencia.</span>
-                                        </div>
+                                        <p className="text-[9px] text-slate-500 leading-normal font-medium text-left">
+                                            Bloquea el acceso a todos los usuarios residentes con un banner de mantenimiento programado.
+                                        </p>
                                     </div>
                                 </div>
 
-                                <div className="space-y-3 pt-4 border-t border-slate-800">
-                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Matriz de Permisos Spatie RBAC</span>
-                                    <div className="overflow-x-auto border border-slate-850 rounded-2xl bg-slate-950">
-                                        <table className="min-w-full divide-y divide-slate-850 font-mono text-[10px] sm:text-xs">
-                                            <thead>
-                                                <tr className="bg-slate-900/60 text-slate-450">
-                                                    <th className="px-4 py-3 text-left font-bold uppercase">Rol del Sistema</th>
-                                                    <th className="px-3 py-3 text-center font-bold uppercase">Ver Perfil</th>
-                                                    <th className="px-3 py-3 text-center font-bold uppercase">Pagar Gasto</th>
-                                                    <th className="px-3 py-3 text-center font-bold uppercase">Resolver Ticket</th>
-                                                    <th className="px-3 py-3 text-center font-bold uppercase">Circulares</th>
-                                                    <th className="px-3 py-3 text-center font-bold uppercase">Soporte TI</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-slate-900 text-slate-350">
-                                                {Object.keys(rbMatrix).map((role) => (
-                                                    <tr key={role} className="hover:bg-slate-900/40 transition-colors">
-                                                        <td className="px-4 py-3 font-bold text-white uppercase">{role}</td>
-                                                        <td className="px-3 py-3 text-center">
-                                                            <input 
-                                                                type="checkbox" checked={rbMatrix[role].read_profile}
-                                                                onChange={() => handleTogglePermission(role, 'read_profile')}
-                                                                className="h-4 w-4 rounded accent-[#00A896] cursor-pointer"
-                                                            />
-                                                        </td>
-                                                        <td className="px-3 py-3 text-center">
-                                                            <input 
-                                                                type="checkbox" checked={rbMatrix[role].pay_expenses}
-                                                                onChange={() => handleTogglePermission(role, 'pay_expenses')}
-                                                                className="h-4 w-4 rounded accent-[#00A896] cursor-pointer"
-                                                            />
-                                                        </td>
-                                                        <td className="px-3 py-3 text-center">
-                                                            <input 
-                                                                type="checkbox" checked={rbMatrix[role].resolve_tickets}
-                                                                onChange={() => handleTogglePermission(role, 'resolve_tickets')}
-                                                                className="h-4 w-4 rounded accent-[#00A896] cursor-pointer"
-                                                            />
-                                                        </td>
-                                                        <td className="px-3 py-3 text-center">
-                                                            <input 
-                                                                type="checkbox" checked={rbMatrix[role].publish_announcements}
-                                                                onChange={() => handleTogglePermission(role, 'publish_announcements')}
-                                                                className="h-4 w-4 rounded accent-[#00A896] cursor-pointer"
-                                                            />
-                                                        </td>
-                                                        <td className="px-3 py-3 text-center">
-                                                            <input 
-                                                                type="checkbox" checked={rbMatrix[role].config_ti}
-                                                                onChange={() => handleTogglePermission(role, 'config_ti')}
-                                                                className="h-4 w-4 rounded accent-[#00A896] cursor-pointer"
-                                                            />
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <span className="text-[10px] text-slate-500 block leading-relaxed">
-                                        * Nota: Marcar o desmarcar permisos genera consultas inmediatas en la base de datos simuladas en caliente en la consola superior.
-                                    </span>
-                        </div>
-                    </div>
-                )}
+                                {/* 2. MAIN WORKSPACE CONTENT */}
+                                <div className="flex-1 p-8 overflow-y-auto bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-200 flex flex-col justify-between h-full">
+                                    <div className="space-y-6">
+                                        {tiActiveTab === 'devops' && (
+                                            <div className="space-y-6 animate-fade-in">
+                                                <div className="flex items-center justify-between">
+                                                    <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                                        💻 DevOps & Telemetría de Servidores
+                                                    </h4>
+                                                    <span className="text-[10px] font-mono text-slate-500 font-bold uppercase tracking-wider text-right">database.sqlite &bull; online</span>
+                                                </div>
 
-                        {/* Stats Cards Grid */}
+                                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                    <div className="bg-slate-900/60 border border-slate-800/80 p-4 rounded-2xl">
+                                                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Carga CPU</span>
+                                                        <span className="text-xl font-black text-white block mt-1 flex items-center gap-2">
+                                                            {cpuLoad}%
+                                                            <span className="flex h-2 w-2 relative">
+                                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00A896] opacity-75"></span>
+                                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00A896]"></span>
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                    <div className="bg-slate-900/60 border border-slate-800/80 p-4 rounded-2xl">
+                                                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">RAM Asignada</span>
+                                                        <span className="text-xl font-black text-white block mt-1">{ramUsage} MB / 1024 MB</span>
+                                                    </div>
+                                                    <div className="bg-slate-900/60 border border-slate-800/80 p-4 rounded-2xl">
+                                                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Latencia Red</span>
+                                                        <span className="text-xl font-black text-[#00A896] block mt-1">{latency}ms</span>
+                                                    </div>
+                                                    <div className="bg-slate-900/60 border border-slate-800/80 p-4 rounded-2xl">
+                                                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Infraestructura</span>
+                                                        <span className="text-xl font-black text-emerald-400 block mt-1 uppercase">Sana</span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Syslog console */}
+                                                <div className="bg-slate-950 border border-slate-850 rounded-2xl p-4 font-mono text-xs overflow-hidden shadow-inner flex flex-col justify-between h-[200px]">
+                                                    <div className="space-y-1.5 overflow-y-auto max-h-[140px] text-[#00A896]/95 text-left">
+                                                        {terminalLogs.map((log, idx) => (
+                                                            <div key={idx} className="flex gap-2">
+                                                                <span className="text-slate-600 shrink-0">[{new Date().toLocaleTimeString('es-CL')}]</span>
+                                                                <span className="break-all">{log}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                    <form onSubmit={(e) => {
+                                                        e.preventDefault();
+                                                        const cmd = e.target.commandInput.value.trim();
+                                                        if (!cmd) return;
+                                                        let reply = `[CMD] '${cmd}' ejecutado sin resultados.`;
+                                                        if (cmd.startsWith('/help')) {
+                                                            reply = '[HELP] Comandos válidos: db:status, cache:clear, system:info, auth:permissions';
+                                                        } else if (cmd === 'db:status') {
+                                                            reply = '[DATABASE] SQLite: OK. ' + allUsers.length + ' usuarios, ' + allProperties.length + ' departamentos cargados.';
+                                                        } else if (cmd === 'cache:clear') {
+                                                            reply = '[CACHE] Éxito: Caché de la aplicación de RedVecino limpiada por completo (Vite & Laravel).';
+                                                        } else if (cmd === 'system:info') {
+                                                            reply = '[SYSTEM] OS: Windows/Host XAMPP. DB: sqlite. PHP: 8.2. Laravel: 10. React: 18.';
+                                                        } else if (cmd === 'auth:permissions') {
+                                                            reply = '[SPATIE] Roles: Admin (All), TI (All), Resident (Limited), Conserje (Audits).';
+                                                        }
+                                                        setTerminalLogs(prev => [...prev, `> ${cmd}`, reply]);
+                                                        e.target.commandInput.value = '';
+                                                    }} className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-900">
+                                                        <span className="text-slate-500 shrink-0 font-bold">$</span>
+                                                        <input
+                                                            type="text"
+                                                            name="commandInput"
+                                                            placeholder="Escribe un comando... (ej: /help, db:status, cache:clear)"
+                                                            className="flex-1 bg-transparent border-none outline-none focus:ring-0 text-slate-100 text-xs p-0 placeholder-slate-600"
+                                                        />
+                                                        <button type="submit" className="px-3 py-1 bg-slate-900 border border-slate-800 rounded text-[10px] text-slate-400 hover:text-white transition-all">Ejecutar</button>
+                                                    </form>
+                                                </div>
+
+                                                {/* RBAC Matrix */}
+                                                <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-5 space-y-4">
+                                                    <h5 className="text-xs font-bold text-slate-300 uppercase tracking-wider">Matriz Interactiva de Permisos Spatie (RBAC)</h5>
+                                                    <div className="overflow-x-auto">
+                                                        <table className="w-full text-left text-[11px] font-mono">
+                                                            <thead>
+                                                                <tr className="border-b border-slate-800 text-slate-500">
+                                                                    <th className="py-2 pr-4 text-left">Permiso / Operación</th>
+                                                                    <th className="py-2 text-center">TI (DevOps)</th>
+                                                                    <th className="py-2 text-center">Administrador</th>
+                                                                    <th className="py-2 text-center">Conserjería</th>
+                                                                    <th className="py-2 text-center">Residente</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody className="divide-y divide-slate-800 text-slate-350">
+                                                                {[
+                                                                    { p: 'ver_finanzas_global', roles: [true, true, false, false] },
+                                                                    { p: 'impersonar_residentes', roles: [true, true, false, false] },
+                                                                    { p: 'auditar_conversaciones', roles: [true, true, true, false] },
+                                                                    { p: 'simular_ocr_conserje', roles: [true, true, true, false] },
+                                                                    { p: 'modificar_sistema_config', roles: [true, false, false, false] }
+                                                                ].map((row, idx) => (
+                                                                    <tr key={idx} className="hover:bg-slate-900/50">
+                                                                        <td className="py-2.5 font-bold text-slate-200 text-left">{row.p}</td>
+                                                                        {row.roles.map((hasPerm, rIdx) => (
+                                                                            <td key={rIdx} className="py-2.5 text-center">
+                                                                                <span className={`inline-block h-3.5 w-3.5 rounded-full border ${
+                                                                                    hasPerm
+                                                                                        ? 'bg-[#00A896]/20 border-[#00A896] text-[#00A896]'
+                                                                                        : 'bg-rose-500/10 border-rose-500/20 text-rose-500'
+                                                                                } flex items-center justify-center mx-auto text-[9px] font-black`}>
+                                                                                    {hasPerm ? '✓' : '✗'}
+                                                                                </span>
+                                                                            </td>
+                                                                        ))}
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {tiActiveTab === 'users' && (
+                                            <div className="space-y-6 animate-fade-in">
+                                                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                                                    <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                                        👥 Registro Global de Usuarios & Impersonación
+                                                    </h4>
+                                                    <div className="flex items-center gap-3 w-full md:w-auto">
+                                                        <input
+                                                            type="text"
+                                                            value={searchUserQuery}
+                                                            onChange={(e) => setSearchUserQuery(e.target.value)}
+                                                            placeholder="Buscar por Nombre, RUT..."
+                                                            className="px-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#00A896] w-full md:w-64"
+                                                        />
+                                                        <select
+                                                            value={roleUserFilter}
+                                                            onChange={(e) => setRoleUserFilter(e.target.value)}
+                                                            className="px-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-[#00A896]"
+                                                        >
+                                                            <option value="all">Todos los Roles</option>
+                                                            <option value="ti">TI</option>
+                                                            <option value="admin">Administrador</option>
+                                                            <option value="resident">Residente</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl overflow-hidden shadow-inner">
+                                                    <div className="overflow-x-auto max-h-[380px]">
+                                                        <table className="w-full text-left text-xs">
+                                                            <thead>
+                                                                <tr className="bg-slate-950 text-slate-500 border-b border-slate-850">
+                                                                    <th className="p-4 font-black text-left">Nombre completo</th>
+                                                                    <th className="p-4 font-black text-left">RUT / Identificación</th>
+                                                                    <th className="p-4 font-black text-left">Correo Electrónico</th>
+                                                                    <th className="p-4 font-black text-left">Rol Principal</th>
+                                                                    <th className="p-4 font-black text-left">Estado</th>
+                                                                    <th className="p-4 font-black text-right">Acciones</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody className="divide-y divide-slate-850 text-slate-350">
+                                                                {allUsers
+                                                                    .filter(u => {
+                                                                        const matchesSearch = u.name.toLowerCase().includes(searchUserQuery.toLowerCase()) || u.rut.includes(searchUserQuery);
+                                                                        if (roleUserFilter === 'all') return matchesSearch;
+                                                                        return matchesSearch && u.roles.some(r => r.toLowerCase() === roleUserFilter);
+                                                                    })
+                                                                    .map((u) => (
+                                                                        <tr key={u.id} className="hover:bg-slate-900/60">
+                                                                            <td className="p-4 font-bold text-slate-100 text-left">{u.name}</td>
+                                                                            <td className="p-4 font-mono text-left">{u.rut}</td>
+                                                                            <td className="p-4 text-left">{u.email}</td>
+                                                                            <td className="p-4 text-left">
+                                                                                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                                                                                    u.roles.includes('ti')
+                                                                                        ? 'bg-rose-500/10 border border-rose-500/20 text-rose-400'
+                                                                                        : u.roles.includes('admin') || u.roles.includes('administrador')
+                                                                                        ? 'bg-indigo-500/10 border border-indigo-500/20 text-indigo-400'
+                                                                                        : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
+                                                                                }`}>
+                                                                                    {u.roles[0] || 'Residente'}
+                                                                                </span>
+                                                                            </td>
+                                                                            <td className="p-4 text-left">
+                                                                                <span className="inline-flex items-center gap-1">
+                                                                                    <span className={`h-1.5 w-1.5 rounded-full ${u.status === 'active' ? 'bg-emerald-500' : 'bg-slate-500'}`} />
+                                                                                    <span className="capitalize">{u.status}</span>
+                                                                                </span>
+                                                                            </td>
+                                                                            <td className="p-4 text-right">
+                                                                                <button
+                                                                                    type="button"
+                                                                                    onClick={() => {
+                                                                                        setImpersonatedUser(u);
+                                                                                        setTerminalLogs(prev => [...prev, `[IMPERSONATION] Iniciando sesión como usuario: ${u.name}`]);
+                                                                                    }}
+                                                                                    className="px-3 py-1.5 bg-[#00A896]/10 hover:bg-[#00A896]/20 border border-[#00A896]/30 text-[#00A896] text-[10px] font-bold rounded-lg transition-all flex items-center gap-1.5 ml-auto"
+                                                                                >
+                                                                                    <span>💻 Impersonar</span>
+                                                                                </button>
+                                                                            </td>
+                                                                        </tr>
+                                                                    ))
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {tiActiveTab === 'map' && (
+                                            <div className="space-y-6 animate-fade-in">
+                                                <div className="flex items-center justify-between">
+                                                    <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                                        🏢 Grid 2D de Propiedades y Mapa de Morosidad
+                                                    </h4>
+                                                    <div className="flex gap-4 text-[10px] font-bold">
+                                                        <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-500" /> Al día</span>
+                                                        <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-rose-500 animate-pulse" /> Moroso &gt;= 3 meses</span>
+                                                        <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-amber-500" /> Mantenimiento</span>
+                                                        <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-slate-500" /> Vacante</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                                    <div className="lg:col-span-2 bg-slate-900/40 border border-slate-800/80 p-6 rounded-[24px] space-y-4 shadow-inner">
+                                                        <h5 className="text-xs font-bold text-slate-400 text-left">Torre A - MiVecino Residences</h5>
+                                                        
+                                                        <div className="space-y-3">
+                                                            {[5, 4, 3, 2, 1].map((floor) => (
+                                                                <div key={floor} className="flex items-center gap-4">
+                                                                    <span className="text-[10px] font-bold text-slate-500 w-12 font-mono uppercase shrink-0">Piso {floor}</span>
+                                                                    <div className="grid grid-cols-4 gap-3 flex-1">
+                                                                        {[1, 2, 3, 4].map((num) => {
+                                                                            const condoNum = `Depto ${floor}0${num}`;
+                                                                            const property = allProperties.find(p => p.number === `${floor}0${num}`) || {
+                                                                                id: floor * 100 + num,
+                                                                                number: `${floor}0${num}`,
+                                                                                status: floor === 2 && num === 1 ? 'delinquent' : floor === 3 && num === 3 ? 'vacant' : floor === 4 && num === 2 ? 'maintenance' : 'occupied',
+                                                                                owners: ['Juan Pérez'],
+                                                                                residents: ['Carlos Resident']
+                                                                            };
+                                                                            
+                                                                            const status = property.status;
+                                                                            let color = 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/25';
+                                                                            if (status === 'delinquent' || condoNum === 'Depto 201') {
+                                                                                color = 'bg-rose-500/10 border-rose-500/40 text-rose-400 hover:bg-rose-500/25 shadow-lg shadow-rose-950/15 animate-pulse';
+                                                                            } else if (status === 'maintenance' || condoNum === 'Depto 202' || condoNum === 'Depto 402') {
+                                                                                color = 'bg-amber-500/10 border-amber-500/40 text-amber-400 hover:bg-amber-500/25';
+                                                                            } else if (status === 'vacant' || condoNum === 'Depto 102' || condoNum === 'Depto 303') {
+                                                                                color = 'bg-slate-500/10 border-slate-500/30 text-slate-400 hover:bg-slate-500/25';
+                                                                            }
+
+                                                                            return (
+                                                                                <button
+                                                                                    key={num}
+                                                                                    type="button"
+                                                                                    onClick={() => {
+                                                                                        setSelectedAuditChat(condoNum);
+                                                                                    }}
+                                                                                    className={`py-3.5 border rounded-xl text-center font-bold text-xs transition-all ${color}`}
+                                                                                >
+                                                                                    {condoNum}
+                                                                                </button>
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Property Detail overlay */}
+                                                    <div className="bg-slate-900/60 border border-slate-800/80 p-6 rounded-[24px] flex flex-col justify-between">
+                                                        <div className="space-y-4">
+                                                            <div className="border-b border-slate-800 pb-3">
+                                                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest font-mono">Ficha Técnica de Residencia</span>
+                                                                <h4 className="text-base font-black text-slate-100 mt-1 text-left">{selectedAuditChat || 'Depto 202'}</h4>
+                                                            </div>
+
+                                                            <div className="space-y-3 text-xs">
+                                                                <div className="flex justify-between">
+                                                                    <span className="text-slate-500">Copropietario:</span>
+                                                                    <span className="font-bold text-slate-300">
+                                                                        {selectedAuditChat === 'Depto 201' ? 'Sofía Valenzuela' : selectedAuditChat === 'Depto 102' || selectedAuditChat === 'Depto 303' ? 'Sin asignar' : 'Carlos Residente'}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="flex justify-between">
+                                                                    <span className="text-slate-500">Residente Activo:</span>
+                                                                    <span className="font-bold text-slate-300">
+                                                                        {selectedAuditChat === 'Depto 201' ? 'Sofía Valenzuela' : selectedAuditChat === 'Depto 102' || selectedAuditChat === 'Depto 303' ? 'Vacante' : 'Carlos Residente'}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="flex justify-between">
+                                                                    <span className="text-slate-500">Estado de Cuenta:</span>
+                                                                    <span className={`font-bold ${selectedAuditChat === 'Depto 201' ? 'text-rose-400' : 'text-emerald-400'}`}>
+                                                                        {selectedAuditChat === 'Depto 201' ? 'Moroso (3 Meses)' : 'Al Día'}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="flex justify-between">
+                                                                    <span className="text-slate-500">Saldo Pendiente:</span>
+                                                                    <span className={`font-bold ${selectedAuditChat === 'Depto 201' ? 'text-rose-400' : 'text-slate-300'}`}>
+                                                                        {selectedAuditChat === 'Depto 201' ? '$231,450' : '$0'}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {selectedAuditChat !== 'Depto 102' && selectedAuditChat !== 'Depto 303' && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    const matched = allUsers.find(u => u.name.includes('Carlos') || u.name.includes('Residente')) || allUsers[0];
+                                                                    setImpersonatedUser(matched);
+                                                                    setTerminalLogs(prev => [...prev, `[IMPERSONATION] Impersonando desde mapa 2D: ${matched.name}`]);
+                                                                }}
+                                                                className="w-full mt-6 py-2.5 bg-[#00A896]/10 hover:bg-[#00A896]/20 border border-[#00A896]/30 text-[#00A896] font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2"
+                                                            >
+                                                                <span>💻 Impersonar Residente</span>
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {tiActiveTab === 'chats' && (
+                                            <div className="space-y-6 animate-fade-in">
+                                                <div className="flex items-center justify-between">
+                                                    <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                                        💬 Real-time Shared Chat Inbox Hub (Auditoría)
+                                                    </h4>
+                                                    <span className="text-[10px] bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded font-mono">Modo: Supervisor Activo</span>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[420px] bg-slate-900/40 border border-slate-800/80 rounded-[24px] overflow-hidden animate-fade-in">
+                                                    {/* Inbox list */}
+                                                    <div className="border-r border-slate-850 divide-y divide-slate-850 overflow-y-auto">
+                                                        {[
+                                                            { name: 'Residente Demo', lastMsg: 'Hola, llegó mi paquete?', depto: 'Depto 202', count: 1 },
+                                                            { name: 'Propietario Demo', lastMsg: 'Pago conciliado correctamente', depto: 'Depto 101', count: 0 }
+                                                        ].map((ch) => (
+                                                            <button
+                                                                key={ch.name}
+                                                                type="button"
+                                                                onClick={() => setSelectedAuditChat(ch.name)}
+                                                                className={`w-full p-4 text-left flex items-start justify-between gap-3 hover:bg-slate-900/50 transition-all ${
+                                                                    selectedAuditChat === ch.name ? 'bg-slate-900/80' : ''
+                                                                }`}
+                                                            >
+                                                                <div>
+                                                                    <h5 className="text-xs font-bold text-slate-200">{ch.name}</h5>
+                                                                    <p className="text-[10px] text-slate-500 mt-1 truncate max-w-[140px]">{ch.lastMsg}</p>
+                                                                </div>
+                                                                <div className="text-right shrink-0">
+                                                                    <span className="text-[9px] font-mono text-slate-600 block">{ch.depto}</span>
+                                                                    {ch.count > 0 && <span className="inline-block px-1.5 py-0.5 bg-[#00A896] text-white text-[8px] font-black rounded-full mt-1.5">NUEVO</span>}
+                                                                </div>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+
+                                                    {/* Conversation log */}
+                                                    <div className="lg:col-span-2 flex flex-col justify-between h-full bg-slate-950/40 p-4">
+                                                        <div className="space-y-4 overflow-y-auto max-h-[300px] flex-1 pb-4 text-left">
+                                                            {auditedMessagesState
+                                                                .filter(m => m.sender_name === selectedAuditChat || m.receiver_name === selectedAuditChat || (selectedAuditChat === 'Residente Demo' && m.sender_name === 'Residente Demo') || (selectedAuditChat === 'Propietario Demo' && m.sender_name === 'Propietario Demo'))
+                                                                .map((m) => {
+                                                                    const isMe = m.sender_name === 'Conserje Principal' || m.sender_name === 'Soporte TI' || m.sender_name === 'Administración';
+                                                                    return (
+                                                                        <div key={m.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                                                                            <div className={`p-3 rounded-2xl max-w-[70%] text-xs ${
+                                                                                isMe
+                                                                                    ? 'bg-[#00A896]/15 border border-[#00A896]/30 text-white rounded-br-none'
+                                                                                    : 'bg-slate-900/80 border border-slate-800 text-slate-200 rounded-bl-none'
+                                                                            }`}>
+                                                                                <p className="font-bold text-[9px] text-slate-400 mb-1">{m.sender_name}</p>
+                                                                                <p>{m.content}</p>
+                                                                            </div>
+                                                                            <span className="text-[9px] text-slate-500 mt-1 px-1">{m.time}</span>
+                                                                        </div>
+                                                                    );
+                                                                })
+                                                            }
+                                                        </div>
+
+                                                        {/* Send direct message */}
+                                                        <form onSubmit={(e) => {
+                                                            e.preventDefault();
+                                                            if (!chatAuditReply.trim()) return;
+                                                            const newMsg = {
+                                                                id: auditedMessagesState.length + 1,
+                                                                sender_id: 1,
+                                                                sender_name: 'Soporte TI',
+                                                                receiver_id: 3,
+                                                                receiver_name: selectedAuditChat,
+                                                                content: chatAuditReply,
+                                                                time: new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' }),
+                                                                date: new Date().toLocaleDateString('es-CL'),
+                                                                is_read: true
+                                                            };
+                                                            setAuditedMessagesState(prev => [...prev, newMsg]);
+                                                            setChatAuditReply('');
+                                                        }} className="flex gap-2 pt-3 border-t border-slate-900">
+                                                            <input
+                                                                type="text"
+                                                                value={chatAuditReply}
+                                                                onChange={(e) => setChatAuditReply(e.target.value)}
+                                                                placeholder={`Responder oficialmente a ${selectedAuditChat}...`}
+                                                                className="flex-1 bg-slate-900 border border-slate-800 rounded-xl text-xs px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-[#00A896]"
+                                                            />
+                                                            <button
+                                                                type="submit"
+                                                                className="px-4 py-2 bg-[#00A896] hover:bg-[#00A896]/85 text-white font-bold text-xs rounded-xl shadow transition-all shrink-0"
+                                                            >
+                                                                Enviar
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {tiActiveTab === 'ocr' && (
+                                            <div className="space-y-6 animate-fade-in">
+                                                <div className="flex items-center justify-between">
+                                                    <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                                        📦 Conserjería OCR & Recepción Simulator
+                                                    </h4>
+                                                    <span className="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded font-mono">Simulador de Integración</span>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                                    {/* OCR Scanning simulator */}
+                                                    <div className="bg-slate-900/40 border border-slate-800/80 p-6 rounded-[24px] space-y-4">
+                                                        <h5 className="text-xs font-bold text-slate-300 uppercase tracking-wider">Cámara de Escáner OCR</h5>
+                                                        
+                                                        {/* Laser simulator */}
+                                                        <div className="bg-slate-950 aspect-[4/3] rounded-2xl border border-slate-800 flex items-center justify-center relative overflow-hidden">
+                                                            {ocrScanning ? (
+                                                                <div className="space-y-2 text-center z-10">
+                                                                    <div className="animate-spin h-6 w-6 border-2 border-t-transparent border-[#00A896] rounded-full mx-auto" />
+                                                                    <span className="text-[9px] font-mono text-[#00A896] block animate-pulse">Lector OCR: Analizando etiqueta...</span>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="text-center z-10 space-y-2">
+                                                                    <svg className="w-8 h-8 text-slate-650 mx-auto" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+                                                                    </svg>
+                                                                    <span className="text-[9px] font-mono text-slate-500 block">Posiciona el paquete frente al lector</span>
+                                                                </div>
+                                                            )}
+
+                                                            {/* Custom CSS Laser Line */}
+                                                            {ocrScanning && (
+                                                                <div 
+                                                                    className="absolute left-0 w-full h-[2px] bg-rose-500/80 shadow-[0_0_8px_#f43f5e] z-20"
+                                                                    style={{
+                                                                        animation: 'scanLaser 1.5s infinite ease-in-out',
+                                                                        top: '0%'
+                                                                    }}
+                                                                />
+                                                            )}
+                                                            
+                                                            <style>{`
+                                                                @keyframes scanLaser {
+                                                                    0% { top: 10%; }
+                                                                    50% { top: 90%; }
+                                                                    100% { top: 10%; }
+                                                                }
+                                                            `}</style>
+                                                        </div>
+
+                                                        <div className="space-y-3">
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1 text-left">Destinatario / Residencia</label>
+                                                                <select id="ocrDeptSelect" className="w-full bg-slate-900 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]">
+                                                                    <option value="Depto 202">Residente Demo (Depto 202)</option>
+                                                                    <option value="Depto 101">Propietario Demo (Depto 101)</option>
+                                                                </select>
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1 text-left">Empresa de Envío</label>
+                                                                <select id="ocrCarrierSelect" className="w-full bg-slate-900 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]">
+                                                                    <option value="Starken">Starken (Turbus)</option>
+                                                                    <option value="Chilexpress">Chilexpress</option>
+                                                                    <option value="CorreosChile">Correos de Chile</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <button
+                                                                type="button"
+                                                                disabled={ocrScanning}
+                                                                onClick={() => {
+                                                                    setOcrScanning(true);
+                                                                    setTerminalLogs(prev => [...prev, '[OCR] Iniciando proceso de lectura óptica en etiqueta...']);
+                                                                    setTimeout(() => {
+                                                                        setOcrScanning(false);
+                                                                        const dept = document.getElementById('ocrDeptSelect').value;
+                                                                        const carrier = document.getElementById('ocrCarrierSelect').value;
+                                                                        
+                                                                        const randTracking = carrier.slice(0,2).toUpperCase() + "-" + Math.floor(100000 + Math.random() * 900000) + "-CL";
+                                                                        const newPkg = {
+                                                                            id: "PKG-" + Date.now().toString().slice(-4),
+                                                                            tracking: randTracking,
+                                                                            carrier: carrier,
+                                                                            resident: dept === 'Depto 202' ? 'Residente Demo' : 'Propietario Demo',
+                                                                            property: dept,
+                                                                            status: 'pending',
+                                                                            date: new Date().toLocaleString('es-CL', { hour12: false })
+                                                                        };
+
+                                                                        setPackages(prev => [newPkg, ...prev]);
+                                                                        setTerminalLogs(prev => [...prev, "[OCR] ¡Éxito! Encomienda " + randTracking + " asociada automáticamente a " + dept]);
+                                                                        alert("OCR exitoso: Se registró el paquete " + randTracking + " de " + carrier + " para " + dept + ".");
+                                                                    }, 1500);
+                                                                }}
+                                                                className="w-full py-2.5 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
+                                                            >
+                                                                <span>📷 Simular Escaneo OCR</span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Package List */}
+                                                    <div className="lg:col-span-2 bg-slate-900/40 border border-slate-800/80 p-6 rounded-[24px] space-y-4">
+                                                        <h5 className="text-xs font-bold text-slate-300 uppercase tracking-wider">Historial de Custodia e Inventario</h5>
+                                                        
+                                                        <div className="overflow-x-auto">
+                                                            <table className="w-full text-left text-xs">
+                                                                <thead>
+                                                                    <tr className="bg-slate-950 text-slate-500 border-b border-slate-850">
+                                                                        <th className="p-3 font-black text-left">ID</th>
+                                                                        <th className="p-3 font-black text-left">Tracking</th>
+                                                                        <th className="p-3 font-black text-left">Carrier</th>
+                                                                        <th className="p-3 font-black text-left">Destinatario</th>
+                                                                        <th className="p-3 font-black text-left">Depto</th>
+                                                                        <th className="p-3 font-black text-center">Estado</th>
+                                                                        <th className="p-3 font-black text-right">Acciones</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody className="divide-y divide-slate-850 text-slate-350">
+                                                                    {packages.map((pkg) => (
+                                                                        <tr key={pkg.id} className="hover:bg-slate-900/50">
+                                                                            <td className="p-3 font-bold text-slate-200 text-left">{pkg.id}</td>
+                                                                            <td className="p-3 font-mono text-[#00A896] text-left">{pkg.tracking}</td>
+                                                                            <td className="p-3 text-left">{pkg.carrier}</td>
+                                                                            <td className="p-3 font-bold text-slate-100 text-left">{pkg.resident}</td>
+                                                                            <td className="p-3 font-mono text-left">{pkg.property}</td>
+                                                                            <td className="p-3 text-center">
+                                                                                <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
+                                                                                    pkg.status === 'pending'
+                                                                                        ? 'bg-amber-500/10 border border-amber-500/20 text-amber-400'
+                                                                                        : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
+                                                                                }`}>
+                                                                                    {pkg.status === 'pending' ? 'En Custodia' : 'Entregado'}
+                                                                                </span>
+                                                                            </td>
+                                                                            <td className="p-3 text-right">
+                                                                                {pkg.status === 'pending' && (
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        onClick={() => {
+                                                                                            setPackages(prev => prev.map(p => p.id === pkg.id ? { ...p, status: 'completed' } : p));
+                                                                                            setTerminalLogs(prev => [...prev, "[CUSTODIA] Entregado paquete " + pkg.tracking + " al residente " + pkg.resident]);
+                                                                                        }}
+                                                                                        className="px-2 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold text-[10px] rounded hover:bg-emerald-500/20 transition-all"
+                                                                                    >
+                                                                                        Entregar
+                                                                                    </button>
+                                                                                )}
+                                                                            </td>
+                                                                        </tr>
+                                                                    ))}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="flex items-center justify-between border-t border-slate-900 pt-4 mt-6 text-[10px] text-slate-500 font-mono">
+                                        <span>ESTACIÓN TRABAJO: ACTIVA</span>
+                                        <span>RedVecino & MiVecino Condominio-PRO &bull; 2026</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="space-y-8 animate-fade-in">
+{/* Stats Cards Grid */}
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                             <StatCard
                                 title="Usuarios"
@@ -1070,6 +1679,8 @@ export default function Dashboard() {
                                 <p className="text-sm text-gray-400 dark:text-slate-500 text-center py-4">No hay anuncios publicados</p>
                             )}
                         </SectionCard>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
