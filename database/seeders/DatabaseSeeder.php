@@ -18,6 +18,8 @@ use App\Models\Fine;
 use App\Models\TicketCategory;
 use App\Models\Ticket;
 use App\Models\Announcement;
+use App\Models\CondoIncome;
+use App\Models\CondoExpense;
 use App\Models\Message;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -560,6 +562,60 @@ class DatabaseSeeder extends Seeder
                 'status' => 'pending',
             ]);
         }
+
+        // ─── SEED CONDO INCOMES FROM PAYMENTS & FINES ──────────────────────
+        foreach (Payment::where('status', 'approved')->get() as $payment) {
+            $property = $payment->property;
+            if (!$property) continue;
+
+            CondoIncome::create([
+                'condominium_id' => $property->condominium_id,
+                'category' => 'gastos_comunes',
+                'subcategory' => 'Pago Gasto Común - ' . ($payment->commonExpense->period ?? ''),
+                'amount' => $payment->amount,
+                'date' => $payment->payment_date ?? $payment->created_at->format('Y-m-d'),
+                'description' => 'Pago registrado por ' . ($payment->user->name ?? 'Usuario') . ' - Ref: ' . ($payment->reference ?? 'N/A'),
+                'property_id' => $property->id,
+                'user_id' => $payment->user_id,
+            ]);
+        }
+
+        foreach (Fine::where('status', 'paid')->get() as $fine) {
+            $property = $fine->property;
+            if (!$property) continue;
+
+            CondoIncome::create([
+                'condominium_id' => $property->condominium_id,
+                'category' => 'multas',
+                'subcategory' => 'Multa por infracción',
+                'amount' => $fine->amount,
+                'date' => $fine->issued_date,
+                'description' => 'Multa: ' . $fine->reason,
+                'property_id' => $fine->property_id,
+                'user_id' => $fine->user_id,
+            ]);
+        }
+
+        $this->command->info('Condo incomes seeded from payments and fines.');
+
+        // ─── SEED CONDO EXPENSES FROM EXPENSE ITEMS ─────────────────────
+        foreach (ExpenseItem::all() as $item) {
+            $commonExpense = $item->commonExpense;
+            if (!$commonExpense) continue;
+
+            CondoExpense::create([
+                'condominium_id' => $commonExpense->condominium_id,
+                'category' => 'administracion',
+                'subcategory' => $item->category,
+                'amount' => $item->amount,
+                'date' => $commonExpense->due_date,
+                'description' => $item->description ?? $item->category,
+                'common_expense_id' => $commonExpense->id,
+                'expense_item_id' => $item->id,
+            ]);
+        }
+
+        $this->command->info('Condo expenses seeded from expense items.');
 
         $this->command->info('Infractions and Fines seeded.');
 

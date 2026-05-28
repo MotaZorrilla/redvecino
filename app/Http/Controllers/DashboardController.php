@@ -28,6 +28,7 @@ class DashboardController extends Controller
         $vacantProperties = Property::where('status', 'vacant')->count();
 
         $totalCondominiums = Condominium::count();
+        $allCondominiums = Condominium::with('properties')->get();
 
         $totalExpenses = CommonExpense::sum('amount');
         $pendingExpenses = CommonExpense::where('status', 'pending')->count();
@@ -154,6 +155,7 @@ class DashboardController extends Controller
             'allUsers' => $allUsers,
             'allProperties' => $allProperties,
             'allMessages' => $allMessages,
+            'allCondominiums' => $allCondominiums,
         ]);
     }
 }

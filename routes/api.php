@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CondoFinanceController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FineController;
 use App\Http\Controllers\MessageController;
@@ -46,6 +47,22 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/expenses', [ExpenseController::class, 'store']);
         Route::post('/fines', [FineController::class, 'store']);
         Route::put('/payments/{id}/reconcile', [PaymentController::class, 'reconcile']);
+    });
+
+    // Condo Finances (Ingresos y Egresos)
+    Route::middleware('can:view financial reports')->group(function () {
+        Route::get('/condo-finances/summary', [CondoFinanceController::class, 'summary']);
+        Route::get('/condo-finances/incomes', [CondoFinanceController::class, 'indexIncomes']);
+        Route::get('/condo-finances/expenses', [CondoFinanceController::class, 'indexExpenses']);
+    });
+
+    Route::middleware('can:approve expenses')->group(function () {
+        Route::post('/condo-finances/incomes', [CondoFinanceController::class, 'storeIncome']);
+        Route::put('/condo-finances/incomes/{id}', [CondoFinanceController::class, 'updateIncome']);
+        Route::delete('/condo-finances/incomes/{id}', [CondoFinanceController::class, 'destroyIncome']);
+        Route::post('/condo-finances/expenses', [CondoFinanceController::class, 'storeExpense']);
+        Route::put('/condo-finances/expenses/{id}', [CondoFinanceController::class, 'updateExpense']);
+        Route::delete('/condo-finances/expenses/{id}', [CondoFinanceController::class, 'destroyExpense']);
     });
 
     Route::middleware('can:pay common expenses')->group(function () {

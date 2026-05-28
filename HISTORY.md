@@ -104,6 +104,19 @@ Este checklist interactivo registra el avance global y detalla los nuevos requer
 - [ ] **Gobernanza y Validez de Votaciones:** Implementar la lógica matemática de quórum por cabezas y por coeficiente para asambleas virtuales con sellado de tiempo.
 - [ ] **Mobile Attestation:** Diseñar la estructura de verificación de hardware para blindar las APIs contra scripts y emuladores.
 
+### 2.6 Nuevos Hitos de Desarrollo - Reunión 27/05/2026 & Guías de IA
+- [ ] **Branding Unificado:** Modificar logos en el frontend (`ApplicationLogo.jsx`) para cambiar el punto de la letra "i" en RedVecino a color Verde Césped, sincronizándolo con MiVecino.
+- [ ] **Corrección del Control de Roles (Bug Rodrigo #1):** Auditar y parchear el middleware de Laravel y políticas para impedir accesos cruzados ilegales de usuarios "cliente" a recursos administrativos globales.
+- [ ] **Corrección de Reportes PDF Duplicados (Bug Rodrigo #2):** Revisar las plantillas Blade y los disparos de eventos JS para subsanar los resultados duplicados en reportes.
+- [ ] **Consola Web de Emergencia para TI:** Implementar la interfaz de consola interactiva en el panel TI con comandos seguros (`database status`, `cache:clear`, `permissions:reset`).
+- [ ] **Mapa de Ocupación con Colores de Morosidad:** Desarrollar en el portal del Administrador la grilla de ocupación por pisos y departamentos con colores (Verde, Rojo, Amarillo) y selector de condominio.
+- [ ] **Sistema de Tres Canales para Tickets:** Segregar la lógica del módulo de tickets en soporte técnico de TI, notificaciones financieras de gastos y tickets vecinales correctivos.
+- [ ] **Correspondencia y Custodia:** Crear la base de datos de paquetes, firma digital del conserje/residente, y la simulación del escaneo OCR de etiquetas en el front-desk.
+- [ ] **Gastos Comunes e Incidencias por Voz (IA Adaptada):** Desarrollar la integración de voz a texto para la creación de tickets rápidos de residentes y cargos rápidos de administradores.
+- [ ] **Actas de Asamblea con Validez Legal y Quórum IA (IA Adaptada):** Implementar la transcripción y generación de resúmenes, actas y cálculo de quórum doble ponderado en PDF.
+- [ ] **Insights de Morosidad Vecinal Predictiva (IA Adaptada):** Crear la ficha de análisis de comportamiento del copropietario y recomendaciones proactivas.
+- [ ] **Vídeo-Comunicados en MiVecino con fal.ai (IA Adaptada):** Crear el generador de avatares en vídeo para los boletines semanales de la administración.
+
 ---
 
 ## 🚀 3. Registro de Cambios (Walkthrough) y Resultados de Pruebas
@@ -166,9 +179,31 @@ Failures:    0 failed
 *   **Lightbox de Identidad Visual:** Se agregaron modales interactivos en la Landing Page que permiten ampliar con un zoom nítido los 5 recursos de marketing de la suite (Roadmap, Embudo de Ventas, etc.), agregando descripciones técnicas contextuales.
 *   **Logotipos Reales Integrados:** Se eliminó la simulación en `ApplicationLogo.jsx` y ahora la suite consume directamente las imágenes físicas de marca `/images/Logo Redvecino.png` y `/images/Mi Vecino.png`.
 
+### 3.3 Integración de Auditoría de Requerimientos zAux
+*   **Auditoría de la Reunión 27/05/2026:** Análisis de la transcripción completa de Héctor y René, extrayendo las necesidades de branding ("i" unificada de RedVecino/MiVecino en color Verde Césped), parámetros de despliegue en servidor FTP (`ftp.redvecino.cl`), parámetros `.env` de producción, bugs reportados por Rodrigo (fuga de roles y reportes PDF duplicados), diseño de la Consola de Emergencia TI, y la segregación del sistema de tickets en tres canales funcionales.
+*   **Adaptación de Casos de IA (Guía Día 2):** Diseño estratégico e ingeniería de requerimientos para adaptar:
+    *   *Facturación por Voz* $\rightarrow$ Registro por Voz de Gastos (Admin) e Incidencias (Residentes).
+    *   *TranscripAI* $\rightarrow$ Actas de Asamblea de Copropietarios automáticas con cálculo de quórum doble ponderado.
+    *   *CRM Lumen* $\rightarrow$ Prospección de TI e Insights predictivos de Morosidad Vecinal.
+    *   *Jon's Studio* $\rightarrow$ Boletines semanales en formato de vídeo animado con avatares integrados (fal.ai).
+*   **Consolidación en Artefacto:** Creación del archivo `analisis_requerimientos_aux.md` en el directorio de la conversación para servir como fuente de verdad de arquitectura técnica.
+*   **Especificación Incremental:** Actualización de `SPEC.md` incorporando las secciones 15.7 (Adaptaciones Avanzadas de IA) y 15.8 (Directrices de la Reunión 27/05).
+
+### 3.4 Reconstrucción Técnica y Verificación de Morosidad y Finanzas (Sesión 28/05/2026)
+*   **Restauración de Pestañas en Frontend:** Se implementaron mediante automatización determinista las pestañas TI correspondientes a `Gestion de Tickets`, `Finanzas y Recaudación de Gastos`, y `Gestión de Condominios` en [Dashboard.jsx](file:///C:/xampp/htdocs/redvecino/resources/js/Pages/Dashboard.jsx), las cuales habían chocado en la sesión paralela.
+*   **Corrección de Sintaxis JSX:** Se solucionó una advertencia de esbuild provocada por el uso del caracter crudo `>` en el selector de estados de morosidad (`Moroso (>= 3 meses)`), reemplazándola por una cadena segura de JSX `{"Moroso (>= 3 meses)"}` logrando una compilación de activos limpia en producción.
+*   **Reestructuración y Siembra del Modelo Financiero:** Se ejecutó una migración limpia con siembra de datos (`php artisan migrate:fresh --seed`), poblando el motor SQLite con datos reales cruzados de ingresos (`condo_incomes` por multas y arriendo de espacios) y egresos (`condo_expenses` de mantención y personal), integrando automáticamente el prorrateo de gastos comunes (`common_expenses`) y sus detalles de costos (`expense_items`).
+*   **Navegación y Auditoría con Chrome DevTools (MCP):**
+    *   Navegación e inicio de sesión seguro y React-compatible en `/login` para el usuario administrador `admin@redvecino.cl` con contraseña `password`.
+    *   Activación exitosa de la consola interactiva DevOps de TI.
+    *   Validación visual y funcional del **Mapa interactivo de Ocupación y Morosidad** (grilla 2D codificada por colores: Verde para "Al Día", Rosa para "Moroso >= 3 meses", Amarillo para "Mantenimiento", Gris para "Vacante").
+    *   Auditoría de la pestaña de **Gestión de Condominios** (con los registros en producción de Parque del Sol y Residencial MiVecino).
+    *   Auditoría del libro contable en **Finanzas y Recaudación** (comprobando el cargado dinámico de cobros y pagos de copropietarios en tiempo real).
+*   **Verificación QA al 100%:** Ejecución completa de la suite de pruebas del backend. **Los 63 test suites (177 aserciones de control de seguridad, ciclos de vida de incidencias, finanzas y RBAC) pasaron exitosamente sin errores.**
+
 ---
 
 **Fecha de creación:** Mayo 2026
-**Última actualización:** Mayo 2026 (Consolidación de Plan, Tareas e Histórico de QA del Proyecto)
-**Versión:** 1.0 (Master Log Unified)
+**Última actualización:** 28 de Mayo de 2026 (Consolidación de Plan, Tareas, Histórico de QA del Proyecto, Auditoría de zAux y Reconstrucción de Finanzas/Morosidad)
+**Versión:** 2.1 (Master Log Unified with QA Reconstruction)
 **Estado:** Activo y Actualizado

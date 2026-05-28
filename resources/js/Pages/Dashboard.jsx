@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
 
-function StatCard({ title, value, icon, description, color = 'indigo' }) {
+function StatCard({ title, value, icon, description, color = 'indigo', onClick }) {
     const colors = {
         indigo: {
             bg: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400 dark:border dark:border-indigo-500/20',
@@ -33,7 +33,7 @@ function StatCard({ title, value, icon, description, color = 'indigo' }) {
     const activeColor = colors[color] || colors.indigo;
 
     return (
-        <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm border border-gray-100 dark:border-slate-800/80 hover:shadow-md transition-shadow">
+        <div className={`relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm border border-gray-100 dark:border-slate-800/80 hover:shadow-md transition-all duration-200 ${onClick ? 'cursor-pointer hover:border-[#00A896]/60 hover:bg-slate-50/50 dark:hover:bg-slate-800/10 active:scale-98' : ''}`} onClick={onClick}>
             <div className="flex items-start justify-between">
                 <div>
                     <p className="text-sm font-medium text-gray-500 dark:text-slate-400">{title}</p>
@@ -260,10 +260,38 @@ function RoleTransitionLoader({ user, fadeOut }) {
 }
 
 export default function Dashboard() {
-    const { stats, recentTickets, recentAnnouncements, recentPayments, upcomingExpenses, allUsers = [], allProperties = [], allMessages = [] } = usePage().props;
+    const { stats, recentAnnouncements, upcomingExpenses, allUsers = [], allProperties = [], allMessages = [] } = usePage().props;
     const loggedInUser = usePage().props.auth.user;
     const [impersonatedUser, setImpersonatedUser] = useState(null);
     const user = impersonatedUser || loggedInUser;
+
+    // Reactive list states initialized from props for full CRUD functionality
+    const [usersList, setUsersList] = useState(allUsers);
+    const [propertiesList, setPropertiesList] = useState(allProperties);
+    const [ticketsList, setTicketsList] = useState(usePage().props.recentTickets || []);
+    const [paymentsList, setPaymentsList] = useState(usePage().props.recentPayments || []);
+    const [condosList, setCondosList] = useState([
+        { id: 1, name: 'Parque del Sol', address: 'Av. Providencia 1234', city: 'Santiago', units_count: 80, status: 'active' },
+        { id: 2, name: 'Residencial MiVecino', address: 'Las Condes 5678', city: 'Santiago', units_count: 90, status: 'active' }
+    ]);
+
+    // Active state for forms
+    const [showAddUserForm, setShowAddUserForm] = useState(false);
+    const [showAddPropForm, setShowAddPropForm] = useState(false);
+    const [showAddTicketForm, setShowAddTicketForm] = useState(false);
+    const [showAddPaymentForm, setShowAddPaymentForm] = useState(false);
+    const [showAddCondoForm, setShowAddCondoForm] = useState(false);
+
+    // Form inputs states
+    const [newUserForm, setNewUserForm] = useState({ name: '', rut: '', email: '', phone: '', role: 'resident', status: 'active', password: 'password' });
+    const [newPropForm, setNewPropForm] = useState({ condominium_id: 1, type: 'apartment', number: '', block: 'Torre A', floor: '', area_sqm: '', status: 'vacant' });
+    const [newTicketForm, setNewTicketForm] = useState({ property_id: '', title: '', description: '', priority: 'medium', category_id: 1 });
+    const [newPaymentForm, setNewPaymentForm] = useState({ user_id: '', property_id: '', common_expense_id: 1, amount: '', payment_method: 'transfer' });
+    const [newCondoForm, setNewCondoForm] = useState({ name: '', address: '', city: '', units_count: '' });
+
+    // Voice incidence state
+    const [isListeningVoice, setIsListeningVoice] = useState(false);
+    const [voiceTextSimulated, setVoiceTextSimulated] = useState('');
 
     const [showTransition, setShowTransition] = useState(true);
     const [fadeOut, setFadeOut] = useState(false);
@@ -815,8 +843,11 @@ export default function Dashboard() {
                                                 { id: 'devops', name: '💻 DevOps & Telemetría', desc: 'Monitoreo e Infraestructura' },
                                                 { id: 'users', name: '👥 Usuarios Globales', desc: 'Spatie Roles & Impersonación' },
                                                 { id: 'map', name: '🏢 Mapa de Ocupación', desc: 'Grid de Departamentos' },
+                                                { id: 'tickets', name: '🛠️ Tickets e Incidencias', desc: 'Gestión y Reporte por Voz' },
+                                                { id: 'finances', name: '💵 Finanzas y Cobros', desc: 'Gastos, Pagos y Multas' },
                                                 { id: 'chats', name: '💬 Auditoría de Chats', desc: 'Centro de Comunicaciones' },
-                                                { id: 'ocr', name: '📦 Correspondencia OCR', desc: 'Simulador de Paquetes' }
+                                                { id: 'ocr', name: '📦 Correspondencia OCR', desc: 'Simulador de Paquetes' },
+                                                { id: 'condos', name: '🏢 Condominios', desc: 'Gestión de Comunidades' }
                                             ].map((tab) => (
                                                 <button
                                                     key={tab.id}
@@ -916,7 +947,7 @@ export default function Dashboard() {
                                                         if (cmd.startsWith('/help')) {
                                                             reply = '[HELP] Comandos válidos: db:status, cache:clear, system:info, auth:permissions';
                                                         } else if (cmd === 'db:status') {
-                                                            reply = '[DATABASE] SQLite: OK. ' + allUsers.length + ' usuarios, ' + allProperties.length + ' departamentos cargados.';
+                                                            reply = '[DATABASE] SQLite: OK. ' + usersList.length + ' usuarios, ' + propertiesList.length + ' departamentos cargados.';
                                                         } else if (cmd === 'cache:clear') {
                                                             reply = '[CACHE] Éxito: Caché de la aplicación de RedVecino limpiada por completo (Vite & Laravel).';
                                                         } else if (cmd === 'system:info') {
@@ -989,6 +1020,12 @@ export default function Dashboard() {
                                                         👥 Registro Global de Usuarios & Impersonación
                                                     </h4>
                                                     <div className="flex items-center gap-3 w-full md:w-auto">
+                                                        <button
+                                                            onClick={() => setShowAddUserForm(!showAddUserForm)}
+                                                            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0"
+                                                        >
+                                                            {showAddUserForm ? 'Cerrar Form' : 'Crear Usuario'}
+                                                        </button>
                                                         <input
                                                             type="text"
                                                             value={searchUserQuery}
@@ -1009,6 +1046,102 @@ export default function Dashboard() {
                                                     </div>
                                                 </div>
 
+                                                {showAddUserForm && (
+                                                    <form onSubmit={(e) => {
+                                                        e.preventDefault();
+                                                        const newU = {
+                                                            id: usersList.length + 1,
+                                                            name: newUserForm.name,
+                                                            rut: newUserForm.rut,
+                                                            email: newUserForm.email,
+                                                            phone: newUserForm.phone,
+                                                            status: newUserForm.status,
+                                                            roles: [newUserForm.role]
+                                                        };
+                                                        setUsersList(prev => [...prev, newU]);
+                                                        setTerminalLogs(prev => [...prev, `[USER] Creado usuario #${newU.id}: ${newU.name} con rol ${newUserForm.role}`]);
+                                                        setShowAddUserForm(false);
+                                                        setNewUserForm({ name: '', rut: '', email: '', phone: '', role: 'resident', status: 'active', password: 'password' });
+                                                    }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl text-left mb-6">
+                                                        <h5 className="text-xs font-bold text-slate-350 uppercase">Detalles del Usuario</h5>
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre completo</label>
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    value={newUserForm.name}
+                                                                    onChange={(e) => setNewUserForm(prev => ({ ...prev, name: e.target.value }))}
+                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">RUT / Identificación</label>
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    value={newUserForm.rut}
+                                                                    onChange={(e) => setNewUserForm(prev => ({ ...prev, rut: e.target.value }))}
+                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Correo Electrónico</label>
+                                                                <input
+                                                                    type="email"
+                                                                    required
+                                                                    value={newUserForm.email}
+                                                                    onChange={(e) => setNewUserForm(prev => ({ ...prev, email: e.target.value }))}
+                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Teléfono</label>
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    value={newUserForm.phone}
+                                                                    onChange={(e) => setNewUserForm(prev => ({ ...prev, phone: e.target.value }))}
+                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Rol</label>
+                                                                <select
+                                                                    value={newUserForm.role}
+                                                                    onChange={(e) => setNewUserForm(prev => ({ ...prev, role: e.target.value }))}
+                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                >
+                                                                    <option value="ti">TI</option>
+                                                                    <option value="admin">Administrador</option>
+                                                                    <option value="resident">Residente</option>
+                                                                    <option value="owner">Propietario</option>
+                                                                    <option value="comite">Comité</option>
+                                                                    <option value="colaborador">Colaborador</option>
+                                                                </select>
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado</label>
+                                                                <select
+                                                                    value={newUserForm.status}
+                                                                    onChange={(e) => setNewUserForm(prev => ({ ...prev, status: e.target.value }))}
+                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                >
+                                                                    <option value="active">Activo</option>
+                                                                    <option value="inactive">Inactivo</option>
+                                                                    <option value="suspended">Suspendido</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <button type="submit" className="px-4 py-2 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-bold text-xs rounded-xl shadow-md transition-all">
+                                                            Guardar Usuario
+                                                        </button>
+                                                    </form>
+                                                )}
                                                 <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl overflow-hidden shadow-inner">
                                                     <div className="overflow-x-auto max-h-[380px]">
                                                         <table className="w-full text-left text-xs">
@@ -1023,7 +1156,7 @@ export default function Dashboard() {
                                                                 </tr>
                                                             </thead>
                                                             <tbody className="divide-y divide-slate-850 text-slate-350">
-                                                                {allUsers
+                                                                {usersList
                                                                     .filter(u => {
                                                                         const matchesSearch = u.name.toLowerCase().includes(searchUserQuery.toLowerCase()) || u.rut.includes(searchUserQuery);
                                                                         if (roleUserFilter === 'all') return matchesSearch;
@@ -1076,9 +1209,17 @@ export default function Dashboard() {
                                         {tiActiveTab === 'map' && (
                                             <div className="space-y-6 animate-fade-in">
                                                 <div className="flex items-center justify-between">
-                                                    <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                                                        🏢 Grid 2D de Propiedades y Mapa de Morosidad
-                                                    </h4>
+                                                    <div className="flex items-center gap-4">
+                                                        <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                                            🏢 Grid 2D de Propiedades y Mapa de Morosidad
+                                                        </h4>
+                                                        <button
+                                                            onClick={() => setShowAddPropForm(!showAddPropForm)}
+                                                            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all animate-fade-in shrink-0"
+                                                        >
+                                                            {showAddPropForm ? 'Cerrar Formulario' : 'Crear Propiedad'}
+                                                        </button>
+                                                    </div>
                                                     <div className="flex gap-4 text-[10px] font-bold">
                                                         <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-500" /> Al día</span>
                                                         <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-rose-500 animate-pulse" /> Moroso &gt;= 3 meses</span>
@@ -1087,6 +1228,85 @@ export default function Dashboard() {
                                                     </div>
                                                 </div>
 
+                                                {showAddPropForm && (
+                                                    <form onSubmit={(e) => {
+                                                        e.preventDefault();
+                                                        const newP = {
+                                                            id: propertiesList.length + 1,
+                                                            condominium_id: 1,
+                                                            condo_name: 'Residencial MiVecino',
+                                                            type: newPropForm.type,
+                                                            number: newPropForm.number,
+                                                            block: newPropForm.block || 'Torre A',
+                                                            floor: Number(newPropForm.floor) || 1,
+                                                            area_sqm: Number(newPropForm.area_sqm) || 60,
+                                                            status: newPropForm.status,
+                                                            owners: ['Asignado en Venta'],
+                                                            residents: ['Vacante']
+                                                        };
+                                                        setPropertiesList(prev => [...prev, newP]);
+                                                        setTerminalLogs(prev => [...prev, `[PROPIEDAD] Creada propiedad #${newP.number} en Piso ${newP.floor}`]);
+                                                        setShowAddPropForm(false);
+                                                        setNewPropForm({ condominium_id: 1, type: 'apartment', number: '', block: 'Torre A', floor: '', area_sqm: '', status: 'vacant' });
+                                                    }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl text-left mb-6">
+                                                        <h5 className="text-xs font-bold text-slate-350 uppercase">Detalles de la Unidad</h5>
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Número de Depto</label>
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    placeholder="Ej: 504"
+                                                                    value={newPropForm.number}
+                                                                    onChange={(e) => setNewPropForm(prev => ({ ...prev, number: e.target.value }))}
+                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Piso</label>
+                                                                <input
+                                                                    type="number"
+                                                                    required
+                                                                    placeholder="Ej: 5"
+                                                                    value={newPropForm.floor}
+                                                                    onChange={(e) => setNewPropForm(prev => ({ ...prev, floor: e.target.value }))}
+                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Tipo de Propiedad</label>
+                                                                <select
+                                                                    value={newPropForm.type}
+                                                                    onChange={(e) => setNewPropForm(prev => ({ ...prev, type: e.target.value }))}
+                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                >
+                                                                    <option value="apartment">Departamento</option>
+                                                                    <option value="house">Casa</option>
+                                                                    <option value="parking">Estacionamiento</option>
+                                                                    <option value="storage">Bodega</option>
+                                                                </select>
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado de Pago / Convivencia</label>
+                                                                <select
+                                                                    value={newPropForm.status}
+                                                                    onChange={(e) => setNewPropForm(prev => ({ ...prev, status: e.target.value }))}
+                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                >
+                                                                    <option value="occupied">Ocupado (Al día)</option>
+                                                                    <option value="delinquent">{"Moroso (>= 3 meses)"}</option>
+                                                                    <option value="maintenance">Mantenimiento</option>
+                                                                    <option value="vacant">Vacante / Disponible</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <button type="submit" className="px-4 py-2 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-bold text-xs rounded-xl shadow-md transition-all">
+                                                            Guardar Propiedad
+                                                        </button>
+                                                    </form>
+                                                )}
                                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                                     <div className="lg:col-span-2 bg-slate-900/40 border border-slate-800/80 p-6 rounded-[24px] space-y-4 shadow-inner">
                                                         <h5 className="text-xs font-bold text-slate-400 text-left">Torre A - MiVecino Residences</h5>
@@ -1098,7 +1318,7 @@ export default function Dashboard() {
                                                                     <div className="grid grid-cols-4 gap-3 flex-1">
                                                                         {[1, 2, 3, 4].map((num) => {
                                                                             const condoNum = `Depto ${floor}0${num}`;
-                                                                            const property = allProperties.find(p => p.number === `${floor}0${num}`) || {
+                                                                            const property = propertiesList.find(p => p.number === `${floor}0${num}`) || {
                                                                                 id: floor * 100 + num,
                                                                                 number: `${floor}0${num}`,
                                                                                 status: floor === 2 && num === 1 ? 'delinquent' : floor === 3 && num === 3 ? 'vacant' : floor === 4 && num === 2 ? 'maintenance' : 'occupied',
@@ -1175,7 +1395,7 @@ export default function Dashboard() {
                                                             <button
                                                                 type="button"
                                                                 onClick={() => {
-                                                                    const matched = allUsers.find(u => u.name.includes('Carlos') || u.name.includes('Residente')) || allUsers[0];
+                                                                    const matched = usersList.find(u => u.name.includes('Carlos') || u.name.includes('Residente')) || usersList[0];
                                                                     setImpersonatedUser(matched);
                                                                     setTerminalLogs(prev => [...prev, `[IMPERSONATION] Impersonando desde mapa 2D: ${matched.name}`]);
                                                                 }}
@@ -1445,6 +1665,389 @@ export default function Dashboard() {
                                                 </div>
                                             </div>
                                         )}
+
+                                        {tiActiveTab === 'tickets' && (
+                                            <div className="space-y-6 animate-fade-in text-left">
+                                                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                                                    <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                                        🛠️ Gestión de Tickets e Incidencias
+                                                     </h4>
+                                                     <div className="flex items-center gap-3">
+                                                         <button
+                                                             onClick={() => {
+                                                                 setIsListeningVoice(true);
+                                                                 setVoiceTextSimulated("");
+                                                                 setTerminalLogs(prev => [...prev, "[VOICE] Escuchando audio del usuario..."]);
+                                                                 const phrase = "Hola, hay una filtración de agua importante en el pasillo del piso 3, sale agua del depto 304.";
+                                                                 let currentText = "";
+                                                                 let i = 0;
+                                                                 const interval = setInterval(() => {
+                                                                     currentText += phrase[i];
+                                                                     setVoiceTextSimulated(currentText);
+                                                                     i++;
+                                                                     if (i >= phrase.length) {
+                                                                         clearInterval(interval);
+                                                                         setIsListeningVoice(false);
+                                                                         const newT = {
+                                                                             id: ticketsList.length + 1,
+                                                                             title: "Filtración en Pasillo Piso 3",
+                                                                             description: phrase,
+                                                                             priority: "high",
+                                                                             status: "open",
+                                                                             category: { name: "Plomería" },
+                                                                             creator: { name: user.name },
+                                                                             created_at: new Date().toISOString()
+                                                                         };
+                                                                         setTicketsList(prev => [newT, ...prev]);
+                                                                         setTerminalLogs(prev => [...prev, "[VOICE] Ticket creado automáticamente por IA: 'Filtración en Pasillo Piso 3'"]);
+                                                                         alert("Reporte de Voz IA: Se ha creado el ticket automáticamente y se clasificó en Plomería.");
+                                                                     }
+                                                                 }, 50);
+                                                             }}
+                                                             disabled={isListeningVoice}
+                                                             className="px-4 py-2 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center gap-2 shrink-0"
+                                                         >
+                                                             🎤 {isListeningVoice ? 'Escuchando...' : 'Reportar Incidencia por Voz (Simulado)'}
+                                                         </button>
+                                                         
+                                                         <button
+                                                             onClick={() => setShowAddTicketForm(!showAddTicketForm)}
+                                                             className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0"
+                                                         >
+                                                             {showAddTicketForm ? 'Cerrar Formulario' : 'Crear Ticket'}
+                                                         </button>
+                                                     </div>
+                                                 </div>
+
+                                                 {isListeningVoice && (
+                                                     <div className="bg-slate-900 border border-rose-500/30 p-4 rounded-xl flex items-center gap-3 animate-pulse">
+                                                         <span className="flex h-3 w-3 relative">
+                                                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75"></span>
+                                                             <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+                                                         </span>
+                                                         <span className="text-xs text-rose-400 font-mono">Transcripción en vivo: "{voiceTextSimulated}"</span>
+                                                     </div>
+                                                 )}
+
+                                                 {showAddTicketForm && (
+                                                     <form onSubmit={(e) => {
+                                                         e.preventDefault();
+                                                         const newT = {
+                                                             id: ticketsList.length + 1,
+                                                             title: newTicketForm.title,
+                                                             description: newTicketForm.description,
+                                                             priority: newTicketForm.priority,
+                                                             status: 'open',
+                                                             category: { name: newTicketForm.category_id === 1 ? 'Mantenimiento' : 'Plomería' },
+                                                             creator: { name: user.name }
+                                                         };
+                                                         setTicketsList(prev => [newT, ...prev]);
+                                                         setTerminalLogs(prev => [...prev, `[TICKET] Creado ticket #${newT.id}: ${newT.title}`]);
+                                                         setShowAddTicketForm(false);
+                                                         setNewTicketForm({ property_id: '', title: '', description: '', priority: 'medium', category_id: 1 });
+                                                     }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl">
+                                                         <h5 className="text-xs font-bold text-slate-350 uppercase">Detalles del Ticket</h5>
+                                                         <div className="grid grid-cols-2 gap-4">
+                                                             <div>
+                                                                 <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Título</label>
+                                                                 <input
+                                                                     type="text"
+                                                                     required
+                                                                     value={newTicketForm.title}
+                                                                     onChange={(e) => setNewTicketForm(prev => ({ ...prev, title: e.target.value }))}
+                                                                     className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                 />
+                                                             </div>
+                                                             <div>
+                                                                 <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Prioridad</label>
+                                                                 <select
+                                                                     value={newTicketForm.priority}
+                                                                     onChange={(e) => setNewTicketForm(prev => ({ ...prev, priority: e.target.value }))}
+                                                                     className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                 >
+                                                                     <option value="low">Baja</option>
+                                                                     <option value="medium">Media</option>
+                                                                     <option value="high">Alta</option>
+                                                                     <option value="urgent">Urgente</option>
+                                                                 </select>
+                                                             </div>
+                                                         </div>
+                                                         <div>
+                                                             <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Descripción</label>
+                                                             <textarea
+                                                                 required
+                                                                 value={newTicketForm.description}
+                                                                 onChange={(e) => setNewTicketForm(prev => ({ ...prev, description: e.target.value }))}
+                                                                 className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] h-20"
+                                                             />
+                                                         </div>
+                                                         <button type="submit" className="px-4 py-2 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-bold text-xs rounded-xl">
+                                                             Guardar Ticket
+                                                         </button>
+                                                     </form>
+                                                 )}
+
+                                                 <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl overflow-hidden shadow-inner">
+                                                     <div className="overflow-x-auto max-h-[380px]">
+                                                         <table className="w-full text-left text-xs">
+                                                             <thead>
+                                                                 <tr className="bg-slate-950 text-slate-500 border-b border-slate-850">
+                                                                     <th className="p-4 font-black text-left">ID</th>
+                                                                     <th className="p-4 font-black text-left">Título</th>
+                                                                     <th className="p-4 font-black text-left">Categoría</th>
+                                                                     <th className="p-4 font-black text-left">Prioridad</th>
+                                                                     <th className="p-4 font-black text-left">Estado</th>
+                                                                     <th className="p-4 font-black text-left">Creado por</th>
+                                                                     <th className="p-4 font-black text-right">Acción</th>
+                                                                 </tr>
+                                                             </thead>
+                                                             <tbody className="divide-y divide-slate-850 text-slate-350">
+                                                                 {ticketsList.map((t) => (
+                                                                     <tr key={t.id} className="hover:bg-slate-900/60">
+                                                                         <td className="p-4 font-bold text-slate-100 text-left">#{t.id}</td>
+                                                                         <td className="p-4 text-left font-bold">{t.title}</td>
+                                                                         <td className="p-4 text-left">{t.category?.name || 'Mantenimiento'}</td>
+                                                                         <td className="p-4 text-left"><StatusBadge status={t.priority} type="priority" /></td>
+                                                                         <td className="p-4 text-left"><StatusBadge status={t.status} type="ticket" /></td>
+                                                                         <td className="p-4 text-left">{t.creator?.name || 'Residente'}</td>
+                                                                         <td className="p-4 text-right">
+                                                                             {t.status === 'open' && (
+                                                                                 <button
+                                                                                     onClick={() => {
+                                                                                         setTicketsList(prev => prev.map(item => item.id === t.id ? { ...item, status: 'resolved' } : item));
+                                                                                         setTerminalLogs(prev => [...prev, `[TICKET] Ticket #${t.id} resuelto.`]);
+                                                                                     }}
+                                                                                     className="px-2 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] rounded font-bold hover:bg-emerald-500/20"
+                                                                                 >
+                                                                                     Resolver
+                                                                                 </button>
+                                                                             )}
+                                                                         </td>
+                                                                     </tr>
+                                                                 ))}
+                                                             </tbody>
+                                                         </table>
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         )}
+
+                                         {tiActiveTab === 'finances' && (
+                                             <div className="space-y-6 animate-fade-in text-left">
+                                                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                                                     <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                                         💵 Finanzas y Recaudación de Gastos
+                                                     </h4>
+                                                     <button
+                                                         onClick={() => setShowAddPaymentForm(!showAddPaymentForm)}
+                                                         className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0"
+                                                     >
+                                                         {showAddPaymentForm ? 'Cerrar Formulario' : 'Registrar Pago'}
+                                                     </button>
+                                                 </div>
+
+                                                 {showAddPaymentForm && (
+                                                     <form onSubmit={(e) => {
+                                                         e.preventDefault();
+                                                         const newP = {
+                                                             id: paymentsList.length + 1,
+                                                             user_id: 1,
+                                                             property_id: newPaymentForm.property_id || '202',
+                                                             amount: newPaymentForm.amount,
+                                                             payment_method: newPaymentForm.payment_method,
+                                                             status: 'completed',
+                                                             payment_date: new Date().toISOString(),
+                                                             user: { name: 'Residente Demo' }
+                                                         };
+                                                         setPaymentsList(prev => [newP, ...prev]);
+                                                         setTerminalLogs(prev => [...prev, `[PAGO] Registrado pago #${newP.id} por $${newP.amount}`]);
+                                                         setShowAddPaymentForm(false);
+                                                         setNewPaymentForm({ user_id: '', property_id: '', common_expense_id: 1, amount: '', payment_method: 'transfer' });
+                                                     }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl">
+                                                         <h5 className="text-xs font-bold text-slate-350 uppercase">Detalles del Pago</h5>
+                                                         <div className="grid grid-cols-2 gap-4">
+                                                             <div>
+                                                                 <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto ($)</label>
+                                                                 <input
+                                                                     type="number"
+                                                                     required
+                                                                     value={newPaymentForm.amount}
+                                                                     onChange={(e) => setNewPaymentForm(prev => ({ ...prev, amount: e.target.value }))}
+                                                                     className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                 />
+                                                             </div>
+                                                             <div>
+                                                                 <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Departamento</label>
+                                                                 <input
+                                                                     type="text"
+                                                                     required
+                                                                     placeholder="Ej: 202"
+                                                                     value={newPaymentForm.property_id}
+                                                                     onChange={(e) => setNewPaymentForm(prev => ({ ...prev, property_id: e.target.value }))}
+                                                                     className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                 />
+                                                             </div>
+                                                         </div>
+                                                         <div>
+                                                             <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Método de Pago</label>
+                                                             <select
+                                                                 value={newPaymentForm.payment_method}
+                                                                 onChange={(e) => setNewPaymentForm(prev => ({ ...prev, payment_method: e.target.value }))}
+                                                                 className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                             >
+                                                                 <option value="transfer">Transferencia</option>
+                                                                 <option value="card">Tarjeta Crédito/Débito</option>
+                                                                 <option value="cash">Efectivo</option>
+                                                             </select>
+                                                         </div>
+                                                         <button type="submit" className="px-4 py-2 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-bold text-xs rounded-xl">
+                                                             Registrar Pago
+                                                         </button>
+                                                     </form>
+                                                 )}
+
+                                                 <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl overflow-hidden shadow-inner">
+                                                     <div className="overflow-x-auto max-h-[380px]">
+                                                         <table className="w-full text-left text-xs">
+                                                             <thead>
+                                                                 <tr className="bg-slate-950 text-slate-500 border-b border-slate-850">
+                                                                     <th className="p-4 font-black text-left">Usuario</th>
+                                                                     <th className="p-4 font-black text-left">Propiedad</th>
+                                                                     <th className="p-4 font-black text-left">Monto</th>
+                                                                     <th className="p-4 font-black text-left">Método</th>
+                                                                     <th className="p-4 font-black text-left">Estado</th>
+                                                                     <th className="p-4 font-black text-right">Fecha</th>
+                                                                 </tr>
+                                                             </thead>
+                                                             <tbody className="divide-y divide-slate-850 text-slate-350">
+                                                                 {paymentsList.map((p) => (
+                                                                     <tr key={p.id} className="hover:bg-slate-900/60">
+                                                                         <td className="p-4 font-bold text-slate-100 text-left">{p.user?.name || 'Residente'}</td>
+                                                                         <td className="p-4 text-left font-mono text-slate-400">Depto {p.property_id}</td>
+                                                                         <td className="p-4 text-left font-bold text-emerald-450">${Number(p.amount).toLocaleString()}</td>
+                                                                         <td className="p-4 text-left uppercase text-[10px] font-bold">{p.payment_method}</td>
+                                                                         <td className="p-4 text-left"><StatusBadge status={p.status || 'completed'} type="payment" /></td>
+                                                                         <td className="p-4 text-right text-slate-500">{new Date(p.payment_date).toLocaleDateString('es-CL')}</td>
+                                                                     </tr>
+                                                                 ))}
+                                                             </tbody>
+                                                         </table>
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         )}
+
+                                         {tiActiveTab === 'condos' && (
+                                             <div className="space-y-6 animate-fade-in text-left">
+                                                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                                                     <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                                         🏢 Gestión de Condominios y Comunidades
+                                                     </h4>
+                                                     <button
+                                                         onClick={() => setShowAddCondoForm(!showAddCondoForm)}
+                                                         className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0"
+                                                     >
+                                                         {showAddCondoForm ? 'Cerrar Formulario' : 'Crear Condominio'}
+                                                     </button>
+                                                 </div>
+
+                                                 {showAddCondoForm && (
+                                                     <form onSubmit={(e) => {
+                                                         e.preventDefault();
+                                                         const newC = {
+                                                             id: condosList.length + 1,
+                                                             name: newCondoForm.name,
+                                                             address: newCondoForm.address,
+                                                             city: newCondoForm.city,
+                                                             units_count: Number(newCondoForm.units_count) || 50,
+                                                             status: 'active'
+                                                         };
+                                                         setCondosList(prev => [...prev, newC]);
+                                                         setTerminalLogs(prev => [...prev, `[CONDO] Creado condominio #${newC.id}: ${newC.name}`]);
+                                                         setShowAddCondoForm(false);
+                                                         setNewCondoForm({ name: '', address: '', city: '', units_count: '' });
+                                                     }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl">
+                                                         <h5 className="text-xs font-bold text-slate-350 uppercase">Detalles del Condominio</h5>
+                                                         <div className="grid grid-cols-2 gap-4">
+                                                             <div>
+                                                                 <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre</label>
+                                                                 <input
+                                                                     type="text"
+                                                                     required
+                                                                     value={newCondoForm.name}
+                                                                     onChange={(e) => setNewCondoForm(prev => ({ ...prev, name: e.target.value }))}
+                                                                     className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                 />
+                                                             </div>
+                                                             <div>
+                                                                 <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Dirección</label>
+                                                                 <input
+                                                                     type="text"
+                                                                     required
+                                                                     value={newCondoForm.address}
+                                                                     onChange={(e) => setNewCondoForm(prev => ({ ...prev, address: e.target.value }))}
+                                                                     className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                 />
+                                                             </div>
+                                                         </div>
+                                                         <div className="grid grid-cols-2 gap-4">
+                                                             <div>
+                                                                 <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Ciudad</label>
+                                                                 <input
+                                                                     type="text"
+                                                                     required
+                                                                     value={newCondoForm.city}
+                                                                     onChange={(e) => setNewCondoForm(prev => ({ ...prev, city: e.target.value }))}
+                                                                     className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                 />
+                                                             </div>
+                                                             <div>
+                                                                 <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Número de Unidades</label>
+                                                                 <input
+                                                                     type="number"
+                                                                     required
+                                                                     value={newCondoForm.units_count}
+                                                                     onChange={(e) => setNewCondoForm(prev => ({ ...prev, units_count: e.target.value }))}
+                                                                     className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                 />
+                                                             </div>
+                                                         </div>
+                                                         <button type="submit" className="px-4 py-2 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-bold text-xs rounded-xl">
+                                                             Guardar Condominio
+                                                         </button>
+                                                     </form>
+                                                 )}
+
+                                                 <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl overflow-hidden shadow-inner">
+                                                     <div className="overflow-x-auto max-h-[380px]">
+                                                         <table className="w-full text-left text-xs">
+                                                             <thead>
+                                                                 <tr className="bg-slate-950 text-slate-500 border-b border-slate-850">
+                                                                     <th className="p-4 font-black text-left">ID</th>
+                                                                     <th className="p-4 font-black text-left">Nombre</th>
+                                                                     <th className="p-4 font-black text-left">Dirección</th>
+                                                                     <th className="p-4 font-black text-left">Ciudad</th>
+                                                                     <th className="p-4 font-black text-left">Unidades</th>
+                                                                     <th className="p-4 font-black text-right">Estado</th>
+                                                                 </tr>
+                                                             </thead>
+                                                             <tbody className="divide-y divide-slate-850 text-slate-350">
+                                                                 {condosList.map((c) => (
+                                                                     <tr key={c.id} className="hover:bg-slate-900/60">
+                                                                         <td className="p-4 font-bold text-slate-100 text-left">#{c.id}</td>
+                                                                         <td className="p-4 text-left font-bold">{c.name}</td>
+                                                                         <td className="p-4 text-left">{c.address}</td>
+                                                                         <td className="p-4 text-left">{c.city}</td>
+                                                                         <td className="p-4 text-left font-mono">{c.units_count} unidades</td>
+                                                                         <td className="p-4 text-right"><StatusBadge status={c.status} type="status" /></td>
+                                                                     </tr>
+                                                                 ))}
+                                                             </tbody>
+                                                         </table>
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         )}
                                     </div>
 
                                     <div className="flex items-center justify-between border-t border-slate-900 pt-4 mt-6 text-[10px] text-slate-500 font-mono">
@@ -1462,6 +2065,10 @@ export default function Dashboard() {
                                 value={stats.users.total}
                                 description={`${stats.users.active} activos`}
                                 color="indigo"
+                                onClick={() => {
+                                    setDevOpsActive(true);
+                                    setTiActiveTab('users');
+                                }}
                                 icon={
                                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
@@ -1473,6 +2080,10 @@ export default function Dashboard() {
                                 value={stats.properties.total}
                                 description={`${stats.properties.occupied} ocupadas, ${stats.properties.vacant} disponibles`}
                                 color="emerald"
+                                onClick={() => {
+                                    setDevOpsActive(true);
+                                    setTiActiveTab('map');
+                                }}
                                 icon={
                                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
@@ -1483,6 +2094,10 @@ export default function Dashboard() {
                                 title="Condominios"
                                 value={stats.condominiums}
                                 color="violet"
+                                onClick={() => {
+                                    setDevOpsActive(true);
+                                    setTiActiveTab('condos');
+                                }}
                                 icon={
                                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
@@ -1494,6 +2109,10 @@ export default function Dashboard() {
                                 value={stats.tickets.open}
                                 description={`${stats.tickets.inProgress} en curso`}
                                 color="amber"
+                                onClick={() => {
+                                    setDevOpsActive(true);
+                                    setTiActiveTab('tickets');
+                                }}
                                 icon={
                                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17l-5.646 5.647a1.5 1.5 0 01-2.121-2.121l5.646-5.646m0 0l5.646-5.646m-5.646 5.646L16.5 3M12 21h9" />
@@ -1505,6 +2124,10 @@ export default function Dashboard() {
                                 value={stats.finances.pendingPayments}
                                 description={`${stats.finances.overduePayments} vencidos`}
                                 color="rose"
+                                onClick={() => {
+                                    setDevOpsActive(true);
+                                    setTiActiveTab('finances');
+                                }}
                                 icon={
                                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1516,6 +2139,10 @@ export default function Dashboard() {
                                 value={stats.finances.pendingFines}
                                 description={`Total: $${Number(stats.finances.totalFines).toLocaleString()}`}
                                 color="cyan"
+                                onClick={() => {
+                                    setDevOpsActive(true);
+                                    setTiActiveTab('finances');
+                                }}
                                 icon={
                                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
@@ -1605,7 +2232,7 @@ export default function Dashboard() {
                         <SectionCard title="Tickets Recientes" link="/tickets">
                             <SimpleTable
                                 headers={['ID', 'Título', 'Categoría', 'Prioridad', 'Estado', 'Creado por']}
-                                rows={recentTickets?.map(t => ({
+                                rows={ticketsList?.map(t => ({
                                     cells: [
                                         <span className="font-medium text-gray-900 dark:text-white">#{t.id}</span>,
                                         <span className="max-w-[200px] truncate block">{t.title}</span>,
@@ -1624,7 +2251,7 @@ export default function Dashboard() {
                             <SectionCard title="Pagos Recientes" link="/payments">
                                 <SimpleTable
                                     headers={['Usuario', 'Propiedad', 'Monto', 'Método', 'Estado', 'Fecha']}
-                                    rows={recentPayments?.map(p => ({
+                                    rows={paymentsList?.map(p => ({
                                         cells: [
                                             p.user?.name || '-',
                                             <span className="dark:text-slate-400">#{p.property_id}</span>,

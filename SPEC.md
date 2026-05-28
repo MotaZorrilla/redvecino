@@ -1108,9 +1108,28 @@ Para robustecer la suite hacia un nivel corporativo y prepararla para su escalab
 *   **Certificación de Dispositivo:** El SDK móvil integrado solicita una firma criptográfica nativa del hardware del teléfono (DeviceCheck en iOS o Play Integrity en Google).
 *   **Bloqueo de Entornos Vulnerables:** El servidor central rechaza de inmediato cualquier petición que no contenga una firma criptográfica válida o que sea iniciada desde dispositivos con Root, Jailbreak, emuladores maliciosos o con inyección activa de scripts.
 
+### 15.7 Adaptaciones Avanzadas de Inteligencia Artificial (zAux Guía 2)
+Para elevar el valor competitivo de la plataforma en el sector PropTech, se incorporan las siguientes adaptaciones funcionales basadas en la Guía 2 del Curso de IA de Mayo 2026:
+*   **Gastos Comunes e Incidencias por Voz:** Integración de un motor de reconocimiento de voz y procesamiento de lenguaje natural (NLP) que permite a los administradores registrar egresos contables dictando órdenes simples y a los residentes reportar desperfectos en su condominio de forma oral, auto-categorizando los reportes con prioridad y asignación automatizada.
+*   **Actas Automatizadas de Asambleas de Copropietarios:** Procesamiento de grabaciones de audio de asambleas virtuales para la generación automática de actas PDF estructuradas. Incluye: cálculo matemático de quórum doble ponderado (cabezas y coeficientes), resumen de acuerdos aprobados, y lista de responsables asignados, almacenándose de forma inmutable en la biblioteca del condominio.
+*   **Insights de Morosidad Vecinal Predictiva:** Modelado inteligente del historial de pagos y mensajería en chat de residentes. Permite emitir resúmenes predictivos al administrador recomendando acciones de cobranza personalizadas y selectivas en lugar de alertas automáticas punitivas.
+*   **Boletín en Vídeo Comunitario (fal.ai API):** Integración con la API externa de fal.ai para la síntesis automatizada de boletines semanales en formato de vídeo animado con avatares integrados que resumen las circulares largas publicadas por la administración en MiVecino.
+
+### 15.8 Bitácora de Despliegue y Correcciones de la Reunión (zAux 27/05)
+Derivado de la auditoría técnica de la reunión presencial de Héctor y René del 27 de mayo de 2026, se especifican las siguientes directrices operativas y de seguridad obligatorias:
+*   **Unificación Visual en Enlace de Logos:** En la barra superior y logos de RedVecino, el punto de la letra "i" simulará la silueta de un vecino de color Verde Césped (o Celeste/Turquesa), consolidando la identidad del portal con el diseño móvil de MiVecino.
+*   **Control Riguroso de Roles e Impedimento de Fugas de Acceso (Bug Rodrigo #1):** Aislamiento total de accesos basados en roles. El middleware de Laravel bloqueará estrictamente que cuentas de tipo "cliente" (residentes y propietarios) accedan a rutas administrativas globales de RedVecino (`/api/users`, `/api/properties`, etc.).
+*   **Corrección de Duplicados en Reportes PDF (Bug Rodrigo #2):** Auditoría de los bucles de renderización Blade y eventos de disparo JS en el frontend para erradicar la duplicación de datos al exportar listados de deudas y estados de cuenta.
+*   **Consola de Emergencia TI Web:** Interfaz para el rol de TI súper usuario con un menú interactivo para la ejecución segura de comandos artisan (`database status`, `cache:clear`, `permissions:reset`) para el mantenimiento de producción en servidores compartidos sin acceso SSH terminal.
+*   **Estructura de Tres Canales para el Sistema de Tickets:** El módulo de tickets se segrega estrictamente en:
+    1.  *Tickets de Mantenimiento:* Reportes vecinales de averías edilicias.
+    2.  *Tickets de Pago:* Notificación del copropietario reportando comprobantes de depósitos para su conciliación de gastos.
+    3.  *Tickets de TI (Averías de Plataforma):* Incidencias del administrador dirigidas directamente al soporte de ingeniería de RedVecino.
+*   **Flujo de Correspondencia OCR:** Registro e inventario automatizado en conserjería para paquetería, guardando la empresa de courier, datos del destinatario, firma del guardia y firma digital del residente.
+
 ---
 
 **Fecha de creación:** Mayo 2026
-**Última actualización:** Mayo 2026 (Actualizado con la Estrategia de Lanzamiento, Embudo de Ventas, Marketing Digital y Especificaciones Avanzadas de Ingeniería PropTech de RedVecino & MiVecino)
-**Versión:** 4.0 (Enterprise Spec Ready)
+**Última actualización:** 28 de Mayo de 2026 (Actualizado con la Estrategia de Lanzamiento, Embudo de Ventas, Marketing Digital, Especificaciones Avanzadas de Ingeniería PropTech de RedVecino & MiVecino, y Adaptaciones e Incidencias del zAux 27/05/2026 y Guía 2 IA)
+**Versión:** 5.0 (Enterprise Spec & IA Ready)
 **Estado:** Listo para desarrollo (Con base de datos en SQLite/MySQL, suite de pruebas automatizadas y especificación de alta fidelidad PropTech)
