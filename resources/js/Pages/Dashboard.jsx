@@ -298,15 +298,23 @@ export default function Dashboard() {
     
     // Core Role Detection
     const userRoles = user?.roles || [];
-    const isActuallyAdmin = userRoles.some(role => 
-        ['admin', 'ti', 'committee', 'employee', 'colaborador', 'administrador', 'comité'].includes(role.toLowerCase())
+    const isTiRole = userRoles.some(role => role.toLowerCase() === 'ti');
+    const isBusinessAdmin = userRoles.some(role => 
+        ['admin', 'administrador', 'committee', 'comité', 'colaborador', 'employee'].includes(role.toLowerCase())
     );
+    const isActuallyAdmin = isTiRole || isBusinessAdmin;
     
     // Interactive Simulation Toggle for Admins/TI
     const [simulationMode, setSimulationMode] = useState(false);
     
+    // TI Sandbox: allow TI to inspect admin modules per condominium
+    const [sandboxCondoId, setSandboxCondoId] = useState('all');
+    const [sandboxModule, setSandboxModule] = useState('map');
+    
     // Check if the current render should be Admin view or Resident view
     const renderAdminView = isActuallyAdmin && !simulationMode && !impersonatedUser;
+    const renderTiDevOps = isTiRole && !simulationMode && !impersonatedUser;
+    const renderBusinessAdmin = isBusinessAdmin && !simulationMode && !impersonatedUser;
 
     // Layout simulation states
     const [forceMobileView, setForceMobileView] = useState(false);
@@ -357,7 +365,7 @@ export default function Dashboard() {
         setDarkMode(prev => !prev);
     };
 
-    const [devOpsActive, setDevOpsActive] = useState(false);
+    const [devOpsActive, setDevOpsActive] = useState(isTiRole);
     const [tiActiveTab, setTiActiveTab] = useState('devops');
     const [globalMaintenanceMode, setGlobalMaintenanceMode] = useState(false);
     const [packages, setPackages] = useState([
@@ -691,14 +699,16 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between flex-wrap gap-4">
                     <div className="flex items-center gap-3">
                         <h2 className="text-xl font-bold leading-tight text-gray-800 dark:text-slate-100 font-sans">
-                            {renderAdminView ? 'Consola de RedVecino' : 'Portal MiVecino'}
+                            {renderBusinessAdmin ? 'Portal Administrativo RedVecino' : renderTiDevOps ? 'Estación DevOps RedVecino' : 'Portal MiVecino'}
                         </h2>
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                             renderAdminView 
-                                ? 'bg-indigo-500/10 border border-indigo-500/20 text-indigo-500' 
+                                ? renderTiDevOps
+                                    ? 'bg-cyan-500/10 border border-cyan-500/20 text-cyan-500'
+                                    : 'bg-indigo-500/10 border border-indigo-500/20 text-indigo-500'
                                 : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-500'
                         }`}>
-                            {renderAdminView ? 'Rol: Administrativo' : 'Rol: Copropietario'}
+                            {renderTiDevOps ? 'Rol: Soporte TI' : renderBusinessAdmin ? 'Rol: Administrativo' : 'Rol: Copropietario'}
                         </span>
                     </div>
 
@@ -783,37 +793,50 @@ export default function Dashboard() {
                 <div className="py-8 animate-fade-in font-sans selection:bg-[#00A896]/30">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
                         
-                        {/* DevOps TI Top Banner */}
-                        <div className="flex flex-col sm:flex-row items-center justify-between p-6 bg-slate-900 border border-slate-800 rounded-2xl gap-4 shadow-sm relative overflow-hidden">
-                            <div className="absolute -top-10 -left-10 w-40 h-40 bg-[#00A896]/10 rounded-full blur-3xl pointer-events-none" />
-                            <div className="flex items-center gap-4 relative z-10">
-                                <div className="h-12 w-12 bg-[#00A896]/10 text-[#00A896] flex items-center justify-center rounded-xl border border-[#00A896]/20 shrink-0">
-                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 010 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.43l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 010-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0Z" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
-                                        Consola de Operaciones DevOps TI
-                                        <span className="px-2 py-0.5 bg-[#00A896]/10 border border-[#00A896]/20 text-[#00A896] text-[10px] font-bold rounded">
-                                            Estación DevOps
-                                        </span>
-                                    </h3>
-                                    <p className="text-xs text-slate-400 mt-1">Navega por los submódulos de telemetría, gestión de ocupación, auditoría de mensajería e integración OCR.</p>
+                        {renderTiDevOps ? (
+                            /* 💻 TI DevOps Header (always active, no toggle) */
+                            <div className="flex flex-col sm:flex-row items-center justify-between p-6 bg-slate-900 border border-slate-800 rounded-2xl gap-4 shadow-sm relative overflow-hidden">
+                                <div className="absolute -top-10 -left-10 w-40 h-40 bg-[#00A896]/10 rounded-full blur-3xl pointer-events-none" />
+                                <div className="flex items-center gap-4 relative z-10">
+                                    <div className="h-12 w-12 bg-[#00A896]/10 text-[#00A896] flex items-center justify-center rounded-xl border border-[#00A896]/20 shrink-0">
+                                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 010 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.43l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 010-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0Z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
+                                            Consola de Operaciones DevOps TI
+                                            <span className="px-2 py-0.5 bg-[#00A896]/10 border border-[#00A896]/20 text-[#00A896] text-[10px] font-bold rounded">
+                                                Estación DevOps
+                                            </span>
+                                        </h3>
+                                        <p className="text-xs text-slate-400 mt-1">Panel de infraestructura y monitoreo del sistema. Gestiona usuarios, condominios e inspecciona comunidades.</p>
+                                    </div>
                                 </div>
                             </div>
-                            <button
-                                onClick={() => setDevOpsActive(!devOpsActive)}
-                                className={`px-5 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all z-10 border ${
-                                    devOpsActive
-                                        ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border-rose-500/30'
-                                        : 'bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border-indigo-500/30'
-                                }`}
-                            >
-                                {devOpsActive ? 'Desactivar Consola TI' : 'Activar Consola TI'}
-                            </button>
-                        </div>
+                        ) : renderBusinessAdmin ? (
+                            /* 🏢 Admin Portal Header (no DevOps references) */
+                            <div className="flex flex-col sm:flex-row items-center justify-between p-6 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl gap-4 shadow-sm relative overflow-hidden">
+                                <div className="absolute -top-10 -left-10 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+                                <div className="flex items-center gap-4 relative z-10">
+                                    <div className="h-12 w-12 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center rounded-xl border border-indigo-500/20 shrink-0">
+                                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-sm font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
+                                            Panel de Gestión del Condominio
+                                            <span className="px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded">
+                                                RedVecino
+                                            </span>
+                                        </h3>
+                                        <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">Administra finanzas, tickets, mensajería y ocupación de tu comunidad.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : null}
 
                         {devOpsActive ? (
                             <div className="flex bg-slate-950/80 backdrop-blur-xl border border-slate-800/80 rounded-[32px] overflow-hidden shadow-2xl h-[700px] transition-colors duration-300 relative text-slate-350">
@@ -842,12 +865,8 @@ export default function Dashboard() {
                                             {[
                                                 { id: 'devops', name: '💻 DevOps & Telemetría', desc: 'Monitoreo e Infraestructura' },
                                                 { id: 'users', name: '👥 Usuarios Globales', desc: 'Spatie Roles & Impersonación' },
-                                                { id: 'map', name: '🏢 Mapa de Ocupación', desc: 'Grid de Departamentos' },
-                                                { id: 'tickets', name: '🛠️ Tickets e Incidencias', desc: 'Gestión y Reporte por Voz' },
-                                                { id: 'finances', name: '💵 Finanzas y Cobros', desc: 'Gastos, Pagos y Multas' },
-                                                { id: 'chats', name: '💬 Auditoría de Chats', desc: 'Centro de Comunicaciones' },
-                                                { id: 'ocr', name: '📦 Correspondencia OCR', desc: 'Simulador de Paquetes' },
-                                                { id: 'condos', name: '🏢 Condominios', desc: 'Gestión de Comunidades' }
+                                                { id: 'condos', name: '🏢 Condominios', desc: 'Gestión de Comunidades' },
+                                                { id: 'sandbox', name: '🛠️ Sandbox de Inspección', desc: 'Módulos por Condominio' }
                                             ].map((tab) => (
                                                 <button
                                                     key={tab.id}
@@ -1937,117 +1956,318 @@ export default function Dashboard() {
                                              </div>
                                          )}
 
-                                         {tiActiveTab === 'condos' && (
-                                             <div className="space-y-6 animate-fade-in text-left">
-                                                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                                                     <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                                                         🏢 Gestión de Condominios y Comunidades
-                                                     </h4>
-                                                     <button
-                                                         onClick={() => setShowAddCondoForm(!showAddCondoForm)}
-                                                         className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0"
-                                                     >
-                                                         {showAddCondoForm ? 'Cerrar Formulario' : 'Crear Condominio'}
-                                                     </button>
-                                                 </div>
+                                          {tiActiveTab === 'condos' && (
+                                              <div className="space-y-6 animate-fade-in text-left">
+                                                  <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                                                      <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                                          🏢 Gestión de Condominios y Comunidades
+                                                      </h4>
+                                                      <button
+                                                          onClick={() => setShowAddCondoForm(!showAddCondoForm)}
+                                                          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0"
+                                                      >
+                                                          {showAddCondoForm ? 'Cerrar Formulario' : 'Crear Condominio'}
+                                                      </button>
+                                                  </div>
 
-                                                 {showAddCondoForm && (
-                                                     <form onSubmit={(e) => {
-                                                         e.preventDefault();
-                                                         const newC = {
-                                                             id: condosList.length + 1,
-                                                             name: newCondoForm.name,
-                                                             address: newCondoForm.address,
-                                                             city: newCondoForm.city,
-                                                             units_count: Number(newCondoForm.units_count) || 50,
-                                                             status: 'active'
-                                                         };
-                                                         setCondosList(prev => [...prev, newC]);
-                                                         setTerminalLogs(prev => [...prev, `[CONDO] Creado condominio #${newC.id}: ${newC.name}`]);
-                                                         setShowAddCondoForm(false);
-                                                         setNewCondoForm({ name: '', address: '', city: '', units_count: '' });
-                                                     }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl">
-                                                         <h5 className="text-xs font-bold text-slate-350 uppercase">Detalles del Condominio</h5>
-                                                         <div className="grid grid-cols-2 gap-4">
-                                                             <div>
-                                                                 <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre</label>
-                                                                 <input
-                                                                     type="text"
-                                                                     required
-                                                                     value={newCondoForm.name}
-                                                                     onChange={(e) => setNewCondoForm(prev => ({ ...prev, name: e.target.value }))}
-                                                                     className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
-                                                                 />
-                                                             </div>
-                                                             <div>
-                                                                 <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Dirección</label>
-                                                                 <input
-                                                                     type="text"
-                                                                     required
-                                                                     value={newCondoForm.address}
-                                                                     onChange={(e) => setNewCondoForm(prev => ({ ...prev, address: e.target.value }))}
-                                                                     className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
-                                                                 />
-                                                             </div>
-                                                         </div>
-                                                         <div className="grid grid-cols-2 gap-4">
-                                                             <div>
-                                                                 <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Ciudad</label>
-                                                                 <input
-                                                                     type="text"
-                                                                     required
-                                                                     value={newCondoForm.city}
-                                                                     onChange={(e) => setNewCondoForm(prev => ({ ...prev, city: e.target.value }))}
-                                                                     className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
-                                                                 />
-                                                             </div>
-                                                             <div>
-                                                                 <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Número de Unidades</label>
-                                                                 <input
-                                                                     type="number"
-                                                                     required
-                                                                     value={newCondoForm.units_count}
-                                                                     onChange={(e) => setNewCondoForm(prev => ({ ...prev, units_count: e.target.value }))}
-                                                                     className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
-                                                                 />
-                                                             </div>
-                                                         </div>
-                                                         <button type="submit" className="px-4 py-2 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-bold text-xs rounded-xl">
-                                                             Guardar Condominio
-                                                         </button>
-                                                     </form>
-                                                 )}
+                                                  {showAddCondoForm && (
+                                                      <form onSubmit={(e) => {
+                                                          e.preventDefault();
+                                                          const newC = {
+                                                              id: condosList.length + 1,
+                                                              name: newCondoForm.name,
+                                                              address: newCondoForm.address,
+                                                              city: newCondoForm.city,
+                                                              units_count: Number(newCondoForm.units_count) || 50,
+                                                              status: 'active'
+                                                          };
+                                                          setCondosList(prev => [...prev, newC]);
+                                                          setTerminalLogs(prev => [...prev, `[CONDO] Creado condominio #${newC.id}: ${newC.name}`]);
+                                                          setShowAddCondoForm(false);
+                                                          setNewCondoForm({ name: '', address: '', city: '', units_count: '' });
+                                                      }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl">
+                                                          <h5 className="text-xs font-bold text-slate-350 uppercase">Detalles del Condominio</h5>
+                                                          <div className="grid grid-cols-2 gap-4">
+                                                              <div>
+                                                                  <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre</label>
+                                                                  <input
+                                                                      type="text"
+                                                                      required
+                                                                      value={newCondoForm.name}
+                                                                      onChange={(e) => setNewCondoForm(prev => ({ ...prev, name: e.target.value }))}
+                                                                      className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                  />
+                                                              </div>
+                                                              <div>
+                                                                  <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Dirección</label>
+                                                                  <input
+                                                                      type="text"
+                                                                      required
+                                                                      value={newCondoForm.address}
+                                                                      onChange={(e) => setNewCondoForm(prev => ({ ...prev, address: e.target.value }))}
+                                                                      className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                  />
+                                                              </div>
+                                                          </div>
+                                                          <div className="grid grid-cols-2 gap-4">
+                                                              <div>
+                                                                  <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Ciudad</label>
+                                                                  <input
+                                                                      type="text"
+                                                                      required
+                                                                      value={newCondoForm.city}
+                                                                      onChange={(e) => setNewCondoForm(prev => ({ ...prev, city: e.target.value }))}
+                                                                      className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                  />
+                                                              </div>
+                                                              <div>
+                                                                  <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Número de Unidades</label>
+                                                                  <input
+                                                                      type="number"
+                                                                      required
+                                                                      value={newCondoForm.units_count}
+                                                                      onChange={(e) => setNewCondoForm(prev => ({ ...prev, units_count: e.target.value }))}
+                                                                      className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                  />
+                                                              </div>
+                                                          </div>
+                                                          <button type="submit" className="px-4 py-2 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-bold text-xs rounded-xl">
+                                                              Guardar Condominio
+                                                          </button>
+                                                      </form>
+                                                  )}
 
-                                                 <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl overflow-hidden shadow-inner">
-                                                     <div className="overflow-x-auto max-h-[380px]">
-                                                         <table className="w-full text-left text-xs">
-                                                             <thead>
-                                                                 <tr className="bg-slate-950 text-slate-500 border-b border-slate-850">
-                                                                     <th className="p-4 font-black text-left">ID</th>
-                                                                     <th className="p-4 font-black text-left">Nombre</th>
-                                                                     <th className="p-4 font-black text-left">Dirección</th>
-                                                                     <th className="p-4 font-black text-left">Ciudad</th>
-                                                                     <th className="p-4 font-black text-left">Unidades</th>
-                                                                     <th className="p-4 font-black text-right">Estado</th>
-                                                                 </tr>
-                                                             </thead>
-                                                             <tbody className="divide-y divide-slate-850 text-slate-350">
-                                                                 {condosList.map((c) => (
-                                                                     <tr key={c.id} className="hover:bg-slate-900/60">
-                                                                         <td className="p-4 font-bold text-slate-100 text-left">#{c.id}</td>
-                                                                         <td className="p-4 text-left font-bold">{c.name}</td>
-                                                                         <td className="p-4 text-left">{c.address}</td>
-                                                                         <td className="p-4 text-left">{c.city}</td>
-                                                                         <td className="p-4 text-left font-mono">{c.units_count} unidades</td>
-                                                                         <td className="p-4 text-right"><StatusBadge status={c.status} type="status" /></td>
-                                                                     </tr>
-                                                                 ))}
-                                                             </tbody>
-                                                         </table>
-                                                     </div>
-                                                 </div>
-                                             </div>
-                                         )}
+                                                  <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl overflow-hidden shadow-inner">
+                                                      <div className="overflow-x-auto max-h-[380px]">
+                                                          <table className="w-full text-left text-xs">
+                                                              <thead>
+                                                                  <tr className="bg-slate-950 text-slate-500 border-b border-slate-850">
+                                                                      <th className="p-4 font-black text-left">ID</th>
+                                                                      <th className="p-4 font-black text-left">Nombre</th>
+                                                                      <th className="p-4 font-black text-left">Dirección</th>
+                                                                      <th className="p-4 font-black text-left">Ciudad</th>
+                                                                      <th className="p-4 font-black text-left">Unidades</th>
+                                                                      <th className="p-4 font-black text-right">Estado</th>
+                                                                  </tr>
+                                                              </thead>
+                                                              <tbody className="divide-y divide-slate-850 text-slate-350">
+                                                                  {condosList.map((c) => (
+                                                                      <tr key={c.id} className="hover:bg-slate-900/60">
+                                                                          <td className="p-4 font-bold text-slate-100 text-left">#{c.id}</td>
+                                                                          <td className="p-4 text-left font-bold">{c.name}</td>
+                                                                          <td className="p-4 text-left">{c.address}</td>
+                                                                          <td className="p-4 text-left">{c.city}</td>
+                                                                          <td className="p-4 text-left font-mono">{c.units_count} unidades</td>
+                                                                          <td className="p-4 text-right"><StatusBadge status={c.status} type="status" /></td>
+                                                                      </tr>
+                                                                  ))}
+                                                              </tbody>
+                                                          </table>
+                                                      </div>
+                                                  </div>
+                                              </div>
+                                          )}
+
+                                          {tiActiveTab === 'sandbox' && (
+                                              <div className="space-y-6 animate-fade-in text-left">
+                                                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                                                      <div>
+                                                          <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                                              🛠️ Sandbox de Inspección de Comunidades
+                                                          </h4>
+                                                          <p className="text-xs text-slate-400 mt-1">Selecciona un condominio y un módulo para inspeccionar sus datos administrativos.</p>
+                                                      </div>
+                                                  </div>
+
+                                                  {/* Condominium Selector */}
+                                                  <div className="flex flex-wrap items-center gap-4">
+                                                      <div className="flex items-center gap-2">
+                                                          <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Condominio:</label>
+                                                          <select
+                                                              value={sandboxCondoId}
+                                                              onChange={(e) => setSandboxCondoId(e.target.value)}
+                                                              className="bg-slate-900 border border-slate-700 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                          >
+                                                              <option value="all">Todos los Condominios</option>
+                                                              {condosList.map(c => (
+                                                                  <option key={c.id} value={c.id}>{c.name}</option>
+                                                              ))}
+                                                          </select>
+                                                      </div>
+                                                  </div>
+
+                                                  {/* Module Sub-tabs */}
+                                                  <div className="flex flex-wrap gap-2 border-b border-slate-800 pb-2">
+                                                      {[
+                                                          { id: 'map', name: '🏢 Mapa de Ocupación' },
+                                                          { id: 'tickets', name: '🛠️ Tickets' },
+                                                          { id: 'finances', name: '💵 Finanzas' },
+                                                          { id: 'chats', name: '💬 Auditoría de Chats' },
+                                                          { id: 'ocr', name: '📦 Correspondencia OCR' },
+                                                      ].map(mod => (
+                                                          <button
+                                                              key={mod.id}
+                                                              onClick={() => setSandboxModule(mod.id)}
+                                                              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                                                                  sandboxModule === mod.id
+                                                                      ? 'bg-[#00A896]/20 text-[#00A896] border border-[#00A896]/30'
+                                                                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border border-transparent'
+                                                              }`}
+                                                          >
+                                                              {mod.name}
+                                                          </button>
+                                                      ))}
+                                                  </div>
+
+                                                  {/* Sandbox Module Content */}
+                                                  {sandboxModule === 'map' && (
+                                                      <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-inner">
+                                                          <h5 className="text-xs font-bold text-slate-300 mb-4 flex items-center gap-2">
+                                                              <span className="text-[#00A896]">●</span>
+                                                              Mapa de Ocupación {sandboxCondoId !== 'all' ? `— ${condosList.find(c => c.id === Number(sandboxCondoId))?.name || ''}` : '(Todos los condominios)'}
+                                                          </h5>
+                                                          {/* Reuse the 2D grid map logic from existing map tab */}
+                                                          <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2">
+                                                              {propertiesList
+                                                                  .filter(p => sandboxCondoId === 'all' || p.condominium_id === Number(sandboxCondoId))
+                                                                  .slice(0, 24)
+                                                                  .map(p => (
+                                                                      <div
+                                                                          key={p.id}
+                                                                          onClick={() => {
+                                                                              setTerminalLogs(prev => [...prev, `[SANDBOX] Inspeccionando propiedad #${p.id}: ${p.number} (${p.status})`]);
+                                                                              const matched = usersList.find(u => u.properties?.includes?.(p.id));
+                                                                              if (matched) {
+                                                                                  setImpersonatedUser(matched);
+                                                                              }
+                                                                          }}
+                                                                          className={`p-2 rounded-xl border text-center cursor-pointer transition-all hover:scale-105 ${
+                                                                              p.status === 'occupied'
+                                                                                  ? 'bg-emerald-950/40 border-emerald-800/50 text-emerald-400'
+                                                                                  : p.status === 'vacant'
+                                                                                  ? 'bg-slate-800/40 border-slate-700/50 text-slate-400'
+                                                                                  : 'bg-amber-950/40 border-amber-800/50 text-amber-400'
+                                                                          }`}
+                                                                      >
+                                                                          <span className="text-[9px] font-bold block">{p.number}</span>
+                                                                          <span className="text-[7px] opacity-70 block">{p.type}</span>
+                                                                      </div>
+                                                                  ))}
+                                                          </div>
+                                                      </div>
+                                                  )}
+
+                                                  {sandboxModule === 'tickets' && (
+                                                      <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-inner">
+                                                          <h5 className="text-xs font-bold text-slate-300 mb-4 flex items-center gap-2">
+                                                              <span className="text-[#00A896]">●</span>
+                                                              Tickets e Incidencias {sandboxCondoId !== 'all' ? `— ${condosList.find(c => c.id === Number(sandboxCondoId))?.name || ''}` : '(Todos los condominios)'}
+                                                          </h5>
+                                                          <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                                                              {ticketsList
+                                                                  .filter(t => sandboxCondoId === 'all' || t.property?.condominium_id === Number(sandboxCondoId))
+                                                                  .slice(0, 8)
+                                                                  .map(t => (
+                                                                      <div key={t.id} className="flex items-center justify-between p-3 bg-slate-950/50 rounded-xl border border-slate-800/60">
+                                                                          <div className="flex items-center gap-3 min-w-0">
+                                                                              <span className="text-[10px] font-mono text-slate-500 shrink-0">#{t.id}</span>
+                                                                              <span className="text-xs font-medium text-slate-200 truncate">{t.title}</span>
+                                                                          </div>
+                                                                          <div className="flex items-center gap-2 shrink-0">
+                                                                              <StatusBadge status={t.priority} type="priority" />
+                                                                              <StatusBadge status={t.status} type="ticket" />
+                                                                          </div>
+                                                                      </div>
+                                                                  ))}
+                                                              {ticketsList.filter(t => sandboxCondoId === 'all' || t.property?.condominium_id === Number(sandboxCondoId)).length === 0 && (
+                                                                  <p className="text-xs text-slate-500 text-center py-4">No hay tickets para este condominio.</p>
+                                                              )}
+                                                          </div>
+                                                      </div>
+                                                  )}
+
+                                                  {sandboxModule === 'finances' && (
+                                                      <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-inner">
+                                                          <h5 className="text-xs font-bold text-slate-300 mb-4 flex items-center gap-2">
+                                                              <span className="text-[#00A896]">●</span>
+                                                              Finanzas y Cobros {sandboxCondoId !== 'all' ? `— ${condosList.find(c => c.id === Number(sandboxCondoId))?.name || ''}` : '(Todos los condominios)'}
+                                                          </h5>
+                                                          <div className="grid grid-cols-2 gap-4 mb-4">
+                                                              <div className="bg-slate-950/50 rounded-xl p-4 border border-slate-800/60">
+                                                                  <span className="text-[10px] text-slate-400 block">Total Gastos</span>
+                                                                  <span className="text-lg font-black text-slate-100">${Number(stats.finances.totalExpenses).toLocaleString()}</span>
+                                                              </div>
+                                                              <div className="bg-slate-950/50 rounded-xl p-4 border border-slate-800/60">
+                                                                  <span className="text-[10px] text-slate-400 block">Total Pagos</span>
+                                                                  <span className="text-lg font-black text-emerald-400">${Number(stats.finances.totalPayments).toLocaleString()}</span>
+                                                              </div>
+                                                          </div>
+                                                          <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                                                              {paymentsList
+                                                                  .filter(p => sandboxCondoId === 'all' || p.property?.condominium_id === Number(sandboxCondoId))
+                                                                  .slice(0, 6)
+                                                                  .map(p => (
+                                                                      <div key={p.id} className="flex items-center justify-between p-2 bg-slate-950/50 rounded-xl border border-slate-800/60">
+                                                                          <span className="text-xs text-slate-400">{p.user?.name || '-'} — Prop #{p.property_id}</span>
+                                                                          <span className="text-xs font-bold text-slate-200">${Number(p.amount).toLocaleString()}</span>
+                                                                      </div>
+                                                                  ))}
+                                                          </div>
+                                                      </div>
+                                                  )}
+
+                                                  {sandboxModule === 'chats' && (
+                                                      <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-inner">
+                                                          <h5 className="text-xs font-bold text-slate-300 mb-4 flex items-center gap-2">
+                                                              <span className="text-[#00A896]">●</span>
+                                                              Auditoría de Mensajería {sandboxCondoId !== 'all' ? `— ${condosList.find(c => c.id === Number(sandboxCondoId))?.name || ''}` : '(Todos los condominios)'}
+                                                          </h5>
+                                                          <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                                                              {auditedMessagesState.slice(0, 8).map(msg => (
+                                                                  <div key={msg.id} className="flex items-start gap-3 p-3 bg-slate-950/50 rounded-xl border border-slate-800/60">
+                                                                      <div className="h-7 w-7 rounded-full bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-300 shrink-0">
+                                                                          {msg.sender_name.charAt(0)}
+                                                                      </div>
+                                                                      <div className="min-w-0 flex-1">
+                                                                          <div className="flex items-center gap-2">
+                                                                              <span className="text-[10px] font-bold text-slate-300">{msg.sender_name}</span>
+                                                                              <span className="text-[8px] text-slate-600">→ {msg.receiver_name}</span>
+                                                                              <span className="text-[8px] text-slate-600 ml-auto">{msg.time}</span>
+                                                                          </div>
+                                                                          <p className="text-[11px] text-slate-400 mt-1 truncate">{msg.content}</p>
+                                                                      </div>
+                                                                  </div>
+                                                              ))}
+                                                          </div>
+                                                      </div>
+                                                  )}
+
+                                                  {sandboxModule === 'ocr' && (
+                                                      <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-inner">
+                                                          <h5 className="text-xs font-bold text-slate-300 mb-4 flex items-center gap-2">
+                                                              <span className="text-[#00A896]">●</span>
+                                                              Correspondencia y Paquetería {sandboxCondoId !== 'all' ? `— ${condosList.find(c => c.id === Number(sandboxCondoId))?.name || ''}` : '(Todos los condominios)'}
+                                                          </h5>
+                                                          <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                                                              {packages.map(pkg => (
+                                                                  <div key={pkg.id} className="flex items-center justify-between p-3 bg-slate-950/50 rounded-xl border border-slate-800/60">
+                                                                      <div className="flex items-center gap-3 min-w-0">
+                                                                          <span className={`text-[10px] font-mono ${pkg.status === 'completed' ? 'text-emerald-500' : 'text-amber-500'}`}>
+                                                                              {pkg.status === 'completed' ? '📦' : '📋'}
+                                                                          </span>
+                                                                          <div className="min-w-0">
+                                                                              <span className="text-xs font-medium text-slate-200 block truncate">{pkg.tracking}</span>
+                                                                              <span className="text-[9px] text-slate-500">{pkg.carrier} → {pkg.resident}</span>
+                                                                          </div>
+                                                                      </div>
+                                                                      <span className="text-[9px] text-slate-600 shrink-0">{pkg.date}</span>
+                                                                  </div>
+                                                              ))}
+                                                          </div>
+                                                      </div>
+                                                  )}
+                                              </div>
+                                          )}
                                     </div>
 
                                     <div className="flex items-center justify-between border-t border-slate-900 pt-4 mt-6 text-[10px] text-slate-500 font-mono">
@@ -2065,10 +2285,6 @@ export default function Dashboard() {
                                 value={stats.users.total}
                                 description={`${stats.users.active} activos`}
                                 color="indigo"
-                                onClick={() => {
-                                    setDevOpsActive(true);
-                                    setTiActiveTab('users');
-                                }}
                                 icon={
                                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
@@ -2080,10 +2296,6 @@ export default function Dashboard() {
                                 value={stats.properties.total}
                                 description={`${stats.properties.occupied} ocupadas, ${stats.properties.vacant} disponibles`}
                                 color="emerald"
-                                onClick={() => {
-                                    setDevOpsActive(true);
-                                    setTiActiveTab('map');
-                                }}
                                 icon={
                                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
@@ -2094,10 +2306,6 @@ export default function Dashboard() {
                                 title="Condominios"
                                 value={stats.condominiums}
                                 color="violet"
-                                onClick={() => {
-                                    setDevOpsActive(true);
-                                    setTiActiveTab('condos');
-                                }}
                                 icon={
                                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
@@ -2109,10 +2317,6 @@ export default function Dashboard() {
                                 value={stats.tickets.open}
                                 description={`${stats.tickets.inProgress} en curso`}
                                 color="amber"
-                                onClick={() => {
-                                    setDevOpsActive(true);
-                                    setTiActiveTab('tickets');
-                                }}
                                 icon={
                                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17l-5.646 5.647a1.5 1.5 0 01-2.121-2.121l5.646-5.646m0 0l5.646-5.646m-5.646 5.646L16.5 3M12 21h9" />
@@ -2124,10 +2328,6 @@ export default function Dashboard() {
                                 value={stats.finances.pendingPayments}
                                 description={`${stats.finances.overduePayments} vencidos`}
                                 color="rose"
-                                onClick={() => {
-                                    setDevOpsActive(true);
-                                    setTiActiveTab('finances');
-                                }}
                                 icon={
                                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -2139,10 +2339,6 @@ export default function Dashboard() {
                                 value={stats.finances.pendingFines}
                                 description={`Total: $${Number(stats.finances.totalFines).toLocaleString()}`}
                                 color="cyan"
-                                onClick={() => {
-                                    setDevOpsActive(true);
-                                    setTiActiveTab('finances');
-                                }}
                                 icon={
                                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
