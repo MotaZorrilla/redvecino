@@ -283,6 +283,7 @@ export default function Dashboard() {
     // Administrative Portal States
     const [adminActiveTab, setAdminActiveTab] = useState('dashboard');
     const [adminCondoId, setAdminCondoId] = useState(1);
+    const [userSubTab, setUserSubTab] = useState('residents');
 
     // Dynamic Tickets pre-filters from KPI click
     const [ticketStatusFilter, setTicketStatusFilter] = useState('all');
@@ -965,6 +966,93 @@ export default function Dashboard() {
                                 {/* 2. MAIN WORKSPACE CONTENT */}
                                 <div className="flex-1 p-8 overflow-y-auto bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-200 flex flex-col justify-between h-full">
                                     <div className="space-y-6">
+                                        {/* Dynamic Impersonation Cross-Filtering Panel */}
+                                        <div className="bg-slate-900/80 border border-slate-800/80 p-5 rounded-2xl space-y-4 relative overflow-hidden shadow-lg text-left">
+                                            <div className="absolute -top-10 -right-10 w-24 h-24 bg-[#00A896]/5 rounded-full blur-2xl pointer-events-none" />
+                                            <h5 className="text-xs font-bold text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                                👑 Matriz de Impersonación Inteligente (Cross-Filtering)
+                                            </h5>
+                                            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
+                                                <div>
+                                                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">1. Condominio</label>
+                                                    <select
+                                                        value={selectedImpCondo}
+                                                        onChange={(e) => {
+                                                            setSelectedImpCondo(e.target.value);
+                                                            setSelectedImpUser(''); // Reset selected user when filter changes
+                                                        }}
+                                                        className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                    >
+                                                        <option value="all">Todos los Condominios</option>
+                                                        {condosList.map(c => (
+                                                            <option key={c.id} value={c.id}>{c.name}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">2. Rol</label>
+                                                    <select
+                                                        value={selectedImpRole}
+                                                        onChange={(e) => {
+                                                            setSelectedImpRole(e.target.value);
+                                                            setSelectedImpUser(''); // Reset selected user when filter changes
+                                                        }}
+                                                        className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                    >
+                                                        <option value="all">Todos los Roles</option>
+                                                        <option value="admin">Administrador</option>
+                                                        <option value="propietario">Propietario</option>
+                                                        <option value="resident">Residente</option>
+                                                        <option value="comite">Comité</option>
+                                                        <option value="colaborador">Colaborador</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">3. Usuario</label>
+                                                    <select
+                                                        value={selectedImpUser}
+                                                        onChange={(e) => setSelectedImpUser(e.target.value)}
+                                                        className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                    >
+                                                        <option value="">Seleccione Usuario...</option>
+                                                        {usersList
+                                                            .filter(u => {
+                                                                if (selectedImpCondo !== 'all') {
+                                                                    const condoId = getUserCondoId(u);
+                                                                    if (condoId !== Number(selectedImpCondo)) return false;
+                                                                }
+                                                                if (selectedImpRole !== 'all') {
+                                                                    const r = selectedImpRole.toLowerCase();
+                                                                    const hasRole = u.roles?.some(role => role.toLowerCase() === r || (r === 'admin' && role.toLowerCase() === 'administrador'));
+                                                                    if (!hasRole) return false;
+                                                                }
+                                                                return true;
+                                                            })
+                                                            .map(u => (
+                                                                <option key={u.id} value={u.id}>{u.name} ({u.roles[0] || 'Residente'})</option>
+                                                            ))
+                                                        }
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            if (!selectedImpUser) return alert('Por favor, seleccione un usuario de la lista.');
+                                                            const targetUser = usersList.find(u => u.id === Number(selectedImpUser));
+                                                            if (targetUser) {
+                                                                setImpersonatedUser(targetUser);
+                                                                setTerminalLogs(prev => [...prev, `[IMPERSONATION] Impersonando a ${targetUser.name} (${targetUser.roles[0]})`]);
+                                                            }
+                                                        }}
+                                                        className="w-full px-4 py-2 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5"
+                                                    >
+                                                        <span>💻 Acceder a la Vista</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         {tiActiveTab === 'devops' && (
                                             <div className="space-y-6 animate-fade-in">
                                                 <div className="flex items-center justify-between">
@@ -1091,8 +1179,12 @@ export default function Dashboard() {
                                                     </h4>
                                                     <div className="flex items-center gap-3 w-full md:w-auto">
                                                         <button
-                                                            onClick={() => setShowAddUserForm(!showAddUserForm)}
-                                                            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0"
+                                                            onClick={() => {
+                                                                setEditingUser(null);
+                                                                setNewUserForm({ name: '', rut: '', email: '', phone: '', role: 'resident', status: 'active', password: 'password' });
+                                                                setShowAddUserForm(!showAddUserForm);
+                                                            }}
+                                                            className="px-4 py-2 bg-indigo-600 hover:bg-[#00A896] text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0"
                                                         >
                                                             {showAddUserForm ? 'Cerrar Form' : 'Crear Usuario'}
                                                         </button>
@@ -1119,21 +1211,35 @@ export default function Dashboard() {
                                                 {showAddUserForm && (
                                                     <form onSubmit={(e) => {
                                                         e.preventDefault();
-                                                        const newU = {
-                                                            id: usersList.length + 1,
-                                                            name: newUserForm.name,
-                                                            rut: newUserForm.rut,
-                                                            email: newUserForm.email,
-                                                            phone: newUserForm.phone,
-                                                            status: newUserForm.status,
-                                                            roles: [newUserForm.role]
-                                                        };
-                                                        setUsersList(prev => [...prev, newU]);
-                                                        setTerminalLogs(prev => [...prev, `[USER] Creado usuario #${newU.id}: ${newU.name} con rol ${newUserForm.role}`]);
+                                                        if (editingUser) {
+                                                            setUsersList(prev => prev.map(u => u.id === editingUser.id ? {
+                                                                ...u,
+                                                                name: newUserForm.name,
+                                                                rut: newUserForm.rut,
+                                                                email: newUserForm.email,
+                                                                phone: newUserForm.phone,
+                                                                status: newUserForm.status,
+                                                                roles: [newUserForm.role]
+                                                            } : u));
+                                                            setTerminalLogs(prev => [...prev, `[USER] Actualizado usuario #${editingUser.id}: ${newUserForm.name}`]);
+                                                            setEditingUser(null);
+                                                        } else {
+                                                            const newU = {
+                                                                id: usersList.length > 0 ? Math.max(...usersList.map(u => u.id)) + 1 : 1,
+                                                                name: newUserForm.name,
+                                                                rut: newUserForm.rut,
+                                                                email: newUserForm.email,
+                                                                phone: newUserForm.phone,
+                                                                status: newUserForm.status,
+                                                                roles: [newUserForm.role]
+                                                            };
+                                                            setUsersList(prev => [...prev, newU]);
+                                                            setTerminalLogs(prev => [...prev, `[USER] Creado usuario #${newU.id}: ${newU.name} con rol ${newUserForm.role}`]);
+                                                        }
                                                         setShowAddUserForm(false);
                                                         setNewUserForm({ name: '', rut: '', email: '', phone: '', role: 'resident', status: 'active', password: 'password' });
                                                     }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl text-left mb-6">
-                                                        <h5 className="text-xs font-bold text-slate-350 uppercase">Detalles del Usuario</h5>
+                                                        <h5 className="text-xs font-bold text-slate-350 uppercase">{editingUser ? '✏️ Editar Usuario' : 'Detalles del Usuario'}</h5>
                                                         <div className="grid grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre completo</label>
@@ -1255,16 +1361,49 @@ export default function Dashboard() {
                                                                                 </span>
                                                                             </td>
                                                                             <td className="p-4 text-right">
-                                                                                <button
-                                                                                    type="button"
-                                                                                    onClick={() => {
-                                                                                        setImpersonatedUser(u);
-                                                                                        setTerminalLogs(prev => [...prev, `[IMPERSONATION] Iniciando sesión como usuario: ${u.name}`]);
-                                                                                    }}
-                                                                                    className="px-3 py-1.5 bg-[#00A896]/10 hover:bg-[#00A896]/20 border border-[#00A896]/30 text-[#00A896] text-[10px] font-bold rounded-lg transition-all flex items-center gap-1.5 ml-auto"
-                                                                                >
-                                                                                    <span>💻 Impersonar</span>
-                                                                                </button>
+                                                                                <div className="flex justify-end gap-1.5">
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        onClick={() => {
+                                                                                            setImpersonatedUser(u);
+                                                                                            setTerminalLogs(prev => [...prev, `[IMPERSONATION] Iniciando sesión como usuario: ${u.name}`]);
+                                                                                        }}
+                                                                                        className="px-2.5 py-1 bg-[#00A896]/10 hover:bg-[#00A896]/20 border border-[#00A896]/30 text-[#00A896] text-[10px] font-bold rounded-lg transition-all"
+                                                                                    >
+                                                                                        💻 Impersonar
+                                                                                    </button>
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        onClick={() => {
+                                                                                            setEditingUser(u);
+                                                                                            setNewUserForm({
+                                                                                                name: u.name,
+                                                                                                rut: u.rut,
+                                                                                                email: u.email,
+                                                                                                phone: u.phone || '',
+                                                                                                role: u.roles[0] || 'resident',
+                                                                                                status: u.status || 'active',
+                                                                                                password: ''
+                                                                                            });
+                                                                                            setShowAddUserForm(true);
+                                                                                        }}
+                                                                                        className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[10px] font-bold rounded-lg transition-all"
+                                                                                    >
+                                                                                        ✏️ Editar
+                                                                                    </button>
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        onClick={() => {
+                                                                                            if (confirm(`¿Estás seguro de eliminar el usuario ${u.name}?`)) {
+                                                                                                setUsersList(prev => prev.filter(item => item.id !== u.id));
+                                                                                                setTerminalLogs(prev => [...prev, `[DELETE] Usuario eliminado: ${u.name} (ID: ${u.id})`]);
+                                                                                            }
+                                                                                        }}
+                                                                                        className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 text-[10px] font-bold rounded-lg transition-all"
+                                                                                    >
+                                                                                        🗑️ Eliminar
+                                                                                    </button>
+                                                                                </div>
                                                                             </td>
                                                                         </tr>
                                                                     ))
@@ -2391,232 +2530,1106 @@ export default function Dashboard() {
                                 </div>
                             </div>
                         ) : (
-                            <div className="space-y-8 animate-fade-in">
-{/* Stats Cards Grid */}
-                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-                            <StatCard
-                                title="Usuarios"
-                                value={stats.users.total}
-                                description={`${stats.users.active} activos`}
-                                color="indigo"
-                                icon={
-                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-                                    </svg>
-                                }
-                            />
-                            <StatCard
-                                title="Propiedades"
-                                value={stats.properties.total}
-                                description={`${stats.properties.occupied} ocupadas, ${stats.properties.vacant} disponibles`}
-                                color="emerald"
-                                icon={
-                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
-                                    </svg>
-                                }
-                            />
-                            <StatCard
-                                title="Condominios"
-                                value={stats.condominiums}
-                                color="violet"
-                                icon={
-                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
-                                    </svg>
-                                }
-                            />
-                            <StatCard
-                                title="Tickets"
-                                value={stats.tickets.open}
-                                description={`${stats.tickets.inProgress} en curso`}
-                                color="amber"
-                                icon={
-                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17l-5.646 5.647a1.5 1.5 0 01-2.121-2.121l5.646-5.646m0 0l5.646-5.646m-5.646 5.646L16.5 3M12 21h9" />
-                                    </svg>
-                                }
-                            />
-                            <StatCard
-                                title="Pagos Pend."
-                                value={stats.finances.pendingPayments}
-                                description={`${stats.finances.overduePayments} vencidos`}
-                                color="rose"
-                                icon={
-                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                }
-                            />
-                            <StatCard
-                                title="Multas"
-                                value={stats.finances.pendingFines}
-                                description={`Total: $${Number(stats.finances.totalFines).toLocaleString()}`}
-                                color="cyan"
-                                icon={
-                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                                    </svg>
-                                }
-                            />
-                        </div>
+                            (() => {
+                                // Compute dynamic filtered states for normal Admins
+                                const adminFilteredUsers = usersList.filter(u => {
+                                    // Spatie TI occlusion - normal Admins must NEVER see or interact with TI users!
+                                    if (u.roles?.some(r => r.toLowerCase() === 'ti')) return false;
+                                    
+                                    const condoId = getUserCondoId(u);
+                                    return condoId === adminCondoId;
+                                });
 
-                        {/* Users by Role & Ticket Status */}
-                        <div className="grid gap-6 lg:grid-cols-3">
-                            <SectionCard title="Usuarios por Rol">
-                                <div className="space-y-1">
-                                    {Object.entries(stats.usersByRole || {}).map(([role, count]) => (
-                                        <StatRow
-                                            key={role}
-                                            label={role}
-                                            value={count}
-                                        />
-                                    ))}
-                                </div>
-                            </SectionCard>
+                                const adminFilteredProperties = propertiesList.filter(p => Number(p.condominium_id) === adminCondoId);
+                                const adminFilteredTickets = ticketsList.filter(t => t.property && Number(t.property.condominium_id) === adminCondoId);
+                                const adminFilteredPayments = paymentsList.filter(p => p.property && Number(p.property.condominium_id) === adminCondoId);
+                                const adminFilteredFines = finesList.filter(f => Number(f.condominium_id) === adminCondoId);
 
-                            <SectionCard title="Estado de Tickets">
-                                <div className="space-y-1">
-                                    <StatRow label="Abiertos" value={stats.tickets.open} />
-                                    <StatRow label="En Progreso" value={stats.tickets.inProgress} />
-                                    <StatRow label="Resueltos" value={stats.tickets.resolved} />
-                                    <StatRow label="Alta Prioridad" value={stats.tickets.highPriority} />
-                                </div>
-                                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-800">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium text-gray-700 dark:text-slate-400">Total gastos</span>
-                                        <span className="text-sm font-bold text-gray-900 dark:text-white">
-                                            ${Number(stats.finances.totalExpenses).toLocaleString()}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center justify-between mt-1">
-                                        <span className="text-sm font-medium text-gray-700 dark:text-slate-400">Total pagos</span>
-                                        <span className="text-sm font-bold text-emerald-600 dark:text-emerald-450">
-                                            ${Number(stats.finances.totalPayments).toLocaleString()}
-                                        </span>
-                                    </div>
-                                </div>
-                            </SectionCard>
+                                const filteredUsersForSubtab = adminFilteredUsers.filter(u => {
+                                    const isAdmin = u.roles?.some(r => ['admin', 'administrador'].includes(r.toLowerCase()));
+                                    return userSubTab === 'residents' ? !isAdmin : isAdmin;
+                                });
 
-                            <SectionCard title="Resumen Rápido">
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400 dark:border dark:border-indigo-500/20">
-                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-gray-900 dark:text-slate-200">
-                                                {stats.unreadMessages > 0 ? (
-                                                    <span>{stats.unreadMessages} mensaje{stats.unreadMessages !== 1 ? 's' : ''} sin leer</span>
-                                                ) : (
-                                                    <span>No hay mensajes sin leer</span>
-                                                )}
-                                            </p>
-                                            <p className="text-xs text-gray-400 dark:text-slate-500">Bandeja de entrada</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 dark:border dark:border-amber-500/20">
-                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-gray-900 dark:text-slate-200">
-                                                {stats.tickets.highPriority > 0 ? (
-                                                    <span>{stats.tickets.highPriority} ticket{stats.tickets.highPriority !== 1 ? 's' : ''} urgentes</span>
-                                                ) : (
-                                                    <span>Sin tickets urgentes</span>
-                                                )}
-                                            </p>
-                                            <p className="text-xs text-gray-400 dark:text-slate-500">Requieren atención</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </SectionCard>
-                        </div>
-
-                        {/* Recent Tickets */}
-                        <SectionCard title="Tickets Recientes" link="/tickets">
-                            <SimpleTable
-                                headers={['ID', 'Título', 'Categoría', 'Prioridad', 'Estado', 'Creado por']}
-                                rows={ticketsList?.map(t => ({
-                                    cells: [
-                                        <span className="font-medium text-gray-900 dark:text-white">#{t.id}</span>,
-                                        <span className="max-w-[200px] truncate block">{t.title}</span>,
-                                        t.category?.name || '-',
-                                        <StatusBadge status={t.priority} type="priority" />,
-                                        <StatusBadge status={t.status} type="ticket" />,
-                                        t.creator?.name || '-',
-                                    ]
-                                }))}
-                                emptyMessage="No hay tickets registrados"
-                            />
-                        </SectionCard>
-
-                        {/* Recent Payments & Upcoming Expenses */}
-                        <div className="grid gap-6 lg:grid-cols-2">
-                            <SectionCard title="Pagos Recientes" link="/payments">
-                                <SimpleTable
-                                    headers={['Usuario', 'Propiedad', 'Monto', 'Método', 'Estado', 'Fecha']}
-                                    rows={paymentsList?.map(p => ({
-                                        cells: [
-                                            p.user?.name || '-',
-                                            <span className="dark:text-slate-400">#{p.property_id}</span>,
-                                            <span className="font-medium dark:text-emerald-450">${Number(p.amount).toLocaleString()}</span>,
-                                            p.payment_method,
-                                            <StatusBadge status={p.status} type="payment" />,
-                                            new Date(p.payment_date).toLocaleDateString('es-CL'),
-                                        ]
-                                    }))}
-                                    emptyMessage="No hay pagos registrados"
-                                />
-                            </SectionCard>
-
-                            <SectionCard title="Próximos Gastos Comunes">
-                                <SimpleTable
-                                    headers={['Condominio', 'Período', 'Monto', 'Vencimiento', 'Estado']}
-                                    rows={upcomingExpenses?.map(e => ({
-                                        cells: [
-                                            e.condominium?.name || '-',
-                                            e.period,
-                                            <span className="font-medium dark:text-slate-200">${Number(e.amount).toLocaleString()}</span>,
-                                            new Date(e.due_date).toLocaleDateString('es-CL'),
-                                            <StatusBadge status={e.status} type="payment" />,
-                                        ]
-                                    }))}
-                                    emptyMessage="No hay gastos próximos"
-                                />
-                            </SectionCard>
-                        </div>
-
-                        {/* Recent Announcements */}
-                        <SectionCard title="Últimos Anuncios" link="/announcements">
-                            {recentAnnouncements && recentAnnouncements.length > 0 ? (
-                                <div className="divide-y divide-gray-50 dark:divide-slate-800">
-                                    {recentAnnouncements.map(a => (
-                                        <div key={a.id} className="py-3 flex items-start justify-between">
-                                            <div className="min-w-0 flex-1">
-                                                <p className="text-sm font-medium text-gray-900 dark:text-slate-200 truncate">{a.title}</p>
-                                                <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
-                                                    {new Date(a.published_at).toLocaleDateString('es-CL', {
-                                                        year: 'numeric', month: 'long', day: 'numeric'
-                                                    })}
-                                                </p>
+                                return (
+                                    <div className="space-y-8 animate-fade-in text-gray-700 dark:text-slate-200">
+                                        {/* Top Condo and Navigation Bar */}
+                                        <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-white dark:bg-slate-900 border border-gray-150 dark:border-slate-800/80 p-5 rounded-2xl shadow-sm">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-10 w-10 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center rounded-xl border border-indigo-500/20">
+                                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 21V5.25A2.25 2.25 0 0017.25 3h-10.5A2.25 2.25 0 004.5 5.25V21m15 0h-15M19.5 21h-3m-12 0h3m12 0v-4.125a1.125 1.125 0 00-1.125-1.125h-2.25a1.125 1.125 0 00-1.125 1.125V21M3 10.5h18" />
+                                                    </svg>
+                                                </div>
+                                                <div className="text-left">
+                                                    <span className="text-[10px] text-gray-400 dark:text-slate-505 font-bold uppercase tracking-wider block">Condominio Seleccionado</span>
+                                                    <select
+                                                        value={adminCondoId}
+                                                        onChange={(e) => {
+                                                            setAdminCondoId(Number(e.target.value));
+                                                            setAdminActiveTab('dashboard'); // reset to dashboard on condo switch
+                                                        }}
+                                                        className="bg-transparent border-none font-bold text-slate-800 dark:text-white text-sm focus:ring-0 p-0 pr-8 focus:outline-none cursor-pointer"
+                                                    >
+                                                        {condosList.map(c => (
+                                                            <option key={c.id} value={c.id} className="dark:bg-slate-900 text-slate-800 dark:text-white">{c.name}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
                                             </div>
-                                            <div className="ml-4 flex-shrink-0">
-                                                <span className="text-xs text-gray-400 dark:text-slate-500">por {a.creator?.name || '-'}</span>
+
+                                            {/* Tab Navigation */}
+                                            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-slate-955 p-1.5 rounded-xl border border-gray-150 dark:border-slate-800/80 overflow-x-auto w-full md:w-auto">
+                                                {[
+                                                    { id: 'dashboard', label: '📊 Resumen' },
+                                                    { id: 'users', label: '👥 Usuarios' },
+                                                    { id: 'properties', label: '🏢 Propiedades' },
+                                                    { id: 'tickets', label: '🛠️ Tickets' },
+                                                    { id: 'payments', label: '💵 Pagos' },
+                                                    { id: 'fines', label: '⚖️ Multas' }
+                                                ].map(tab => (
+                                                    <button
+                                                        key={tab.id}
+                                                        onClick={() => setAdminActiveTab(tab.id)}
+                                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+                                                            adminActiveTab === tab.id
+                                                                ? 'bg-indigo-650 text-white shadow shadow-indigo-650/10'
+                                                                : 'text-gray-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white'
+                                                        }`}
+                                                    >
+                                                        {tab.label}
+                                                    </button>
+                                                ))}
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-sm text-gray-400 dark:text-slate-500 text-center py-4">No hay anuncios publicados</p>
-                            )}
-                        </SectionCard>
-                            </div>
+
+                                        {/* 📊 DASHBOARD TAB */}
+                                        {adminActiveTab === 'dashboard' && (
+                                            <div className="space-y-6 animate-fade-in">
+                                                {/* Condo Banner */}
+                                                <div className="bg-gradient-to-r from-indigo-900 to-indigo-850 border border-indigo-950 rounded-2xl p-6 text-white relative overflow-hidden shadow-md">
+                                                    <div className="absolute -right-20 -top-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+                                                    <div className="relative z-10 space-y-1 text-left">
+                                                        <span className="text-[10px] bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 font-bold px-2 py-0.5 rounded uppercase">Comunidad Activa</span>
+                                                        <h4 className="text-xl font-black">{condosList.find(c => c.id === adminCondoId)?.name || 'Condominio'}</h4>
+                                                        <p className="text-xs text-indigo-200">{condosList.find(c => c.id === adminCondoId)?.address}, {condosList.find(c => c.id === adminCondoId)?.city}</p>
+                                                    </div>
+                                                </div>
+
+                                                {/* KPI Cards Grid */}
+                                                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                                                    <StatCard
+                                                        title="Usuarios"
+                                                        value={adminFilteredUsers.length}
+                                                        description="Ver residentes & admins"
+                                                        color="indigo"
+                                                        icon={
+                                                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                                                            </svg>
+                                                        }
+                                                        onClick={() => setAdminActiveTab('users')}
+                                                    />
+                                                    <StatCard
+                                                        title="Propiedades"
+                                                        value={adminFilteredProperties.length}
+                                                        description={`${adminFilteredProperties.filter(p => p.status === 'occupied').length} ocupadas`}
+                                                        color="emerald"
+                                                        icon={
+                                                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+                                                            </svg>
+                                                        }
+                                                        onClick={() => setAdminActiveTab('properties')}
+                                                    />
+                                                    <StatCard
+                                                        title="Tickets Activos"
+                                                        value={adminFilteredTickets.filter(t => t.status !== 'resolved').length}
+                                                        description="Pendientes o en curso"
+                                                        color="amber"
+                                                        icon={
+                                                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17l-5.646 5.647a1.5 1.5 0 01-2.121-2.121l5.646-5.646m0 0l5.646-5.646m-5.646 5.646L16.5 3M12 21h9" />
+                                                            </svg>
+                                                        }
+                                                        onClick={() => {
+                                                            setTicketStatusFilter('all');
+                                                            setTicketPriorityFilter('all');
+                                                            setAdminActiveTab('tickets');
+                                                        }}
+                                                    />
+                                                    <StatCard
+                                                        title="Pagos Registrados"
+                                                        value={adminFilteredPayments.length}
+                                                        description={`Monto: $${adminFilteredPayments.reduce((acc, curr) => acc + Number(curr.amount), 0).toLocaleString()}`}
+                                                        color="rose"
+                                                        icon={
+                                                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                            </svg>
+                                                        }
+                                                        onClick={() => setAdminActiveTab('payments')}
+                                                    />
+                                                    <StatCard
+                                                        title="Multas Pendentes"
+                                                        value={adminFilteredFines.filter(f => f.status === 'pending').length}
+                                                        description={`Total: $${adminFilteredFines.reduce((acc, curr) => acc + Number(curr.amount), 0).toLocaleString()}`}
+                                                        color="cyan"
+                                                        icon={
+                                                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                                                            </svg>
+                                                        }
+                                                        onClick={() => setAdminActiveTab('fines')}
+                                                    />
+                                                </div>
+
+                                                {/* Quick Summary Section */}
+                                                <div className="grid gap-6 lg:grid-cols-2">
+                                                    {/* Tickets Recientes */}
+                                                    <SectionCard title="Tickets Recientes del Condominio">
+                                                        <SimpleTable
+                                                            headers={['ID', 'Título', 'Prioridad', 'Estado', 'Vecino']}
+                                                            rows={adminFilteredTickets.slice(0, 5).map(t => ({
+                                                                cells: [
+                                                                    <span className="font-mono text-xs text-gray-500">#{t.id}</span>,
+                                                                    <button 
+                                                                        onClick={() => {
+                                                                            setEditingTicket(t);
+                                                                            setAdminActiveTab('tickets');
+                                                                        }}
+                                                                        className="text-xs text-indigo-650 dark:text-indigo-400 hover:underline text-left font-medium block truncate max-w-[150px]"
+                                                                    >
+                                                                        {t.title}
+                                                                    </button>,
+                                                                    <StatusBadge status={t.priority} type="priority" />,
+                                                                    <StatusBadge status={t.status} type="ticket" />,
+                                                                    <span className="text-xs text-slate-500">{t.creator?.name || 'Vecino'}</span>
+                                                                ]
+                                                            }))}
+                                                            emptyMessage="No hay tickets recientes en esta comunidad"
+                                                        />
+                                                    </SectionCard>
+
+                                                    {/* Pagos Recientes */}
+                                                    <SectionCard title="Últimos Pagos Registrados">
+                                                        <SimpleTable
+                                                            headers={['Propiedad', 'Vecino', 'Monto', 'Fecha', 'Estado']}
+                                                            rows={adminFilteredPayments.slice(0, 5).map(p => ({
+                                                                cells: [
+                                                                    <span className="font-mono font-bold">#{p.property_id}</span>,
+                                                                    <span className="text-xs">{p.user?.name || '-'}</span>,
+                                                                    <span className="font-bold text-emerald-600 dark:text-emerald-450">${Number(p.amount).toLocaleString()}</span>,
+                                                                    <span className="text-xs text-slate-500">{new Date(p.payment_date).toLocaleDateString('es-CL')}</span>,
+                                                                    <StatusBadge status={p.status} type="payment" />
+                                                                ]
+                                                            }))}
+                                                            emptyMessage="No hay cobros ni pagos recientes"
+                                                        />
+                                                    </SectionCard>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* 👥 USERS TAB */}
+                                        {adminActiveTab === 'users' && (
+                                            <div className="space-y-6 animate-fade-in text-left">
+                                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                                    <div>
+                                                        <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">
+                                                            👥 Gestión de Usuarios
+                                                        </h4>
+                                                        <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Administra residentes y personal con accesos restringidos.</p>
+                                                    </div>
+                                                    
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="flex bg-gray-100 dark:bg-slate-950 p-1 rounded-lg border border-gray-200 dark:border-slate-800/80 mr-2">
+                                                            <button
+                                                                onClick={() => setUserSubTab('residents')}
+                                                                className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${userSubTab === 'residents' ? 'bg-white dark:bg-slate-900 text-indigo-650 dark:text-white shadow' : 'text-slate-505 dark:text-slate-400'}`}
+                                                            >
+                                                                Residentes ({adminFilteredUsers.filter(u => !u.roles?.some(r => ['admin', 'administrador'].includes(r.toLowerCase()))).length})
+                                                            </button>
+                                                            <button
+                                                                onClick={() => setUserSubTab('admins')}
+                                                                className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${userSubTab === 'admins' ? 'bg-white dark:bg-slate-900 text-indigo-650 dark:text-white shadow' : 'text-slate-505 dark:text-slate-400'}`}
+                                                            >
+                                                                Administradores ({adminFilteredUsers.filter(u => u.roles?.some(r => ['admin', 'administrador'].includes(r.toLowerCase()))).length})
+                                                            </button>
+                                                        </div>
+
+                                                        <button
+                                                            onClick={() => {
+                                                                setEditingUser(null);
+                                                                setNewUserForm({ name: '', rut: '', email: '', phone: '', role: userSubTab === 'admins' ? 'admin' : 'resident', status: 'active', password: 'password' });
+                                                                setShowAddUserForm(!showAddUserForm);
+                                                            }}
+                                                            className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow transition-all"
+                                                        >
+                                                            {showAddUserForm ? 'Cerrar Form' : 'Añadir Usuario'}
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {showAddUserForm && (
+                                                    <form onSubmit={(e) => {
+                                                        e.preventDefault();
+                                                        if (editingUser) {
+                                                            setUsersList(prev => prev.map(u => u.id === editingUser.id ? {
+                                                                ...u,
+                                                                name: newUserForm.name,
+                                                                rut: newUserForm.rut,
+                                                                email: newUserForm.email,
+                                                                phone: newUserForm.phone,
+                                                                status: newUserForm.status,
+                                                                roles: [newUserForm.role]
+                                                            } : u));
+                                                            setEditingUser(null);
+                                                        } else {
+                                                            const newU = {
+                                                                id: usersList.length > 0 ? Math.max(...usersList.map(u => u.id)) + 1 : 1,
+                                                                name: newUserForm.name,
+                                                                rut: newUserForm.rut,
+                                                                email: newUserForm.email,
+                                                                phone: newUserForm.phone,
+                                                                status: newUserForm.status,
+                                                                roles: [newUserForm.role],
+                                                                condominium_id: adminCondoId
+                                                            };
+                                                            setUsersList(prev => [...prev, newU]);
+                                                        }
+                                                        setShowAddUserForm(false);
+                                                        setNewUserForm({ name: '', rut: '', email: '', phone: '', role: 'resident', status: 'active', password: 'password' });
+                                                    }} className="bg-slate-50 dark:bg-slate-900/60 p-6 rounded-2xl border border-gray-200 dark:border-slate-800 space-y-4 max-w-xl text-left">
+                                                        <h5 className="text-xs font-bold text-gray-800 dark:text-slate-200 uppercase">{editingUser ? '✏️ Editar Usuario' : '👥 Detalles del Usuario'}</h5>
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre completo</label>
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    value={newUserForm.name}
+                                                                    onChange={(e) => setNewUserForm(prev => ({ ...prev, name: e.target.value }))}
+                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">RUT / Identificación</label>
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    value={newUserForm.rut}
+                                                                    onChange={(e) => setNewUserForm(prev => ({ ...prev, rut: e.target.value }))}
+                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Correo Electrónico</label>
+                                                                <input
+                                                                    type="email"
+                                                                    required
+                                                                    value={newUserForm.email}
+                                                                    onChange={(e) => setNewUserForm(prev => ({ ...prev, email: e.target.value }))}
+                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Teléfono</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={newUserForm.phone}
+                                                                    onChange={(e) => setNewUserForm(prev => ({ ...prev, phone: e.target.value }))}
+                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Rol</label>
+                                                                <select
+                                                                    value={newUserForm.role}
+                                                                    onChange={(e) => setNewUserForm(prev => ({ ...prev, role: e.target.value }))}
+                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                                                >
+                                                                    <option value="resident">Residente</option>
+                                                                    <option value="owner">Propietario</option>
+                                                                    <option value="comite">Comité</option>
+                                                                    <option value="colaborador">Colaborador</option>
+                                                                    <option value="admin">Administrador</option>
+                                                                </select>
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado</label>
+                                                                <select
+                                                                    value={newUserForm.status}
+                                                                    onChange={(e) => setNewUserForm(prev => ({ ...prev, status: e.target.value }))}
+                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                                                >
+                                                                    <option value="active">Activo</option>
+                                                                    <option value="inactive">Inactivo</option>
+                                                                    <option value="suspended">Suspendido</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex gap-2">
+                                                            <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow">
+                                                                {editingUser ? 'Guardar Cambios' : 'Añadir Usuario'}
+                                                            </button>
+                                                            <button type="button" onClick={() => { setShowAddUserForm(false); setEditingUser(null); }} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl">
+                                                                Cancelar
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                )}
+
+                                                <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+                                                    <SimpleTable
+                                                        headers={['Nombre Completo', 'RUT', 'Correo', 'Rol', 'Estado', 'Acciones']}
+                                                        rows={filteredUsersForSubtab.map(u => ({
+                                                            cells: [
+                                                                <span className="font-bold text-gray-900 dark:text-white">{u.name}</span>,
+                                                                <span className="font-mono text-xs">{u.rut}</span>,
+                                                                u.email,
+                                                                <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 dark:text-indigo-400">
+                                                                    {u.roles[0] || 'Residente'}
+                                                                </span>,
+                                                                <span className={`inline-flex items-center gap-1.5 text-xs ${u.status === 'active' ? 'text-emerald-500' : 'text-slate-500'}`}>
+                                                                    <span className={`h-1.5 w-1.5 rounded-full ${u.status === 'active' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                                                                    <span className="capitalize">{u.status || 'Active'}</span>
+                                                                </span>,
+                                                                <div className="flex items-center gap-2 justify-end">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            setEditingUser(u);
+                                                                            setNewUserForm({
+                                                                                name: u.name,
+                                                                                rut: u.rut,
+                                                                                email: u.email,
+                                                                                phone: u.phone || '',
+                                                                                role: u.roles[0] || 'resident',
+                                                                                status: u.status || 'active',
+                                                                                password: ''
+                                                                            });
+                                                                            setShowAddUserForm(true);
+                                                                        }}
+                                                                        className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-[10px] font-bold rounded-lg transition-all"
+                                                                    >
+                                                                        ✏️ Editar
+                                                                    </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            if (confirm(`¿Estás seguro de eliminar a ${u.name}?`)) {
+                                                                                setUsersList(prev => prev.filter(item => item.id !== u.id));
+                                                                            }
+                                                                        }}
+                                                                        className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-bold rounded-lg transition-all"
+                                                                    >
+                                                                        🗑️ Eliminar
+                                                                    </button>
+                                                                </div>
+                                                            ]
+                                                        }))}
+                                                        emptyMessage="No hay usuarios en este segmento"
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* 🏢 PROPERTIES TAB */}
+                                        {adminActiveTab === 'properties' && (
+                                            <div className="space-y-6 animate-fade-in text-left">
+                                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                                    <div>
+                                                        <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">
+                                                            🏢 Registro de Unidades (Propiedades)
+                                                        </h4>
+                                                        <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Gestiona departamentos, estacionamientos y asignación de vecinos.</p>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => {
+                                                            setEditingProp(null);
+                                                            setNewPropForm({ condominium_id: adminCondoId, type: 'apartment', number: '', block: 'Torre A', floor: '', area_sqm: '', status: 'vacant' });
+                                                            setShowAddPropForm(!showAddPropForm);
+                                                        }}
+                                                        className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow transition-all"
+                                                    >
+                                                        {showAddPropForm ? 'Cerrar Form' : 'Añadir Unidad'}
+                                                    </button>
+                                                </div>
+
+                                                {showAddPropForm && (
+                                                    <form onSubmit={(e) => {
+                                                        e.preventDefault();
+                                                        if (editingProp) {
+                                                            setPropertiesList(prev => prev.map(p => p.id === editingProp.id ? {
+                                                                ...p,
+                                                                type: newPropForm.type,
+                                                                number: newPropForm.number,
+                                                                block: newPropForm.block,
+                                                                floor: Number(newPropForm.floor),
+                                                                area_sqm: Number(newPropForm.area_sqm),
+                                                                status: newPropForm.status
+                                                            } : p));
+                                                            setEditingProp(null);
+                                                        } else {
+                                                            const newP = {
+                                                                id: propertiesList.length > 0 ? Math.max(...propertiesList.map(p => p.id)) + 1 : 1,
+                                                                condominium_id: adminCondoId,
+                                                                type: newPropForm.type,
+                                                                number: newPropForm.number,
+                                                                block: newPropForm.block,
+                                                                floor: Number(newPropForm.floor),
+                                                                area_sqm: Number(newPropForm.area_sqm),
+                                                                status: newPropForm.status,
+                                                                owners: [],
+                                                                residents: []
+                                                            };
+                                                            setPropertiesList(prev => [...prev, newP]);
+                                                        }
+                                                        setShowAddPropForm(false);
+                                                        setNewPropForm({ condominium_id: adminCondoId, type: 'apartment', number: '', block: 'Torre A', floor: '', area_sqm: '', status: 'vacant' });
+                                                    }} className="bg-slate-50 dark:bg-slate-900/60 p-6 rounded-2xl border border-gray-200 dark:border-slate-800 space-y-4 max-w-xl text-left">
+                                                        <h5 className="text-xs font-bold text-gray-800 dark:text-slate-200 uppercase">{editingProp ? '✏️ Editar Propiedad' : '🏢 Detalles de la Propiedad'}</h5>
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Tipo de Unidad</label>
+                                                                <select
+                                                                    value={newPropForm.type}
+                                                                    onChange={(e) => setNewPropForm(prev => ({ ...prev, type: e.target.value }))}
+                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                >
+                                                                    <option value="apartment">Departamento</option>
+                                                                    <option value="house">Casa</option>
+                                                                    <option value="parking">Estacionamiento</option>
+                                                                    <option value="storage">Bodega</option>
+                                                                </select>
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Número / Identificador</label>
+                                                                <input
+                                                                    type="text"
+                                                                    required
+                                                                    value={newPropForm.number}
+                                                                    onChange={(e) => setNewPropForm(prev => ({ ...prev, number: e.target.value }))}
+                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div className="grid grid-cols-3 gap-4">
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Torre / Bloque</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={newPropForm.block}
+                                                                    onChange={(e) => setNewPropForm(prev => ({ ...prev, block: e.target.value }))}
+                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Piso</label>
+                                                                <input
+                                                                    type="number"
+                                                                    value={newPropForm.floor}
+                                                                    onChange={(e) => setNewPropForm(prev => ({ ...prev, floor: e.target.value }))}
+                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Metros Cuadrados (m²)</label>
+                                                                <input
+                                                                    type="number"
+                                                                    value={newPropForm.area_sqm}
+                                                                    onChange={(e) => setNewPropForm(prev => ({ ...prev, area_sqm: e.target.value }))}
+                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado de Ocupación</label>
+                                                            <select
+                                                                value={newPropForm.status}
+                                                                onChange={(e) => setNewPropForm(prev => ({ ...prev, status: e.target.value }))}
+                                                                className="w-full bg-white dark:bg-slate-955 border border-gray-350 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                            >
+                                                                <option value="occupied">Ocupado</option>
+                                                                <option value="vacant">Desocupado</option>
+                                                                <option value="maintenance">Mantenimiento</option>
+                                                            </select>
+                                                        </div>
+                                                        <div className="flex gap-2">
+                                                            <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow">
+                                                                {editingProp ? 'Guardar Cambios' : 'Añadir Propiedad'}
+                                                            </button>
+                                                            <button type="button" onClick={() => { setShowAddPropForm(false); setEditingProp(null); }} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl">
+                                                                Cancelar
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                )}
+
+                                                <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+                                                    <SimpleTable
+                                                        headers={['Unidad', 'Tipo', 'Ubicación', 'Área (m²)', 'Ocupación', 'Vecinos Asignados', 'Acciones']}
+                                                        rows={adminFilteredProperties.map(p => {
+                                                            const ownersListText = p.owners?.join(', ') || 'Sin Propietario';
+                                                            const residentsListText = p.residents?.join(', ') || 'Sin Residente';
+                                                            
+                                                            return {
+                                                                cells: [
+                                                                    <span className="font-bold text-gray-900 dark:text-white">#{p.number}</span>,
+                                                                    <span className="capitalize text-xs font-mono">{p.type === 'apartment' ? 'Depto' : p.type === 'parking' ? 'Estac.' : p.type}</span>,
+                                                                    <span>{p.block || 'Torre A'} &bull; Piso {p.floor || 1}</span>,
+                                                                    <span className="font-mono text-xs">{p.area_sqm || 0} m²</span>,
+                                                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                                                                        p.status === 'occupied'
+                                                                            ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-500'
+                                                                            : p.status === 'vacant'
+                                                                            ? 'bg-slate-500/10 border border-slate-500/20 text-slate-500'
+                                                                            : 'bg-amber-500/10 border border-amber-500/20 text-amber-500'
+                                                                    }`}>
+                                                                        {p.status}
+                                                                    </span>,
+                                                                    <div className="text-xs space-y-0.5">
+                                                                        <div><span className="text-[10px] font-bold text-indigo-500 uppercase">Prop:</span> {ownersListText}</div>
+                                                                        <div><span className="text-[10px] font-bold text-emerald-500 uppercase">Resi:</span> {residentsListText}</div>
+                                                                    </div>,
+                                                                    <div className="flex items-center gap-2 justify-end">
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => {
+                                                                                setEditingProp(p);
+                                                                                setNewPropForm({
+                                                                                    condominium_id: p.condominium_id,
+                                                                                    type: p.type,
+                                                                                    number: p.number,
+                                                                                    block: p.block || 'Torre A',
+                                                                                    floor: p.floor || '',
+                                                                                    area_sqm: p.area_sqm || '',
+                                                                                    status: p.status
+                                                                                });
+                                                                                setShowAddPropForm(true);
+                                                                            }}
+                                                                            className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-[10px] font-bold rounded-lg transition-all"
+                                                                        >
+                                                                            ✏️ Editar
+                                                                        </button>
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => {
+                                                                                if (confirm(`¿Estás seguro de eliminar la unidad #${p.number}?`)) {
+                                                                                    setPropertiesList(prev => prev.filter(item => item.id !== p.id));
+                                                                                }
+                                                                            }}
+                                                                            className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-bold rounded-lg transition-all"
+                                                                        >
+                                                                            🗑️ Eliminar
+                                                                        </button>
+                                                                    </div>
+                                                                ]
+                                                            };
+                                                        })}
+                                                        emptyMessage="No hay propiedades registradas en este condominio"
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* 🛠️ TICKETS TAB */}
+                                        {adminActiveTab === 'tickets' && (
+                                            <div className="space-y-6 animate-fade-in text-left">
+                                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                                    <div>
+                                                        <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">
+                                                            🛠️ Consola de Tickets e Infracciones
+                                                        </h4>
+                                                        <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Inspecciona, asigna personal y resuelve incidentes de copropietarios.</p>
+                                                    </div>
+                                                    
+                                                    {/* Filters */}
+                                                    <div className="flex items-center gap-3">
+                                                        <select
+                                                            value={ticketStatusFilter}
+                                                            onChange={(e) => setTicketStatusFilter(e.target.value)}
+                                                            className="px-3 py-1.5 bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800/80 rounded-xl text-xs text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                                        >
+                                                            <option value="all">Todos los Estados</option>
+                                                            <option value="open">Abierto</option>
+                                                            <option value="in_progress">En Progreso</option>
+                                                            <option value="resolved">Resuelto</option>
+                                                        </select>
+                                                        <select
+                                                            value={ticketPriorityFilter}
+                                                            onChange={(e) => setTicketPriorityFilter(e.target.value)}
+                                                            className="px-3 py-1.5 bg-gray-50 dark:bg-slate-955 border border-gray-200 dark:border-slate-800/80 rounded-xl text-xs text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                                        >
+                                                            <option value="all">Todas las Prioridades</option>
+                                                            <option value="low">Baja</option>
+                                                            <option value="medium">Media</option>
+                                                            <option value="high">Alta</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid gap-6 lg:grid-cols-3 items-start">
+                                                    {/* Tickets List */}
+                                                    <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+                                                        <SimpleTable
+                                                            headers={['ID', 'Título', 'Vecino', 'Prioridad', 'Estado', 'Acción']}
+                                                            rows={adminFilteredTickets
+                                                                .filter(t => {
+                                                                    if (ticketStatusFilter !== 'all' && t.status !== ticketStatusFilter) return false;
+                                                                    if (ticketPriorityFilter !== 'all' && t.priority !== ticketPriorityFilter) return false;
+                                                                    return true;
+                                                                })
+                                                                .map(t => ({
+                                                                    cells: [
+                                                                        <span className="font-mono text-xs text-slate-500">#{t.id}</span>,
+                                                                        <span className="font-bold text-gray-900 dark:text-white truncate block max-w-[160px]">{t.title}</span>,
+                                                                        <span className="text-xs">{t.creator?.name || 'Vecino'}</span>,
+                                                                        <StatusBadge status={t.priority} type="priority" />,
+                                                                        <StatusBadge status={t.status} type="ticket" />,
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => setEditingTicket(t)}
+                                                                            className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-indigo-200 dark:border-slate-700 text-indigo-650 dark:text-indigo-400 text-[10px] font-bold rounded-lg transition-all"
+                                                                        >
+                                                                            🔍 Inspeccionar
+                                                                        </button>
+                                                                    ]
+                                                                }))
+                                                            }
+                                                            emptyMessage="No hay tickets que coincidan con los filtros"
+                                                        />
+                                                    </div>
+
+                                                    {/* Details & Assignment Card */}
+                                                    <div className="bg-slate-50 dark:bg-slate-900/60 p-5 rounded-2xl border border-gray-200 dark:border-slate-800 space-y-4">
+                                                        <h5 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Detalle del Ticket</h5>
+                                                        {editingTicket ? (
+                                                            <div className="space-y-4">
+                                                                <div className="space-y-1">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <span className="font-mono text-xs text-slate-500 font-bold">#{editingTicket.id}</span>
+                                                                        <StatusBadge status={editingTicket.priority} type="priority" />
+                                                                    </div>
+                                                                    <h6 className="font-bold text-sm text-gray-900 dark:text-white">{editingTicket.title}</h6>
+                                                                    <p className="text-xs text-gray-600 dark:text-slate-400 bg-white dark:bg-slate-955 p-3 rounded-lg border border-gray-200 dark:border-slate-800/80 min-h-[60px]">{editingTicket.description}</p>
+                                                                </div>
+
+                                                                <div className="grid grid-cols-2 gap-3 text-xs">
+                                                                    <div>
+                                                                        <span className="text-[9px] text-slate-400 block uppercase font-bold">Solicitante:</span>
+                                                                        <span className="font-medium">{editingTicket.creator?.name || 'Coproprietario'}</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <span className="text-[9px] text-slate-400 block uppercase font-bold">Categoría:</span>
+                                                                        <span className="font-medium">{editingTicket.category?.name || 'Mantenimiento'}</span>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Status Update */}
+                                                                <div>
+                                                                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado de la Solicitud</label>
+                                                                    <select
+                                                                        value={editingTicket.status}
+                                                                        onChange={(e) => {
+                                                                            const updatedStatus = e.target.value;
+                                                                            setTicketsList(prev => prev.map(t => t.id === editingTicket.id ? { ...t, status: updatedStatus } : t));
+                                                                            setEditingTicket(prev => ({ ...prev, status: updatedStatus }));
+                                                                        }}
+                                                                        className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-855 dark:text-white focus:outline-none"
+                                                                    >
+                                                                        <option value="open">Abierto / Recibido</option>
+                                                                        <option value="in_progress">En Progreso / Asignado</option>
+                                                                        <option value="resolved">Resuelto</option>
+                                                                    </select>
+                                                                </div>
+
+                                                                {/* Employee Assignment */}
+                                                                <div>
+                                                                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Asignar Operador / Conserje</label>
+                                                                    <select
+                                                                        value={editingTicket.assigned_to || ''}
+                                                                        onChange={(e) => {
+                                                                            const assigneeName = e.target.value;
+                                                                            setTicketsList(prev => prev.map(t => t.id === editingTicket.id ? { ...t, assigned_to: assigneeName } : t));
+                                                                            setEditingTicket(prev => ({ ...prev, assigned_to: assigneeName }));
+                                                                        }}
+                                                                        className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-855 dark:text-white focus:outline-none"
+                                                                    >
+                                                                        <option value="">Sin Asignar</option>
+                                                                        {adminFilteredUsers
+                                                                            .filter(u => u.roles?.some(r => ['employee', 'colaborador', 'comite', 'admin'].includes(r.toLowerCase())))
+                                                                            .map(u => (
+                                                                                <option key={u.id} value={u.name}>{u.name} ({u.roles[0]})</option>
+                                                                            ))
+                                                                        }
+                                                                    </select>
+                                                                </div>
+                                                                
+                                                                {editingTicket.assigned_to && (
+                                                                    <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-450 text-xs rounded-xl flex items-center gap-2">
+                                                                        <span>👷</span>
+                                                                        <span>Asignado correctamente a <strong>{editingTicket.assigned_to}</strong></span>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        ) : (
+                                                            <p className="text-xs text-gray-400 dark:text-slate-500 text-center py-8">Seleccione un ticket de la lista para inspeccionar y resolver.</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* 💵 PAYMENTS TAB */}
+                                        {adminActiveTab === 'payments' && (
+                                            <div className="space-y-6 animate-fade-in text-left">
+                                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                                    <div>
+                                                        <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">
+                                                            💵 Registro de Recaudación y Gastos Comunes
+                                                        </h4>
+                                                        <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Registra transferencias, pagos con tarjetas y concilia expensas mensuales.</p>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => {
+                                                            setEditingPayment(null);
+                                                            setNewPaymentForm({ user_id: '', property_id: '', amount: '', payment_method: 'transfer', status: 'completed' });
+                                                            setShowAddPaymentForm(!showAddPaymentForm);
+                                                        }}
+                                                        className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow transition-all"
+                                                    >
+                                                        {showAddPaymentForm ? 'Cerrar Form' : 'Registrar Pago'}
+                                                    </button>
+                                                </div>
+
+                                                {showAddPaymentForm && (
+                                                    <form onSubmit={(e) => {
+                                                        e.preventDefault();
+                                                        const selectedUser = usersList.find(u => u.id === Number(newPaymentForm.user_id));
+                                                        if (editingPayment) {
+                                                            setPaymentsList(prev => prev.map(p => p.id === editingPayment.id ? {
+                                                                ...p,
+                                                                amount: Number(newPaymentForm.amount),
+                                                                payment_method: newPaymentForm.payment_method,
+                                                                status: newPaymentForm.status,
+                                                                user: selectedUser ? { id: selectedUser.id, name: selectedUser.name } : p.user
+                                                            } : p));
+                                                            setEditingPayment(null);
+                                                        } else {
+                                                            const newP = {
+                                                                id: paymentsList.length > 0 ? Math.max(...paymentsList.map(p => p.id)) + 1 : 1,
+                                                                property_id: Number(newPaymentForm.property_id),
+                                                                amount: Number(newPaymentForm.amount),
+                                                                payment_method: newPaymentForm.payment_method,
+                                                                status: newPaymentForm.status,
+                                                                payment_date: new Date().toISOString(),
+                                                                user: selectedUser ? { id: selectedUser.id, name: selectedUser.name } : { name: 'Vecino Anonimo' },
+                                                                property: { condominium_id: adminCondoId }
+                                                            };
+                                                            setPaymentsList(prev => [newP, ...prev]);
+                                                        }
+                                                        setShowAddPaymentForm(false);
+                                                        setNewPaymentForm({ user_id: '', property_id: '', amount: '', payment_method: 'transfer', status: 'completed' });
+                                                    }} className="bg-slate-50 dark:bg-slate-900/60 p-6 rounded-2xl border border-gray-200 dark:border-slate-800 space-y-4 max-w-xl text-left">
+                                                        <h5 className="text-xs font-bold text-gray-800 dark:text-slate-200 uppercase">{editingPayment ? '✏️ Editar Registro de Pago' : '💵 Registrar Nuevo Pago'}</h5>
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Propiedad Asociada</label>
+                                                                <select
+                                                                    required
+                                                                    value={newPaymentForm.property_id}
+                                                                    onChange={(e) => setNewPaymentForm(prev => ({ ...prev, property_id: e.target.value }))}
+                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                >
+                                                                    <option value="">Seleccione Unidad...</option>
+                                                                    {adminFilteredProperties.map(p => (
+                                                                        <option key={p.id} value={p.id}>Depto #{p.number}</option>
+                                                                    ))}
+                                                                </select>
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Vecino Pagador</label>
+                                                                <select
+                                                                    required
+                                                                    value={newPaymentForm.user_id}
+                                                                    onChange={(e) => setNewPaymentForm(prev => ({ ...prev, user_id: e.target.value }))}
+                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                >
+                                                                    <option value="">Seleccione Residente...</option>
+                                                                    {adminFilteredUsers.map(u => (
+                                                                        <option key={u.id} value={u.id}>{u.name}</option>
+                                                                    ))}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div className="grid grid-cols-3 gap-4">
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto ($)</label>
+                                                                <input
+                                                                    type="number"
+                                                                    required
+                                                                    value={newPaymentForm.amount}
+                                                                    onChange={(e) => setNewPaymentForm(prev => ({ ...prev, amount: e.target.value }))}
+                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Medio de Pago</label>
+                                                                <select
+                                                                    value={newPaymentForm.payment_method}
+                                                                    onChange={(e) => setNewPaymentForm(prev => ({ ...prev, payment_method: e.target.value }))}
+                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-850 dark:text-white focus:outline-none"
+                                                                >
+                                                                    <option value="transfer">Transferencia</option>
+                                                                    <option value="card">Tarjeta Débito/Crédito</option>
+                                                                    <option value="cash">Efectivo / Depósito</option>
+                                                                </select>
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado Conciliación</label>
+                                                                <select
+                                                                    value={newPaymentForm.status}
+                                                                    onChange={(e) => setNewPaymentForm(prev => ({ ...prev, status: e.target.value }))}
+                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-850 dark:text-white focus:outline-none"
+                                                                >
+                                                                    <option value="completed">Completado</option>
+                                                                    <option value="pending">Pendiente</option>
+                                                                    <option value="failed">Rechazado</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex gap-2">
+                                                            <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow">
+                                                                {editingPayment ? 'Guardar Cambios' : 'Registrar'}
+                                                            </button>
+                                                            <button type="button" onClick={() => { setShowAddPaymentForm(false); setEditingPayment(null); }} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl">
+                                                                Cancelar
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                )}
+
+                                                <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+                                                    <SimpleTable
+                                                        headers={['Vecino', 'Propiedad', 'Monto', 'Método', 'Fecha', 'Estado', 'Acciones']}
+                                                        rows={adminFilteredPayments.map(p => ({
+                                                            cells: [
+                                                                <span className="font-bold text-gray-900 dark:text-white">{p.user?.name || 'Vecino'}</span>,
+                                                                <span className="font-bold">Depto #{p.property_id}</span>,
+                                                                <span className="font-bold text-emerald-600 dark:text-emerald-450">${Number(p.amount).toLocaleString()}</span>,
+                                                                <span className="capitalize font-mono text-xs">{p.payment_method === 'transfer' ? 'Transferencia' : p.payment_method === 'card' ? 'Tarjeta' : 'Efectivo'}</span>,
+                                                                <span>{new Date(p.payment_date).toLocaleDateString('es-CL')}</span>,
+                                                                <StatusBadge status={p.status} type="payment" />,
+                                                                <div className="flex items-center gap-2 justify-end">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            setEditingPayment(p);
+                                                                            setNewPaymentForm({
+                                                                                user_id: String(p.user?.id || ''),
+                                                                                property_id: String(p.property_id),
+                                                                                amount: String(p.amount),
+                                                                                payment_method: p.payment_method,
+                                                                                status: p.status
+                                                                            });
+                                                                            setShowAddPaymentForm(true);
+                                                                        }}
+                                                                        className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-[10px] font-bold rounded-lg transition-all"
+                                                                    >
+                                                                        ✏️ Editar
+                                                                    </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            if (confirm('¿Desea eliminar este registro de pago?')) {
+                                                                                setPaymentsList(prev => prev.filter(item => item.id !== p.id));
+                                                                            }
+                                                                        }}
+                                                                        className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-bold rounded-lg transition-all"
+                                                                    >
+                                                                        🗑️ Eliminar
+                                                                    </button>
+                                                                </div>
+                                                            ]
+                                                        }))}
+                                                        emptyMessage="No hay cobros ni ingresos registrados para este condominio"
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* ⚖️ FINES TAB */}
+                                        {adminActiveTab === 'fines' && (
+                                            <div className="space-y-6 animate-fade-in text-left">
+                                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                                    <div>
+                                                        <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">
+                                                            ⚖️ Infracciones y Multas
+                                                        </h4>
+                                                        <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Sanciona infracciones al reglamento de copropiedad (ruidos, mascotas, etc.).</p>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => {
+                                                            setEditingFine(null);
+                                                            setNewFineForm({ property_id: '', amount: '', reason: '', status: 'pending' });
+                                                            setShowAddFineForm(!showAddFineForm);
+                                                        }}
+                                                        className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow transition-all"
+                                                    >
+                                                        {showAddFineForm ? 'Cerrar Form' : 'Cursar Multa'}
+                                                    </button>
+                                                </div>
+
+                                                {showAddFineForm && (
+                                                    <form onSubmit={(e) => {
+                                                        e.preventDefault();
+                                                        if (editingFine) {
+                                                            setFinesList(prev => prev.map(f => f.id === editingFine.id ? {
+                                                                ...f,
+                                                                property_id: Number(newFineForm.property_id),
+                                                                amount: Number(newFineForm.amount),
+                                                                reason: newFineForm.reason,
+                                                                status: newFineForm.status
+                                                            } : f));
+                                                            setEditingFine(null);
+                                                        } else {
+                                                            const newF = {
+                                                                id: finesList.length > 0 ? Math.max(...finesList.map(f => f.id)) + 1 : 1,
+                                                                property_id: Number(newFineForm.property_id),
+                                                                amount: Number(newFineForm.amount),
+                                                                reason: newFineForm.reason,
+                                                                status: newFineForm.status,
+                                                                date: new Date().toISOString().split('T')[0],
+                                                                condominium_id: adminCondoId
+                                                            };
+                                                            setFinesList(prev => [newF, ...prev]);
+                                                        }
+                                                        setShowAddFineForm(false);
+                                                        setNewFineForm({ property_id: '', amount: '', reason: '', status: 'pending' });
+                                                    }} className="bg-slate-50 dark:bg-slate-900/60 p-6 rounded-2xl border border-gray-200 dark:border-slate-800 space-y-4 max-w-xl text-left">
+                                                        <h5 className="text-xs font-bold text-gray-800 dark:text-slate-200 uppercase">{editingFine ? '✏️ Editar Multa' : '⚖️ Detalles de la Multa / Sanción'}</h5>
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Propiedad Infractora</label>
+                                                                <select
+                                                                    required
+                                                                    value={newFineForm.property_id}
+                                                                    onChange={(e) => setNewFineForm(prev => ({ ...prev, property_id: e.target.value }))}
+                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-850 dark:text-white focus:outline-none"
+                                                                >
+                                                                    <option value="">Seleccione Unidad...</option>
+                                                                    {adminFilteredProperties.map(p => (
+                                                                        <option key={p.id} value={p.id}>Depto #{p.number}</option>
+                                                                    ))}
+                                                                </select>
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto de la Sanción ($)</label>
+                                                                <input
+                                                                    type="number"
+                                                                    required
+                                                                    value={newFineForm.amount}
+                                                                    onChange={(e) => setNewFineForm(prev => ({ ...prev, amount: e.target.value }))}
+                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-350 dark:border-slate-805 rounded-xl text-xs px-3 py-2 text-slate-855 dark:text-white focus:outline-none"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Motivo / Infracción Detallada</label>
+                                                            <textarea
+                                                                required
+                                                                rows="3"
+                                                                value={newFineForm.reason}
+                                                                onChange={(e) => setNewFineForm(prev => ({ ...prev, reason: e.target.value }))}
+                                                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-855 dark:text-white focus:outline-none"
+                                                                placeholder="Describa la infracción (ej. Ruidos molestos, desacato reglamento)..."
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado</label>
+                                                            <select
+                                                                value={newFineForm.status}
+                                                                onChange={(e) => setNewFineForm(prev => ({ ...prev, status: e.target.value }))}
+                                                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-855 dark:text-white focus:outline-none"
+                                                            >
+                                                                <option value="pending">Pendiente de Pago</option>
+                                                                <option value="resolved">Pagada / Resuelta</option>
+                                                                <option value="annulled">Anulada</option>
+                                                            </select>
+                                                        </div>
+                                                        <div className="flex gap-2">
+                                                            <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow">
+                                                                {editingFine ? 'Guardar Cambios' : 'Cursar Multa'}
+                                                            </button>
+                                                            <button type="button" onClick={() => { setShowAddFineForm(false); setEditingFine(null); }} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl">
+                                                                Cancelar
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                )}
+
+                                                <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+                                                    <SimpleTable
+                                                        headers={['Fecha', 'Propiedad', 'Infracción / Motivo', 'Monto', 'Estado', 'Acciones']}
+                                                        rows={adminFilteredFines.map(f => ({
+                                                            cells: [
+                                                                <span>{f.date}</span>,
+                                                                <span className="font-bold">Depto #{f.property_id}</span>,
+                                                                <p className="text-xs text-slate-600 dark:text-slate-400 max-w-[320px] truncate" title={f.reason}>{f.reason}</p>,
+                                                                <span className="font-bold text-rose-500">${Number(f.amount).toLocaleString()}</span>,
+                                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                                                                    f.status === 'resolved'
+                                                                        ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-500'
+                                                                        : f.status === 'annulled'
+                                                                        ? 'bg-slate-500/10 border border-slate-500/20 text-slate-500'
+                                                                        : 'bg-rose-500/10 border border-rose-500/20 text-rose-500'
+                                                                }`}>
+                                                                    {f.status === 'pending' ? 'pendiente' : f.status === 'resolved' ? 'resuelta' : 'anulada'}
+                                                                </span>,
+                                                                <div className="flex items-center gap-2 justify-end">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            setEditingFine(f);
+                                                                            setNewFineForm({
+                                                                                property_id: String(f.property_id),
+                                                                                amount: String(f.amount),
+                                                                                reason: f.reason,
+                                                                                status: f.status
+                                                                            });
+                                                                            setShowAddFineForm(true);
+                                                                        }}
+                                                                        className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-[10px] font-bold rounded-lg transition-all"
+                                                                    >
+                                                                        ✏️ Editar
+                                                                    </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            if (confirm('¿Desea anular o eliminar esta sanción?')) {
+                                                                                setFinesList(prev => prev.filter(item => item.id !== f.id));
+                                                                            }
+                                                                        }}
+                                                                        className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-bold rounded-lg transition-all"
+                                                                    >
+                                                                        🗑️ Eliminar
+                                                                    </button>
+                                                                </div>
+                                                            ]
+                                                        }))}
+                                                        emptyMessage="No hay multas registradas en esta comunidad"
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })()
                         )}
                     </div>
                 </div>
