@@ -275,6 +275,37 @@ export default function Dashboard() {
         { id: 2, name: 'Residencial MiVecino', address: 'Las Condes 5678', city: 'Santiago', units_count: 90, status: 'active' }
     ]);
 
+    // Chained Impersonation Filters for DevOps TI
+    const [selectedImpCondo, setSelectedImpCondo] = useState('all');
+    const [selectedImpRole, setSelectedImpRole] = useState('all');
+    const [selectedImpUser, setSelectedImpUser] = useState('');
+
+    // Administrative Portal States
+    const [adminActiveTab, setAdminActiveTab] = useState('dashboard');
+    const [adminCondoId, setAdminCondoId] = useState(1);
+
+    // Dynamic Tickets pre-filters from KPI click
+    const [ticketStatusFilter, setTicketStatusFilter] = useState('all');
+    const [ticketPriorityFilter, setTicketPriorityFilter] = useState('all');
+
+    // Fines Reactive List and Forms
+    const [finesList, setFinesList] = useState([
+        { id: 1, property_id: 1, amount: 45000, reason: 'Ruidos molestos después de las 02:00 AM (música alta)', status: 'pending', date: '2026-05-10', condominium_id: 1 },
+        { id: 2, property_id: 2, amount: 65000, reason: 'Uso de piscina comunitaria sin reserva previa', status: 'pending', date: '2026-05-18', condominium_id: 1 },
+        { id: 3, property_id: 3, amount: 50000, reason: 'Mascota suelta en pasillos sin correa de seguridad', status: 'resolved', date: '2026-05-02', condominium_id: 1 },
+        { id: 4, property_id: 21, amount: 80000, reason: 'Estacionar en espacio de visitas sin autorización', status: 'pending', date: '2026-05-25', condominium_id: 2 }
+    ]);
+    const [showAddFineForm, setShowAddFineForm] = useState(false);
+    const [newFineForm, setNewFineForm] = useState({ property_id: '', amount: '', reason: '', status: 'pending' });
+
+    // Editing States for full inline CRUD
+    const [editingUser, setEditingUser] = useState(null);
+    const [editingCondo, setEditingCondo] = useState(null);
+    const [editingProp, setEditingProp] = useState(null);
+    const [editingTicket, setEditingTicket] = useState(null);
+    const [editingPayment, setEditingPayment] = useState(null);
+    const [editingFine, setEditingFine] = useState(null);
+
     // Active state for forms
     const [showAddUserForm, setShowAddUserForm] = useState(false);
     const [showAddPropForm, setShowAddPropForm] = useState(false);
@@ -312,9 +343,9 @@ export default function Dashboard() {
     const [sandboxModule, setSandboxModule] = useState('map');
     
     // Check if the current render should be Admin view or Resident view
-    const renderAdminView = isActuallyAdmin && !simulationMode && !impersonatedUser;
-    const renderTiDevOps = isTiRole && !simulationMode && !impersonatedUser;
-    const renderBusinessAdmin = isBusinessAdmin && !simulationMode && !impersonatedUser;
+    const renderAdminView = isActuallyAdmin && !simulationMode;
+    const renderTiDevOps = isTiRole && !simulationMode;
+    const renderBusinessAdmin = isBusinessAdmin && !simulationMode;
 
     // Layout simulation states
     const [forceMobileView, setForceMobileView] = useState(false);
@@ -363,6 +394,26 @@ export default function Dashboard() {
 
     const toggleTheme = () => {
         setDarkMode(prev => !prev);
+    };
+
+    const getUserCondoId = (u) => {
+        if (!u) return 1;
+        if (u.condominium_id) return Number(u.condominium_id);
+        
+        // Find property that is owned or resident by this user
+        const prop = propertiesList.find(p => 
+            p.owners?.some(o => o.toLowerCase() === u.name.toLowerCase()) || 
+            p.residents?.some(r => r.toLowerCase() === u.name.toLowerCase())
+        );
+        if (prop) return Number(prop.condominium_id);
+
+        // Fallback for demo accounts
+        if (u.email === 'admin@redvecino.cl') return 1;
+        if (u.email === 'comite@redvecino.cl') return 1;
+        if (u.email === 'colaborador@redvecino.cl') return 1;
+        if (u.email === 'propietario@redvecino.cl') return 1;
+        if (u.email === 'residente@redvecino.cl') return 1;
+        return 1; // Default fallback
     };
 
     const [devOpsActive, setDevOpsActive] = useState(isTiRole);
@@ -1971,100 +2022,163 @@ export default function Dashboard() {
                                                   </div>
 
                                                   {showAddCondoForm && (
-                                                      <form onSubmit={(e) => {
-                                                          e.preventDefault();
-                                                          const newC = {
-                                                              id: condosList.length + 1,
-                                                              name: newCondoForm.name,
-                                                              address: newCondoForm.address,
-                                                              city: newCondoForm.city,
-                                                              units_count: Number(newCondoForm.units_count) || 50,
-                                                              status: 'active'
-                                                          };
-                                                          setCondosList(prev => [...prev, newC]);
-                                                          setTerminalLogs(prev => [...prev, `[CONDO] Creado condominio #${newC.id}: ${newC.name}`]);
-                                                          setShowAddCondoForm(false);
-                                                          setNewCondoForm({ name: '', address: '', city: '', units_count: '' });
-                                                      }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl">
-                                                          <h5 className="text-xs font-bold text-slate-350 uppercase">Detalles del Condominio</h5>
-                                                          <div className="grid grid-cols-2 gap-4">
-                                                              <div>
-                                                                  <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre</label>
-                                                                  <input
-                                                                      type="text"
-                                                                      required
-                                                                      value={newCondoForm.name}
-                                                                      onChange={(e) => setNewCondoForm(prev => ({ ...prev, name: e.target.value }))}
-                                                                      className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
-                                                                  />
-                                                              </div>
-                                                              <div>
-                                                                  <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Dirección</label>
-                                                                  <input
-                                                                      type="text"
-                                                                      required
-                                                                      value={newCondoForm.address}
-                                                                      onChange={(e) => setNewCondoForm(prev => ({ ...prev, address: e.target.value }))}
-                                                                      className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
-                                                                  />
-                                                              </div>
-                                                          </div>
-                                                          <div className="grid grid-cols-2 gap-4">
-                                                              <div>
-                                                                  <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Ciudad</label>
-                                                                  <input
-                                                                      type="text"
-                                                                      required
-                                                                      value={newCondoForm.city}
-                                                                      onChange={(e) => setNewCondoForm(prev => ({ ...prev, city: e.target.value }))}
-                                                                      className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
-                                                                  />
-                                                              </div>
-                                                              <div>
-                                                                  <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Número de Unidades</label>
-                                                                  <input
-                                                                      type="number"
-                                                                      required
-                                                                      value={newCondoForm.units_count}
-                                                                      onChange={(e) => setNewCondoForm(prev => ({ ...prev, units_count: e.target.value }))}
-                                                                      className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
-                                                                  />
-                                                              </div>
-                                                          </div>
-                                                          <button type="submit" className="px-4 py-2 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-bold text-xs rounded-xl">
-                                                              Guardar Condominio
-                                                          </button>
-                                                      </form>
-                                                  )}
+                        <form onSubmit={(e) => {
+                            e.preventDefault();
+                            if (editingCondo) {
+                                setCondosList(prev => prev.map(c => c.id === editingCondo.id ? {
+                                    ...c,
+                                    name: newCondoForm.name,
+                                    address: newCondoForm.address,
+                                    city: newCondoForm.city,
+                                    units_count: Number(newCondoForm.units_count) || 50
+                                } : c));
+                                setTerminalLogs(prev => [...prev, `[CONDO] Editado condominio #${editingCondo.id}: ${newCondoForm.name}`]);
+                                setEditingCondo(null);
+                            } else {
+                                const newC = {
+                                    id: condosList.length + 1,
+                                    name: newCondoForm.name,
+                                    address: newCondoForm.address,
+                                    city: newCondoForm.city,
+                                    units_count: Number(newCondoForm.units_count) || 50,
+                                    status: 'active'
+                                };
+                                setCondosList(prev => [...prev, newC]);
+                                setTerminalLogs(prev => [...prev, `[CONDO] Creado condominio #${newC.id}: ${newC.name}`]);
+                            }
+                            setShowAddCondoForm(false);
+                            setNewCondoForm({ name: '', address: '', city: '', units_count: '' });
+                        }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl">
+                            <h5 className="text-xs font-bold text-slate-350 uppercase">{editingCondo ? 'Editar Condominio' : 'Detalles del Condominio'}</h5>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={newCondoForm.name}
+                                        onChange={(e) => setNewCondoForm(prev => ({ ...prev, name: e.target.value }))}
+                                        className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Dirección</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={newCondoForm.address}
+                                        onChange={(e) => setNewCondoForm(prev => ({ ...prev, address: e.target.value }))}
+                                        className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Ciudad</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={newCondoForm.city}
+                                        onChange={(e) => setNewCondoForm(prev => ({ ...prev, city: e.target.value }))}
+                                        className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Número de Unidades</label>
+                                    <input
+                                        type="number"
+                                        required
+                                        value={newCondoForm.units_count}
+                                        onChange={(e) => setNewCondoForm(prev => ({ ...prev, units_count: e.target.value }))}
+                                        className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex gap-2">
+                                <button type="submit" className="px-4 py-2 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-bold text-xs rounded-xl">
+                                    {editingCondo ? 'Actualizar Condominio' : 'Guardar Condominio'}
+                                </button>
+                                {editingCondo && (
+                                    <button 
+                                        type="button" 
+                                        onClick={() => {
+                                            setEditingCondo(null);
+                                            setShowAddCondoForm(false);
+                                            setNewCondoForm({ name: '', address: '', city: '', units_count: '' });
+                                        }}
+                                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl"
+                                    >
+                                        Cancelar
+                                    </button>
+                                )}
+                            </div>
+                        </form>
+                    )}
 
-                                                  <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl overflow-hidden shadow-inner">
-                                                      <div className="overflow-x-auto max-h-[380px]">
-                                                          <table className="w-full text-left text-xs">
-                                                              <thead>
-                                                                  <tr className="bg-slate-950 text-slate-500 border-b border-slate-850">
-                                                                      <th className="p-4 font-black text-left">ID</th>
-                                                                      <th className="p-4 font-black text-left">Nombre</th>
-                                                                      <th className="p-4 font-black text-left">Dirección</th>
-                                                                      <th className="p-4 font-black text-left">Ciudad</th>
-                                                                      <th className="p-4 font-black text-left">Unidades</th>
-                                                                      <th className="p-4 font-black text-right">Estado</th>
-                                                                  </tr>
-                                                              </thead>
-                                                              <tbody className="divide-y divide-slate-850 text-slate-350">
-                                                                  {condosList.map((c) => (
-                                                                      <tr key={c.id} className="hover:bg-slate-900/60">
-                                                                          <td className="p-4 font-bold text-slate-100 text-left">#{c.id}</td>
-                                                                          <td className="p-4 text-left font-bold">{c.name}</td>
-                                                                          <td className="p-4 text-left">{c.address}</td>
-                                                                          <td className="p-4 text-left">{c.city}</td>
-                                                                          <td className="p-4 text-left font-mono">{c.units_count} unidades</td>
-                                                                          <td className="p-4 text-right"><StatusBadge status={c.status} type="status" /></td>
-                                                                      </tr>
-                                                                  ))}
-                                                              </tbody>
-                                                          </table>
-                                                      </div>
-                                                  </div>
+                    <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl overflow-hidden shadow-inner">
+                        <div className="overflow-x-auto max-h-[380px]">
+                            <table className="w-full text-left text-xs">
+                                <thead>
+                                    <tr className="bg-slate-950 text-slate-500 border-b border-slate-850">
+                                        <th className="p-4 font-black text-left">ID</th>
+                                        <th className="p-4 font-black text-left">Nombre</th>
+                                        <th className="p-4 font-black text-left">Dirección</th>
+                                        <th className="p-4 font-black text-left">Ciudad</th>
+                                        <th className="p-4 font-black text-left">Unidades</th>
+                                        <th className="p-4 font-black text-left">Estado</th>
+                                        <th className="p-4 font-black text-right">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-850 text-slate-350">
+                                    {condosList.map((c) => (
+                                        <tr key={c.id} className="hover:bg-slate-900/60">
+                                            <td className="p-4 font-bold text-slate-100 text-left">#{c.id}</td>
+                                            <td className="p-4 text-left font-bold">{c.name}</td>
+                                            <td className="p-4 text-left">{c.address}</td>
+                                            <td className="p-4 text-left">{c.city}</td>
+                                            <td className="p-4 text-left font-mono">{c.units_count} unidades</td>
+                                            <td className="p-4 text-left"><StatusBadge status={c.status} type="status" /></td>
+                                            <td className="p-4 text-right">
+                                                <div className="flex justify-end gap-1.5">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setEditingCondo(c);
+                                                            setNewCondoForm({
+                                                                name: c.name,
+                                                                address: c.address,
+                                                                city: c.city,
+                                                                units_count: c.units_count
+                                                            });
+                                                            setShowAddCondoForm(true);
+                                                        }}
+                                                        className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[10px] font-bold rounded-lg transition-all"
+                                                    >
+                                                        ✏️ Editar
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            if (confirm(`¿Estás seguro de eliminar el condominio ${c.name}?`)) {
+                                                                setCondosList(prev => prev.filter(item => item.id !== c.id));
+                                                                setTerminalLogs(prev => [...prev, `[DELETE] Condominio eliminado: ${c.name} (ID: ${c.id})`]);
+                                                                if (adminCondoId === c.id) {
+                                                                    setAdminCondoId(1); // Reset selected condo if deleted
+                                                                }
+                                                            }
+                                                        }}
+                                                        className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 text-[10px] font-bold rounded-lg transition-all"
+                                                    >
+                                                        🗑️ Eliminar
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                                               </div>
                                           )}
 
