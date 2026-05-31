@@ -275,7 +275,24 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#F8FAFC] via-[#F1F5F9] to-[#E2E8F0] dark:from-[#0F2557] dark:via-[#132c66] dark:to-[#0A183A] text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-[#00A896]/30 selection:text-white overflow-x-hidden transition-colors duration-300">
-            <Head title="RedVecino - La Red Inteligente de Condominios" />
+            <Head>
+                <title>RedVecino - La Red Inteligente de Condominios</title>
+                <meta name="description" content="RedVecino es la plataforma de administración e integración social más completa e inteligente para condominios y edificios. Gestiona finanzas, seguridad y comunicación de tu comunidad." />
+                <meta name="keywords" content="administración de condominios, gastos comunes, control de acceso, seguridad de edificios, redvecino, mivecino, copropietarios, chile" />
+                
+                {/* Open Graph / Facebook */}
+                <meta property="og:type" content="website" />
+                <meta property="og:title" content="RedVecino - La Red Inteligente de Condominios" />
+                <meta property="og:description" content="Gestiona finanzas, seguridad y comunicación de tu comunidad con la red inteligente para condominios y edificios." />
+                <meta property="og:image" content="/images/logo_redvecino.png" />
+                <meta property="og:url" content="https://redvecino.cl" />
+
+                {/* Twitter */}
+                <meta property="twitter:card" content="summary_large_image" />
+                <meta property="twitter:title" content="RedVecino - La Red Inteligente de Condominios" />
+                <meta property="twitter:description" content="Gestiona finanzas, seguridad y comunicación de tu comunidad con la red inteligente para condominios y edificios." />
+                <meta property="twitter:image" content="/images/logo_redvecino.png" />
+            </Head>
 
             {/* Glowing background meshes (opacity-attenuated in light mode) */}
             <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#00A896]/5 dark:bg-[#00A896]/15 rounded-full blur-[120px] pointer-events-none -z-10 transition-opacity duration-300" />

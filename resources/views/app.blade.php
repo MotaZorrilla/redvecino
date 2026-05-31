@@ -3,8 +3,13 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="RedVecino - La red inteligente y moderna para la administración de condominios y edificios. Portal de residentes, finanzas y control de accesos.">
+        <meta name="author" content="RedVecino Team">
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <title inertia>{{ config('app.name', 'RedVecino') }}</title>
+
+        <!-- Favicon / Tab Icon -->
+        <link rel="icon" type="image/png" href="/images/logo_redvecino.png">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">

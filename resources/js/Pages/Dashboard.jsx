@@ -825,7 +825,11 @@ export default function Dashboard() {
                 </div>
             }
         >
-            <Head title={renderAdminView ? 'Dashboard RedVecino' : 'Portal MiVecino'} />
+            <Head>
+                <title>{renderAdminView ? 'Dashboard RedVecino - Gestión de Condominio' : 'Portal MiVecino - Tu Comunidad Conectada'}</title>
+                <meta name="description" content="Portal interactivo de RedVecino para la administración inteligente, control de accesos, gastos comunes y solicitudes de copropietarios." />
+                <meta name="robots" content="noindex, nofollow" />
+            </Head>
 
             {/* Impersonation Banner */}
             {impersonatedUser && (
