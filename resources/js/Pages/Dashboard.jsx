@@ -428,6 +428,9 @@ export default function Dashboard() {
     };
 
     const [devOpsActive, setDevOpsActive] = useState(isTiRole);
+    useEffect(() => {
+        setDevOpsActive(isTiRole);
+    }, [isTiRole]);
     const [tiActiveTab, setTiActiveTab] = useState('devops');
     const [globalMaintenanceMode, setGlobalMaintenanceMode] = useState(false);
     const [packages, setPackages] = useState([
@@ -2610,8 +2613,7 @@ export default function Dashboard() {
                                                         { id: 'users', label: '👥 Usuarios', desc: 'Vecinos y directiva' },
                                                         { id: 'tickets', label: '🛠️ Tickets', desc: 'Casos y solicitudes' },
                                                         { id: 'payments', label: '💵 Pagos', desc: 'Historial y registros' },
-                                                        { id: 'fines', label: '⚖️ Multas', desc: 'Infracciones y cargos' },
-                                                        { id: 'settings', label: '⚙️ Ajustes', desc: 'Configuración perfil' }
+                                                        { id: 'fines', label: '⚖️ Multas', desc: 'Infracciones y cargos' }
                                                     ].map(tab => (
                                                         <button
                                                             key={tab.id}
@@ -2634,22 +2636,33 @@ export default function Dashboard() {
                                                 </nav>
                                             </div>
 
-                                            {/* Admin Profile Card */}
-                                            <div className="bg-slate-900/80 border border-slate-800/80 p-3 rounded-2xl space-y-2 text-left">
+                                            {/* Admin Profile Card (Clickable to edit profile settings) */}
+                                            <button
+                                                type="button"
+                                                onClick={() => setAdminActiveTab('settings')}
+                                                className={`w-full bg-slate-900/60 hover:bg-slate-900/90 border transition-all duration-200 p-3 rounded-2xl space-y-2 text-left relative group ${
+                                                    adminActiveTab === 'settings'
+                                                        ? 'border-indigo-500 shadow-md ring-1 ring-indigo-500/25 bg-slate-900'
+                                                        : 'border-slate-800/80 hover:border-slate-700'
+                                                }`}
+                                            >
                                                 <div className="flex items-center gap-2.5">
-                                                    <div className="h-8 w-8 rounded-full bg-indigo-650 flex items-center justify-center text-xs font-extrabold text-white shrink-0 shadow-inner">
+                                                    <div className="h-8 w-8 rounded-full bg-indigo-650 flex items-center justify-center text-xs font-extrabold text-white shrink-0 shadow-inner group-hover:scale-105 transition-all">
                                                         {adminSettingsForm.name.charAt(0)}
                                                     </div>
                                                     <div className="min-w-0 flex-1">
-                                                        <span className="text-xs font-bold text-slate-200 block truncate">{adminSettingsForm.name}</span>
-                                                        <span className="text-[9px] text-slate-500 block truncate">Administrador</span>
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-xs font-bold text-slate-200 block truncate group-hover:text-white transition-colors">{adminSettingsForm.name}</span>
+                                                            <span className="text-[10px] opacity-0 group-hover:opacity-100 text-indigo-400 font-mono transition-opacity">⚙️</span>
+                                                        </div>
+                                                        <span className="text-[9px] text-slate-505 dark:text-slate-500 block truncate font-medium">Administrador (Configurar)</span>
                                                     </div>
                                                 </div>
-                                                <div className="pt-1.5 border-t border-slate-800 flex justify-between items-center text-[9px] text-slate-400">
+                                                <div className="pt-1.5 border-t border-slate-800 flex justify-between items-center text-[9px] text-slate-400 group-hover:text-slate-350 transition-colors">
                                                     <span>RUT: {adminSettingsForm.rut}</span>
                                                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                                 </div>
-                                            </div>
+                                            </button>
                                         </div>
 
                                         {/* 2. RIGHT CONTENT PANEL */}
