@@ -1127,9 +1127,20 @@ Derivado de la auditoría técnica de la reunión presencial de Héctor y René 
     3.  *Tickets de TI (Averías de Plataforma):* Incidencias del administrador dirigidas directamente al soporte de ingeniería de RedVecino.
 *   **Flujo de Correspondencia OCR:** Registro e inventario automatizado en conserjería para paquetería, guardando la empresa de courier, datos del destinatario, firma del guardia y firma digital del residente.
 
+### 15.9 Especificaciones de la Estación de Trabajo del Administrador, Impersonación TI y SEO Avanzado (zAux 31/05)
+Derivado de la refactorización e ingeniería de interfaz de la estación de trabajo y optimizaciones SEO del 31 de mayo de 2026, se especifican las siguientes normas técnicas obligatorias:
+*   **Layout Widescreen Adaptativo de PC:** El portal administrativo de RedVecino para pantallas de PC implementa un esquema de dos paneles horizontales:
+    -   *Panel Lateral Izquierdo (Sidebar):* Un menú vertical de ancho fijo (`w-64`) en fondo oscuro (`slate-950`), el cual integra el logotipo de la marca con animación de pulso activo, el selector desplegable de condominio activo y los enlaces principales de operación con fuente tipográfica Montserrat.
+    -   *Panel de Contenido Derecho (Main Area):* Un contenedor flexible widescreen con un ancho de visualización máximo de `max-w-[1700px]`, con scroll interno y cabeceras dinámicas que se ajustan reactivamente según la pestaña de navegación activa.
+*   **Integración de Configuración de Cuenta en Perfil:** Se erradica el acceso redundante a Ajustes del menú lateral y se integra como un disparador interactivo en la tarjeta de perfil administrativo al fondo del sidebar. Esta tarjeta implementa transiciones hover de escala y un indicador visual de engrane `⚙️` que redirecciona a la sección de configuración de cuenta, la cual porta un formulario dual de datos de perfil y ajustes del motor de base de datos y alertas por email.
+*   **Sincronización Dinámica de Entornos TI (Impersonation):** La interfaz de súper usuario TI se vincula reactivamente a través de un hook de efecto (`useEffect`) al rol del usuario en sesión (`isTiRole`). Al activar la impersonación de un residente o un administrador de condominio, el entorno TI debe apagar automáticamente el portal DevOps TI para desplegar con absoluta fidelidad y consistencia el portal o la app móvil del usuario simulado, restaurándose de inmediato una vez se abandona la impersonación.
+*   **Estándares de SEO y Favicon de Pestañas:** 
+    -   *Páginas Públicas (Welcome):* Deben contener un marcado SEO robusto inyectando etiquetas de descripción, palabras clave (keywords), tarjetas sociales Open Graph (Facebook/LinkedIn) y Twitter Cards, vinculando la imagen principal de marca y el favicon oficial `/images/logo_redvecino.png`.
+    -   *Páginas Privadas (Dashboard/Admin):* Deben incorporar títulos dinámicos detallados para el navegador (ej: *"Dashboard RedVecino - Gestión de Condominio"*) y forzar de manera obligatoria la directiva de meta-robots `<meta name="robots" content="noindex, nofollow" />` para asegurar que las consolas administrativas internas de copropietarios y administración no sean rastreadas ni indexadas por motores de búsqueda públicos.
+
 ---
 
 **Fecha de creación:** Mayo 2026
-**Última actualización:** 28 de Mayo de 2026 (Actualizado con la Estrategia de Lanzamiento, Embudo de Ventas, Marketing Digital, Especificaciones Avanzadas de Ingeniería PropTech de RedVecino & MiVecino, y Adaptaciones e Incidencias del zAux 27/05/2026 y Guía 2 IA)
-**Versión:** 5.0 (Enterprise Spec & IA Ready)
-**Estado:** Listo para desarrollo (Con base de datos en SQLite/MySQL, suite de pruebas automatizadas y especificación de alta fidelidad PropTech)
+**Última actualización:** 31 de Mayo de 2026 (Actualizado con el Rediseño de la Estación de Trabajo del Administrador, Sincronización de Impersonación TI, SEO Exclusivo y Favicon RedVecino, además de Especificaciones del zAux 27/05/2026 y Guía 2 IA)
+**Versión:** 5.1 (Enterprise Spec & SaaS Admin Attestation)
+**Estado:** Listo para desarrollo (Con base de datos en SQLite/MySQL, suite de pruebas automatizadas, especificación de alta fidelidad PropTech y maquetación premium widescreen)
