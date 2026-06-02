@@ -236,4 +236,29 @@ class DashboardPropsTest extends TestCase
                 )
         );
     }
+
+    /**
+     * allPayments must be present and contain critical fields.
+     */
+    public function test_dashboard_returns_all_payments_prop(): void
+    {
+        $admin = $this->getUserByRole('Administrador');
+
+        $response = $this->actingAs($admin)->get('/dashboard');
+
+        $response->assertStatus(200);
+        $response->assertInertia(
+            fn (AssertableInertia $page) => $page
+                ->has('allPayments')
+                ->has('allPayments.0', fn (AssertableInertia $payment) => $payment
+                    ->has('id')
+                    ->has('user_id')
+                    ->has('property_id')
+                    ->has('amount')
+                    ->has('payment_method')
+                    ->has('status')
+                    ->etc()
+                )
+        );
+    }
 }

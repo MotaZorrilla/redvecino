@@ -27,7 +27,6 @@ class RolePermissionSeeder extends Seeder
         }
 
         $all = Permission::where('guard_name', 'web')->pluck('name')->toArray();
-        dump($all);
 
         $owner = Role::findOrCreate('Propietario', 'web');
         $owner->syncPermissions(['view profile', 'edit profile', 'view properties',

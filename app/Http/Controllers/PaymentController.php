@@ -10,7 +10,14 @@ class PaymentController extends Controller
 {
     public function index()
     {
-        return Payment::with(['user', 'property', 'commonExpense'])->paginate(20);
+        $user = auth()->user();
+        if ($user && ($user->can('view financial reports') || $user->can('approve expenses') || $user->can('view logs'))) {
+            return Payment::with(['user', 'property', 'commonExpense'])->paginate(20);
+        }
+
+        return Payment::where('user_id', $user->id)
+            ->with(['user', 'property', 'commonExpense'])
+            ->paginate(20);
     }
 
     public function store(Request $request)
@@ -26,7 +33,7 @@ class PaymentController extends Controller
         ]);
 
         $user = auth()->user();
-        if ($user && !$user->hasAnyPermission(['approve expenses', 'view logs'])) {
+        if ($user && !($user->can('approve expenses') || $user->can('view logs'))) {
             if ($data['user_id'] != $user->id) {
                 abort(403, 'No puedes registrar pagos en nombre de otro usuario.');
             }
@@ -44,6 +51,11 @@ class PaymentController extends Controller
 
     public function accountStatement($userId)
     {
+        $currentUser = auth()->user();
+        if ($currentUser && $currentUser->id != $userId && !($currentUser->can('view financial reports') || $currentUser->can('manage users') || $currentUser->can('approve expenses'))) {
+            abort(403, 'No tienes permiso para ver el estado de cuenta de otro usuario.');
+        }
+
         $user = User::findOrFail($userId);
         $payments = Payment::where('user_id', $userId)->get();
         $totalPaid = $payments->where('status', 'completed')->sum('amount');

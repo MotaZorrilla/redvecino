@@ -55,7 +55,7 @@ class SecurityRbacMatrixTest extends TestCase
         // CANNOT: Configure system (Create properties should yield 403 for Admin since only TI has configure system)
         $responseProperty = $this->actingAs($admin)->postJson('/api/properties', [
             'condominium_id' => 1,
-            'type' => 'departamento',
+            'type' => 'apartment',
             'number' => '101B',
             'block' => 'Torre B',
             'status' => 'vacant'

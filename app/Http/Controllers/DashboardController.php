@@ -61,6 +61,8 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
+        $allPayments = Payment::with(['user', 'property.condominium', 'commonExpense'])->get();
+
         $upcomingExpenses = CommonExpense::with('condominium')
             ->where('status', 'pending')
             ->where('due_date', '>=', now())
@@ -156,6 +158,7 @@ class DashboardController extends Controller
             'allProperties' => $allProperties,
             'allMessages' => $allMessages,
             'allCondominiums' => $allCondominiums,
+            'allPayments' => $allPayments,
         ]);
     }
 }

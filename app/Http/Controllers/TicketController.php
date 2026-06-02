@@ -12,7 +12,7 @@ class TicketController extends Controller
         $user = auth()->user();
         $query = Ticket::with(['property', 'creator', 'assignee', 'category', 'attachments']);
 
-        if ($user && !$user->hasAnyPermission(['assign tickets', 'resolve tickets', 'view logs'])) {
+        if ($user && !($user->can('assign tickets') || $user->can('resolve tickets') || $user->can('view logs'))) {
             $query->where(function($q) use ($user) {
                 $q->where('created_by', $user->id)
                   ->orWhereHas('property.residents', function($rq) use ($user) {
@@ -32,7 +32,7 @@ class TicketController extends Controller
         $ticket = Ticket::with(['property', 'creator', 'assignee', 'category', 'attachments.uploader'])->findOrFail($id);
         $user = auth()->user();
 
-        if ($user && !$user->hasAnyPermission(['assign tickets', 'resolve tickets', 'view logs'])) {
+        if ($user && !($user->can('assign tickets') || $user->can('resolve tickets') || $user->can('view logs'))) {
             $isCreator = $ticket->created_by === $user->id;
             $isResident = $ticket->property && $ticket->property->residents()->where('user_id', $user->id)->exists();
             $isOwner = $ticket->property && $ticket->property->owners()->where('user_id', $user->id)->exists();

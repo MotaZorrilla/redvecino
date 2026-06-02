@@ -237,7 +237,7 @@ class DatabaseSeeder extends Seeder
                 
                 $property = Property::create([
                     'condominium_id' => $condo->id,
-                    'type' => 'departamento',
+                    'type' => 'apartment',
                     'number' => $aptNumber,
                     'block' => 'Torre A',
                     'floor' => intval(ceil($i / 4)),
@@ -336,7 +336,7 @@ class DatabaseSeeder extends Seeder
             for ($i = 1; $i <= 5; $i++) {
                 $property = Property::create([
                     'condominium_id' => $condo->id,
-                    'type' => 'estacionamiento',
+                    'type' => 'parking',
                     'number' => 'E-' . $i,
                     'block' => 'Subterráneo -1',
                     'floor' => null,
@@ -363,7 +363,7 @@ class DatabaseSeeder extends Seeder
             for ($i = 1; $i <= 5; $i++) {
                 $property = Property::create([
                     'condominium_id' => $condo->id,
-                    'type' => 'bodega',
+                    'type' => 'storage',
                     'number' => 'B-' . $i,
                     'block' => 'Subterráneo -1',
                     'floor' => null,
@@ -529,7 +529,7 @@ class DatabaseSeeder extends Seeder
         ];
 
         // Seed 6 realistic fines
-        $apartments = Property::where('type', 'departamento')->get();
+        $apartments = Property::where('type', 'apartment')->get();
         for ($i = 1; $i <= 6; $i++) {
             $property = $apartments->random();
             $ownerProfile = OwnerProfile::where('property_id', $property->id)->first();
@@ -647,7 +647,7 @@ class DatabaseSeeder extends Seeder
                 'amount' => 35000.00,
                 'date' => '2026-03-12',
                 'description' => 'Arriendo Quincho N°1 - Residente Apt 102',
-                'property_id' => Property::where('condominium_id', $condo->id)->where('type', 'departamento')->inRandomOrder()->first()->id ?? null,
+                'property_id' => Property::where('condominium_id', $condo->id)->where('type', 'apartment')->inRandomOrder()->first()->id ?? null,
             ]);
             CondoIncome::create([
                 'condominium_id' => $condo->id,
@@ -656,7 +656,7 @@ class DatabaseSeeder extends Seeder
                 'amount' => 60000.00,
                 'date' => '2026-04-18',
                 'description' => 'Arriendo Salón de Eventos - Copropietario Apt 105',
-                'property_id' => Property::where('condominium_id', $condo->id)->where('type', 'departamento')->inRandomOrder()->first()->id ?? null,
+                'property_id' => Property::where('condominium_id', $condo->id)->where('type', 'apartment')->inRandomOrder()->first()->id ?? null,
             ]);
 
             // 2. Intereses por Mora

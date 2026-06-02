@@ -12,15 +12,16 @@ class PropertyFactory extends Factory
 
     public function definition(): array
     {
-        $types = ['departamento', 'casa', 'estacionamiento', 'bodega'];
+        $types = ['apartment', 'house', 'parking', 'storage', 'commercial'];
         $type = fake()->randomElement($types);
         
-        $floor = $type === 'departamento' ? fake()->numberBetween(1, 15) : null;
+        $floor = $type === 'apartment' ? fake()->numberBetween(1, 15) : null;
         $area = match ($type) {
-            'departamento' => fake()->randomFloat(2, 45, 120),
-            'casa' => fake()->randomFloat(2, 80, 220),
-            'estacionamiento' => 12.50,
-            'bodega' => fake()->randomFloat(2, 4, 10),
+            'apartment' => fake()->randomFloat(2, 45, 120),
+            'house' => fake()->randomFloat(2, 80, 220),
+            'parking' => 12.50,
+            'storage' => fake()->randomFloat(2, 4, 10),
+            'commercial' => fake()->randomFloat(2, 50, 300),
         };
 
         return [
