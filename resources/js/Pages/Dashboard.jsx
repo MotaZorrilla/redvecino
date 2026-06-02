@@ -899,7 +899,7 @@ export default function Dashboard() {
 
     return (
         <AuthenticatedLayout
-            hideNav={!renderAdminView}
+            hideNav={!renderAdminView || devOpsActive}
             header={
                 <div className="flex items-center justify-between flex-wrap gap-4">
                     <div className="space-y-1 text-left">
@@ -992,9 +992,9 @@ export default function Dashboard() {
 
 
                         {devOpsActive ? (
-                            <div className="flex bg-slate-950/80 backdrop-blur-xl border border-slate-800/80 rounded-[32px] overflow-hidden shadow-2xl h-[700px] transition-colors duration-300 relative text-slate-350">
+                            <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-[#00A896]/30 flex flex-col md:flex-row relative w-full">
                                 {/* 1. LEFT SIDEBAR */}
-                                <div className={`w-64 bg-slate-900/90 border-r border-slate-800/80 p-6 flex-col justify-between shrink-0 font-sans md:flex transition-transform duration-300 absolute md:relative inset-y-0 left-0 z-40 md:translate-x-0 ${isMobileDevOpsSidebarOpen ? 'flex translate-x-0' : 'hidden -translate-x-full md:flex'}`}>
+                                <div className={`w-64 bg-slate-900 border-r border-slate-800 p-6 flex flex-col justify-between shrink-0 font-sans transition-transform duration-300 fixed inset-y-0 left-0 z-30 ${isMobileDevOpsSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
                                     <div className="space-y-6 text-left">
                                         <div className="flex items-center gap-3">
                                             <div className="h-9 w-9 rounded-xl bg-gradient-to-r from-[#0F2557] to-[#00A896] flex items-center justify-center shadow-lg shadow-cyan-950/30">
@@ -1086,42 +1086,90 @@ export default function Dashboard() {
                                 </div>
 
                                 {/* 2. MAIN WORKSPACE CONTENT */}
-                                <div className="flex-1 px-6 md:px-12 py-8 md:py-10 overflow-y-auto bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-200 flex flex-col justify-between h-full">
-                                    <div className="space-y-6">
-                                        {/* Workstation Header */}
-                                        <div className="flex items-center justify-between border-b border-slate-800/80 pb-4 text-left">
-                                            <div className="flex items-center gap-3">
-                                                <button
-                                                    onClick={() => setIsMobileDevOpsSidebarOpen(!isMobileDevOpsSidebarOpen)}
-                                                    className="md:hidden p-2 -ml-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
-                                                    aria-label="Abrir menú"
-                                                >
-                                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5-5.25h16.5m-16.5 10.5h16.5" />
-                                                    </svg>
-                                                </button>
-                                                <div>
-                                                    <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider">
-                                                        {tiActiveTab === 'devops' && '💻 DevOps & Telemetría'}
-                                                        {tiActiveTab === 'impersonation' && '👑 Matriz de Impersonación'}
-                                                        {tiActiveTab === 'users' && '👥 Usuarios Globales'}
-                                                        {tiActiveTab === 'condos' && '🏢 Gestión de Condominios'}
-                                                        {tiActiveTab === 'sandbox' && '🛠️ Sandbox de Inspección'}
-                                                    </h4>
-                                                    <p className="text-[10px] text-slate-400 mt-0.5">Consola de operaciones de TI y soporte técnico en tiempo real.</p>
-                                                </div>
+                                {/* Mobile sidebar overlay backdrop */}
+                                {isMobileDevOpsSidebarOpen && (
+                                    <div 
+                                        onClick={() => setIsMobileDevOpsSidebarOpen(false)}
+                                        className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-20 md:hidden"
+                                    />
+                                )}
+
+                                <div className="flex-1 flex flex-col md:pl-64 min-h-screen">
+                                    {/* Fixed Top Navbar */}
+                                    <header className="h-16 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 flex items-center justify-between px-6 md:px-12 fixed top-0 right-0 left-0 md:left-64 z-20 transition-colors duration-300">
+                                        <div className="flex items-center gap-3">
+                                            <button
+                                                onClick={() => setIsMobileDevOpsSidebarOpen(!isMobileDevOpsSidebarOpen)}
+                                                className="md:hidden p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors mr-1"
+                                                aria-label="Abrir menú"
+                                            >
+                                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5-5.25h16.5m-16.5 10.5h16.5" />
+                                                </svg>
+                                            </button>
+                                            <div>
+                                                <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                                    {tiActiveTab === 'devops' && '💻 DevOps & Telemetría'}
+                                                    {tiActiveTab === 'impersonation' && '👑 Matriz de Impersonación'}
+                                                    {tiActiveTab === 'users' && '👥 Usuarios Globales'}
+                                                    {tiActiveTab === 'condos' && '🏢 Gestión de Condominios'}
+                                                    {tiActiveTab === 'sandbox' && '🛠️ Sandbox de Inspección'}
+                                                </h4>
                                             </div>
                                         </div>
+                                        
+                                        {/* Right Side: Profile settings, theme toggle, and logout */}
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex items-center gap-2 bg-slate-950/40 px-3 py-1.5 rounded-xl border border-slate-800">
+                                                <div className="h-6 w-6 rounded bg-gradient-to-r from-[#0F2557] to-[#00A896] flex items-center justify-center font-bold text-white text-[10px]">
+                                                    {user.name.charAt(0)}
+                                                </div>
+                                                <span className="text-[11px] font-bold text-slate-300 hidden sm:inline">{user.name}</span>
+                                                <span className="text-[8px] bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-extrabold uppercase px-1.5 py-0.5 rounded">TI</span>
+                                            </div>
+
+                                            <button
+                                                onClick={toggleTheme}
+                                                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-750 transition-colors duration-200"
+                                                aria-label="Toggle Theme"
+                                                title="Cambiar tema"
+                                            >
+                                                {darkMode ? (
+                                                    <svg className="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m0 13.5V21M4.75 4.75l1.59 1.59m11.32 11.32l1.59 1.59M3 12h2.25m13.5 0H21M4.75 19.25l1.59-1.59m11.32-11.32l1.59-1.59M12 7.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9z" />
+                                                    </svg>
+                                                ) : (
+                                                    <svg className="w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                                                    </svg>
+                                                )}
+                                            </button>
+
+                                            <Link
+                                                href={route('logout')}
+                                                method="post"
+                                                as="button"
+                                                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-rose-400 hover:text-rose-300 border border-slate-750 transition-colors duration-200"
+                                                aria-label="Cerrar sesión"
+                                                title="Cerrar sesión"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                                                </svg>
+                                            </Link>
+                                        </div>
+                                    </header>
+
+                                    {/* Main Scrollable Workspace Content */}
+                                    <main className="flex-1 px-6 md:px-12 py-8 md:py-10 mt-16 overflow-y-auto bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-200">
+                                        <div className="space-y-6">
 
                                         {/* Dynamic Impersonation Cross-Filtering Panel */}
                                         
 
                                         {tiActiveTab === 'devops' && (
                                             <div className="space-y-6 animate-fade-in">
-                                                <div className="flex items-center justify-between">
-                                                    <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                                                        💻 DevOps & Telemetría de Servidores
-                                                    </h4>
+                                                <div className="flex items-center justify-end">
                                                     <span className="text-[10px] font-mono text-slate-500 font-bold uppercase tracking-wider text-right">database.sqlite &bull; online</span>
                                                 </div>
 
@@ -1237,12 +1285,7 @@ export default function Dashboard() {
                                         {tiActiveTab === 'impersonation' && (
                                             <div className="space-y-6 animate-fade-in text-left">
                                                 <div className="bg-slate-900/80 border border-slate-800/80 p-6 rounded-2xl space-y-4 relative overflow-hidden shadow-lg">
-                                                    <h5 className="text-xs font-bold text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                                                        👑 Matriz de Impersonación Inteligente (Cross-Filtering)
-                                                    </h5>
-                                                    <p className="text-[11px] text-slate-400 leading-normal">
-                                                        Selecciona un condominio, un rol y un usuario de la base de datos para simular su sesión completa en el portal.
-                                                     </p>
+                                                    {/* Matriz de Impersonación */}
                                                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
                                                         <div>
                                                             <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">1. Condominio</label>
@@ -1329,9 +1372,7 @@ export default function Dashboard() {
                                         {tiActiveTab === 'users' && (
                                             <div className="space-y-6 animate-fade-in">
                                                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                                                    <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                                                        👥 Registro Global de Usuarios & Impersonación
-                                                    </h4>
+                                                    {/* Registro de Usuarios */}
                                                     <div className="flex items-center gap-3 w-full md:w-auto">
                                                         <button
                                                             onClick={() => {
@@ -2304,9 +2345,7 @@ export default function Dashboard() {
                                           {tiActiveTab === 'condos' && (
                                               <div className="space-y-6 animate-fade-in text-left">
                                                   <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                                                      <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                                                          🏢 Gestión de Condominios y Comunidades
-                                                      </h4>
+                                                      {/* Gestión de Condominios */}
                                                       <button
                                                           onClick={() => setShowAddCondoForm(!showAddCondoForm)}
                                                           className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0"
@@ -2478,14 +2517,7 @@ export default function Dashboard() {
 
                                           {tiActiveTab === 'sandbox' && (
                                               <div className="space-y-6 animate-fade-in text-left">
-                                                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                                                      <div>
-                                                          <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                                                              🛠️ Sandbox de Inspección de Comunidades
-                                                          </h4>
-                                                          <p className="text-xs text-slate-400 mt-1">Selecciona un condominio y un módulo para inspeccionar sus datos administrativos.</p>
-                                                      </div>
-                                                  </div>
+                                                  {/* Sandbox de Inspección */}
 
                                                   {/* Condominium Selector */}
                                                   <div className="flex flex-wrap items-center gap-4">
@@ -2682,9 +2714,10 @@ export default function Dashboard() {
 
 
 
-                                </div>
+                                </main>
                             </div>
-                        ) : (
+                        </div>
+                    ) : (
                             (() => {
                                 // Compute dynamic filtered states for normal Admins
                                 const adminFilteredUsers = usersList.filter(u => {
