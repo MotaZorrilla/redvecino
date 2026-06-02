@@ -74,7 +74,14 @@ class DashboardController extends Controller
             ->where('is_read', false)
             ->count();
 
-        $allUsers = User::with('roles')->get()->map(function($user) {
+        $allUsers = User::with(['roles', 'ownerProfile.property', 'residentProfile.property'])->get()->map(function($user) {
+            $condoId = null;
+            if ($user->ownerProfile && $user->ownerProfile->property) {
+                $condoId = $user->ownerProfile->property->condominium_id;
+            } elseif ($user->residentProfile && $user->residentProfile->property) {
+                $condoId = $user->residentProfile->property->condominium_id;
+            }
+
             return [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -83,6 +90,7 @@ class DashboardController extends Controller
                 'phone' => $user->phone,
                 'status' => $user->status,
                 'roles' => $user->roles->pluck('name'),
+                'condominium_id' => $condoId,
             ];
         });
 

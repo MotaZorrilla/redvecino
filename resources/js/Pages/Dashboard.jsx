@@ -53,7 +53,7 @@ function StatCard({ title, value, icon, description, color = 'indigo', onClick }
 function Badge({ children, variant = 'default' }) {
     const variants = {
         default: 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300 dark:border dark:border-slate-700/60',
-        success: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-450 dark:border dark:border-emerald-500/20',
+        success: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-500 dark:border dark:border-emerald-500/20',
         warning: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 dark:border dark:border-amber-500/20',
         danger: 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 dark:border dark:border-rose-500/20',
         info: 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 dark:border dark:border-blue-500/20',
@@ -934,7 +934,7 @@ export default function Dashboard() {
                         
                         <button
                             onClick={toggleTheme}
-                            className="p-2 rounded-xl bg-gray-150 hover:bg-gray-200 text-gray-600 dark:bg-slate-850 dark:hover:bg-slate-850 dark:text-slate-350 transition-colors duration-200"
+                            className="p-2 rounded-xl bg-gray-150 hover:bg-gray-200 text-gray-600 dark:bg-slate-800 dark:hover:bg-slate-800 dark:text-slate-300 transition-colors duration-200"
                             aria-label="Toggle Theme"
                             title="Cambiar tema"
                         >
@@ -943,7 +943,7 @@ export default function Dashboard() {
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m0 13.5V21M4.75 4.75l1.59 1.59m11.32 11.32l1.59 1.59M3 12h2.25m13.5 0H21M4.75 19.25l1.59-1.59m11.32-11.32l1.59-1.59M12 7.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9z" />
                                 </svg>
                             ) : (
-                                <svg className="w-4 h-4 text-indigo-650" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                <svg className="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
                                 </svg>
                             )}
@@ -986,12 +986,7 @@ export default function Dashboard() {
             {/* 🔵 ADMIN / TI VIEW - CORPORATE REDVECINO (PRESERVED)     */}
             {/* ======================================================== */}
             {renderAdminView && (
-                <div className="py-8 animate-fade-in font-sans selection:bg-[#00A896]/30">
-                    <div className="mx-auto max-w-[1700px] w-full px-4 sm:px-6 lg:px-8 space-y-6">
-                        
-
-
-                        {devOpsActive ? (
+                devOpsActive ? (
                             <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-[#00A896]/30 flex flex-col md:flex-row relative w-full">
                                 {/* 1. LEFT SIDEBAR */}
                                 <div className={`w-64 bg-slate-900 border-r border-slate-800 p-6 flex flex-col justify-between shrink-0 font-sans transition-transform duration-300 fixed inset-y-0 left-0 z-30 ${isMobileDevOpsSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
@@ -1038,40 +1033,13 @@ export default function Dashboard() {
                                                     <span className={`text-xs font-bold ${tiActiveTab === tab.id ? 'text-[#00A896]' : 'text-slate-300'}`}>
                                                         {tab.name}
                                                     </span>
-                                                    <span className="text-[10px] text-slate-505 dark:text-slate-500 font-medium">
+                                                    <span className="text-[10px] text-slate-500 dark:text-slate-500 font-medium">
                                                         {tab.desc}
                                                     </span>
                                                 </button>
                                             ))}
 
-                                            {/* Maintenance Mode Toggle Option */}
-                                            <div className="pt-2 border-t border-slate-800/40">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setGlobalMaintenanceMode(!globalMaintenanceMode)}
-                                                    className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex items-center justify-between border ${
-                                                        globalMaintenanceMode
-                                                            ? 'bg-orange-600/20 border-orange-500/50 text-orange-400'
-                                                            : 'border-transparent hover:bg-slate-800/40 text-slate-400 hover:text-slate-200'
-                                                    }`}
-                                                >
-                                                    <div className="flex flex-col gap-0.5 text-left">
-                                                        <span className="text-xs font-bold flex items-center gap-1.5">
-                                                            ⚠️ Modo Mantenimiento
-                                                        </span>
-                                                        <span className="text-[10px] text-slate-500 font-medium">
-                                                            {globalMaintenanceMode ? 'Activo (Bloqueo total)' : 'Inactivo (Normal)'}
-                                                        </span>
-                                                    </div>
-                                                    <div className={`relative inline-flex h-4 w-7 shrink-0 cursor-pointer rounded-full border border-transparent transition-colors duration-205 ease-in-out ${
-                                                        globalMaintenanceMode ? 'bg-orange-600' : 'bg-slate-700'
-                                                    }`}>
-                                                        <span className={`pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                                            globalMaintenanceMode ? 'translate-x-3.5' : 'translate-x-0.5'
-                                                        } mt-0.5`} />
-                                                    </div>
-                                                </button>
-                                            </div>
+
                                         </nav>
                                     </div>
 
@@ -1079,7 +1047,7 @@ export default function Dashboard() {
                                     <div className="border-t border-slate-800/60 pt-4 text-[9px] text-slate-500 font-mono space-y-1 text-left">
                                         <div className="flex justify-between">
                                             <span>ESTACIÓN TRABAJO:</span>
-                                            <span className="text-emerald-450 dark:text-emerald-400 font-bold">ACTIVA</span>
+                                            <span className="text-emerald-500 dark:text-emerald-400 font-bold">ACTIVA</span>
                                         </div>
                                         <div>RedVecino & MiVecino &bull; 2026</div>
                                     </div>
@@ -1128,28 +1096,12 @@ export default function Dashboard() {
                                                 <span className="text-[8px] bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-extrabold uppercase px-1.5 py-0.5 rounded">TI</span>
                                             </div>
 
-                                            <button
-                                                onClick={toggleTheme}
-                                                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-750 transition-colors duration-200"
-                                                aria-label="Toggle Theme"
-                                                title="Cambiar tema"
-                                            >
-                                                {darkMode ? (
-                                                    <svg className="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m0 13.5V21M4.75 4.75l1.59 1.59m11.32 11.32l1.59 1.59M3 12h2.25m13.5 0H21M4.75 19.25l1.59-1.59m11.32-11.32l1.59-1.59M12 7.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9z" />
-                                                    </svg>
-                                                ) : (
-                                                    <svg className="w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
-                                                    </svg>
-                                                )}
-                                            </button>
 
                                             <Link
                                                 href={route('logout')}
                                                 method="post"
                                                 as="button"
-                                                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-rose-400 hover:text-rose-300 border border-slate-750 transition-colors duration-200"
+                                                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-rose-400 hover:text-rose-300 border border-slate-700 transition-colors duration-200"
                                                 aria-label="Cerrar sesión"
                                                 title="Cerrar sesión"
                                             >
@@ -1169,7 +1121,19 @@ export default function Dashboard() {
 
                                         {tiActiveTab === 'devops' && (
                                             <div className="space-y-6 animate-fade-in">
-                                                <div className="flex items-center justify-end">
+                                                <div className="flex items-center justify-between flex-wrap gap-4 border-b border-slate-900 pb-4 mb-4">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setGlobalMaintenanceMode(!globalMaintenanceMode)}
+                                                        className={`flex items-center gap-2.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all duration-200 ${
+                                                            globalMaintenanceMode
+                                                                ? 'bg-orange-600/20 border-orange-500/50 text-orange-400 shadow-md shadow-orange-950/20 animate-pulse'
+                                                                : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                                                        }`}
+                                                    >
+                                                        <span className={`h-2 w-2 rounded-full ${globalMaintenanceMode ? 'bg-orange-500 animate-pulse' : 'bg-slate-500'}`} />
+                                                        <span>⚠️ Mantenimiento: {globalMaintenanceMode ? 'BLOQUEO ACTIVO' : 'SISTEMA ONLINE (NORMAL)'}</span>
+                                                    </button>
                                                     <span className="text-[10px] font-mono text-slate-500 font-bold uppercase tracking-wider text-right">database.sqlite &bull; online</span>
                                                 </div>
 
@@ -1199,7 +1163,7 @@ export default function Dashboard() {
                                                 </div>
 
                                                 {/* Syslog console */}
-                                                <div className="bg-slate-950 border border-slate-850 rounded-2xl p-4 font-mono text-xs overflow-hidden shadow-inner flex flex-col justify-between h-[200px]">
+                                                <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 font-mono text-xs overflow-hidden shadow-inner flex flex-col justify-between h-[200px]">
                                                     <div className="space-y-1.5 overflow-y-auto max-h-[140px] text-[#00A896]/95 text-left">
                                                         {terminalLogs.map((log, idx) => (
                                                             <div key={idx} className="flex gap-2">
@@ -1252,7 +1216,7 @@ export default function Dashboard() {
                                                                     <th className="py-2 text-center">Residente</th>
                                                                 </tr>
                                                             </thead>
-                                                            <tbody className="divide-y divide-slate-800 text-slate-350">
+                                                            <tbody className="divide-y divide-slate-800 text-slate-300">
                                                                 {[
                                                                     { p: 'ver_finanzas_global', roles: [true, true, false, false] },
                                                                     { p: 'impersonar_residentes', roles: [true, true, false, false] },
@@ -1282,92 +1246,179 @@ export default function Dashboard() {
                                             </div>
                                         )}
 
-                                        {tiActiveTab === 'impersonation' && (
-                                            <div className="space-y-6 animate-fade-in text-left">
-                                                <div className="bg-slate-900/80 border border-slate-800/80 p-6 rounded-2xl space-y-4 relative overflow-hidden shadow-lg">
-                                                    {/* Matriz de Impersonación */}
-                                                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
-                                                        <div>
-                                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">1. Condominio</label>
-                                                            <select
-                                                                value={selectedImpCondo}
-                                                                onChange={(e) => {
-                                                                    setSelectedImpCondo(e.target.value);
-                                                                    setSelectedImpUser('');
-                                                                }}
-                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
-                                                            >
-                                                                <option value="all" className="bg-slate-950 text-slate-100">Todos los Condominios</option>
-                                                                {condosList.map(c => (
-                                                                    <option key={c.id} value={c.id} className="bg-slate-950 text-slate-100">{c.name}</option>
-                                                                ))}
-                                                            </select>
-                                                        </div>
-                                                        <div>
-                                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">2. Rol</label>
-                                                            <select
-                                                                value={selectedImpRole}
-                                                                onChange={(e) => {
-                                                                    setSelectedImpRole(e.target.value);
-                                                                    setSelectedImpUser('');
-                                                                }}
-                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
-                                                            >
-                                                                <option value="all" className="bg-slate-950 text-slate-100">Todos los Roles</option>
-                                                                <option value="admin" className="bg-slate-950 text-slate-100">Administrador</option>
-                                                                <option value="propietario" className="bg-slate-950 text-slate-100">Propietario</option>
-                                                                <option value="resident" className="bg-slate-950 text-slate-100">Residente</option>
-                                                                <option value="comite" className="bg-slate-950 text-slate-100">Comité</option>
-                                                                <option value="colaborador" className="bg-slate-950 text-slate-100">Colaborador</option>
-                                                            </select>
-                                                        </div>
-                                                        <div>
-                                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">3. Usuario</label>
-                                                            <select
-                                                                value={selectedImpUser}
-                                                                onChange={(e) => setSelectedImpUser(e.target.value)}
-                                                                className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
-                                                            >
-                                                                <option value="" className="bg-slate-950 text-slate-100">Seleccione Usuario...</option>
-                                                                {usersList
-                                                                    .filter(u => {
-                                                                        if (selectedImpCondo !== 'all') {
-                                                                            const condoId = getUserCondoId(u);
-                                                                            if (condoId !== Number(selectedImpCondo)) return false;
-                                                                        }
-                                                                        if (selectedImpRole !== 'all') {
-                                                                            const r = selectedImpRole.toLowerCase();
-                                                                            const hasRole = u.roles?.some(role => role.toLowerCase() === r || (r === 'admin' && role.toLowerCase() === 'administrador'));
-                                                                            if (!hasRole) return false;
-                                                                        }
-                                                                        return true;
-                                                                    })
-                                                                    .map(u => (
-                                                                        <option key={u.id} value={u.id} className="bg-slate-950 text-slate-100">{u.name} ({u.roles[0] || 'Residente'})</option>
-                                                                    ))
-                                                                }
-                                                            </select>
-                                                        </div>
-                                                        <div>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    if (!selectedImpUser) return alert('Por favor, seleccione un usuario de la lista.');
-                                                                    const targetUser = usersList.find(u => u.id === Number(selectedImpUser));
-                                                                    if (targetUser) {
-                                                                        setImpersonatedUser(targetUser);
-                                                                        setTerminalLogs(prev => [...prev, `[IMPERSONATION] Impersonando a ${targetUser.name} (${targetUser.roles[0]})`]);
-                                                                    }
-                                                                }}
-                                                                className="w-full px-4 py-2 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5"
-                                                            >
-                                                                <span>💻 Acceder a la Vista</span>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
+                                         {tiActiveTab === 'impersonation' && (
+                                             <div className="space-y-6 animate-fade-in text-left max-w-4xl mx-auto">
+                                                 <div className="bg-slate-900/80 border border-slate-800/80 p-6 md:p-8 rounded-3xl space-y-6 relative overflow-hidden shadow-2xl">
+                                                     {/* Decorative gradient overlay */}
+                                                     <div className="absolute top-0 right-0 w-32 h-32 bg-[#00A896]/10 rounded-full blur-3xl pointer-events-none" />
+                                                     <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+                                                     <div className="border-b border-slate-800 pb-4">
+                                                         <h4 className="text-sm font-black text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                                             👑 Simulador de Impersonación Spatie
+                                                         </h4>
+                                                         <p className="text-[11px] text-slate-400 mt-1">
+                                                             Esta consola te permite auditar el comportamiento de la interfaz y la contención de datos simulando la sesión de cualquier usuario del sistema.
+                                                         </p>
+                                                     </div>
+
+                                                     {/* Step-by-step interactive filters */}
+                                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                         {/* Step 1: Condo selection */}
+                                                         <div className="space-y-2">
+                                                             <div className="flex items-center gap-2">
+                                                                 <span className="h-5 w-5 rounded-full bg-[#00A896]/10 border border-[#00A896]/30 text-[#00A896] flex items-center justify-center text-[10px] font-black font-mono">1</span>
+                                                                 <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Condominio</label>
+                                                             </div>
+                                                             <select
+                                                                 value={selectedImpCondo}
+                                                                 onChange={(e) => {
+                                                                     setSelectedImpCondo(e.target.value);
+                                                                     setSelectedImpUser('');
+                                                                 }}
+                                                                 className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3.5 py-2.5 text-white focus:outline-none focus:border-[#00A896] hover:border-slate-700 transition-all font-medium"
+                                                             >
+                                                                 <option value="all" className="bg-slate-950 text-slate-100">Todos los Condominios</option>
+                                                                 {condosList.map(c => (
+                                                                     <option key={c.id} value={c.id} className="bg-slate-950 text-slate-100">{c.name}</option>
+                                                                 ))}
+                                                             </select>
+                                                         </div>
+
+                                                         {/* Step 2: Role selection */}
+                                                         <div className="space-y-2">
+                                                             <div className="flex items-center gap-2">
+                                                                 <span className="h-5 w-5 rounded-full bg-[#00A896]/10 border border-[#00A896]/30 text-[#00A896] flex items-center justify-center text-[10px] font-black font-mono">2</span>
+                                                                 <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Rol de Acceso</label>
+                                                             </div>
+                                                             <select
+                                                                 value={selectedImpRole}
+                                                                 onChange={(e) => {
+                                                                     setSelectedImpRole(e.target.value);
+                                                                     setSelectedImpUser('');
+                                                                 }}
+                                                                 className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3.5 py-2.5 text-white focus:outline-none focus:border-[#00A896] hover:border-slate-700 transition-all font-medium"
+                                                             >
+                                                                 <option value="all" className="bg-slate-950 text-slate-100">Todos los Roles</option>
+                                                                 <option value="admin" className="bg-slate-950 text-slate-100">Administrador</option>
+                                                                 <option value="propietario" className="bg-slate-950 text-slate-100">Propietario</option>
+                                                                 <option value="resident" className="bg-slate-950 text-slate-100">Residente</option>
+                                                                 <option value="comite" className="bg-slate-950 text-slate-100">Comité</option>
+                                                                 <option value="colaborador" className="bg-slate-950 text-slate-100">Colaborador</option>
+                                                             </select>
+                                                         </div>
+
+                                                         {/* Step 3: User selection */}
+                                                         <div className="space-y-2">
+                                                             <div className="flex items-center gap-2">
+                                                                 <span className="h-5 w-5 rounded-full bg-[#00A896]/10 border border-[#00A896]/30 text-[#00A896] flex items-center justify-center text-[10px] font-black font-mono">3</span>
+                                                                 <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Usuario Destino</label>
+                                                             </div>
+                                                             <select
+                                                                 value={selectedImpUser}
+                                                                 onChange={(e) => setSelectedImpUser(e.target.value)}
+                                                                 className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3.5 py-2.5 text-white focus:outline-none focus:border-[#00A896] hover:border-slate-700 transition-all font-medium"
+                                                             >
+                                                                 <option value="" className="bg-slate-950 text-slate-100">Seleccione Usuario...</option>
+                                                                 {usersList
+                                                                     .filter(u => {
+                                                                         if (selectedImpCondo !== 'all') {
+                                                                             const condoId = getUserCondoId(u);
+                                                                             const isStaff = u.roles?.some(role => 
+                                                                                 ['administrador', 'admin', 'comité', 'comite', 'colaborador', 'ti'].includes(role.toLowerCase())
+                                                                             );
+                                                                             if (!isStaff && condoId !== Number(selectedImpCondo)) return false;
+                                                                         }
+                                                                         if (selectedImpRole !== 'all') {
+                                                                             const r = selectedImpRole.toLowerCase();
+                                                                             const hasRole = u.roles?.some(role => role.toLowerCase() === r || (r === 'admin' && role.toLowerCase() === 'administrador'));
+                                                                             if (!hasRole) return false;
+                                                                         }
+                                                                         return true;
+                                                                     })
+                                                                     .map(u => (
+                                                                         <option key={u.id} value={u.id} className="bg-slate-950 text-slate-100">{u.name} ({u.roles[0] || 'Residente'})</option>
+                                                                     ))
+                                                                 }
+                                                             </select>
+                                                         </div>
+                                                     </div>
+
+                                                     {/* Live User Preview Card */}
+                                                     {selectedImpUser && (() => {
+                                                         const selectedUserObj = usersList.find(u => u.id === Number(selectedImpUser));
+                                                         if (!selectedUserObj) return null;
+                                                         return (
+                                                             <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-5 mt-4 flex items-center justify-between gap-4 animate-fade-in text-left">
+                                                                 <div className="flex items-center gap-4">
+                                                                     <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-[#0F2557] to-[#00A896] flex items-center justify-center font-extrabold text-white text-lg shadow-lg">
+                                                                         {selectedUserObj.name.charAt(0)}
+                                                                     </div>
+                                                                     <div>
+                                                                         <div className="flex items-center gap-2 flex-wrap">
+                                                                             <h5 className="text-sm font-bold text-slate-100">{selectedUserObj.name}</h5>
+                                                                             <span className="text-[9px] bg-[#00A896]/10 border border-[#00A896]/30 text-[#00A896] font-extrabold uppercase px-2 py-0.5 rounded">
+                                                                                 {selectedUserObj.roles?.[0] || 'Residente'}
+                                                                             </span>
+                                                                             <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded ${
+                                                                                 selectedUserObj.status === 'active' 
+                                                                                     ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400' 
+                                                                                     : 'bg-rose-500/10 border border-rose-500/20 text-rose-400'
+                                                                             }`}>
+                                                                                 {selectedUserObj.status === 'active' ? 'Activo' : 'Inactivo'}
+                                                                             </span>
+                                                                         </div>
+                                                                         <p className="text-[11px] text-slate-400 mt-1 font-mono">{selectedUserObj.email} &bull; RUT: {selectedUserObj.rut}</p>
+                                                                     </div>
+                                                                 </div>
+                                                                 <div className="text-right hidden sm:block">
+                                                                     <span className="text-[9px] text-slate-500 block uppercase font-bold tracking-wider">Condominio Simulado</span>
+                                                                     <span className="text-xs font-bold text-slate-300 block mt-0.5">
+                                                                         {selectedImpCondo === 'all' 
+                                                                             ? (condosList.find(c => c.id === getUserCondoId(selectedUserObj))?.name || 'Condominio Alameda Loft')
+                                                                             : (condosList.find(c => c.id === Number(selectedImpCondo))?.name || 'Condominio Alameda Loft')
+                                                                         }
+                                                                     </span>
+                                                                 </div>
+                                                             </div>
+                                                         );
+                                                     })()}
+
+                                                     {/* Actions */}
+                                                     <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-800/80 flex-wrap">
+                                                         <div className="flex items-center gap-2 text-amber-500 text-[10px] font-bold uppercase tracking-wider">
+                                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                             </svg>
+                                                             <span>La simulación genera registros de auditoría local en SQLite</span>
+                                                         </div>
+                                                         
+                                                         <button
+                                                             type="button"
+                                                             onClick={() => {
+                                                                 if (!selectedImpUser) return alert('Por favor, seleccione un usuario de la lista.');
+                                                                 const targetUser = usersList.find(u => u.id === Number(selectedImpUser));
+                                                                 if (targetUser) {
+                                                                     if (selectedImpCondo !== 'all') {
+                                                                         setAdminCondoId(Number(selectedImpCondo));
+                                                                     } else {
+                                                                         setAdminCondoId(getUserCondoId(targetUser));
+                                                                     }
+                                                                     setImpersonatedUser(targetUser);
+                                                                     setTerminalLogs(prev => [...prev, `[IMPERSONATION] Impersonando a ${targetUser.name} (${targetUser.roles[0]})`]);
+                                                                 }
+                                                             }}
+                                                             className="px-6 py-2.5 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-[#00A896]/20 transition-all flex items-center gap-2 duration-200 transform active:scale-95"
+                                                         >
+                                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+                                                             </svg>
+                                                             <span>💻 ACCEDER A LA VISTA SIMULADA</span>
+                                                         </button>
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         )}
 
                                         {tiActiveTab === 'users' && (
                                             <div className="space-y-6 animate-fade-in">
@@ -1435,7 +1486,7 @@ export default function Dashboard() {
                                                         setShowAddUserForm(false);
                                                         setNewUserForm({ name: '', rut: '', email: '', phone: '', role: 'resident', status: 'active', password: 'password' });
                                                     }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl text-left mb-6">
-                                                        <h5 className="text-xs font-bold text-slate-350 uppercase">{editingUser ? '✏️ Editar Usuario' : 'Detalles del Usuario'}</h5>
+                                                        <h5 className="text-xs font-bold text-slate-300 uppercase">{editingUser ? '✏️ Editar Usuario' : 'Detalles del Usuario'}</h5>
                                                         <div className="grid grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre completo</label>
@@ -1444,7 +1495,7 @@ export default function Dashboard() {
                                                                     required
                                                                     value={newUserForm.name}
                                                                     onChange={(e) => setNewUserForm(prev => ({ ...prev, name: e.target.value }))}
-                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                                                                 />
                                                             </div>
                                                             <div>
@@ -1454,7 +1505,7 @@ export default function Dashboard() {
                                                                     required
                                                                     value={newUserForm.rut}
                                                                     onChange={(e) => setNewUserForm(prev => ({ ...prev, rut: e.target.value }))}
-                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                                                                 />
                                                             </div>
                                                         </div>
@@ -1466,7 +1517,7 @@ export default function Dashboard() {
                                                                     required
                                                                     value={newUserForm.email}
                                                                     onChange={(e) => setNewUserForm(prev => ({ ...prev, email: e.target.value }))}
-                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                                                                 />
                                                             </div>
                                                             <div>
@@ -1476,7 +1527,7 @@ export default function Dashboard() {
                                                                     required
                                                                     value={newUserForm.phone}
                                                                     onChange={(e) => setNewUserForm(prev => ({ ...prev, phone: e.target.value }))}
-                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                                                                 />
                                                             </div>
                                                         </div>
@@ -1486,7 +1537,7 @@ export default function Dashboard() {
                                                                 <select
                                                                     value={newUserForm.role}
                                                                     onChange={(e) => setNewUserForm(prev => ({ ...prev, role: e.target.value }))}
-                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                                                                 >
                                                                     <option value="ti">TI</option>
                                                                     <option value="admin">Administrador</option>
@@ -1501,7 +1552,7 @@ export default function Dashboard() {
                                                                 <select
                                                                     value={newUserForm.status}
                                                                     onChange={(e) => setNewUserForm(prev => ({ ...prev, status: e.target.value }))}
-                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                                                                 >
                                                                     <option value="active">Activo</option>
                                                                     <option value="inactive">Inactivo</option>
@@ -1515,10 +1566,10 @@ export default function Dashboard() {
                                                     </form>
                                                 )}
                                                 <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl overflow-hidden shadow-inner">
-                                                    <div className="overflow-x-auto max-h-[380px]">
+                                                    <div className="overflow-x-auto">
                                                         <table className="w-full text-left text-xs">
                                                             <thead>
-                                                                <tr className="bg-slate-950 text-slate-500 border-b border-slate-850">
+                                                                <tr className="bg-slate-950 text-slate-500 border-b border-slate-800">
                                                                     <th className="p-4 font-black text-left">Nombre completo</th>
                                                                     <th className="p-4 font-black text-left">RUT / Identificación</th>
                                                                     <th className="p-4 font-black text-left">Correo Electrónico</th>
@@ -1527,7 +1578,7 @@ export default function Dashboard() {
                                                                     <th className="p-4 font-black text-right">Acciones</th>
                                                                 </tr>
                                                             </thead>
-                                                            <tbody className="divide-y divide-slate-850 text-slate-350">
+                                                            <tbody className="divide-y divide-slate-800 text-slate-300">
                                                                 {usersList
                                                                     .filter(u => {
                                                                         const matchesSearch = u.name.toLowerCase().includes(searchUserQuery.toLowerCase()) || u.rut.includes(searchUserQuery);
@@ -1654,7 +1705,7 @@ export default function Dashboard() {
                                                         setShowAddPropForm(false);
                                                         setNewPropForm({ condominium_id: 1, type: 'apartment', number: '', block: 'Torre A', floor: '', area_sqm: '', status: 'vacant' });
                                                     }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl text-left mb-6">
-                                                        <h5 className="text-xs font-bold text-slate-350 uppercase">Detalles de la Unidad</h5>
+                                                        <h5 className="text-xs font-bold text-slate-300 uppercase">Detalles de la Unidad</h5>
                                                         <div className="grid grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Número de Depto</label>
@@ -1664,7 +1715,7 @@ export default function Dashboard() {
                                                                     placeholder="Ej: 504"
                                                                     value={newPropForm.number}
                                                                     onChange={(e) => setNewPropForm(prev => ({ ...prev, number: e.target.value }))}
-                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                                                                 />
                                                             </div>
                                                             <div>
@@ -1675,7 +1726,7 @@ export default function Dashboard() {
                                                                     placeholder="Ej: 5"
                                                                     value={newPropForm.floor}
                                                                     onChange={(e) => setNewPropForm(prev => ({ ...prev, floor: e.target.value }))}
-                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                                                                 />
                                                             </div>
                                                         </div>
@@ -1685,7 +1736,7 @@ export default function Dashboard() {
                                                                 <select
                                                                     value={newPropForm.type}
                                                                     onChange={(e) => setNewPropForm(prev => ({ ...prev, type: e.target.value }))}
-                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                                                                 >
                                                                     <option value="apartment">Departamento</option>
                                                                     <option value="house">Casa</option>
@@ -1698,7 +1749,7 @@ export default function Dashboard() {
                                                                 <select
                                                                     value={newPropForm.status}
                                                                     onChange={(e) => setNewPropForm(prev => ({ ...prev, status: e.target.value }))}
-                                                                    className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                                                                 >
                                                                     <option value="occupied">Ocupado (Al día)</option>
                                                                     <option value="delinquent">{"Moroso (>= 3 meses)"}</option>
@@ -1825,7 +1876,7 @@ export default function Dashboard() {
 
                                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[420px] bg-slate-900/40 border border-slate-800/80 rounded-[24px] overflow-hidden animate-fade-in">
                                                     {/* Inbox list */}
-                                                    <div className="border-r border-slate-850 divide-y divide-slate-850 overflow-y-auto">
+                                                    <div className="border-r border-slate-800 divide-y divide-slate-800 overflow-y-auto">
                                                         {[
                                                             { name: 'Residente Demo', lastMsg: 'Hola, llegó mi paquete?', depto: 'Depto 202', count: 1 },
                                                             { name: 'Propietario Demo', lastMsg: 'Pago conciliado correctamente', depto: 'Depto 101', count: 0 }
@@ -1934,7 +1985,7 @@ export default function Dashboard() {
                                                                 </div>
                                                             ) : (
                                                                 <div className="text-center z-10 space-y-2">
-                                                                    <svg className="w-8 h-8 text-slate-650 mx-auto" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                                                                    <svg className="w-8 h-8 text-slate-600 mx-auto" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
                                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
                                                                     </svg>
@@ -2020,7 +2071,7 @@ export default function Dashboard() {
                                                         <div className="overflow-x-auto">
                                                             <table className="w-full text-left text-xs">
                                                                 <thead>
-                                                                    <tr className="bg-slate-950 text-slate-500 border-b border-slate-850">
+                                                                    <tr className="bg-slate-950 text-slate-500 border-b border-slate-800">
                                                                         <th className="p-3 font-black text-left">ID</th>
                                                                         <th className="p-3 font-black text-left">Tracking</th>
                                                                         <th className="p-3 font-black text-left">Carrier</th>
@@ -2030,7 +2081,7 @@ export default function Dashboard() {
                                                                         <th className="p-3 font-black text-right">Acciones</th>
                                                                     </tr>
                                                                 </thead>
-                                                                <tbody className="divide-y divide-slate-850 text-slate-350">
+                                                                <tbody className="divide-y divide-slate-800 text-slate-300">
                                                                     {packages.map((pkg) => (
                                                                         <tr key={pkg.id} className="hover:bg-slate-900/50">
                                                                             <td className="p-3 font-bold text-slate-200 text-left">{pkg.id}</td>
@@ -2151,7 +2202,7 @@ export default function Dashboard() {
                                                          setShowAddTicketForm(false);
                                                          setNewTicketForm({ property_id: '', title: '', description: '', priority: 'medium', category_id: 1 });
                                                      }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl">
-                                                         <h5 className="text-xs font-bold text-slate-350 uppercase">Detalles del Ticket</h5>
+                                                         <h5 className="text-xs font-bold text-slate-300 uppercase">Detalles del Ticket</h5>
                                                          <div className="grid grid-cols-2 gap-4">
                                                              <div>
                                                                  <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Título</label>
@@ -2160,7 +2211,7 @@ export default function Dashboard() {
                                                                      required
                                                                      value={newTicketForm.title}
                                                                      onChange={(e) => setNewTicketForm(prev => ({ ...prev, title: e.target.value }))}
-                                                                     className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                     className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                                                                  />
                                                              </div>
                                                              <div>
@@ -2168,7 +2219,7 @@ export default function Dashboard() {
                                                                  <select
                                                                      value={newTicketForm.priority}
                                                                      onChange={(e) => setNewTicketForm(prev => ({ ...prev, priority: e.target.value }))}
-                                                                     className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                     className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                                                                  >
                                                                      <option value="low">Baja</option>
                                                                      <option value="medium">Media</option>
@@ -2183,7 +2234,7 @@ export default function Dashboard() {
                                                                  required
                                                                  value={newTicketForm.description}
                                                                  onChange={(e) => setNewTicketForm(prev => ({ ...prev, description: e.target.value }))}
-                                                                 className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] h-20"
+                                                                 className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] h-20"
                                                              />
                                                          </div>
                                                          <button type="submit" className="px-4 py-2 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-bold text-xs rounded-xl">
@@ -2193,10 +2244,10 @@ export default function Dashboard() {
                                                  )}
 
                                                  <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl overflow-hidden shadow-inner">
-                                                     <div className="overflow-x-auto max-h-[380px]">
+                                                     <div className="overflow-x-auto">
                                                          <table className="w-full text-left text-xs">
                                                              <thead>
-                                                                 <tr className="bg-slate-950 text-slate-500 border-b border-slate-850">
+                                                                 <tr className="bg-slate-950 text-slate-500 border-b border-slate-800">
                                                                      <th className="p-4 font-black text-left">ID</th>
                                                                      <th className="p-4 font-black text-left">Título</th>
                                                                      <th className="p-4 font-black text-left">Categoría</th>
@@ -2206,7 +2257,7 @@ export default function Dashboard() {
                                                                      <th className="p-4 font-black text-right">Acción</th>
                                                                  </tr>
                                                              </thead>
-                                                             <tbody className="divide-y divide-slate-850 text-slate-350">
+                                                             <tbody className="divide-y divide-slate-800 text-slate-300">
                                                                  {ticketsList.map((t) => (
                                                                      <tr key={t.id} className="hover:bg-slate-900/60">
                                                                          <td className="p-4 font-bold text-slate-100 text-left">#{t.id}</td>
@@ -2269,7 +2320,7 @@ export default function Dashboard() {
                                                          setShowAddPaymentForm(false);
                                                          setNewPaymentForm({ user_id: '', property_id: '', common_expense_id: 1, amount: '', payment_method: 'transfer' });
                                                      }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl">
-                                                         <h5 className="text-xs font-bold text-slate-350 uppercase">Detalles del Pago</h5>
+                                                         <h5 className="text-xs font-bold text-slate-300 uppercase">Detalles del Pago</h5>
                                                          <div className="grid grid-cols-2 gap-4">
                                                              <div>
                                                                  <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto ($)</label>
@@ -2278,7 +2329,7 @@ export default function Dashboard() {
                                                                      required
                                                                      value={newPaymentForm.amount}
                                                                      onChange={(e) => setNewPaymentForm(prev => ({ ...prev, amount: e.target.value }))}
-                                                                     className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                     className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                                                                  />
                                                              </div>
                                                              <div>
@@ -2289,7 +2340,7 @@ export default function Dashboard() {
                                                                      placeholder="Ej: 202"
                                                                      value={newPaymentForm.property_id}
                                                                      onChange={(e) => setNewPaymentForm(prev => ({ ...prev, property_id: e.target.value }))}
-                                                                     className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                     className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                                                                  />
                                                              </div>
                                                          </div>
@@ -2298,7 +2349,7 @@ export default function Dashboard() {
                                                              <select
                                                                  value={newPaymentForm.payment_method}
                                                                  onChange={(e) => setNewPaymentForm(prev => ({ ...prev, payment_method: e.target.value }))}
-                                                                 className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                                                 className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                                                              >
                                                                  <option value="transfer">Transferencia</option>
                                                                  <option value="card">Tarjeta Crédito/Débito</option>
@@ -2312,10 +2363,10 @@ export default function Dashboard() {
                                                  )}
 
                                                  <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl overflow-hidden shadow-inner">
-                                                     <div className="overflow-x-auto max-h-[380px]">
+                                                     <div className="overflow-x-auto">
                                                          <table className="w-full text-left text-xs">
                                                              <thead>
-                                                                 <tr className="bg-slate-950 text-slate-500 border-b border-slate-850">
+                                                                 <tr className="bg-slate-950 text-slate-500 border-b border-slate-800">
                                                                      <th className="p-4 font-black text-left">Usuario</th>
                                                                      <th className="p-4 font-black text-left">Propiedad</th>
                                                                      <th className="p-4 font-black text-left">Monto</th>
@@ -2324,12 +2375,12 @@ export default function Dashboard() {
                                                                      <th className="p-4 font-black text-right">Fecha</th>
                                                                  </tr>
                                                              </thead>
-                                                             <tbody className="divide-y divide-slate-850 text-slate-350">
+                                                             <tbody className="divide-y divide-slate-800 text-slate-300">
                                                                  {paymentsList.map((p) => (
                                                                      <tr key={p.id} className="hover:bg-slate-900/60">
                                                                          <td className="p-4 font-bold text-slate-100 text-left">{p.user?.name || 'Residente'}</td>
                                                                          <td className="p-4 text-left font-mono text-slate-400">Depto {p.property_id}</td>
-                                                                         <td className="p-4 text-left font-bold text-emerald-450">${Number(p.amount).toLocaleString()}</td>
+                                                                         <td className="p-4 text-left font-bold text-emerald-500">${Number(p.amount).toLocaleString()}</td>
                                                                          <td className="p-4 text-left uppercase text-[10px] font-bold">{p.payment_method}</td>
                                                                          <td className="p-4 text-left"><StatusBadge status={p.status || 'completed'} type="payment" /></td>
                                                                          <td className="p-4 text-right text-slate-500">{new Date(p.payment_date).toLocaleDateString('es-CL')}</td>
@@ -2382,7 +2433,7 @@ export default function Dashboard() {
                             setShowAddCondoForm(false);
                             setNewCondoForm({ name: '', address: '', city: '', units_count: '' });
                         }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl">
-                            <h5 className="text-xs font-bold text-slate-350 uppercase">{editingCondo ? 'Editar Condominio' : 'Detalles del Condominio'}</h5>
+                            <h5 className="text-xs font-bold text-slate-300 uppercase">{editingCondo ? 'Editar Condominio' : 'Detalles del Condominio'}</h5>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre</label>
@@ -2391,7 +2442,7 @@ export default function Dashboard() {
                                         required
                                         value={newCondoForm.name}
                                         onChange={(e) => setNewCondoForm(prev => ({ ...prev, name: e.target.value }))}
-                                        className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                        className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                                     />
                                 </div>
                                 <div>
@@ -2401,7 +2452,7 @@ export default function Dashboard() {
                                         required
                                         value={newCondoForm.address}
                                         onChange={(e) => setNewCondoForm(prev => ({ ...prev, address: e.target.value }))}
-                                        className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                        className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                                     />
                                 </div>
                             </div>
@@ -2413,7 +2464,7 @@ export default function Dashboard() {
                                         required
                                         value={newCondoForm.city}
                                         onChange={(e) => setNewCondoForm(prev => ({ ...prev, city: e.target.value }))}
-                                        className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                        className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                                     />
                                 </div>
                                 <div>
@@ -2423,7 +2474,7 @@ export default function Dashboard() {
                                         required
                                         value={newCondoForm.units_count}
                                         onChange={(e) => setNewCondoForm(prev => ({ ...prev, units_count: e.target.value }))}
-                                        className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                        className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                                     />
                                 </div>
                             </div>
@@ -2449,10 +2500,10 @@ export default function Dashboard() {
                     )}
 
                     <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl overflow-hidden shadow-inner">
-                        <div className="overflow-x-auto max-h-[380px]">
+                        <div className="overflow-x-auto">
                             <table className="w-full text-left text-xs">
                                 <thead>
-                                    <tr className="bg-slate-950 text-slate-500 border-b border-slate-850">
+                                    <tr className="bg-slate-950 text-slate-500 border-b border-slate-800">
                                         <th className="p-4 font-black text-left">ID</th>
                                         <th className="p-4 font-black text-left">Nombre</th>
                                         <th className="p-4 font-black text-left">Dirección</th>
@@ -2462,7 +2513,7 @@ export default function Dashboard() {
                                         <th className="p-4 font-black text-right">Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-850 text-slate-350">
+                                <tbody className="divide-y divide-slate-800 text-slate-300">
                                     {condosList.map((c) => (
                                         <tr key={c.id} className="hover:bg-slate-900/60">
                                             <td className="p-4 font-bold text-slate-100 text-left">#{c.id}</td>
@@ -2717,8 +2768,10 @@ export default function Dashboard() {
                                 </main>
                             </div>
                         </div>
-                    ) : (
-                            (() => {
+                ) : (
+                    <div className="py-8 animate-fade-in font-sans selection:bg-[#00A896]/30">
+                        <div className="mx-auto max-w-[1700px] w-full px-4 sm:px-6 lg:px-8 space-y-6">
+                            {(() => {
                                 // Compute dynamic filtered states for normal Admins
                                 const adminFilteredUsers = usersList.filter(u => {
                                     // Spatie TI occlusion - normal Admins must NEVER see or interact with TI users!
@@ -2769,7 +2822,7 @@ export default function Dashboard() {
                                                                 setAdminActiveTab('dashboard'); // reset to dashboard on condo switch
                                                                 setIsMobileSidebarOpen(false);
                                                             }}
-                                                            className="w-full bg-slate-955 border border-slate-800 rounded-lg py-1.5 px-3 text-xs font-bold text-slate-100 focus:ring-1 focus:ring-indigo-500 focus:outline-none cursor-pointer appearance-none pr-8"
+                                                            className="w-full bg-slate-950 border border-slate-800 rounded-lg py-1.5 px-3 text-xs font-bold text-slate-100 focus:ring-1 focus:ring-indigo-500 focus:outline-none cursor-pointer appearance-none pr-8"
                                                         >
                                                             {condosList.map(c => (
                                                                 <option key={c.id} value={c.id} className="bg-slate-900 text-slate-100">{c.name}</option>
@@ -2801,10 +2854,10 @@ export default function Dashboard() {
                                                             className={`w-full text-left px-4 py-2 rounded-xl transition-all duration-200 group flex flex-col gap-0.5 border ${
                                                                 adminActiveTab === tab.id
                                                                     ? 'bg-indigo-600/20 border-indigo-500/50 text-white shadow-md'
-                                                                    : 'border-transparent hover:bg-slate-905 hover:bg-slate-900 text-slate-400 hover:text-slate-200'
+                                                                    : 'border-transparent hover:bg-slate-900 hover:bg-slate-900 text-slate-400 hover:text-slate-200'
                                                             }`}
                                                         >
-                                                            <span className={`text-xs font-bold ${adminActiveTab === tab.id ? 'text-indigo-400' : 'text-slate-350'}`}>
+                                                            <span className={`text-xs font-bold ${adminActiveTab === tab.id ? 'text-indigo-400' : 'text-slate-300'}`}>
                                                                 {tab.label}
                                                             </span>
                                                             <span className="text-[9px] text-slate-500 font-medium">
@@ -2826,7 +2879,7 @@ export default function Dashboard() {
                                                 }`}
                                             >
                                                 <div className="flex items-center gap-2.5">
-                                                    <div className="h-8 w-8 rounded-full bg-indigo-650 flex items-center justify-center text-xs font-extrabold text-white shrink-0 shadow-inner group-hover:scale-105 transition-all">
+                                                    <div className="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-extrabold text-white shrink-0 shadow-inner group-hover:scale-105 transition-all">
                                                         {adminSettingsForm.name.charAt(0)}
                                                     </div>
                                                     <div className="min-w-0 flex-1">
@@ -2834,10 +2887,10 @@ export default function Dashboard() {
                                                             <span className="text-xs font-bold text-slate-200 block truncate group-hover:text-white transition-colors">{adminSettingsForm.name}</span>
                                                             <span className="text-[10px] opacity-0 group-hover:opacity-100 text-indigo-400 font-mono transition-opacity">⚙️</span>
                                                         </div>
-                                                        <span className="text-[9px] text-slate-505 dark:text-slate-500 block truncate font-medium">Administrador (Configurar)</span>
+                                                        <span className="text-[9px] text-slate-500 dark:text-slate-500 block truncate font-medium">Administrador (Configurar)</span>
                                                     </div>
                                                 </div>
-                                                <div className="pt-1.5 border-t border-slate-800 flex justify-between items-center text-[9px] text-slate-400 group-hover:text-slate-350 transition-colors">
+                                                <div className="pt-1.5 border-t border-slate-800 flex justify-between items-center text-[9px] text-slate-400 group-hover:text-slate-300 transition-colors">
                                                     <span>RUT: {adminSettingsForm.rut}</span>
                                                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                                 </div>
@@ -2888,7 +2941,7 @@ export default function Dashboard() {
                                         {adminActiveTab === 'dashboard' && (
                                             <div className="space-y-6 animate-fade-in">
                                                 {/* Condo Banner */}
-                                                <div className="bg-gradient-to-r from-indigo-900 to-indigo-850 border border-indigo-950 rounded-2xl p-6 text-white relative overflow-hidden shadow-md">
+                                                <div className="bg-gradient-to-r from-indigo-900 to-indigo-800 border border-indigo-950 rounded-2xl p-6 text-white relative overflow-hidden shadow-md">
                                                     <div className="absolute -right-20 -top-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
                                                     <div className="relative z-10 space-y-1 text-left">
                                                         <span className="text-[10px] bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 font-bold px-2 py-0.5 rounded uppercase">Comunidad Activa</span>
@@ -2979,7 +3032,7 @@ export default function Dashboard() {
                                                                             setEditingTicket(t);
                                                                             setAdminActiveTab('tickets');
                                                                         }}
-                                                                        className="text-xs text-indigo-650 dark:text-indigo-400 hover:underline text-left font-medium block truncate max-w-[150px]"
+                                                                        className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline text-left font-medium block truncate max-w-[150px]"
                                                                     >
                                                                         {t.title}
                                                                     </button>,
@@ -3000,7 +3053,7 @@ export default function Dashboard() {
                                                                 cells: [
                                                                     <span className="font-mono font-bold">#{p.property_id}</span>,
                                                                     <span className="text-xs">{p.user?.name || '-'}</span>,
-                                                                    <span className="font-bold text-emerald-600 dark:text-emerald-450">${Number(p.amount).toLocaleString()}</span>,
+                                                                    <span className="font-bold text-emerald-600 dark:text-emerald-500">${Number(p.amount).toLocaleString()}</span>,
                                                                     <span className="text-xs text-slate-500">{new Date(p.payment_date).toLocaleDateString('es-CL')}</span>,
                                                                     <StatusBadge status={p.status} type="payment" />
                                                                 ]
@@ -3027,13 +3080,13 @@ export default function Dashboard() {
                                                         <div className="flex bg-gray-100 dark:bg-slate-950 p-1 rounded-lg border border-gray-200 dark:border-slate-800/80 mr-2">
                                                             <button
                                                                 onClick={() => setUserSubTab('residents')}
-                                                                className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${userSubTab === 'residents' ? 'bg-white dark:bg-slate-900 text-indigo-650 dark:text-white shadow' : 'text-slate-505 dark:text-slate-400'}`}
+                                                                className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${userSubTab === 'residents' ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-white shadow' : 'text-slate-500 dark:text-slate-400'}`}
                                                             >
                                                                 Residentes ({adminFilteredUsers.filter(u => !u.roles?.some(r => ['admin', 'administrador'].includes(r.toLowerCase()))).length})
                                                             </button>
                                                             <button
                                                                 onClick={() => setUserSubTab('admins')}
-                                                                className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${userSubTab === 'admins' ? 'bg-white dark:bg-slate-900 text-indigo-650 dark:text-white shadow' : 'text-slate-505 dark:text-slate-400'}`}
+                                                                className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${userSubTab === 'admins' ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-white shadow' : 'text-slate-500 dark:text-slate-400'}`}
                                                             >
                                                                 Administradores ({adminFilteredUsers.filter(u => u.roles?.some(r => ['admin', 'administrador'].includes(r.toLowerCase()))).length})
                                                             </button>
@@ -3045,7 +3098,7 @@ export default function Dashboard() {
                                                                 setNewUserForm({ name: '', rut: '', email: '', phone: '', role: userSubTab === 'admins' ? 'admin' : 'resident', status: 'active', password: 'password' });
                                                                 setShowAddUserForm(!showAddUserForm);
                                                             }}
-                                                            className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow transition-all"
+                                                            className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all"
                                                         >
                                                             {showAddUserForm ? 'Cerrar Form' : 'Añadir Usuario'}
                                                         </button>
@@ -3101,7 +3154,7 @@ export default function Dashboard() {
                                                                     required
                                                                     value={newUserForm.rut}
                                                                     onChange={(e) => setNewUserForm(prev => ({ ...prev, rut: e.target.value }))}
-                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
                                                                 />
                                                             </div>
                                                         </div>
@@ -3113,7 +3166,7 @@ export default function Dashboard() {
                                                                     required
                                                                     value={newUserForm.email}
                                                                     onChange={(e) => setNewUserForm(prev => ({ ...prev, email: e.target.value }))}
-                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
                                                                 />
                                                             </div>
                                                             <div>
@@ -3122,7 +3175,7 @@ export default function Dashboard() {
                                                                     type="text"
                                                                     value={newUserForm.phone}
                                                                     onChange={(e) => setNewUserForm(prev => ({ ...prev, phone: e.target.value }))}
-                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
                                                                 />
                                                             </div>
                                                         </div>
@@ -3132,7 +3185,7 @@ export default function Dashboard() {
                                                                 <select
                                                                     value={newUserForm.role}
                                                                     onChange={(e) => setNewUserForm(prev => ({ ...prev, role: e.target.value }))}
-                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
                                                                 >
                                                                     <option value="resident">Residente</option>
                                                                     <option value="owner">Propietario</option>
@@ -3146,7 +3199,7 @@ export default function Dashboard() {
                                                                 <select
                                                                     value={newUserForm.status}
                                                                     onChange={(e) => setNewUserForm(prev => ({ ...prev, status: e.target.value }))}
-                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
                                                                 >
                                                                     <option value="active">Activo</option>
                                                                     <option value="inactive">Inactivo</option>
@@ -3155,7 +3208,7 @@ export default function Dashboard() {
                                                             </div>
                                                         </div>
                                                         <div className="flex gap-2">
-                                                            <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow">
+                                                            <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow">
                                                                 {editingUser ? 'Guardar Cambios' : 'Añadir Usuario'}
                                                             </button>
                                                             <button type="button" onClick={() => { setShowAddUserForm(false); setEditingUser(null); }} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl">
@@ -3236,7 +3289,7 @@ export default function Dashboard() {
                                                             setNewPropForm({ condominium_id: adminCondoId, type: 'apartment', number: '', block: 'Torre A', floor: '', area_sqm: '', status: 'vacant' });
                                                             setShowAddPropForm(!showAddPropForm);
                                                         }}
-                                                        className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow transition-all"
+                                                        className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all"
                                                     >
                                                         {showAddPropForm ? 'Cerrar Form' : 'Añadir Unidad'}
                                                     </button>
@@ -3296,7 +3349,7 @@ export default function Dashboard() {
                                                                     required
                                                                     value={newPropForm.number}
                                                                     onChange={(e) => setNewPropForm(prev => ({ ...prev, number: e.target.value }))}
-                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                 />
                                                             </div>
                                                         </div>
@@ -3307,7 +3360,7 @@ export default function Dashboard() {
                                                                     type="text"
                                                                     value={newPropForm.block}
                                                                     onChange={(e) => setNewPropForm(prev => ({ ...prev, block: e.target.value }))}
-                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                 />
                                                             </div>
                                                             <div>
@@ -3316,7 +3369,7 @@ export default function Dashboard() {
                                                                     type="number"
                                                                     value={newPropForm.floor}
                                                                     onChange={(e) => setNewPropForm(prev => ({ ...prev, floor: e.target.value }))}
-                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                 />
                                                             </div>
                                                             <div>
@@ -3325,7 +3378,7 @@ export default function Dashboard() {
                                                                     type="number"
                                                                     value={newPropForm.area_sqm}
                                                                     onChange={(e) => setNewPropForm(prev => ({ ...prev, area_sqm: e.target.value }))}
-                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                 />
                                                             </div>
                                                         </div>
@@ -3334,7 +3387,7 @@ export default function Dashboard() {
                                                             <select
                                                                 value={newPropForm.status}
                                                                 onChange={(e) => setNewPropForm(prev => ({ ...prev, status: e.target.value }))}
-                                                                className="w-full bg-white dark:bg-slate-955 border border-gray-350 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                             >
                                                                 <option value="occupied">Ocupado</option>
                                                                 <option value="vacant">Desocupado</option>
@@ -3342,7 +3395,7 @@ export default function Dashboard() {
                                                             </select>
                                                         </div>
                                                         <div className="flex gap-2">
-                                                            <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow">
+                                                            <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow">
                                                                 {editingProp ? 'Guardar Cambios' : 'Añadir Propiedad'}
                                                             </button>
                                                             <button type="button" onClick={() => { setShowAddPropForm(false); setEditingProp(null); }} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl">
@@ -3445,7 +3498,7 @@ export default function Dashboard() {
                                                         <select
                                                             value={ticketPriorityFilter}
                                                             onChange={(e) => setTicketPriorityFilter(e.target.value)}
-                                                            className="px-3 py-1.5 bg-gray-50 dark:bg-slate-955 border border-gray-200 dark:border-slate-800/80 rounded-xl text-xs text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                                            className="px-3 py-1.5 bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800/80 rounded-xl text-xs text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
                                                         >
                                                             <option value="all">Todas las Prioridades</option>
                                                             <option value="low">Baja</option>
@@ -3476,7 +3529,7 @@ export default function Dashboard() {
                                                                         <button
                                                                             type="button"
                                                                             onClick={() => setEditingTicket(t)}
-                                                                            className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-indigo-200 dark:border-slate-700 text-indigo-650 dark:text-indigo-400 text-[10px] font-bold rounded-lg transition-all"
+                                                                            className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-indigo-200 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-lg transition-all"
                                                                         >
                                                                             🔍 Inspeccionar
                                                                         </button>
@@ -3498,7 +3551,7 @@ export default function Dashboard() {
                                                                         <StatusBadge status={editingTicket.priority} type="priority" />
                                                                     </div>
                                                                     <h6 className="font-bold text-sm text-gray-900 dark:text-white">{editingTicket.title}</h6>
-                                                                    <p className="text-xs text-gray-600 dark:text-slate-400 bg-white dark:bg-slate-955 p-3 rounded-lg border border-gray-200 dark:border-slate-800/80 min-h-[60px]">{editingTicket.description}</p>
+                                                                    <p className="text-xs text-gray-600 dark:text-slate-400 bg-white dark:bg-slate-950 p-3 rounded-lg border border-gray-200 dark:border-slate-800/80 min-h-[60px]">{editingTicket.description}</p>
                                                                 </div>
 
                                                                 <div className="grid grid-cols-2 gap-3 text-xs">
@@ -3522,7 +3575,7 @@ export default function Dashboard() {
                                                                             setTicketsList(prev => prev.map(t => t.id === editingTicket.id ? { ...t, status: updatedStatus } : t));
                                                                             setEditingTicket(prev => ({ ...prev, status: updatedStatus }));
                                                                         }}
-                                                                        className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-855 dark:text-white focus:outline-none"
+                                                                        className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
                                                                     >
                                                                         <option value="open">Abierto / Recibido</option>
                                                                         <option value="in_progress">En Progreso / Asignado</option>
@@ -3540,7 +3593,7 @@ export default function Dashboard() {
                                                                             setTicketsList(prev => prev.map(t => t.id === editingTicket.id ? { ...t, assigned_to: assigneeName } : t));
                                                                             setEditingTicket(prev => ({ ...prev, assigned_to: assigneeName }));
                                                                         }}
-                                                                        className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-855 dark:text-white focus:outline-none"
+                                                                        className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
                                                                     >
                                                                         <option value="">Sin Asignar</option>
                                                                         {adminFilteredUsers
@@ -3553,7 +3606,7 @@ export default function Dashboard() {
                                                                 </div>
                                                                 
                                                                 {editingTicket.assigned_to && (
-                                                                    <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-450 text-xs rounded-xl flex items-center gap-2">
+                                                                    <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-500 text-xs rounded-xl flex items-center gap-2">
                                                                         <span>👷</span>
                                                                         <span>Asignado correctamente a <strong>{editingTicket.assigned_to}</strong></span>
                                                                     </div>
@@ -3602,7 +3655,7 @@ export default function Dashboard() {
                                                                     setNewPaymentForm({ user_id: '', property_id: '', amount: '', payment_method: 'transfer', status: 'completed' });
                                                                     setShowAddPaymentForm(!showAddPaymentForm);
                                                                 }}
-                                                                className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow transition-all"
+                                                                className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all"
                                                             >
                                                                 {showAddPaymentForm ? 'Cerrar Form' : 'Registrar Pago'}
                                                             </button>
@@ -3645,7 +3698,7 @@ export default function Dashboard() {
                                                                             required
                                                                             value={newPaymentForm.property_id}
                                                                             onChange={(e) => setNewPaymentForm(prev => ({ ...prev, property_id: e.target.value }))}
-                                                                            className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                            className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                         >
                                                                             <option value="">Seleccione Unidad...</option>
                                                                             {adminFilteredProperties.map(p => (
@@ -3659,7 +3712,7 @@ export default function Dashboard() {
                                                                             required
                                                                             value={newPaymentForm.user_id}
                                                                             onChange={(e) => setNewPaymentForm(prev => ({ ...prev, user_id: e.target.value }))}
-                                                                            className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                            className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                         >
                                                                             <option value="">Seleccione Residente...</option>
                                                                             {adminFilteredUsers.map(u => (
@@ -3676,7 +3729,7 @@ export default function Dashboard() {
                                                                             required
                                                                             value={newPaymentForm.amount}
                                                                             onChange={(e) => setNewPaymentForm(prev => ({ ...prev, amount: e.target.value }))}
-                                                                            className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                            className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                         />
                                                                     </div>
                                                                     <div>
@@ -3684,7 +3737,7 @@ export default function Dashboard() {
                                                                         <select
                                                                             value={newPaymentForm.payment_method}
                                                                             onChange={(e) => setNewPaymentForm(prev => ({ ...prev, payment_method: e.target.value }))}
-                                                                            className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-850 dark:text-white focus:outline-none"
+                                                                            className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                         >
                                                                             <option value="transfer">Transferencia</option>
                                                                             <option value="card">Tarjeta Débito/Crédito</option>
@@ -3696,7 +3749,7 @@ export default function Dashboard() {
                                                                         <select
                                                                             value={newPaymentForm.status}
                                                                             onChange={(e) => setNewPaymentForm(prev => ({ ...prev, status: e.target.value }))}
-                                                                            className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-850 dark:text-white focus:outline-none"
+                                                                            className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                         >
                                                                             <option value="completed">Completado</option>
                                                                             <option value="pending">Pendiente</option>
@@ -3705,7 +3758,7 @@ export default function Dashboard() {
                                                                     </div>
                                                                 </div>
                                                                 <div className="flex gap-2">
-                                                                    <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow">
+                                                                    <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow">
                                                                         {editingPayment ? 'Guardar Cambios' : 'Registrar'}
                                                                     </button>
                                                                     <button type="button" onClick={() => { setShowAddPaymentForm(false); setEditingPayment(null); }} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl">
@@ -3722,7 +3775,7 @@ export default function Dashboard() {
                                                                     cells: [
                                                                         <span className="font-bold text-gray-900 dark:text-white">{p.user?.name || 'Vecino'}</span>,
                                                                         <span className="font-bold">Depto #{p.property_id}</span>,
-                                                                        <span className="font-bold text-emerald-600 dark:text-emerald-450">${Number(p.amount).toLocaleString()}</span>,
+                                                                        <span className="font-bold text-emerald-600 dark:text-emerald-500">${Number(p.amount).toLocaleString()}</span>,
                                                                         <span className="capitalize font-mono text-xs">{p.payment_method === 'transfer' ? 'Transferencia' : p.payment_method === 'card' ? 'Tarjeta' : 'Efectivo'}</span>,
                                                                         <span>{new Date(p.payment_date).toLocaleDateString('es-CL')}</span>,
                                                                         <StatusBadge status={p.status} type="payment" />,
@@ -3771,7 +3824,7 @@ export default function Dashboard() {
                                                                 <div className="flex justify-between items-start">
                                                                     <div>
                                                                         <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Ingresos Contables</p>
-                                                                        <h3 className="text-xl font-black text-emerald-600 dark:text-emerald-450 mt-1">${Number(financeSummary.total_incomes).toLocaleString()}</h3>
+                                                                        <h3 className="text-xl font-black text-emerald-600 dark:text-emerald-500 mt-1">${Number(financeSummary.total_incomes).toLocaleString()}</h3>
                                                                     </div>
                                                                     <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-500">📥</div>
                                                                 </div>
@@ -3780,7 +3833,7 @@ export default function Dashboard() {
                                                                 <div className="flex justify-between items-start">
                                                                     <div>
                                                                         <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Egresos Contables</p>
-                                                                        <h3 className="text-xl font-black text-rose-650 dark:text-rose-450 mt-1">${Number(financeSummary.total_expenses).toLocaleString()}</h3>
+                                                                        <h3 className="text-xl font-black text-rose-600 dark:text-rose-400 mt-1">${Number(financeSummary.total_expenses).toLocaleString()}</h3>
                                                                     </div>
                                                                     <div className="p-2 bg-rose-500/10 rounded-xl text-rose-500">📤</div>
                                                                 </div>
@@ -3815,7 +3868,7 @@ export default function Dashboard() {
                                                             {/* Income categories breakdown */}
                                                             <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-4">
                                                                 <div>
-                                                                    <h5 className="text-xs font-black text-slate-850 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                                                                    <h5 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider flex items-center gap-2">
                                                                         <span>📥</span> Distribución de Ingresos
                                                                     </h5>
                                                                     <p className="text-[10px] text-slate-400 mt-0.5">Participación de cada categoría en la recaudación total. Haz clic en una categoría para filtrar.</p>
@@ -3839,11 +3892,11 @@ export default function Dashboard() {
                                                                                     setLedgerSubTab('incomes');
                                                                                     setPaymentsTabMode('ledger');
                                                                                 }}
-                                                                                className={`w-full text-left space-y-1 p-2 rounded-xl transition-all duration-200 border hover:bg-slate-50 dark:hover:bg-slate-850 ${isActive ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-transparent border-transparent'}`}
+                                                                                className={`w-full text-left space-y-1 p-2 rounded-xl transition-all duration-200 border hover:bg-slate-50 dark:hover:bg-slate-800 ${isActive ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-transparent border-transparent'}`}
                                                                             >
                                                                                 <div className="flex justify-between text-xs">
-                                                                                    <span className="font-semibold text-slate-700 dark:text-slate-350">{icon} {name}</span>
-                                                                                    <span className="font-bold text-slate-850 dark:text-white">${amount.toLocaleString('es-CL')} <span className="text-[10px] text-slate-400 font-normal">({percentage}%)</span></span>
+                                                                                    <span className="font-semibold text-slate-700 dark:text-slate-300">{icon} {name}</span>
+                                                                                    <span className="font-bold text-slate-800 dark:text-white">${amount.toLocaleString('es-CL')} <span className="text-[10px] text-slate-400 font-normal">({percentage}%)</span></span>
                                                                                 </div>
                                                                                 <div className="w-full bg-slate-100 dark:bg-slate-800/80 rounded-full h-2 overflow-hidden">
                                                                                     <div style={{ width: `${percentage}%` }} className="bg-emerald-500 h-full rounded-full transition-all duration-300" />
@@ -3857,7 +3910,7 @@ export default function Dashboard() {
                                                             {/* Expense categories breakdown */}
                                                             <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-4">
                                                                 <div>
-                                                                    <h5 className="text-xs font-black text-slate-850 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                                                                    <h5 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider flex items-center gap-2">
                                                                         <span>📤</span> Distribución de Egresos
                                                                     </h5>
                                                                     <p className="text-[10px] text-slate-400 mt-0.5">Destino de los fondos del condominio en la operación mensual. Haz clic en una categoría para filtrar.</p>
@@ -3881,11 +3934,11 @@ export default function Dashboard() {
                                                                                     setLedgerSubTab('expenses');
                                                                                     setPaymentsTabMode('ledger');
                                                                                 }}
-                                                                                className={`w-full text-left space-y-1 p-2 rounded-xl transition-all duration-200 border hover:bg-slate-50 dark:hover:bg-slate-850 ${isActive ? 'bg-rose-500/10 border-rose-500/30' : 'bg-transparent border-transparent'}`}
+                                                                                className={`w-full text-left space-y-1 p-2 rounded-xl transition-all duration-200 border hover:bg-slate-50 dark:hover:bg-slate-800 ${isActive ? 'bg-rose-500/10 border-rose-500/30' : 'bg-transparent border-transparent'}`}
                                                                             >
                                                                                 <div className="flex justify-between text-xs">
-                                                                                    <span className="font-semibold text-slate-700 dark:text-slate-350">{icon} {name}</span>
-                                                                                    <span className="font-bold text-slate-850 dark:text-white">${amount.toLocaleString('es-CL')} <span className="text-[10px] text-slate-400 font-normal">({percentage}%)</span></span>
+                                                                                    <span className="font-semibold text-slate-700 dark:text-slate-300">{icon} {name}</span>
+                                                                                    <span className="font-bold text-slate-800 dark:text-white">${amount.toLocaleString('es-CL')} <span className="text-[10px] text-slate-400 font-normal">({percentage}%)</span></span>
                                                                                 </div>
                                                                                 <div className="w-full bg-slate-100 dark:bg-slate-800/80 rounded-full h-2 overflow-hidden">
                                                                                     <div style={{ width: `${percentage}%` }} className="bg-rose-500 h-full rounded-full transition-all duration-300" />
@@ -3907,7 +3960,7 @@ export default function Dashboard() {
                                                             </button>
                                                             <button
                                                                 onClick={() => setLedgerSubTab('expenses')}
-                                                                className={`px-4.5 py-2 rounded-xl text-xs font-extrabold transition-all border ${ledgerSubTab === 'expenses' ? 'bg-rose-500/10 text-rose-650 dark:text-rose-400 border-rose-500/30 shadow-sm' : 'bg-slate-100 dark:bg-slate-800/60 hover:bg-slate-200 border-transparent text-slate-500 dark:text-slate-400'}`}
+                                                                className={`px-4.5 py-2 rounded-xl text-xs font-extrabold transition-all border ${ledgerSubTab === 'expenses' ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30 shadow-sm' : 'bg-slate-100 dark:bg-slate-800/60 hover:bg-slate-200 border-transparent text-slate-500 dark:text-slate-400'}`}
                                                             >
                                                                 📤 Libro de Egresos Contables
                                                             </button>
@@ -3940,7 +3993,7 @@ export default function Dashboard() {
                                                                             setNewIncomeForm({ category: '', subcategory: '', amount: '', date: new Date().toISOString().substring(0, 10), description: '', property_id: '', user_id: '' });
                                                                             setShowAddIncomeForm(!showAddIncomeForm);
                                                                         }}
-                                                                        className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-550 text-white font-bold text-xs rounded-xl shadow transition-all"
+                                                                        className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all"
                                                                     >
                                                                         {showAddIncomeForm ? 'Cerrar Formulario' : '➕ Registrar Ingreso'}
                                                                     </button>
@@ -3957,7 +4010,7 @@ export default function Dashboard() {
                                                                                     required
                                                                                     value={newIncomeForm.category}
                                                                                     onChange={(e) => setNewIncomeForm(prev => ({ ...prev, category: e.target.value, subcategory: '' }))}
-                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                                 >
                                                                                     <option value="">Seleccione Categoría...</option>
                                                                                     {Object.entries(financialCatalog.incomes || {}).map(([key, obj]) => (
@@ -3972,7 +4025,7 @@ export default function Dashboard() {
                                                                                     required
                                                                                     value={newIncomeForm.subcategory}
                                                                                     onChange={(e) => setNewIncomeForm(prev => ({ ...prev, subcategory: e.target.value }))}
-                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                                     disabled={!newIncomeForm.category}
                                                                                 >
                                                                                     <option value="">Seleccione Subcategoría...</option>
@@ -3991,7 +4044,7 @@ export default function Dashboard() {
                                                                                     required
                                                                                     value={newIncomeForm.amount}
                                                                                     onChange={(e) => setNewIncomeForm(prev => ({ ...prev, amount: e.target.value }))}
-                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                                     placeholder="Monto"
                                                                                 />
                                                                             </div>
@@ -4003,7 +4056,7 @@ export default function Dashboard() {
                                                                                     required
                                                                                     value={newIncomeForm.date}
                                                                                     onChange={(e) => setNewIncomeForm(prev => ({ ...prev, date: e.target.value }))}
-                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                                 />
                                                                             </div>
 
@@ -4012,7 +4065,7 @@ export default function Dashboard() {
                                                                                 <select
                                                                                     value={newIncomeForm.property_id}
                                                                                     onChange={(e) => setNewIncomeForm(prev => ({ ...prev, property_id: e.target.value }))}
-                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                                 >
                                                                                     <option value="">Ninguna...</option>
                                                                                     {adminFilteredProperties.map(p => (
@@ -4028,7 +4081,7 @@ export default function Dashboard() {
                                                                                 <select
                                                                                     value={newIncomeForm.user_id}
                                                                                     onChange={(e) => setNewIncomeForm(prev => ({ ...prev, user_id: e.target.value }))}
-                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                                 >
                                                                                     <option value="">Ninguno...</option>
                                                                                     {adminFilteredUsers.map(u => (
@@ -4043,14 +4096,14 @@ export default function Dashboard() {
                                                                                     type="text"
                                                                                     value={newIncomeForm.description}
                                                                                     onChange={(e) => setNewIncomeForm(prev => ({ ...prev, description: e.target.value }))}
-                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                                     placeholder="Comentarios adicionales o detalle del pago"
                                                                                 />
                                                                             </div>
                                                                         </div>
 
                                                                         <div className="flex gap-2">
-                                                                            <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-550 text-white font-bold text-xs rounded-xl shadow">
+                                                                            <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow">
                                                                                 {editingIncome ? 'Guardar Cambios' : 'Registrar'}
                                                                             </button>
                                                                             <button
@@ -4081,15 +4134,15 @@ export default function Dashboard() {
 
                                                                             return {
                                                                                 cells: [
-                                                                                    <span className="font-extrabold text-slate-850 dark:text-white flex items-center gap-1.5">{icon} {catName}</span>,
+                                                                                    <span className="font-extrabold text-slate-800 dark:text-white flex items-center gap-1.5">{icon} {catName}</span>,
                                                                                     <span className="font-semibold text-slate-500 dark:text-slate-400">{subName}</span>,
-                                                                                    <span className="font-bold text-emerald-600 dark:text-emerald-450">${Number(inc.amount).toLocaleString()}</span>,
+                                                                                    <span className="font-bold text-emerald-600 dark:text-emerald-500">${Number(inc.amount).toLocaleString()}</span>,
                                                                                     <span>{new Date(inc.date + 'T12:00:00').toLocaleDateString('es-CL')}</span>,
-                                                                                    <span className="text-xs truncate max-w-xs block text-slate-505 dark:text-slate-400" title={inc.description}>{inc.description || '—'}</span>,
+                                                                                    <span className="text-xs truncate max-w-xs block text-slate-500 dark:text-slate-400" title={inc.description}>{inc.description || '—'}</span>,
                                                                                     <div>
                                                                                         {inc.property && <span className="font-bold block text-xs">Depto #{inc.property.number}</span>}
                                                                                         {inc.user && <span className="text-[10px] text-slate-400 block">{inc.user.name}</span>}
-                                                                                        {!inc.property && !inc.user && <span className="text-slate-450 text-[10px]">—</span>}
+                                                                                        {!inc.property && !inc.user && <span className="text-slate-400 text-[10px]">—</span>}
                                                                                     </div>,
                                                                                     <div className="flex items-center gap-2 justify-end">
                                                                                         <button
@@ -4136,7 +4189,7 @@ export default function Dashboard() {
                                                                             <button
                                                                                 type="button"
                                                                                 onClick={() => setSelectedExpenseCategory('all')}
-                                                                                className="px-2 py-0.5 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-650 dark:text-rose-455 text-[10px] font-black rounded-lg transition-all"
+                                                                                className="px-2 py-0.5 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-600 dark:text-rose-500 text-[10px] font-black rounded-lg transition-all"
                                                                             >
                                                                                 Limpiar Filtro ×
                                                                             </button>
@@ -4148,7 +4201,7 @@ export default function Dashboard() {
                                                                             setNewExpenseForm({ category: '', subcategory: '', amount: '', date: new Date().toISOString().substring(0, 10), description: '', property_id: '', user_id: '' });
                                                                             setShowAddExpenseForm(!showAddExpenseForm);
                                                                         }}
-                                                                        className="px-3 py-1.5 bg-rose-650 hover:bg-rose-600 text-white font-bold text-xs rounded-xl shadow transition-all"
+                                                                        className="px-3 py-1.5 bg-rose-600 hover:bg-rose-600 text-white font-bold text-xs rounded-xl shadow transition-all"
                                                                     >
                                                                         {showAddExpenseForm ? 'Cerrar Formulario' : '➕ Registrar Egreso'}
                                                                     </button>
@@ -4156,7 +4209,7 @@ export default function Dashboard() {
 
                                                                 {showAddExpenseForm && (
                                                                     <form onSubmit={handleSaveExpense} className="bg-slate-50 dark:bg-slate-900/60 p-6 rounded-2xl border border-gray-200 dark:border-slate-800 space-y-4 max-w-2xl text-left">
-                                                                        <h5 className="text-xs font-bold text-rose-650 dark:text-rose-455 uppercase tracking-wide">{editingExpense ? '✏️ Editar Egreso Contable' : '📤 Registrar Nuevo Egreso Contable'}</h5>
+                                                                        <h5 className="text-xs font-bold text-rose-600 dark:text-rose-500 uppercase tracking-wide">{editingExpense ? '✏️ Editar Egreso Contable' : '📤 Registrar Nuevo Egreso Contable'}</h5>
                                                                         
                                                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                             <div>
@@ -4165,7 +4218,7 @@ export default function Dashboard() {
                                                                                     required
                                                                                     value={newExpenseForm.category}
                                                                                     onChange={(e) => setNewExpenseForm(prev => ({ ...prev, category: e.target.value, subcategory: '' }))}
-                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                                 >
                                                                                     <option value="">Seleccione Categoría...</option>
                                                                                     {Object.entries(financialCatalog.expenses || {}).map(([key, obj]) => (
@@ -4180,7 +4233,7 @@ export default function Dashboard() {
                                                                                     required
                                                                                     value={newExpenseForm.subcategory}
                                                                                     onChange={(e) => setNewExpenseForm(prev => ({ ...prev, subcategory: e.target.value }))}
-                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                                     disabled={!newExpenseForm.category}
                                                                                 >
                                                                                     <option value="">Seleccione Subcategoría...</option>
@@ -4199,7 +4252,7 @@ export default function Dashboard() {
                                                                                     required
                                                                                     value={newExpenseForm.amount}
                                                                                     onChange={(e) => setNewExpenseForm(prev => ({ ...prev, amount: e.target.value }))}
-                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                                     placeholder="Monto"
                                                                                 />
                                                                             </div>
@@ -4211,7 +4264,7 @@ export default function Dashboard() {
                                                                                     required
                                                                                     value={newExpenseForm.date}
                                                                                     onChange={(e) => setNewExpenseForm(prev => ({ ...prev, date: e.target.value }))}
-                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                                 />
                                                                             </div>
 
@@ -4220,7 +4273,7 @@ export default function Dashboard() {
                                                                                 <select
                                                                                     value={newExpenseForm.property_id}
                                                                                     onChange={(e) => setNewExpenseForm(prev => ({ ...prev, property_id: e.target.value }))}
-                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                                 >
                                                                                     <option value="">Ninguna...</option>
                                                                                     {adminFilteredProperties.map(p => (
@@ -4236,7 +4289,7 @@ export default function Dashboard() {
                                                                                 <select
                                                                                     value={newExpenseForm.user_id}
                                                                                     onChange={(e) => setNewExpenseForm(prev => ({ ...prev, user_id: e.target.value }))}
-                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                                 >
                                                                                     <option value="">Ninguno...</option>
                                                                                     {adminFilteredUsers.map(u => (
@@ -4251,14 +4304,14 @@ export default function Dashboard() {
                                                                                     type="text"
                                                                                     value={newExpenseForm.description}
                                                                                     onChange={(e) => setNewExpenseForm(prev => ({ ...prev, description: e.target.value }))}
-                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                                     placeholder="Comentarios adicionales o detalle del egreso"
                                                                                 />
                                                                             </div>
                                                                         </div>
 
                                                                         <div className="flex gap-2">
-                                                                            <button type="submit" className="px-4 py-2 bg-rose-650 hover:bg-rose-600 text-white font-bold text-xs rounded-xl shadow">
+                                                                            <button type="submit" className="px-4 py-2 bg-rose-600 hover:bg-rose-600 text-white font-bold text-xs rounded-xl shadow">
                                                                                 {editingExpense ? 'Guardar Cambios' : 'Registrar'}
                                                                             </button>
                                                                             <button
@@ -4289,15 +4342,15 @@ export default function Dashboard() {
 
                                                                             return {
                                                                                 cells: [
-                                                                                    <span className="font-extrabold text-slate-850 dark:text-white flex items-center gap-1.5">{icon} {catName}</span>,
+                                                                                    <span className="font-extrabold text-slate-800 dark:text-white flex items-center gap-1.5">{icon} {catName}</span>,
                                                                                     <span className="font-semibold text-slate-500 dark:text-slate-400">{subName}</span>,
-                                                                                    <span className="font-bold text-rose-650 dark:text-rose-450">${Number(exp.amount).toLocaleString()}</span>,
+                                                                                    <span className="font-bold text-rose-600 dark:text-rose-400">${Number(exp.amount).toLocaleString()}</span>,
                                                                                     <span>{new Date(exp.date + 'T12:00:00').toLocaleDateString('es-CL')}</span>,
-                                                                                    <span className="text-xs truncate max-w-xs block text-slate-505 dark:text-slate-400" title={exp.description}>{exp.description || '—'}</span>,
+                                                                                    <span className="text-xs truncate max-w-xs block text-slate-500 dark:text-slate-400" title={exp.description}>{exp.description || '—'}</span>,
                                                                                     <div>
                                                                                         {exp.property && <span className="font-bold block text-xs">Depto #{exp.property.number}</span>}
                                                                                         {exp.user && <span className="text-[10px] text-slate-400 block">{exp.user.name}</span>}
-                                                                                        {!exp.property && !exp.user && <span className="text-slate-450 text-[10px]">—</span>}
+                                                                                        {!exp.property && !exp.user && <span className="text-slate-400 text-[10px]">—</span>}
                                                                                     </div>,
                                                                                     <div className="flex items-center gap-2 justify-end">
                                                                                         <button
@@ -4356,7 +4409,7 @@ export default function Dashboard() {
                                                             setNewFineForm({ property_id: '', amount: '', reason: '', status: 'pending' });
                                                             setShowAddFineForm(!showAddFineForm);
                                                         }}
-                                                        className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow transition-all"
+                                                        className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all"
                                                     >
                                                         {showAddFineForm ? 'Cerrar Form' : 'Cursar Multa'}
                                                     </button>
@@ -4397,7 +4450,7 @@ export default function Dashboard() {
                                                                     required
                                                                     value={newFineForm.property_id}
                                                                     onChange={(e) => setNewFineForm(prev => ({ ...prev, property_id: e.target.value }))}
-                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-850 dark:text-white focus:outline-none"
+                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                                 >
                                                                     <option value="">Seleccione Unidad...</option>
                                                                     {adminFilteredProperties.map(p => (
@@ -4412,7 +4465,7 @@ export default function Dashboard() {
                                                                     required
                                                                     value={newFineForm.amount}
                                                                     onChange={(e) => setNewFineForm(prev => ({ ...prev, amount: e.target.value }))}
-                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-350 dark:border-slate-805 rounded-xl text-xs px-3 py-2 text-slate-855 dark:text-white focus:outline-none"
+                                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
                                                                 />
                                                             </div>
                                                         </div>
@@ -4423,7 +4476,7 @@ export default function Dashboard() {
                                                                 rows="3"
                                                                 value={newFineForm.reason}
                                                                 onChange={(e) => setNewFineForm(prev => ({ ...prev, reason: e.target.value }))}
-                                                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-855 dark:text-white focus:outline-none"
+                                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
                                                                 placeholder="Describa la infracción (ej. Ruidos molestos, desacato reglamento)..."
                                                             />
                                                         </div>
@@ -4432,7 +4485,7 @@ export default function Dashboard() {
                                                             <select
                                                                 value={newFineForm.status}
                                                                 onChange={(e) => setNewFineForm(prev => ({ ...prev, status: e.target.value }))}
-                                                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-855 dark:text-white focus:outline-none"
+                                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
                                                             >
                                                                 <option value="pending">Pendiente de Pago</option>
                                                                 <option value="resolved">Pagada / Resuelta</option>
@@ -4440,7 +4493,7 @@ export default function Dashboard() {
                                                             </select>
                                                         </div>
                                                         <div className="flex gap-2">
-                                                            <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow">
+                                                            <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow">
                                                                 {editingFine ? 'Guardar Cambios' : 'Cursar Multa'}
                                                             </button>
                                                             <button type="button" onClick={() => { setShowAddFineForm(false); setEditingFine(null); }} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl">
@@ -4509,7 +4562,7 @@ export default function Dashboard() {
                                          {adminActiveTab === 'settings' && (
                                              <div className="grid gap-6 md:grid-cols-2 animate-fade-in text-left">
                                                  {/* Admin profile settings form */}
-                                                 <div className="bg-white dark:bg-slate-900 border border-gray-150 dark:border-slate-805 p-6 rounded-2xl space-y-4 shadow-sm">
+                                                 <div className="bg-white dark:bg-slate-900 border border-gray-150 dark:border-slate-800 p-6 rounded-2xl space-y-4 shadow-sm">
                                                      <h4 className="text-sm font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
                                                          👤 Datos del Administrador
                                                      </h4>
@@ -4517,7 +4570,7 @@ export default function Dashboard() {
                                                          Modifica la información básica del administrador del condominio.
                                                      </p>
                                                      {settingsSuccess && (
-                                                         <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-450 text-xs font-bold animate-fade-in">
+                                                         <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-500 text-xs font-bold animate-fade-in">
                                                              ✅ ¡Datos del administrador actualizados con éxito!
                                                          </div>
                                                      )}
@@ -4533,7 +4586,7 @@ export default function Dashboard() {
                                                                  type="text"
                                                                  value={adminSettingsForm.name}
                                                                  onChange={e => setAdminSettingsForm(prev => ({ ...prev, name: e.target.value }))}
-                                                                 className="w-full bg-gray-50 dark:bg-slate-950 border border-gray-250 dark:border-slate-850 rounded-xl px-3 py-2 text-xs text-gray-800 dark:text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                                                                 className="w-full bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-gray-800 dark:text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none"
                                                                  required
                                                              />
                                                          </div>
@@ -4543,7 +4596,7 @@ export default function Dashboard() {
                                                                  type="email"
                                                                  value={adminSettingsForm.email}
                                                                  onChange={e => setAdminSettingsForm(prev => ({ ...prev, email: e.target.value }))}
-                                                                 className="w-full bg-gray-50 dark:bg-slate-950 border border-gray-250 dark:border-slate-850 rounded-xl px-3 py-2 text-xs text-gray-800 dark:text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                                                                 className="w-full bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-gray-800 dark:text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none"
                                                                  required
                                                              />
                                                          </div>
@@ -4554,7 +4607,7 @@ export default function Dashboard() {
                                                                      type="text"
                                                                      value={adminSettingsForm.phone}
                                                                      onChange={e => setAdminSettingsForm(prev => ({ ...prev, phone: e.target.value }))}
-                                                                     className="w-full bg-gray-50 dark:bg-slate-950 border border-gray-250 dark:border-slate-850 rounded-xl px-3 py-2 text-xs text-gray-800 dark:text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                                                                     className="w-full bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-gray-800 dark:text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none"
                                                                  />
                                                              </div>
                                                              <div>
@@ -4563,7 +4616,7 @@ export default function Dashboard() {
                                                                      type="text"
                                                                      value={adminSettingsForm.rut}
                                                                      onChange={e => setAdminSettingsForm(prev => ({ ...prev, rut: e.target.value }))}
-                                                                     className="w-full bg-gray-50 dark:bg-slate-950 border border-gray-250 dark:border-slate-850 rounded-xl px-3 py-2 text-xs text-gray-800 dark:text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                                                                     className="w-full bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-gray-800 dark:text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none"
                                                                      required
                                                                  />
                                                              </div>
@@ -4578,7 +4631,7 @@ export default function Dashboard() {
                                                  </div>
 
                                                  {/* System settings and simulation */}
-                                                 <div className="bg-white dark:bg-slate-900 border border-gray-150 dark:border-slate-805 p-6 rounded-2xl space-y-4 shadow-sm flex flex-col justify-between">
+                                                 <div className="bg-white dark:bg-slate-900 border border-gray-150 dark:border-slate-800 p-6 rounded-2xl space-y-4 shadow-sm flex flex-col justify-between">
                                                      <div className="space-y-4">
                                                          <h4 className="text-sm font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
                                                              ⚙️ Configuración del Sistema
@@ -4588,9 +4641,9 @@ export default function Dashboard() {
                                                          </p>
 
                                                          <div className="space-y-3">
-                                                             <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-850">
+                                                             <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-800">
                                                                  <div>
-                                                                     <span className="text-xs font-bold text-gray-850 dark:text-slate-200 block">Notificaciones por Email</span>
+                                                                     <span className="text-xs font-bold text-gray-800 dark:text-slate-200 block">Notificaciones por Email</span>
                                                                      <span className="text-[10px] text-gray-500 dark:text-slate-400">Enviar correos por nuevos tickets o pagos.</span>
                                                                  </div>
                                                                  <label className="relative inline-flex items-center cursor-pointer">
@@ -4604,9 +4657,9 @@ export default function Dashboard() {
                                                                  </label>
                                                              </div>
 
-                                                             <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-955 rounded-xl border border-gray-200 dark:border-slate-850">
+                                                             <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-800">
                                                                  <div>
-                                                                     <span className="text-xs font-bold text-gray-855 dark:text-slate-200 block">Motor de Base de Datos</span>
+                                                                     <span className="text-xs font-bold text-gray-900 dark:text-slate-200 block">Motor de Base de Datos</span>
                                                                      <span className="text-[10px] text-gray-500 dark:text-slate-400">Driver activo para la aplicación.</span>
                                                                  </div>
                                                                  <select
@@ -4616,7 +4669,7 @@ export default function Dashboard() {
                                                                          setAdminSettingsForm(prev => ({ ...prev, dbDriver: drv }));
                                                                          setTerminalLogs(prev => [...prev, `[DB-CONFIG] Cambiando motor de base de datos a: ${drv.toUpperCase()}`]);
                                                                      }}
-                                                                     className="bg-transparent border border-gray-200 dark:border-slate-800 rounded-lg py-1 px-2 text-xs font-bold text-gray-855 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+                                                                     className="bg-transparent border border-gray-200 dark:border-slate-800 rounded-lg py-1 px-2 text-xs font-bold text-gray-900 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
                                                                  >
                                                                      <option value="sqlite">SQLite (Local)</option>
                                                                      <option value="mysql">MySQL (Producción)</option>
@@ -4626,7 +4679,7 @@ export default function Dashboard() {
                                                          </div>
                                                      </div>
 
-                                                     <div className="pt-4 border-t border-gray-200 dark:border-slate-850 space-y-2">
+                                                     <div className="pt-4 border-t border-gray-200 dark:border-slate-800 space-y-2">
                                                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Inspección de Auditoría</span>
                                                          <button
                                                              type="button"
@@ -4644,7 +4697,7 @@ export default function Dashboard() {
                                                                  }, 1000);
                                                              }}
                                                              disabled={exportingLogs}
-                                                             className={`w-full py-2 ${exportingLogs ? 'bg-indigo-650/40 text-slate-400 cursor-not-allowed' : 'bg-slate-900 hover:bg-slate-800 text-white'} border border-slate-750 font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2`}
+                                                             className={`w-full py-2 ${exportingLogs ? 'bg-indigo-600/40 text-slate-400 cursor-not-allowed' : 'bg-slate-900 hover:bg-slate-800 text-white'} border border-slate-700 font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2`}
                                                          >
                                                              {exportingLogs ? (
                                                                  <>
@@ -4662,10 +4715,10 @@ export default function Dashboard() {
                                         </div>
                                     </div>
                                 );
-                            })()
-                        )}
+                            })()}
+                        </div>
                     </div>
-                </div>
+                )
             )}
 
             {/* ======================================================== */}
@@ -4747,7 +4800,7 @@ export default function Dashboard() {
                                     <div className="space-y-3 pt-4 border-t border-slate-900">
                                         <button
                                             onClick={() => setForceMobileView(true)}
-                                            className="w-full py-2 bg-slate-900 hover:bg-slate-850 border border-slate-800 text-[10px] font-extrabold rounded-xl transition-all flex items-center justify-center gap-1.5 text-slate-350"
+                                            className="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-[10px] font-extrabold rounded-xl transition-all flex items-center justify-center gap-1.5 text-slate-300"
                                         >
                                             <svg className="w-3.5 h-3.5 text-[#72B043]" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
@@ -4766,7 +4819,7 @@ export default function Dashboard() {
                                     {/* Top Widescreen Header */}
                                     <div className="px-6 md:px-12 py-5 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between shrink-0">
                                         <div>
-                                            <h4 className="text-sm font-black text-slate-855 dark:text-slate-100 uppercase tracking-wider">
+                                            <h4 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider">
                                                 {mobileTab === 'home' && 'Panel Resumen Residente'}
                                                 {mobileTab === 'comunicados' && 'Circular de Copropietarios'}
                                                 {mobileTab === 'reservas' && 'Reservación de Instalaciones'}
@@ -4775,7 +4828,7 @@ export default function Dashboard() {
                                                  {mobileTab === 'comunidad' && 'Mensajería Vecinal Inteligente'}
                                                  {mobileTab === 'configuracion' && 'Ajustes de Perfil y Sistema'}
                                             </h4>
-                                            <p className="text-[10px] text-slate-450 dark:text-slate-555 mt-0.5">Gestión operativa en tiempo real del {residentCondo}.</p>
+                                            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Gestión operativa en tiempo real del {residentCondo}.</p>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <button 
@@ -4788,7 +4841,7 @@ export default function Dashboard() {
                                                 className={`px-2.5 py-1 text-[10px] font-bold rounded-md uppercase tracking-wider border transition-all duration-300 flex items-center gap-1.5 ${
                                                     simulatedMoroso 
                                                         ? 'bg-rose-500/10 border-rose-500/35 text-rose-500 hover:bg-rose-500/20 shadow-sm shadow-rose-500/5' 
-                                                        : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-450 hover:bg-slate-200 dark:hover:bg-slate-750'
+                                                        : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                                                 }`}
                                             >
                                                 <span className={`h-1.5 w-1.5 rounded-full ${simulatedMoroso ? 'bg-rose-500 animate-pulse' : 'bg-slate-400'}`} />
@@ -4802,7 +4855,7 @@ export default function Dashboard() {
 
                                             <button
                                                 onClick={toggleTheme}
-                                                className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-800 dark:hover:bg-slate-750 dark:text-slate-350 transition-colors duration-200 border border-slate-200 dark:border-slate-700 shadow-sm"
+                                                className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 transition-colors duration-200 border border-slate-200 dark:border-slate-700 shadow-sm"
                                                 aria-label="Toggle Theme"
                                                 title="Cambiar tema"
                                             >
@@ -4822,7 +4875,7 @@ export default function Dashboard() {
                                                 className={`p-1.5 rounded-xl border transition-colors duration-200 shadow-sm ${
                                                     mobileTab === 'configuracion'
                                                         ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
-                                                        : 'bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-800 dark:hover:bg-slate-750 dark:text-slate-350 border-slate-200 dark:border-slate-700'
+                                                        : 'bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                                                 }`}
                                                 aria-label="Configuración"
                                                 title="Configuración"
@@ -4837,7 +4890,7 @@ export default function Dashboard() {
                                                 href={route('logout')}
                                                 method="post"
                                                 as="button"
-                                                className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-rose-600 hover:text-rose-700 dark:bg-slate-800 dark:hover:bg-slate-750 dark:text-rose-400 dark:hover:text-rose-300 transition-colors duration-200 border border-slate-200 dark:border-slate-700 shadow-sm"
+                                                className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-rose-600 hover:text-rose-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-rose-400 dark:hover:text-rose-300 transition-colors duration-200 border border-slate-200 dark:border-slate-700 shadow-sm"
                                                 aria-label="Cerrar sesión"
                                                 title="Cerrar sesión"
                                             >
@@ -4892,7 +4945,7 @@ export default function Dashboard() {
                                                              onClick={() => setMobileTab('pagos')} 
                                                              className={`w-full py-2 text-white text-[10px] font-bold rounded-xl shadow-sm transition-all text-center ${
                                                                  simulatedMoroso 
-                                                                     ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-550/10' 
+                                                                     ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-500/10' 
                                                                      : 'bg-[#72B043] hover:bg-[#629b37]'
                                                              }`}
                                                          >
@@ -4902,7 +4955,7 @@ export default function Dashboard() {
 
                                                      <div className={`border p-5 rounded-2xl shadow-sm flex flex-col justify-between h-36 transition-all duration-300 ${
                                                          simulatedMoroso 
-                                                             ? 'bg-slate-50/50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-850 opacity-75' 
+                                                             ? 'bg-slate-50/50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 opacity-75' 
                                                              : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'
                                                      }`}>
                                                          <div>
@@ -4921,7 +4974,7 @@ export default function Dashboard() {
                                                              }} 
                                                              className={`w-full py-2 text-white text-[10px] font-bold rounded-xl shadow-sm transition-all text-center flex items-center justify-center gap-1 ${
                                                                  simulatedMoroso 
-                                                                     ? 'bg-slate-550 dark:bg-slate-800 text-slate-400 border border-slate-300 dark:border-slate-700 cursor-not-allowed hover:bg-slate-600' 
+                                                                     ? 'bg-slate-500 dark:bg-slate-800 text-slate-400 border border-slate-300 dark:border-slate-700 cursor-not-allowed hover:bg-slate-600' 
                                                                      : 'bg-[#EC7A08] hover:bg-[#cf6a06]'
                                                              }`}
                                                          >
@@ -4940,7 +4993,7 @@ export default function Dashboard() {
                                                             <span className="text-[8px] font-black text-indigo-500 uppercase tracking-widest block">Tickets Pendientes</span>
                                                             <h4 className="text-2xl font-black text-slate-800 dark:text-white mt-1">{reportedTickets.filter(t => t.status !== 'resolved').length} Activos</h4>
                                                         </div>
-                                                        <button onClick={() => setMobileTab('incidencias')} className="w-full py-2 bg-indigo-650 hover:bg-indigo-700 text-white text-[10px] font-bold rounded-xl shadow-sm transition-all text-center">
+                                                        <button onClick={() => setMobileTab('incidencias')} className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold rounded-xl shadow-sm transition-all text-center">
                                                             Reportar Nueva Incidencia
                                                         </button>
                                                     </div>
@@ -4956,13 +5009,13 @@ export default function Dashboard() {
                                                                 { id: 1, title: 'Corte de Agua Programado', date: 'Hoy 15:10', body: 'Se suspenderá el suministro el Jueves 28 de 14:00 a 18:00 hrs por reparaciones en matriz principal.', priority: 'warning' },
                                                                 { id: 2, title: 'Fumigación de Áreas Verdes', date: 'Ayer', body: 'Se procederá a realizar la fumigación de jardines este Sábado. Mantenga ventanas cerradas.', priority: 'info' }
                                                             ].map(item => (
-                                                                <div key={item.id} className="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl space-y-1.5 border border-slate-100 dark:border-slate-850">
-                                                                    <div className="flex justify-between items-center text-[10px] font-medium text-slate-550">
+                                                                <div key={item.id} className="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl space-y-1.5 border border-slate-100 dark:border-slate-800">
+                                                                    <div className="flex justify-between items-center text-[10px] font-medium text-slate-500">
                                                                         <span className="font-bold text-[#EC7A08]">{item.date}</span>
                                                                         <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-500 rounded text-[8px] font-bold">Circular</span>
                                                                     </div>
                                                                     <h4 className="font-black text-slate-800 dark:text-white">{item.title}</h4>
-                                                                    <p className="text-[11px] text-slate-650 dark:text-slate-400 leading-snug">{item.body}</p>
+                                                                    <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-snug">{item.body}</p>
                                                                 </div>
                                                             ))}
                                                         </div>
@@ -4976,10 +5029,10 @@ export default function Dashboard() {
                                                                 { title: 'Reglamento de Copropiedad Oficial', type: 'PDF', size: '2.4 MB' },
                                                                 { title: 'Minuta Asamblea Extraordinaria - Mayo', type: 'PDF', size: '820 KB' }
                                                             ].map((doc, i) => (
-                                                                <div key={i} className="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl flex items-center justify-between border border-slate-100 dark:border-slate-850">
+                                                                <div key={i} className="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl flex items-center justify-between border border-slate-100 dark:border-slate-800">
                                                                     <div className="min-w-0 flex-1">
-                                                                        <p className="font-bold text-slate-750 dark:text-slate-350 truncate">{doc.title}</p>
-                                                                        <span className="text-[9px] text-slate-450 block">{doc.type} &bull; {doc.size}</span>
+                                                                        <p className="font-bold text-slate-700 dark:text-slate-300 truncate">{doc.title}</p>
+                                                                        <span className="text-[9px] text-slate-400 block">{doc.type} &bull; {doc.size}</span>
                                                                     </div>
                                                                     <button type="button" onClick={() => alert(`Descargando ${doc.title}...`)} className="p-1.5 hover:bg-[#72B043]/10 text-[#72B043] rounded-lg transition-colors shrink-0">
                                                                         📥
@@ -5001,18 +5054,18 @@ export default function Dashboard() {
                                                         { id: 2, title: 'Prueba de Alarmas de Incendio', category: 'Normal', date: '20/05/2026', body: 'El Miércoles 27 a las 12:00 se realizarán las pruebas reglamentarias del sistema de evacuación. Sonará por bloques de 15 segundos.', priority: 'default' },
                                                         { id: 3, title: 'Pago Gasto Común Disponible', category: 'Urgente', date: '15/05/2026', body: 'Se informa la emisión del cobro del mes de Mayo. Agradecemos registrar sus transferencias mediante nuestro nuevo visor QR express.', priority: 'danger' }
                                                     ].map(item => (
-                                                        <div key={item.id} className="p-5 border border-slate-100 dark:border-slate-850 rounded-2xl space-y-3 bg-white dark:bg-slate-900 shadow-sm">
+                                                        <div key={item.id} className="p-5 border border-slate-100 dark:border-slate-800 rounded-2xl space-y-3 bg-white dark:bg-slate-900 shadow-sm">
                                                             <div className="flex justify-between items-center">
                                                                 <span className={`px-2 py-0.5 text-[8px] font-bold rounded uppercase ${
                                                                     item.priority === 'danger' ? 'bg-rose-500/10 text-rose-500' :
-                                                                    item.priority === 'warning' ? 'bg-amber-500/10 text-amber-500' : 'bg-slate-200 text-slate-700 dark:bg-slate-850 dark:text-slate-400'
+                                                                    item.priority === 'warning' ? 'bg-amber-500/10 text-amber-500' : 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-400'
                                                                 }`}>
                                                                     {item.category}
                                                                 </span>
-                                                                <span className="text-[9px] text-slate-450 dark:text-slate-500">{item.date}</span>
+                                                                <span className="text-[9px] text-slate-400 dark:text-slate-500">{item.date}</span>
                                                             </div>
-                                                            <h4 className="text-sm font-black text-slate-850 dark:text-white">{item.title}</h4>
-                                                            <p className="text-[11px] text-slate-650 dark:text-slate-400 leading-relaxed">{item.body}</p>
+                                                            <h4 className="text-sm font-black text-slate-800 dark:text-white">{item.title}</h4>
+                                                            <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">{item.body}</p>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -5022,16 +5075,16 @@ export default function Dashboard() {
                                         {/* Widescreen Reservas */}
                                         {mobileTab === 'reservas' && (
                                             <div className="grid lg:grid-cols-12 gap-8 animate-scale-up text-xs items-start">
-                                                <form onSubmit={submitBooking} className="lg:col-span-5 bg-white dark:bg-slate-900 p-6 border border-slate-100 dark:border-slate-800 rounded-3xl space-y-4 shadow-sm border-gray-105">
+                                                <form onSubmit={submitBooking} className="lg:col-span-5 bg-white dark:bg-slate-900 p-6 border border-slate-100 dark:border-slate-800 rounded-3xl space-y-4 shadow-sm border-gray-100">
                                                     <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#72B043] block border-b pb-2 dark:border-slate-800">Nueva Reservación de Espacio</span>
                                                     
                                                     <div className="space-y-3">
                                                         <div className="space-y-1">
-                                                            <label className="text-[9px] text-slate-450 uppercase font-extrabold">Selecciona Espacio</label>
+                                                            <label className="text-[9px] text-slate-400 uppercase font-extrabold">Selecciona Espacio</label>
                                                             <select 
                                                                 value={bookingAmenity} 
                                                                 onChange={(e) => setBookingAmenity(e.target.value)}
-                                                                className="w-full px-3 py-2 border border-slate-250 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl text-xs focus:outline-none focus:border-[#72B043] font-bold text-slate-700 dark:text-slate-350"
+                                                                className="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl text-xs focus:outline-none focus:border-[#72B043] font-bold text-slate-700 dark:text-slate-300"
                                                             >
                                                                 {amenities.map(a => (
                                                                     <option key={a.id} value={a.id}>{a.name} ({a.price > 0 ? `${a.price.toLocaleString()}` : 'Gratis'})</option>
@@ -5039,11 +5092,11 @@ export default function Dashboard() {
                                                             </select>
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <label className="text-[9px] text-slate-450 uppercase font-extrabold">Bloque Horario</label>
+                                                            <label className="text-[9px] text-slate-400 uppercase font-extrabold">Bloque Horario</label>
                                                             <select 
                                                                 value={bookingSlot} 
                                                                 onChange={(e) => setBookingSlot(e.target.value)}
-                                                                className="w-full px-3 py-2 border border-slate-250 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl text-xs focus:outline-none focus:border-[#72B043] font-bold text-slate-700 dark:text-slate-355"
+                                                                className="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl text-xs focus:outline-none focus:border-[#72B043] font-bold text-slate-700 dark:text-slate-300"
                                                             >
                                                                 <option value="Mañana (09:00 - 13:00)">Mañana (09:00 - 13:00)</option>
                                                                 <option value="Tarde (14:00 - 18:00)">Tarde (14:00 - 18:00)</option>
@@ -5051,18 +5104,18 @@ export default function Dashboard() {
                                                             </select>
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <label className="text-[9px] text-slate-450 uppercase font-extrabold block">Fecha del Evento</label>
+                                                            <label className="text-[9px] text-slate-400 uppercase font-extrabold block">Fecha del Evento</label>
                                                             <input 
                                                                 type="date"
                                                                 value={bookingDate}
                                                                 onChange={(e) => setBookingDate(e.target.value)}
-                                                                className="w-full px-3 py-2 border border-slate-250 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl text-xs focus:outline-none focus:border-[#72B043] font-mono text-slate-700 dark:text-slate-355"
+                                                                className="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl text-xs focus:outline-none focus:border-[#72B043] font-mono text-slate-700 dark:text-slate-300"
                                                             />
                                                         </div>
                                                     </div>
 
-                                                    <div className="p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-150 dark:border-slate-850 rounded-xl text-[9px] text-slate-500 space-y-1.5">
-                                                        <span className="font-bold text-slate-700 dark:text-slate-355 block">Normas generales de reserva:</span>
+                                                    <div className="p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-150 dark:border-slate-800 rounded-xl text-[9px] text-slate-500 space-y-1.5">
+                                                        <span className="font-bold text-slate-700 dark:text-slate-300 block">Normas generales de reserva:</span>
                                                         <p className="leading-snug">{amenities.find(a => a.id === bookingAmenity)?.rules}</p>
                                                         <p className="font-bold text-[#EC7A08] leading-snug">Capacidad máx: {amenities.find(a => a.id === bookingAmenity)?.cap}</p>
                                                     </div>
@@ -5076,16 +5129,16 @@ export default function Dashboard() {
                                                     <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 block border-b pb-2 dark:border-slate-800">Tus Reservas Activas e Historial</span>
                                                     <div className="space-y-2 max-h-[360px] overflow-y-auto pr-1">
                                                         {myReservations.map(res => (
-                                                            <div key={res.id} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-850 rounded-2xl flex items-center justify-between text-xs">
+                                                            <div key={res.id} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl flex items-center justify-between text-xs">
                                                                 <div className="space-y-1">
                                                                     <div className="flex items-center gap-2">
                                                                         <span className="font-black text-slate-800 dark:text-white text-xs">{res.name}</span>
-                                                                        <span className="text-[9px] text-slate-450 font-mono">#{res.id}</span>
+                                                                        <span className="text-[9px] text-slate-400 font-mono">#{res.id}</span>
                                                                     </div>
-                                                                    <span className="text-[10px] text-slate-550 block">{res.date} &bull; {res.slot}</span>
+                                                                    <span className="text-[10px] text-slate-500 block">{res.date} &bull; {res.slot}</span>
                                                                 </div>
                                                                 <div className="text-right space-y-1">
-                                                                    <span className="font-bold block text-slate-850 dark:text-slate-200">{res.price > 0 ? `${res.price.toLocaleString()}` : 'Gratis'}</span>
+                                                                    <span className="font-bold block text-slate-800 dark:text-slate-200">{res.price > 0 ? `${res.price.toLocaleString()}` : 'Gratis'}</span>
                                                                     <span className={`px-2 py-0.5 text-[8px] font-bold rounded uppercase block text-center ${
                                                                         res.status === 'approved' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
                                                                     }`}>
@@ -5102,13 +5155,13 @@ export default function Dashboard() {
                                         {/* Widescreen Pagos */}
                                         {mobileTab === 'pagos' && (
                                             <div className="grid lg:grid-cols-12 gap-8 animate-scale-up text-xs items-start">
-                                                <div className="lg:col-span-5 bg-white dark:bg-slate-900 p-6 border border-slate-100 dark:border-slate-800 rounded-3xl space-y-4 shadow-sm border-gray-105">
+                                                <div className="lg:col-span-5 bg-white dark:bg-slate-900 p-6 border border-slate-100 dark:border-slate-800 rounded-3xl space-y-4 shadow-sm border-gray-100">
                                                     <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#72B043] block border-b pb-2 dark:border-slate-800">Estado de Gasto Común</span>
                                                     
                                                     <div className="flex justify-between items-center">
                                                         <div>
                                                             <span className="text-[9px] font-mono text-slate-500">Período de Facturación</span>
-                                                            <h4 className="text-xs font-black text-slate-850 dark:text-white">{residentExpenses.period}</h4>
+                                                            <h4 className="text-xs font-black text-slate-800 dark:text-white">{residentExpenses.period}</h4>
                                                         </div>
                                                         <span className={`px-2.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
                                                             residentExpenses.status === 'completed' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'
@@ -5120,7 +5173,7 @@ export default function Dashboard() {
                                                     <div className="space-y-2">
                                                         <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500 block mb-1">Desglose de Conceptos</span>
                                                         {residentExpenses.items.map((item, i) => (
-                                                            <div key={i} className="flex justify-between items-center py-2 border-b border-dashed border-slate-150 dark:border-slate-800 last:border-b-0 text-slate-650 dark:text-slate-400">
+                                                            <div key={i} className="flex justify-between items-center py-2 border-b border-dashed border-slate-150 dark:border-slate-800 last:border-b-0 text-slate-600 dark:text-slate-400">
                                                                 <span>{item.name}</span>
                                                                 <span className="font-mono text-slate-900 dark:text-slate-200 font-bold">${item.amount.toLocaleString()}</span>
                                                             </div>
@@ -5149,20 +5202,20 @@ export default function Dashboard() {
                                                     )}
                                                 </div>
 
-                                                <div className="lg:col-span-7 bg-white dark:bg-slate-900 p-6 border border-slate-100 dark:border-slate-800 rounded-3xl space-y-4 shadow-sm h-full border-gray-105">
+                                                <div className="lg:col-span-7 bg-white dark:bg-slate-900 p-6 border border-slate-100 dark:border-slate-800 rounded-3xl space-y-4 shadow-sm h-full border-gray-100">
                                                     <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 block border-b pb-2 dark:border-slate-800">Historial de Transacciones Consolidadas</span>
                                                     <div className="space-y-2 max-h-[360px] overflow-y-auto pr-1">
                                                         {paymentHistory.map(hist => (
-                                                            <div key={hist.id} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-850 rounded-2xl flex items-center justify-between text-xs">
+                                                            <div key={hist.id} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl flex items-center justify-between text-xs">
                                                                 <div className="space-y-1">
                                                                     <div className="flex items-center gap-2">
                                                                         <span className="font-black text-slate-800 dark:text-white">{hist.period}</span>
-                                                                        <span className="text-[8px] text-slate-550 font-mono">ID: PAY-{hist.id}</span>
+                                                                        <span className="text-[8px] text-slate-500 font-mono">ID: PAY-{hist.id}</span>
                                                                     </div>
-                                                                    <span className="text-[9px] text-slate-555 block">{hist.date} &bull; {hist.method}</span>
+                                                                    <span className="text-[9px] text-slate-500 block">{hist.date} &bull; {hist.method}</span>
                                                                 </div>
                                                                 <div className="text-right space-y-1">
-                                                                    <span className="font-mono font-bold block text-slate-850 dark:text-slate-200">${hist.amount.toLocaleString()}</span>
+                                                                    <span className="font-mono font-bold block text-slate-800 dark:text-slate-200">${hist.amount.toLocaleString()}</span>
                                                                     <span className="text-[9px] text-emerald-500 font-extrabold uppercase flex items-center justify-end gap-1">
                                                                         ✓ Validado
                                                                     </span>
@@ -5177,27 +5230,27 @@ export default function Dashboard() {
                                         {/* Widescreen Incidencias */}
                                         {mobileTab === 'incidencias' && (
                                             <div className="grid lg:grid-cols-12 gap-8 animate-scale-up text-xs items-start">
-                                                <form onSubmit={submitTicket} className="lg:col-span-5 bg-white dark:bg-slate-900 p-6 border border-slate-100 dark:border-slate-800 rounded-3xl space-y-4 shadow-sm border-gray-105">
+                                                <form onSubmit={submitTicket} className="lg:col-span-5 bg-white dark:bg-slate-900 p-6 border border-slate-100 dark:border-slate-800 rounded-3xl space-y-4 shadow-sm border-gray-100">
                                                     <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#72B043] block border-b pb-2 dark:border-slate-800">Levantar Reporte Técnico</span>
                                                     
                                                     <div className="space-y-3">
                                                         <div className="space-y-1">
-                                                            <label className="text-[9px] text-slate-450 uppercase font-extrabold">Título de la Incidencia</label>
+                                                            <label className="text-[9px] text-slate-400 uppercase font-extrabold">Título de la Incidencia</label>
                                                             <input 
                                                                 type="text"
                                                                 placeholder="Ej: Ampolleta quemada en pasillo C"
                                                                 value={newTicketTitle}
                                                                 onChange={(e) => setNewTicketTitle(e.target.value)}
-                                                                className="w-full px-3 py-2 border border-slate-250 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl text-xs focus:outline-none focus:border-[#72B043]"
+                                                                className="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl text-xs focus:outline-none focus:border-[#72B043]"
                                                             />
                                                         </div>
                                                         <div className="grid grid-cols-2 gap-4">
                                                             <div className="space-y-1">
-                                                                <label className="text-[9px] text-slate-450 uppercase font-extrabold">Categoría</label>
+                                                                <label className="text-[9px] text-slate-400 uppercase font-extrabold">Categoría</label>
                                                                 <select 
                                                                     value={newTicketCat} 
                                                                     onChange={(e) => setNewTicketCat(e.target.value)}
-                                                                    className="w-full px-3 py-2 border border-slate-250 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl text-xs focus:outline-none focus:border-[#72B043]"
+                                                                    className="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl text-xs focus:outline-none focus:border-[#72B043]"
                                                                 >
                                                                     <option value="Electricidad">Electricidad</option>
                                                                     <option value="Plomería">Plomería</option>
@@ -5208,11 +5261,11 @@ export default function Dashboard() {
                                                                 </select>
                                                             </div>
                                                             <div className="space-y-1">
-                                                                <label className="text-[9px] text-slate-450 uppercase font-extrabold">Prioridad de Solicitud</label>
+                                                                <label className="text-[9px] text-slate-400 uppercase font-extrabold">Prioridad de Solicitud</label>
                                                                 <select 
                                                                     value={newTicketPri} 
                                                                     onChange={(e) => setNewTicketPri(e.target.value)}
-                                                                    className="w-full px-3 py-2 border border-slate-250 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl text-xs focus:outline-none focus:border-[#72B043]"
+                                                                    className="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl text-xs focus:outline-none focus:border-[#72B043]"
                                                                 >
                                                                     <option value="low">Baja (General)</option>
                                                                     <option value="medium">Media (Necesaria)</option>
@@ -5222,13 +5275,13 @@ export default function Dashboard() {
                                                             </div>
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <label className="text-[9px] text-slate-450 uppercase font-extrabold">Descripción del Problema</label>
+                                                            <label className="text-[9px] text-slate-400 uppercase font-extrabold">Descripción del Problema</label>
                                                             <textarea 
                                                                 rows="3"
                                                                 placeholder="Detalla lo que ocurre para agilizar la asignación..."
                                                                 value={newTicketDesc}
                                                                 onChange={(e) => setNewTicketDesc(e.target.value)}
-                                                                className="w-full px-3 py-2 border border-slate-250 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl text-xs focus:outline-none focus:border-[#72B043] resize-none"
+                                                                className="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl text-xs focus:outline-none focus:border-[#72B043] resize-none"
                                                             />
                                                         </div>
                                                     </div>
@@ -5238,19 +5291,19 @@ export default function Dashboard() {
                                                     </button>
                                                 </form>
 
-                                                <div className="lg:col-span-7 bg-white dark:bg-slate-900 p-6 border border-slate-100 dark:border-slate-800 rounded-3xl space-y-4 shadow-sm h-full border-gray-105">
+                                                <div className="lg:col-span-7 bg-white dark:bg-slate-900 p-6 border border-slate-100 dark:border-slate-800 rounded-3xl space-y-4 shadow-sm h-full border-gray-100">
                                                     <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 block border-b pb-2 dark:border-slate-800">Tus Reportes de Incidencias Levantados</span>
                                                     <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
                                                         {reportedTickets.map(tick => (
-                                                            <div key={tick.id} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-850 rounded-2xl space-y-2 shadow-sm text-xs">
+                                                            <div key={tick.id} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl space-y-2 shadow-sm text-xs">
                                                                 <div className="flex justify-between items-center">
                                                                     <div className="flex items-center gap-2">
                                                                         <span className="font-black text-slate-800 dark:text-white">{tick.title}</span>
-                                                                        <span className="text-[9px] text-slate-450 font-mono">#{tick.id}</span>
+                                                                        <span className="text-[9px] text-slate-400 font-mono">#{tick.id}</span>
                                                                     </div>
                                                                     <StatusBadge status={tick.status} type="ticket" />
                                                                 </div>
-                                                                <p className="text-[10px] text-slate-650 dark:text-slate-400 bg-white/70 dark:bg-slate-900 p-2.5 border border-slate-100 dark:border-slate-850 rounded-xl">{tick.desc}</p>
+                                                                <p className="text-[10px] text-slate-600 dark:text-slate-400 bg-white/70 dark:bg-slate-900 p-2.5 border border-slate-100 dark:border-slate-800 rounded-xl">{tick.desc}</p>
                                                                 <div className="flex items-center justify-between text-[9px] text-slate-500 font-medium">
                                                                     <span>Fecha: {tick.date} &bull; Categoría: {tick.category}</span>
                                                                     <span className="font-extrabold uppercase">Prioridad: {tick.priority}</span>
@@ -5264,7 +5317,7 @@ export default function Dashboard() {
 
                                         {/* Widescreen Documentos */}
                                         {mobileTab === 'documentos' && (
-                                            <div className="bg-white dark:bg-slate-900 p-6 border border-slate-100 dark:border-slate-800 rounded-3xl space-y-4 shadow-sm animate-scale-up text-xs border-gray-105">
+                                            <div className="bg-white dark:bg-slate-900 p-6 border border-slate-100 dark:border-slate-800 rounded-3xl space-y-4 shadow-sm animate-scale-up text-xs border-gray-100">
                                                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 block border-b pb-2 dark:border-slate-800">Biblioteca Completa de Documentos</span>
                                                 <div className="grid md:grid-cols-2 gap-4">
                                                     {[
@@ -5272,10 +5325,10 @@ export default function Dashboard() {
                                                         { title: 'Minuta Asamblea Extraordinaria - Mayo', type: 'PDF', size: '820 KB', date: '12/05/2026' },
                                                         { title: 'Balance Consolidado Gastos Comunes Q1', type: 'XLSX', size: '1.2 MB', date: '10/04/2026' }
                                                     ].map((doc, i) => (
-                                                        <div key={i} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-850 rounded-2xl flex items-center justify-between shadow-sm hover:border-[#72B043]/30 transition-all">
+                                                        <div key={i} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl flex items-center justify-between shadow-sm hover:border-[#72B043]/30 transition-all">
                                                             <div>
                                                                 <p className="font-black text-slate-800 dark:text-white text-xs">{doc.title}</p>
-                                                                <span className="text-[9px] text-slate-450 block mt-0.5">{doc.type} &bull; {doc.size} &bull; Subido el {doc.date}</span>
+                                                                <span className="text-[9px] text-slate-400 block mt-0.5">{doc.type} &bull; {doc.size} &bull; Subido el {doc.date}</span>
                                                             </div>
                                                             <button type="button" onClick={() => alert(`Descargando ${doc.title}...`)} className="px-4 py-2 bg-[#72B043]/10 hover:bg-[#72B043]/20 text-[#72B043] font-bold rounded-xl transition-all">
                                                                 Descargar
@@ -5288,15 +5341,15 @@ export default function Dashboard() {
 
                                         {/* Widescreen Comunidad */}
                                         {mobileTab === 'comunidad' && (
-                                            <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl shadow-sm h-[560px] flex overflow-hidden animate-scale-up text-xs border-gray-105">
+                                            <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl shadow-sm h-[560px] flex overflow-hidden animate-scale-up text-xs border-gray-100">
                                                 {/* Left Chat side panel */}
-                                                <div className="w-56 border-r border-slate-100 dark:border-slate-850 p-4 space-y-4 shrink-0 bg-slate-50/50 dark:bg-slate-950/20">
-                                                    <span className="text-[8px] font-extrabold uppercase tracking-widest text-slate-450 block">Contactos de Soporte</span>
+                                                <div className="w-56 border-r border-slate-100 dark:border-slate-800 p-4 space-y-4 shrink-0 bg-slate-50/50 dark:bg-slate-950/20">
+                                                    <span className="text-[8px] font-extrabold uppercase tracking-widest text-slate-400 block">Contactos de Soporte</span>
                                                     <div className="space-y-2">
                                                         <div className="p-2.5 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 rounded-xl flex items-center gap-2">
                                                             <div className="h-6 w-6 rounded-full bg-[#EC7A08]/15 flex items-center justify-center text-xs">👥</div>
                                                             <div className="min-w-0 flex-1">
-                                                                <h5 className="font-bold text-slate-850 dark:text-slate-200 truncate leading-tight">Conserjería</h5>
+                                                                <h5 className="font-bold text-slate-800 dark:text-slate-200 truncate leading-tight">Conserjería</h5>
                                                                 <span className="text-[8px] text-emerald-500 font-bold block">● En línea</span>
                                                             </div>
                                                         </div>
@@ -5318,20 +5371,20 @@ export default function Dashboard() {
                                                                 key={i} 
                                                                 className={`flex flex-col max-w-[70%] rounded-2xl px-4 py-2.5 relative shadow-sm ${
                                                                     msg.sender === 'system' 
-                                                                        ? 'mx-auto bg-slate-100 text-slate-500 text-[10px] text-center max-w-[80%] dark:bg-slate-950 border border-slate-150 dark:border-slate-850'
+                                                                        ? 'mx-auto bg-slate-100 text-slate-500 text-[10px] text-center max-w-[80%] dark:bg-slate-950 border border-slate-150 dark:border-slate-800'
                                                                         : msg.sender === 'me'
                                                                         ? 'ml-auto bg-[#72B043] text-white rounded-br-none'
-                                                                        : 'bg-slate-50 border border-slate-150 dark:bg-slate-950 dark:border-slate-850 text-slate-800 dark:text-slate-200 rounded-bl-none'
+                                                                        : 'bg-slate-50 border border-slate-150 dark:bg-slate-950 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-bl-none'
                                                                 }`}
                                                             >
                                                                 <p className="leading-relaxed">{msg.text}</p>
                                                                 {msg.time && (
-                                                                    <span className={`text-[7px] block text-right mt-1 ${msg.sender === 'me' ? 'text-white/60' : 'text-slate-450'}`}>{msg.time}</span>
+                                                                    <span className={`text-[7px] block text-right mt-1 ${msg.sender === 'me' ? 'text-white/60' : 'text-slate-400'}`}>{msg.time}</span>
                                                                 )}
                                                             </div>
                                                         ))}
                                                         {isTyping && (
-                                                            <div className="bg-slate-50 border border-slate-150 dark:bg-slate-950 dark:border-slate-850 text-slate-500 px-4 py-2 rounded-2xl rounded-bl-none max-w-[120px] flex items-center gap-1 shadow-sm">
+                                                            <div className="bg-slate-50 border border-slate-150 dark:bg-slate-950 dark:border-slate-800 text-slate-500 px-4 py-2 rounded-2xl rounded-bl-none max-w-[120px] flex items-center gap-1 shadow-sm">
                                                                 <span className="h-1.5 w-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '0ms' }} />
                                                                 <span className="h-1.5 w-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '150ms' }} />
                                                                 <span className="h-1.5 w-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '300ms' }} />
@@ -5345,7 +5398,7 @@ export default function Dashboard() {
                                                             placeholder="Escribe tu mensaje aquí..."
                                                             value={chatInput}
                                                             onChange={(e) => setChatInput(e.target.value)}
-                                                            className="flex-1 px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-250 dark:border-slate-800 text-xs rounded-xl focus:outline-none focus:border-[#72B043]"
+                                                            className="flex-1 px-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs rounded-xl focus:outline-none focus:border-[#72B043]"
                                                         />
                                                         <button type="submit" className="px-5 py-2 bg-[#72B043] hover:bg-[#629b37] text-white text-xs font-bold rounded-xl shadow transition-colors">
                                                             Enviar
@@ -5478,7 +5531,7 @@ export default function Dashboard() {
                                             <div className="min-w-0 flex-1 space-y-1">
                                                 <div className="flex items-center justify-between">
                                                     <span className="px-2 py-0.5 bg-[#EC7A08]/15 border border-[#EC7A08]/25 text-[8px] font-bold text-[#EC7A08] uppercase tracking-wider rounded">Circular Destacada</span>
-                                                    <span className="text-[9px] text-slate-450 dark:text-slate-500">Hoy 15:10</span>
+                                                    <span className="text-[9px] text-slate-400 dark:text-slate-500">Hoy 15:10</span>
                                                 </div>
                                                 <h4 className="text-xs font-black text-slate-800 dark:text-white truncate">Corte de Agua Programado</h4>
                                                 <p className="text-[10px] text-slate-600 dark:text-slate-400 leading-snug">Se informa que el Jueves 28 se suspenderá el suministro de agua potable de 14:00 a 18:00 hrs por reparaciones en matriz principal.</p>
@@ -5489,7 +5542,7 @@ export default function Dashboard() {
                                         <div className={`border p-5 rounded-2xl flex justify-between items-center shadow-sm transition-colors duration-300 ${
                                             simulatedMoroso 
                                                 ? 'bg-rose-50/15 dark:bg-rose-950/10 border-rose-200 dark:border-rose-900/40' 
-                                                : 'bg-slate-50 dark:bg-slate-950 border-slate-100 dark:border-slate-850'
+                                                : 'bg-slate-50 dark:bg-slate-950 border-slate-100 dark:border-slate-800'
                                         }`}>
                                             <div className="space-y-1">
                                                 <span className={`text-[9px] font-extrabold uppercase tracking-widest ${simulatedMoroso ? 'text-rose-500' : 'text-[#72B043]'}`}>
@@ -5499,7 +5552,7 @@ export default function Dashboard() {
                                                     <span className="text-2xl font-black text-slate-900 dark:text-white">
                                                         {residentExpenses.status === 'completed' ? '$0' : (simulatedMoroso ? '$495.000' : '$165.000')}
                                                     </span>
-                                                    <span className="text-[10px] text-slate-450">CLP</span>
+                                                    <span className="text-[10px] text-slate-400">CLP</span>
                                                 </div>
                                                 <p className="text-[10px] text-slate-500">
                                                     {residentExpenses.status === 'completed' ? '¡Tu cuenta está al día!' : (simulatedMoroso ? '⚠️ Bloqueo por 3 meses impagos' : `Vence el ${residentExpenses.dueDate}`)}
@@ -5507,7 +5560,7 @@ export default function Dashboard() {
                                             </div>
                                             <div>
                                                 {residentExpenses.status === 'completed' ? (
-                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/25 text-[10px] font-bold text-emerald-500 dark:text-emerald-450 rounded-full uppercase tracking-wider">
+                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/25 text-[10px] font-bold text-emerald-500 dark:text-emerald-500 rounded-full uppercase tracking-wider">
                                                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                         </svg>
@@ -5536,12 +5589,12 @@ export default function Dashboard() {
                                             <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 block">Tu Taller de MiVecino</span>
                                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                                 {[
-                                                    { tab: 'comunicados', label: 'Comunicados', color: 'bg-indigo-50/80 hover:border-indigo-500/30 text-indigo-650 border-indigo-100 dark:bg-slate-950 dark:border-slate-850 dark:text-indigo-400', icon: '📢', desc: 'Mural de circulares' },
-                                                    { tab: 'reservas', label: 'Reservas', color: 'bg-violet-50/80 hover:border-violet-500/30 text-violet-650 border-violet-100 dark:bg-slate-950 dark:border-slate-850 dark:text-violet-400', icon: '📅', desc: 'Quincho, piscina, gym' },
-                                                    { tab: 'pagos', label: 'Pagos', color: 'bg-emerald-50/80 hover:border-emerald-500/30 text-emerald-650 border-emerald-100 dark:bg-slate-950 dark:border-slate-850 dark:text-emerald-400', icon: '💵', desc: 'Gastos y comprobantes' },
-                                                    { tab: 'incidencias', label: 'Incidencias', color: 'bg-rose-50/80 hover:border-rose-500/30 text-rose-650 border-rose-100 dark:bg-slate-950 dark:border-slate-850 dark:text-rose-400', icon: '🛠️', desc: 'Reportar avería' },
-                                                    { tab: 'documentos', label: 'Documentos', color: 'bg-cyan-50/80 hover:border-cyan-500/30 text-cyan-650 border-cyan-100 dark:bg-slate-950 dark:border-slate-850 dark:text-cyan-400', icon: '📄', desc: 'Reglamentos y actas' },
-                                                    { tab: 'comunidad', label: 'Comunidad', color: 'bg-amber-50/80 hover:border-amber-500/30 text-amber-650 border-amber-100 dark:bg-slate-950 dark:border-slate-850 dark:text-amber-400', icon: '👥', desc: 'Mensajería y Conserje' }
+                                                    { tab: 'comunicados', label: 'Comunicados', color: 'bg-indigo-50/80 hover:border-indigo-500/30 text-indigo-600 border-indigo-100 dark:bg-slate-950 dark:border-slate-800 dark:text-indigo-400', icon: '📢', desc: 'Mural de circulares' },
+                                                    { tab: 'reservas', label: 'Reservas', color: 'bg-violet-50/80 hover:border-violet-500/30 text-violet-650 border-violet-100 dark:bg-slate-950 dark:border-slate-800 dark:text-violet-400', icon: '📅', desc: 'Quincho, piscina, gym' },
+                                                    { tab: 'pagos', label: 'Pagos', color: 'bg-emerald-50/80 hover:border-emerald-500/30 text-emerald-600 border-emerald-100 dark:bg-slate-950 dark:border-slate-800 dark:text-emerald-400', icon: '💵', desc: 'Gastos y comprobantes' },
+                                                    { tab: 'incidencias', label: 'Incidencias', color: 'bg-rose-50/80 hover:border-rose-500/30 text-rose-600 border-rose-100 dark:bg-slate-950 dark:border-slate-800 dark:text-rose-400', icon: '🛠️', desc: 'Reportar avería' },
+                                                    { tab: 'documentos', label: 'Documentos', color: 'bg-cyan-50/80 hover:border-cyan-500/30 text-cyan-600 border-cyan-100 dark:bg-slate-950 dark:border-slate-800 dark:text-cyan-400', icon: '📄', desc: 'Reglamentos y actas' },
+                                                    { tab: 'comunidad', label: 'Comunidad', color: 'bg-amber-50/80 hover:border-amber-500/30 text-amber-600 border-amber-100 dark:bg-slate-950 dark:border-slate-800 dark:text-amber-400', icon: '👥', desc: 'Mensajería y Conserje' }
                                                 ].map(item => {
                                                     const isReservasLocked = simulatedMoroso && item.tab === 'reservas';
                                                     return (
@@ -5556,14 +5609,14 @@ export default function Dashboard() {
                                                             }}
                                                             className={`p-4 border rounded-2xl text-left transition-all hover:scale-[1.02] shadow-sm flex flex-col justify-between aspect-[1.1] sm:aspect-auto ${
                                                                 isReservasLocked 
-                                                                    ? 'bg-rose-50/10 border-rose-200 text-rose-700 opacity-70 dark:bg-slate-950 dark:border-rose-950/40 dark:text-rose-450' 
+                                                                    ? 'bg-rose-50/10 border-rose-200 text-rose-700 opacity-70 dark:bg-slate-950 dark:border-rose-950/40 dark:text-rose-400' 
                                                                     : item.color
                                                             }`}
                                                         >
                                                             <span className="text-2xl">{isReservasLocked ? '🔒' : item.icon}</span>
                                                             <div className="mt-2 text-left">
                                                                 <span className="text-xs font-bold block">{isReservasLocked ? 'Reservas 🔒' : item.label}</span>
-                                                                <span className="text-[8px] text-slate-450 block mt-0.5 leading-tight">
+                                                                <span className="text-[8px] text-slate-400 block mt-0.5 leading-tight">
                                                                     {isReservasLocked ? 'Suspendido por deuda' : item.desc}
                                                                 </span>
                                                             </div>
@@ -5574,19 +5627,19 @@ export default function Dashboard() {
                                         </div>
 
                                         {/* Recent activity snippet */}
-                                        <div className="bg-slate-50 dark:bg-slate-950/60 p-4 border border-slate-100 dark:border-slate-850 rounded-2xl space-y-2.5">
+                                        <div className="bg-slate-50 dark:bg-slate-950/60 p-4 border border-slate-100 dark:border-slate-800 rounded-2xl space-y-2.5">
                                             <span className="text-[8px] font-extrabold uppercase tracking-widest text-slate-500 block">Resumen de Actividad Reciente</span>
                                             <div className="grid grid-cols-2 gap-4 text-xs">
                                                 <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 p-3 rounded-xl flex items-center justify-between">
                                                     <div>
-                                                        <span className="text-[8px] text-slate-450 font-bold block">RESERVAS</span>
+                                                        <span className="text-[8px] text-slate-400 font-bold block">RESERVAS</span>
                                                         <span className="font-bold text-slate-700 dark:text-slate-300">1 Aprobada</span>
                                                     </div>
                                                     <span className="text-emerald-500 text-lg">●</span>
                                                 </div>
                                                 <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 p-3 rounded-xl flex items-center justify-between">
                                                     <div>
-                                                        <span className="text-[8px] text-slate-450 font-bold block">TICKETS</span>
+                                                        <span className="text-[8px] text-slate-400 font-bold block">TICKETS</span>
                                                         <span className="font-bold text-slate-700 dark:text-slate-300">1 Pendiente</span>
                                                     </div>
                                                     <span className="text-amber-500 text-lg">●</span>
@@ -5600,12 +5653,12 @@ export default function Dashboard() {
                                 {mobileTab === 'comunicados' && (
                                     <div className="space-y-4 animate-scale-up">
                                         <div className="flex items-center gap-2">
-                                            <button onClick={() => setMobileTab('home')} className="text-slate-400 hover:text-slate-650 transition-colors">
+                                            <button onClick={() => setMobileTab('home')} className="text-slate-400 hover:text-slate-600 transition-colors">
                                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                                                 </svg>
                                             </button>
-                                            <h3 className="text-sm font-black uppercase tracking-wider text-slate-850 dark:text-slate-200">Mural de Comunicados</h3>
+                                            <h3 className="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">Mural de Comunicados</h3>
                                         </div>
 
                                         <div className="space-y-3">
@@ -5614,18 +5667,18 @@ export default function Dashboard() {
                                                 { id: 2, title: 'Prueba de Alarmas de Incendio', category: 'Normal', date: '20/05/2026', body: 'El Miércoles 27 a las 12:00 se realizarán las pruebas reglamentarias del sistema de evacuación. Sonará por bloques de 15 segundos.', priority: 'default' },
                                                 { id: 3, title: 'Pago Gasto Común Disponible', category: 'Urgente', date: '15/05/2026', body: 'Se informa la emisión del cobro del mes de Mayo. Agradecemos registrar sus transferencias mediante nuestro nuevo visor QR express.', priority: 'danger' }
                                             ].map(item => (
-                                                <div key={item.id} className="p-4 border border-slate-100 dark:border-slate-850 rounded-2xl space-y-2 bg-slate-50/50 dark:bg-slate-950 shadow-sm">
+                                                <div key={item.id} className="p-4 border border-slate-100 dark:border-slate-800 rounded-2xl space-y-2 bg-slate-50/50 dark:bg-slate-950 shadow-sm">
                                                     <div className="flex justify-between items-center">
                                                         <span className={`px-2 py-0.5 text-[8px] font-bold rounded uppercase ${
                                                             item.priority === 'danger' ? 'bg-rose-500/10 text-rose-500' :
-                                                            item.priority === 'warning' ? 'bg-amber-500/10 text-amber-500' : 'bg-slate-200 text-slate-700 dark:bg-slate-850 dark:text-slate-400'
+                                                            item.priority === 'warning' ? 'bg-amber-500/10 text-amber-500' : 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-400'
                                                         }`}>
                                                             {item.category}
                                                         </span>
-                                                        <span className="text-[9px] text-slate-450 dark:text-slate-500">{item.date}</span>
+                                                        <span className="text-[9px] text-slate-400 dark:text-slate-500">{item.date}</span>
                                                     </div>
                                                     <h4 className="text-xs font-black text-slate-800 dark:text-white">{item.title}</h4>
-                                                    <p className="text-[10px] text-slate-650 dark:text-slate-400 leading-relaxed">{item.body}</p>
+                                                    <p className="text-[10px] text-slate-600 dark:text-slate-400 leading-relaxed">{item.body}</p>
                                                 </div>
                                             ))}
                                         </div>
@@ -5636,21 +5689,21 @@ export default function Dashboard() {
                                 {mobileTab === 'reservas' && (
                                     <div className="space-y-6 animate-scale-up">
                                         <div className="flex items-center gap-2">
-                                            <button onClick={() => setMobileTab('home')} className="text-slate-400 hover:text-slate-650 transition-colors">
+                                            <button onClick={() => setMobileTab('home')} className="text-slate-400 hover:text-slate-600 transition-colors">
                                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                                                 </svg>
                                             </button>
-                                            <h3 className="text-sm font-black uppercase tracking-wider text-slate-850 dark:text-slate-200">Reservar Áreas Comunes</h3>
+                                            <h3 className="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">Reservar Áreas Comunes</h3>
                                         </div>
 
                                         {/* Form block */}
-                                        <form onSubmit={submitBooking} className="bg-slate-50 dark:bg-slate-950 p-5 border border-slate-100 dark:border-slate-850 rounded-2xl space-y-4">
+                                        <form onSubmit={submitBooking} className="bg-slate-50 dark:bg-slate-950 p-5 border border-slate-100 dark:border-slate-800 rounded-2xl space-y-4">
                                             <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#72B043] block border-b pb-2 dark:border-slate-800">Nueva Reservación</span>
                                             
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-1">
-                                                    <label className="text-[9px] text-slate-450 uppercase font-extrabold">Selecciona Espacio</label>
+                                                    <label className="text-[9px] text-slate-400 uppercase font-extrabold">Selecciona Espacio</label>
                                                     <select 
                                                         value={bookingAmenity} 
                                                         onChange={(e) => setBookingAmenity(e.target.value)}
@@ -5662,7 +5715,7 @@ export default function Dashboard() {
                                                     </select>
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <label className="text-[9px] text-slate-450 uppercase font-extrabold">Horario</label>
+                                                    <label className="text-[9px] text-slate-400 uppercase font-extrabold">Horario</label>
                                                     <select 
                                                         value={bookingSlot} 
                                                         onChange={(e) => setBookingSlot(e.target.value)}
@@ -5676,18 +5729,18 @@ export default function Dashboard() {
                                             </div>
 
                                             <div className="space-y-1">
-                                                <label className="text-[9px] text-slate-450 uppercase font-extrabold block">Fecha del Evento</label>
+                                                <label className="text-[9px] text-slate-400 uppercase font-extrabold block">Fecha del Evento</label>
                                                 <input 
                                                     type="date"
                                                     value={bookingDate}
                                                     onChange={(e) => setBookingDate(e.target.value)}
-                                                    className="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl text-xs focus:outline-none focus:border-[#72B043] font-mono text-slate-700 dark:text-slate-350"
+                                                    className="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl text-xs focus:outline-none focus:border-[#72B043] font-mono text-slate-700 dark:text-slate-300"
                                                 />
                                             </div>
 
                                             {/* Details indicator */}
                                             <div className="p-3 bg-white/70 dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-xl text-[9px] text-slate-500 space-y-1">
-                                                <span className="font-bold text-slate-750 block">Normas generales de reserva:</span>
+                                                <span className="font-bold text-slate-700 block">Normas generales de reserva:</span>
                                                 <p className="leading-snug">{amenities.find(a => a.id === bookingAmenity)?.rules}</p>
                                                 <p className="font-bold text-[#EC7A08] leading-snug">Capacidad máx: {amenities.find(a => a.id === bookingAmenity)?.cap}</p>
                                             </div>
@@ -5706,16 +5759,16 @@ export default function Dashboard() {
                                             
                                             <div className="space-y-2">
                                                 {myReservations.map(res => (
-                                                    <div key={res.id} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-850 rounded-2xl flex items-center justify-between text-xs shadow-sm">
+                                                    <div key={res.id} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl flex items-center justify-between text-xs shadow-sm">
                                                         <div className="space-y-1">
                                                             <div className="flex items-center gap-2">
                                                                 <span className="font-bold text-slate-800 dark:text-white">{res.name}</span>
-                                                                <span className="text-[9px] text-slate-450 font-mono">#{res.id}</span>
+                                                                <span className="text-[9px] text-slate-400 font-mono">#{res.id}</span>
                                                             </div>
                                                             <span className="text-[10px] text-slate-500 block">{res.date} &bull; {res.slot}</span>
                                                         </div>
                                                         <div className="text-right space-y-1">
-                                                            <span className="font-bold block text-slate-750">{res.price > 0 ? `$${res.price.toLocaleString()}` : 'Gratis'}</span>
+                                                            <span className="font-bold block text-slate-700">{res.price > 0 ? `$${res.price.toLocaleString()}` : 'Gratis'}</span>
                                                             <span className={`px-2 py-0.5 text-[8px] font-bold rounded uppercase block text-center ${
                                                                 res.status === 'approved' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
                                                             }`}>
@@ -5733,19 +5786,19 @@ export default function Dashboard() {
                                 {mobileTab === 'pagos' && (
                                     <div className="space-y-6 animate-scale-up">
                                         <div className="flex items-center gap-2">
-                                            <button onClick={() => setMobileTab('home')} className="text-slate-400 hover:text-slate-650 transition-colors">
+                                            <button onClick={() => setMobileTab('home')} className="text-slate-400 hover:text-slate-600 transition-colors">
                                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                                                 </svg>
                                             </button>
-                                            <h3 className="text-sm font-black uppercase tracking-wider text-slate-850 dark:text-slate-200">Finanzas y Gastos Comunes</h3>
+                                            <h3 className="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">Finanzas y Gastos Comunes</h3>
                                         </div>
 
                                         {/* Outstanding Expense breakdown */}
-                                        <div className="bg-slate-50 dark:bg-slate-950 p-5 border border-slate-100 dark:border-slate-850 rounded-2xl space-y-4">
+                                        <div className="bg-slate-50 dark:bg-slate-950 p-5 border border-slate-100 dark:border-slate-800 rounded-2xl space-y-4">
                                             <div className="flex justify-between items-center border-b pb-3 dark:border-slate-800">
                                                 <div>
-                                                    <span className="text-[9px] font-mono text-slate-550 uppercase">Período de Facturación</span>
+                                                    <span className="text-[9px] font-mono text-slate-500 uppercase">Período de Facturación</span>
                                                     <h4 className="text-xs font-black text-slate-800 dark:text-white">{residentExpenses.period}</h4>
                                                 </div>
                                                 <span className={`px-2.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
@@ -5758,7 +5811,7 @@ export default function Dashboard() {
                                             <div className="space-y-2 text-xs">
                                                 <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500 block mb-1">Desglose de Ítems</span>
                                                 {residentExpenses.items.map((item, i) => (
-                                                    <div key={i} className="flex justify-between items-center py-1.5 border-b border-dashed border-slate-200/50 dark:border-slate-800 last:border-b-0 text-slate-600 dark:text-slate-450">
+                                                    <div key={i} className="flex justify-between items-center py-1.5 border-b border-dashed border-slate-200/50 dark:border-slate-800 last:border-b-0 text-slate-600 dark:text-slate-400">
                                                         <span>{item.name}</span>
                                                         <span className="font-mono text-slate-900 dark:text-slate-200">${item.amount.toLocaleString()}</span>
                                                     </div>
@@ -5792,11 +5845,11 @@ export default function Dashboard() {
                                             
                                             <div className="space-y-2">
                                                 {paymentHistory.map(hist => (
-                                                    <div key={hist.id} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-850 rounded-2xl flex items-center justify-between text-xs shadow-sm">
+                                                    <div key={hist.id} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl flex items-center justify-between text-xs shadow-sm">
                                                         <div className="space-y-1">
                                                             <div className="flex items-center gap-2">
                                                                 <span className="font-bold text-slate-800 dark:text-white">{hist.period}</span>
-                                                                <span className="text-[8px] text-slate-550 font-mono">ID: PAY-{hist.id}</span>
+                                                                <span className="text-[8px] text-slate-500 font-mono">ID: PAY-{hist.id}</span>
                                                             </div>
                                                             <span className="text-[9px] text-slate-500 block">{hist.date} &bull; {hist.method}</span>
                                                         </div>
@@ -5817,20 +5870,20 @@ export default function Dashboard() {
                                 {mobileTab === 'incidencias' && (
                                     <div className="space-y-6 animate-scale-up">
                                         <div className="flex items-center gap-2">
-                                            <button onClick={() => setMobileTab('home')} className="text-slate-400 hover:text-slate-650 transition-colors">
+                                            <button onClick={() => setMobileTab('home')} className="text-slate-400 hover:text-slate-600 transition-colors">
                                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                                                 </svg>
                                             </button>
-                                            <h3 className="text-sm font-black uppercase tracking-wider text-slate-850 dark:text-slate-200">Reportar Incidencias / Averías</h3>
+                                            <h3 className="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">Reportar Incidencias / Averías</h3>
                                         </div>
 
                                         {/* Ticket creation Form */}
-                                        <form onSubmit={submitTicket} className="bg-slate-50 dark:bg-slate-950 p-5 border border-slate-100 dark:border-slate-850 rounded-2xl space-y-4">
+                                        <form onSubmit={submitTicket} className="bg-slate-50 dark:bg-slate-950 p-5 border border-slate-100 dark:border-slate-800 rounded-2xl space-y-4">
                                             <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#72B043] block border-b pb-2 dark:border-slate-800">Levantar Reporte Técnico</span>
                                             
                                             <div className="space-y-1">
-                                                <label className="text-[9px] text-slate-450 uppercase font-extrabold">Título de la Incidencia</label>
+                                                <label className="text-[9px] text-slate-400 uppercase font-extrabold">Título de la Incidencia</label>
                                                 <input 
                                                     type="text"
                                                     placeholder="Ej: Ampolleta quemada en ascensor"
@@ -5842,7 +5895,7 @@ export default function Dashboard() {
 
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-1">
-                                                    <label className="text-[9px] text-slate-450 uppercase font-extrabold">Categoría</label>
+                                                    <label className="text-[9px] text-slate-400 uppercase font-extrabold">Categoría</label>
                                                     <select 
                                                         value={newTicketCat} 
                                                         onChange={(e) => setNewTicketCat(e.target.value)}
@@ -5857,7 +5910,7 @@ export default function Dashboard() {
                                                     </select>
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <label className="text-[9px] text-slate-450 uppercase font-extrabold">Prioridad de Solicitud</label>
+                                                    <label className="text-[9px] text-slate-400 uppercase font-extrabold">Prioridad de Solicitud</label>
                                                     <select 
                                                         value={newTicketPri} 
                                                         onChange={(e) => setNewTicketPri(e.target.value)}
@@ -5872,7 +5925,7 @@ export default function Dashboard() {
                                             </div>
 
                                             <div className="space-y-1">
-                                                <label className="text-[9px] text-slate-450 uppercase font-extrabold">Descripción del Problema</label>
+                                                <label className="text-[9px] text-slate-400 uppercase font-extrabold">Descripción del Problema</label>
                                                 <textarea 
                                                     rows="3"
                                                     placeholder="Detalla lo que ocurre para agilizar la asignación al personal de mantenimiento..."
@@ -5884,14 +5937,14 @@ export default function Dashboard() {
 
                                             {/* Photo simulation attachment */}
                                             <div className="space-y-1">
-                                                <label className="text-[9px] text-slate-450 uppercase font-extrabold block">Adjuntar Evidencia Fotográfica (Simulado)</label>
-                                                <div className="border border-dashed border-slate-250/60 dark:border-slate-850 p-4 rounded-xl flex flex-col items-center justify-center text-center gap-1 bg-white/50 dark:bg-slate-900">
+                                                <label className="text-[9px] text-slate-400 uppercase font-extrabold block">Adjuntar Evidencia Fotográfica (Simulado)</label>
+                                                <div className="border border-dashed border-slate-200/60 dark:border-slate-800 p-4 rounded-xl flex flex-col items-center justify-center text-center gap-1 bg-white/50 dark:bg-slate-900">
                                                     <svg className="w-6 h-6 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
                                                     </svg>
                                                     <span className="text-[10px] font-bold text-slate-500 mt-1">Cargar Archivo JPG/PNG</span>
-                                                    <span className="text-[8px] text-slate-450 block">Máximo 15MB de tamaño</span>
+                                                    <span className="text-[8px] text-slate-400 block">Máximo 15MB de tamaño</span>
                                                 </div>
                                             </div>
 
@@ -5909,15 +5962,15 @@ export default function Dashboard() {
                                             
                                             <div className="space-y-3">
                                                 {reportedTickets.map(tick => (
-                                                    <div key={tick.id} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-850 rounded-2xl space-y-3 shadow-sm text-xs">
+                                                    <div key={tick.id} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl space-y-3 shadow-sm text-xs">
                                                         <div className="flex justify-between items-center">
                                                             <div className="flex items-center gap-2">
                                                                 <span className="font-black text-slate-800 dark:text-white">{tick.title}</span>
-                                                                <span className="text-[9px] text-slate-450 font-mono">#{tick.id}</span>
+                                                                <span className="text-[9px] text-slate-400 font-mono">#{tick.id}</span>
                                                             </div>
                                                             <StatusBadge status={tick.status} type="ticket" />
                                                         </div>
-                                                        <p className="text-[10px] text-slate-650 dark:text-slate-400 leading-relaxed bg-white/70 dark:bg-slate-900 p-2.5 border border-slate-100/50 dark:border-slate-850 rounded-xl">{tick.desc}</p>
+                                                        <p className="text-[10px] text-slate-600 dark:text-slate-400 leading-relaxed bg-white/70 dark:bg-slate-900 p-2.5 border border-slate-100/50 dark:border-slate-800 rounded-xl">{tick.desc}</p>
                                                         <div className="flex items-center justify-between text-[9px] text-slate-500 font-medium">
                                                             <span>Fecha: {tick.date} &bull; Categoría: {tick.category}</span>
                                                             <span className="font-extrabold uppercase">Prioridad: {tick.priority}</span>
@@ -5933,12 +5986,12 @@ export default function Dashboard() {
                                 {mobileTab === 'documentos' && (
                                     <div className="space-y-4 animate-scale-up">
                                         <div className="flex items-center gap-2">
-                                            <button onClick={() => setMobileTab('home')} className="text-slate-400 hover:text-slate-650 transition-colors">
+                                            <button onClick={() => setMobileTab('home')} className="text-slate-400 hover:text-slate-600 transition-colors">
                                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                                                 </svg>
                                             </button>
-                                            <h3 className="text-sm font-black uppercase tracking-wider text-slate-850 dark:text-slate-200">Biblioteca de Documentos</h3>
+                                            <h3 className="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">Biblioteca de Documentos</h3>
                                         </div>
 
                                         <div className="space-y-2.5">
@@ -5949,7 +6002,7 @@ export default function Dashboard() {
                                             ].map((doc, i) => (
                                                 <div 
                                                     key={i} 
-                                                    className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-850 rounded-2xl flex items-center justify-between text-xs shadow-sm hover:border-[#72B043]/30 dark:hover:border-[#72B043]/30 transition-all"
+                                                    className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl flex items-center justify-between text-xs shadow-sm hover:border-[#72B043]/30 dark:hover:border-[#72B043]/30 transition-all"
                                                 >
                                                     <div className="space-y-1">
                                                         <span className="font-bold text-slate-800 dark:text-white block">{doc.title}</span>
@@ -5974,7 +6027,7 @@ export default function Dashboard() {
                                 {mobileTab === 'comunidad' && (
                                     <div className="space-y-4 flex flex-col h-[500px] justify-between pb-2 animate-scale-up">
                                         <div className="flex items-center gap-2 border-b pb-3 dark:border-slate-800 shrink-0">
-                                            <button onClick={() => setMobileTab('home')} className="text-slate-400 hover:text-slate-650 transition-colors">
+                                            <button onClick={() => setMobileTab('home')} className="text-slate-400 hover:text-slate-600 transition-colors">
                                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                                                 </svg>
@@ -5982,7 +6035,7 @@ export default function Dashboard() {
                                             <div className="flex items-center gap-2">
                                                 <div className="h-7 w-7 rounded-full bg-[#EC7A08]/15 border border-[#EC7A08]/30 flex items-center justify-center text-xs">👥</div>
                                                 <div>
-                                                    <h4 className="text-xs font-black text-slate-850 dark:text-slate-200">Conserjería y Soporte Vecinal</h4>
+                                                    <h4 className="text-xs font-black text-slate-800 dark:text-slate-200">Conserjería y Soporte Vecinal</h4>
                                                     <span className="text-[8px] text-emerald-500 font-bold block">● En línea</span>
                                                 </div>
                                             </div>
@@ -5995,21 +6048,21 @@ export default function Dashboard() {
                                                     key={i} 
                                                     className={`flex flex-col max-w-[80%] rounded-2xl px-4 py-2.5 relative shadow-sm ${
                                                         msg.sender === 'system' 
-                                                            ? 'mx-auto bg-slate-100 border border-slate-200/50 text-slate-500 text-[10px] text-center max-w-[90%] dark:bg-slate-950 dark:border-slate-850'
+                                                            ? 'mx-auto bg-slate-100 border border-slate-200/50 text-slate-500 text-[10px] text-center max-w-[90%] dark:bg-slate-950 dark:border-slate-800'
                                                             : msg.sender === 'me'
                                                             ? 'ml-auto bg-[#72B043] text-white rounded-br-none'
-                                                            : 'bg-slate-50 border border-slate-100 dark:bg-slate-950 dark:border-slate-850 text-slate-800 dark:text-slate-200 rounded-bl-none'
+                                                            : 'bg-slate-50 border border-slate-100 dark:bg-slate-950 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-bl-none'
                                                     }`}
                                                 >
                                                     <p className="leading-relaxed">{msg.text}</p>
                                                     {msg.time && (
-                                                        <span className={`text-[7px] block text-right mt-1 ${msg.sender === 'me' ? 'text-white/60' : 'text-slate-450'}`}>{msg.time}</span>
+                                                        <span className={`text-[7px] block text-right mt-1 ${msg.sender === 'me' ? 'text-white/60' : 'text-slate-400'}`}>{msg.time}</span>
                                                     )}
                                                 </div>
                                             ))}
                                             
                                             {isTyping && (
-                                                <div className="bg-slate-50 border border-slate-100 dark:bg-slate-950 dark:border-slate-850 text-slate-500 px-4 py-2 rounded-2xl rounded-bl-none max-w-[120px] flex items-center gap-1 shadow-sm">
+                                                <div className="bg-slate-50 border border-slate-100 dark:bg-slate-950 dark:border-slate-800 text-slate-500 px-4 py-2 rounded-2xl rounded-bl-none max-w-[120px] flex items-center gap-1 shadow-sm">
                                                     <span className="h-1.5 w-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '0ms' }} />
                                                     <span className="h-1.5 w-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '150ms' }} />
                                                     <span className="h-1.5 w-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '300ms' }} />
@@ -6024,7 +6077,7 @@ export default function Dashboard() {
                                                 placeholder="Escribe tu mensaje aquí..."
                                                 value={chatInput}
                                                 onChange={(e) => setChatInput(e.target.value)}
-                                                className="flex-1 px-4 py-2 border border-slate-250 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs rounded-xl focus:outline-none focus:border-[#72B043]"
+                                                className="flex-1 px-4 py-2 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs rounded-xl focus:outline-none focus:border-[#72B043]"
                                             />
                                             <button 
                                                 type="submit"
@@ -6041,7 +6094,7 @@ export default function Dashboard() {
                             <div className="absolute bottom-0 left-0 right-0 h-16 bg-slate-900 border-t border-slate-800 flex items-center justify-around text-slate-500 z-20 shadow-lg select-none">
                                 <button 
                                     onClick={() => setMobileTab('home')}
-                                    className={`flex flex-col items-center justify-center w-12 h-full transition-colors ${mobileTab === 'home' ? 'text-[#72B043] font-bold' : 'text-slate-500 hover:text-slate-350'}`}
+                                    className={`flex flex-col items-center justify-center w-12 h-full transition-colors ${mobileTab === 'home' ? 'text-[#72B043] font-bold' : 'text-slate-500 hover:text-slate-300'}`}
                                 >
                                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
@@ -6062,7 +6115,7 @@ export default function Dashboard() {
                                             ? 'text-rose-500 hover:text-rose-400' 
                                             : mobileTab === 'reservas' 
                                             ? 'text-[#72B043] font-bold' 
-                                            : 'text-slate-500 hover:text-slate-350'
+                                            : 'text-slate-500 hover:text-slate-300'
                                     }`}
                                 >
                                     {simulatedMoroso ? (
@@ -6090,7 +6143,7 @@ export default function Dashboard() {
                                 
                                 <button 
                                     onClick={() => setMobileTab('pagos')}
-                                    className={`flex flex-col items-center justify-center w-12 h-full transition-colors ${mobileTab === 'pagos' ? 'text-[#72B043] font-bold' : 'text-slate-500 hover:text-slate-350'}`}
+                                    className={`flex flex-col items-center justify-center w-12 h-full transition-colors ${mobileTab === 'pagos' ? 'text-[#72B043] font-bold' : 'text-slate-500 hover:text-slate-300'}`}
                                 >
                                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5h.007v.008H3.75V4.5zM3 16.25h1.5m-1.5 3h1.5" />
@@ -6100,7 +6153,7 @@ export default function Dashboard() {
 
                                 <button 
                                     onClick={() => setMobileTab('comunidad')}
-                                    className={`flex flex-col items-center justify-center w-12 h-full transition-colors ${mobileTab === 'comunidad' ? 'text-[#72B043] font-bold' : 'text-slate-500 hover:text-slate-355'}`}
+                                    className={`flex flex-col items-center justify-center w-12 h-full transition-colors ${mobileTab === 'comunidad' ? 'text-[#72B043] font-bold' : 'text-slate-500 hover:text-slate-300'}`}
                                 >
                                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
@@ -6140,11 +6193,11 @@ export default function Dashboard() {
                                 <div className="text-center space-y-1">
                                     <span className="text-[9px] font-mono text-[#72B043] font-bold uppercase tracking-widest">Escaneo QR Bancario Express</span>
                                     <h3 className="text-base font-black">Pagar Gasto Común</h3>
-                                    <p className="text-[10px] text-slate-450 dark:text-slate-500">Realiza tu transferencia o escanea directamente desde tu App del Banco.</p>
+                                    <p className="text-[10px] text-slate-400 dark:text-slate-500">Realiza tu transferencia o escanea directamente desde tu App del Banco.</p>
                                 </div>
 
                                 {/* Dynamic QR Code Box */}
-                                <div className="flex flex-col items-center justify-center py-3 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-150 dark:border-slate-850">
+                                <div className="flex flex-col items-center justify-center py-3 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-150 dark:border-slate-800">
                                     <svg className="w-36 h-36 text-slate-950 dark:text-white" viewBox="0 0 100 100" fill="currentColor">
                                         <path d="M5,5 h30 v30 h-30 z M15,15 h10 v10 h-10 z" />
                                         <path d="M65,5 h30 v30 h-30 z M75,15 h10 v10 h-10 z" />
@@ -6152,12 +6205,12 @@ export default function Dashboard() {
                                         <path d="M45,10 h10 v10 h-10 z M50,30 h10 v10 h-10 z M40,50 h20 v10 h-20 z M45,70 h15 v5 h-15 z M75,45 h10 v15 h-10 z M80,75 h15 v15 h-15 z" />
                                         <circle cx="50" cy="50" r="7" className="text-[#72B043]" />
                                     </svg>
-                                    <span className="text-[9px] text-slate-450 mt-2 font-mono">Doble Enlace Cifrado Local</span>
+                                    <span className="text-[9px] text-slate-400 mt-2 font-mono">Doble Enlace Cifrado Local</span>
                                 </div>
 
                                 <div className="space-y-2 text-xs">
                                     <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500 block">Datos de Transferencia Manual</span>
-                                    <div className="bg-slate-50 dark:bg-slate-950 p-3 rounded-xl border border-slate-100 dark:border-slate-850 space-y-1 text-[10px] font-mono text-slate-650 dark:text-slate-400">
+                                    <div className="bg-slate-50 dark:bg-slate-950 p-3 rounded-xl border border-slate-100 dark:border-slate-800 space-y-1 text-[10px] font-mono text-slate-600 dark:text-slate-400">
                                         <div className="flex justify-between"><span>Banco:</span><span className="font-bold text-slate-800 dark:text-slate-200">Banco de la Comunidad</span></div>
                                         <div className="flex justify-between"><span>Tipo:</span><span className="font-bold text-slate-800 dark:text-slate-200">Cuenta Corriente</span></div>
                                         <div className="flex justify-between"><span>N° Cuenta:</span><span className="font-bold text-slate-800 dark:text-slate-200">20260526-99</span></div>
@@ -6168,7 +6221,7 @@ export default function Dashboard() {
 
                                 {/* receipt upload simulation */}
                                 <div className="space-y-1 text-xs">
-                                    <label className="text-[9px] text-slate-450 uppercase font-extrabold block">Adjuntar Comprobante (Simulado)</label>
+                                    <label className="text-[9px] text-slate-400 uppercase font-extrabold block">Adjuntar Comprobante (Simulado)</label>
                                     <input 
                                         type="file"
                                         onChange={(e) => setPaymentReceiptName(e.target.files[0]?.name || '')}
@@ -6197,8 +6250,8 @@ export default function Dashboard() {
                                     <p className="text-[10px] text-slate-500 px-3">Tu pago del Gasto Común de Mayo ha sido registrado en la base de datos local SQLite y validado por administración.</p>
                                 </div>
                                 
-                                <div className="p-3 bg-slate-50 dark:bg-slate-950 border rounded-xl border-slate-100 dark:border-slate-850 max-w-[240px] mx-auto text-[9px] font-mono text-slate-550 space-y-0.5 text-left">
-                                    <span className="font-bold block text-slate-700 dark:text-slate-350 border-b pb-1 mb-1">COMPROBANTE DE RECIBO</span>
+                                <div className="p-3 bg-slate-50 dark:bg-slate-950 border rounded-xl border-slate-100 dark:border-slate-800 max-w-[240px] mx-auto text-[9px] font-mono text-slate-500 space-y-0.5 text-left">
+                                    <span className="font-bold block text-slate-700 dark:text-slate-300 border-b pb-1 mb-1">COMPROBANTE DE RECIBO</span>
                                     <div>Folio: REC-421-2026</div>
                                     <div>Monto: $165.000 CLP</div>
                                     <div>Método: Transferencia QR</div>
@@ -6229,7 +6282,7 @@ export default function Dashboard() {
                     onClick={() => setShowMorosidadModal(false)}
                 >
                     <div 
-                        className="relative max-w-sm w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl animate-scale-up font-sans text-slate-850 dark:text-slate-200 text-left"
+                        className="relative max-w-sm w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl animate-scale-up font-sans text-slate-800 dark:text-slate-200 text-left"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Close button */}
@@ -6257,13 +6310,13 @@ export default function Dashboard() {
                             <div className="p-4 bg-rose-50/30 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-950 rounded-2xl text-[10px] space-y-1.5 text-left font-mono">
                                 <div className="flex justify-between">
                                     <span className="text-slate-500">Unidad Afectada:</span>
-                                    <span className="font-bold text-slate-800 dark:text-slate-350">Departamento 202</span>
+                                    <span className="font-bold text-slate-800 dark:text-slate-300">Departamento 202</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-slate-500">Períodos Impagos:</span>
-                                    <span className="font-bold text-slate-800 dark:text-slate-350">Marzo, Abril, Mayo 2026</span>
+                                    <span className="font-bold text-slate-800 dark:text-slate-300">Marzo, Abril, Mayo 2026</span>
                                 </div>
-                                <div className="flex justify-between text-rose-600 dark:text-rose-450 font-bold border-t border-rose-100 dark:border-rose-900 pt-1 mt-1">
+                                <div className="flex justify-between text-rose-600 dark:text-rose-400 font-bold border-t border-rose-100 dark:border-rose-900 pt-1 mt-1">
                                     <span>Saldo en Mora:</span>
                                     <span>$495.000 CLP</span>
                                 </div>
@@ -6272,7 +6325,7 @@ export default function Dashboard() {
                             <div className="flex gap-2">
                                 <button 
                                     onClick={() => setShowMorosidadModal(false)}
-                                    className="flex-1 py-2 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-450 text-xs font-bold rounded-xl shadow-sm transition-colors"
+                                    className="flex-1 py-2 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold rounded-xl shadow-sm transition-colors"
                                 >
                                     Cerrar
                                 </button>

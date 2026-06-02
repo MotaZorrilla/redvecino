@@ -231,9 +231,16 @@ Failures:    0 failed
     *   *Tests de Límites en Importes (Amount Boundaries):* Programación de pruebas robustas (`test_amount_must_be_positive_numeric`) que verifican que montos iguales a cero, valores negativos o cadenas no numéricas sean rechazadas categóricamente con código de respuesta HTTP `422 (Unprocessable Entity)`.
 *   **QA Certificado al 100%:** Ejecución exitosa de la suite completa de pruebas. **Los 65 casos de prueba con 183 aserciones pasaron exitosamente en 23.26 segundos.** Compilación Vite finalizada limpiamente en 2.53 segundos.
 
+### 3.8 Resolución de Fuga de Filtros y Estandarización de Estilos Widescreen (Sesión 02/06/2026)
+*   **Resolución de Filtros de Impersonación:** Se corrigió el bug de filtrado cruzado por condominio y rol de acceso en la pestaña de Impersonación de TI. El antiguo método basado en coincidencia de nombres en el frontend fallaba debido a nombres de usuarios duplicados en los seeders (ej., "Matías Contreras" registrado en múltiples condominios). Se modificó [DashboardController.php](file:///C:/xampp/htdocs/redvecino/app/Http/Controllers/DashboardController.php) para inyectar de forma nativa la propiedad `condominium_id` en el objeto de cada usuario consultando las relaciones Eloquent `ownerProfile.property` y `residentProfile.property`. El frontend ahora realiza el filtrado de forma 100% determinista.
+*   **Corrección de Clases Tailwind Inválidas:** Se identificaron y solucionaron 338 clases de Tailwind no estándar (como `slate-955`, `slate-850`, `slate-750`, `gray-855`, etc.) generadas en iteraciones previas. La clase inválida `bg-gradient-to-br from-slate-955 via-slate-900 to-slate-955` provocaba que la estación de DevOps mostrara un fondo transparente, haciendo visible el fondo claro `bg-gray-100` del layout principal y simulando un borde blanco en la parte lateral derecha. Al normalizar a clases Tailwind válidas (ej., `slate-950`, `slate-800`), la visualización oscura se restauró por completo y el problema del borde blanco desapareció.
+*   **Modo Mantenimiento y Navegación:** Confirmada la reubicación del botón de Modo Mantenimiento como una acción interna del panel de DevOps & Telemetría en vez de la barra lateral izquierda, mejorando la navegación y optimizando la interfaz.
+*   **Eliminación de Control de Tema en DevOps TI:** Dado que la estación DevOps TI posee un diseño oscuro fijo de alta fidelidad, se eliminó el botón interruptor de tema claro/oscuro de su cabecera para evitar confusión de usuario y simplificar la barra superior.
+*   **Certificación de Suite de Tests:** Ejecución completa de la suite de pruebas del backend con **146 casos y 597 aserciones validadas al 100%**. Compilación y construcción de Vite completada sin advertencias.
+
 ---
 
 **Fecha de creación:** Mayo 2026
-**Última actualización:** 2 de Junio de 2026 (Integración del Libro Diario Contable, Gráficos Interactivos Frontend y Cobertura QA Externa "Unhappy Paths")
-**Versión:** 2.4 (Real-time Cash Book Integration & High-Fidelity QA Boundary Testing)
+**Última actualización:** 2 de Junio de 2026 (Resolución de Fugas en Filtros de Impersonación, Depuración de Clases Tailwind Inválidas y Certificación de Vistas TI)
+**Versión:** 2.5 (Deterministic Impersonation Scoping & Validated Widescreen Dark Theme)
 **Estado:** Activo y Actualizado
