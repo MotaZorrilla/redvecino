@@ -587,7 +587,7 @@ class DatabaseSeeder extends Seeder
             CondoIncome::create([
                 'condominium_id' => $property->condominium_id,
                 'category' => 'multas',
-                'subcategory' => 'Multa por infracción',
+                'subcategory' => 'Ruidos molestos',
                 'amount' => $fine->amount,
                 'date' => $fine->issued_date,
                 'description' => 'Multa: ' . $fine->reason,
@@ -603,10 +603,28 @@ class DatabaseSeeder extends Seeder
             $commonExpense = $item->commonExpense;
             if (!$commonExpense) continue;
 
+            $categoryMap = match ($item->category) {
+                'Seguridad' => 'seguridad',
+                'Aseo y Áreas Comunes' => 'mantencion',
+                'Administración' => 'administracion',
+                'Mantención Ascensores' => 'mantencion',
+                'Consumo Eléctrico' => 'servicios_basicos',
+                default => 'administracion',
+            };
+
+            $subcategoryMap = match ($item->category) {
+                'Seguridad' => 'Guardias y Conserjería',
+                'Aseo y Áreas Comunes' => 'Limpieza y Aseo',
+                'Administración' => 'Honorarios',
+                'Mantención Ascensores' => 'Ascensores',
+                'Consumo Eléctrico' => 'Electricidad',
+                default => $item->category,
+            };
+
             CondoExpense::create([
                 'condominium_id' => $commonExpense->condominium_id,
-                'category' => 'administracion',
-                'subcategory' => $item->category,
+                'category' => $categoryMap,
+                'subcategory' => $subcategoryMap,
                 'amount' => $item->amount,
                 'date' => $commonExpense->due_date,
                 'description' => $item->description ?? $item->category,
@@ -616,6 +634,158 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->command->info('Condo expenses seeded from expense items.');
+
+        // ─── SEED ADDITIONAL RICHER FINANCIAL DATA ──────────────────────
+        $this->command->info('Seeding additional rich financial transactions...');
+        foreach ($condos as $condo) {
+            // Additional Incomes
+            // 1. Arriendos de Espacios Comunes
+            CondoIncome::create([
+                'condominium_id' => $condo->id,
+                'category' => 'arriendo_espacios',
+                'subcategory' => 'Quinchos',
+                'amount' => 35000.00,
+                'date' => '2026-03-12',
+                'description' => 'Arriendo Quincho N°1 - Residente Apt 102',
+                'property_id' => Property::where('condominium_id', $condo->id)->where('type', 'departamento')->inRandomOrder()->first()->id ?? null,
+            ]);
+            CondoIncome::create([
+                'condominium_id' => $condo->id,
+                'category' => 'arriendo_espacios',
+                'subcategory' => 'Salón de eventos',
+                'amount' => 60000.00,
+                'date' => '2026-04-18',
+                'description' => 'Arriendo Salón de Eventos - Copropietario Apt 105',
+                'property_id' => Property::where('condominium_id', $condo->id)->where('type', 'departamento')->inRandomOrder()->first()->id ?? null,
+            ]);
+
+            // 2. Intereses por Mora
+            CondoIncome::create([
+                'condominium_id' => $condo->id,
+                'category' => 'intereses_mora',
+                'subcategory' => 'Gastos Comunes',
+                'amount' => 5400.00,
+                'date' => '2026-04-10',
+                'description' => 'Cobro intereses por pago atrasado Gasto Común de Marzo',
+            ]);
+
+            // 3. Cuotas Extraordinarias
+            CondoIncome::create([
+                'condominium_id' => $condo->id,
+                'category' => 'cuotas_extraordinarias',
+                'subcategory' => 'Reparaciones mayores',
+                'amount' => 50000.00,
+                'date' => '2026-04-01',
+                'description' => 'Aporte cuota extraordinaria aprobada en Asamblea Extraordinaria N°3',
+            ]);
+
+            // 4. Publicidad o Convenios
+            CondoIncome::create([
+                'condominium_id' => $condo->id,
+                'category' => 'publicidad_convenio',
+                'subcategory' => 'Máquinas expendedoras',
+                'amount' => 25000.00,
+                'date' => '2026-05-02',
+                'description' => 'Comisión mensual por máquinas de café y bebidas en conserjería',
+            ]);
+
+            // 5. Otros Ingresos
+            CondoIncome::create([
+                'condominium_id' => $condo->id,
+                'category' => 'otro',
+                'subcategory' => 'Otros',
+                'amount' => 18500.00,
+                'date' => '2026-05-15',
+                'description' => 'Venta de cartón, vidrio y plástico reciclado de la comunidad',
+            ]);
+
+            // Additional Expenses
+            // 1. Sueldos y Honorarios (personal)
+            CondoExpense::create([
+                'condominium_id' => $condo->id,
+                'category' => 'personal',
+                'subcategory' => 'Administrador',
+                'amount' => 450000.00,
+                'date' => '2026-03-31',
+                'description' => 'Honorarios mensuales de administración externa del condominio',
+            ]);
+            CondoExpense::create([
+                'condominium_id' => $condo->id,
+                'category' => 'personal',
+                'subcategory' => 'Conserjes',
+                'amount' => 850000.00,
+                'date' => '2026-04-30',
+                'description' => 'Pago de sueldos y cotizaciones del personal de conserjería',
+            ]);
+
+            // 2. Servicios Básicos
+            CondoExpense::create([
+                'condominium_id' => $condo->id,
+                'category' => 'servicios_basicos',
+                'subcategory' => 'Agua',
+                'amount' => 125000.00,
+                'date' => '2026-03-25',
+                'description' => 'Consumo mensual de agua potable matriz común de la comunidad',
+            ]);
+            CondoExpense::create([
+                'condominium_id' => $condo->id,
+                'category' => 'servicios_basicos',
+                'subcategory' => 'Electricidad',
+                'amount' => 380000.00,
+                'date' => '2026-04-20',
+                'description' => 'Consumo eléctrico del alumbrado y ascensores comunes',
+            ]);
+
+            // 3. Seguridad
+            CondoExpense::create([
+                'condominium_id' => $condo->id,
+                'category' => 'seguridad',
+                'subcategory' => 'CCTV',
+                'amount' => 95000.00,
+                'date' => '2026-04-05',
+                'description' => 'Mantenimiento preventivo mensual de cámaras y DVR central',
+            ]);
+
+            // 4. Limpieza y Aseo (limpieza)
+            CondoExpense::create([
+                'condominium_id' => $condo->id,
+                'category' => 'limpieza',
+                'subcategory' => 'Productos de limpieza',
+                'amount' => 45000.00,
+                'date' => '2026-04-12',
+                'description' => 'Compra mensual de insumos de aseo y cloro para piscina',
+            ]);
+
+            // 5. Reparaciones (reparacion)
+            CondoExpense::create([
+                'condominium_id' => $condo->id,
+                'category' => 'reparacion',
+                'subcategory' => 'Cañerías',
+                'amount' => 150000.00,
+                'date' => '2026-05-10',
+                'description' => 'Reparación de filtración urgente en cañería matriz de patio central',
+            ]);
+
+            // 6. Seguros (seguros)
+            CondoExpense::create([
+                'condominium_id' => $condo->id,
+                'category' => 'seguros',
+                'subcategory' => 'Incendio',
+                'amount' => 220000.00,
+                'date' => '2026-03-10',
+                'description' => 'Pago póliza semestral de seguro obligatorio contra incendios de bienes comunes',
+            ]);
+
+            // 7. Fondo de Reserva (fondo_reserva)
+            CondoExpense::create([
+                'condominium_id' => $condo->id,
+                'category' => 'fondo_reserva',
+                'subcategory' => 'Emergencias',
+                'amount' => 180000.00,
+                'date' => '2026-04-15',
+                'description' => 'Aporte al fondo de reserva para contingencias futuras',
+            ]);
+        }
 
         $this->command->info('Infractions and Fines seeded.');
 

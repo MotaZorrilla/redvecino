@@ -12,6 +12,157 @@ use Illuminate\Support\Facades\DB;
 
 class CondoFinanceController extends Controller
 {
+    private const FINANCIAL_CATALOG = [
+        'incomes' => [
+            'gastos_comunes' => [
+                'label' => 'Gastos Comunes',
+                'subcategories' => []
+            ],
+            'multas' => [
+                'label' => 'Multas',
+                'subcategories' => [
+                    'Ruidos molestos',
+                    'Mal uso de áreas comunes',
+                    'Estacionamientos indebidos',
+                    'Malos olores',
+                    'Problemas con mascotas',
+                    'Actividades fuera de horario',
+                    'Incumplimiento de normas del reglamento'
+                ]
+            ],
+            'arriendo_espacios' => [
+                'label' => 'Arriendos de Espacios Comunes',
+                'subcategories' => [
+                    'Quinchos',
+                    'Salón de eventos',
+                    'Canchas',
+                    'Estacionamientos de visita'
+                ]
+            ],
+            'intereses_mora' => [
+                'label' => 'Intereses por Mora',
+                'subcategories' => [
+                    'Gastos Comunes',
+                    'Multas',
+                    'Otros'
+                ]
+            ],
+            'cuotas_extraordinarias' => [
+                'label' => 'Cuotas Extraordinarias',
+                'subcategories' => [
+                    'Reparaciones mayores',
+                    'Mejoras',
+                    'Emergencias'
+                ]
+            ],
+            'publicidad_convenio' => [
+                'label' => 'Publicidad o Convenios',
+                'subcategories' => [
+                    'Máquinas expendedoras',
+                    'Antenas',
+                    'Publicidad interna',
+                    'Convenios con empresas'
+                ]
+            ],
+            'otro' => [
+                'label' => 'Otros Ingresos',
+                'subcategories' => []
+            ]
+        ],
+        'expenses' => [
+            'personal' => [
+                'label' => 'Sueldos y Honorarios',
+                'subcategories' => [
+                    'Conserjes',
+                    'Personal de aseo',
+                    'Jardineros',
+                    'Administrador',
+                    'Técnicos externos'
+                ]
+            ],
+            'servicios_basicos' => [
+                'label' => 'Servicios Básicos',
+                'subcategories' => [
+                    'Agua',
+                    'Electricidad',
+                    'Gas',
+                    'Internet',
+                    'Telefonía'
+                ]
+            ],
+            'mantencion' => [
+                'label' => 'Mantención',
+                'subcategories' => [
+                    'Ascensores',
+                    'Bombas de agua',
+                    'Portones eléctricos',
+                    'Cámaras de seguridad',
+                    'Jardines'
+                ]
+            ],
+            'seguridad' => [
+                'label' => 'Seguridad',
+                'subcategories' => [
+                    'Guardias',
+                    'CCTV',
+                    'Alarmas',
+                    'Control de acceso'
+                ]
+            ],
+            'limpieza' => [
+                'label' => 'Limpieza y Aseo',
+                'subcategories' => [
+                    'Productos de limpieza',
+                    'Bolsas de basura',
+                    'Implementos de aseo'
+                ]
+            ],
+            'reparacion' => [
+                'label' => 'Reparaciones',
+                'subcategories' => [
+                    'Cañerías',
+                    'Techos',
+                    'Iluminación',
+                    'Infraestructura común'
+                ]
+            ],
+            'seguros' => [
+                'label' => 'Seguros',
+                'subcategories' => [
+                    'Incendio',
+                    'Responsabilidad civil',
+                    'Equipos'
+                ]
+            ],
+            'administracion' => [
+                'label' => 'Gastos Administrativos',
+                'subcategories' => [
+                    'Papelería',
+                    'Software',
+                    'Bancos',
+                    'Contabilidad',
+                    'Impresiones'
+                ]
+            ],
+            'fondo_reserva' => [
+                'label' => 'Fondo de Reserva',
+                'subcategories' => [
+                    'Emergencias',
+                    'Proyectos futuros'
+                ]
+            ],
+            'otro' => [
+                'label' => 'Otros Egresos',
+                'subcategories' => []
+            ]
+        ]
+    ];
+
+    public function catalog(Request $request)
+    {
+        return response()->json(self::FINANCIAL_CATALOG);
+    }
+
     public function summary(Request $request)
     {
         $request->validate(['condominium_id' => 'required|exists:condominiums,id']);
@@ -54,10 +205,24 @@ class CondoFinanceController extends Controller
 
     public function storeIncome(Request $request)
     {
+        $catalog = self::FINANCIAL_CATALOG['incomes'];
+        $categoriesKeys = implode(',', array_keys($catalog));
+
         $data = $request->validate([
             'condominium_id' => 'required|exists:condominiums,id',
-            'category' => 'required|string',
-            'subcategory' => 'nullable|string',
+            'category' => 'required|string|in:' . $categoriesKeys,
+            'subcategory' => [
+                'nullable',
+                'string',
+                function ($attribute, $value, $fail) use ($request, $catalog) {
+                    $cat = $request->category;
+                    if (isset($catalog[$cat]) && !empty($catalog[$cat]['subcategories'])) {
+                        if (!in_array($value, $catalog[$cat]['subcategories'])) {
+                            $fail("La subcategoría seleccionada no es válida para la categoría {$catalog[$cat]['label']}.");
+                        }
+                    }
+                }
+            ],
             'amount' => 'required|numeric|min:0.01',
             'date' => 'required|date',
             'description' => 'nullable|string',
@@ -72,9 +237,23 @@ class CondoFinanceController extends Controller
     {
         $income = CondoIncome::findOrFail($id);
 
+        $catalog = self::FINANCIAL_CATALOG['incomes'];
+        $categoriesKeys = implode(',', array_keys($catalog));
+
         $data = $request->validate([
-            'category' => 'required|string',
-            'subcategory' => 'nullable|string',
+            'category' => 'required|string|in:' . $categoriesKeys,
+            'subcategory' => [
+                'nullable',
+                'string',
+                function ($attribute, $value, $fail) use ($request, $catalog) {
+                    $cat = $request->category;
+                    if (isset($catalog[$cat]) && !empty($catalog[$cat]['subcategories'])) {
+                        if (!in_array($value, $catalog[$cat]['subcategories'])) {
+                            $fail("La subcategoría seleccionada no es válida para la categoría {$catalog[$cat]['label']}.");
+                        }
+                    }
+                }
+            ],
             'amount' => 'required|numeric|min:0.01',
             'date' => 'required|date',
             'description' => 'nullable|string',
@@ -107,10 +286,24 @@ class CondoFinanceController extends Controller
 
     public function storeExpense(Request $request)
     {
+        $catalog = self::FINANCIAL_CATALOG['expenses'];
+        $categoriesKeys = implode(',', array_keys($catalog));
+
         $data = $request->validate([
             'condominium_id' => 'required|exists:condominiums,id',
-            'category' => 'required|string',
-            'subcategory' => 'nullable|string',
+            'category' => 'required|string|in:' . $categoriesKeys,
+            'subcategory' => [
+                'nullable',
+                'string',
+                function ($attribute, $value, $fail) use ($request, $catalog) {
+                    $cat = $request->category;
+                    if (isset($catalog[$cat]) && !empty($catalog[$cat]['subcategories'])) {
+                        if (!in_array($value, $catalog[$cat]['subcategories'])) {
+                            $fail("La subcategoría seleccionada no es válida para la categoría {$catalog[$cat]['label']}.");
+                        }
+                    }
+                }
+            ],
             'amount' => 'required|numeric|min:0.01',
             'date' => 'required|date',
             'description' => 'nullable|string',
@@ -154,9 +347,23 @@ class CondoFinanceController extends Controller
     {
         $condoExpense = CondoExpense::findOrFail($id);
 
+        $catalog = self::FINANCIAL_CATALOG['expenses'];
+        $categoriesKeys = implode(',', array_keys($catalog));
+
         $data = $request->validate([
-            'category' => 'required|string',
-            'subcategory' => 'nullable|string',
+            'category' => 'required|string|in:' . $categoriesKeys,
+            'subcategory' => [
+                'nullable',
+                'string',
+                function ($attribute, $value, $fail) use ($request, $catalog) {
+                    $cat = $request->category;
+                    if (isset($catalog[$cat]) && !empty($catalog[$cat]['subcategories'])) {
+                        if (!in_array($value, $catalog[$cat]['subcategories'])) {
+                            $fail("La subcategoría seleccionada no es válida para la categoría {$catalog[$cat]['label']}.");
+                        }
+                    }
+                }
+            ],
             'amount' => 'required|numeric|min:0.01',
             'date' => 'required|date',
             'description' => 'nullable|string',

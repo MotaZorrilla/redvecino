@@ -260,7 +260,7 @@ function RoleTransitionLoader({ user, fadeOut }) {
 }
 
 export default function Dashboard() {
-    const { stats, recentAnnouncements, upcomingExpenses, allUsers = [], allProperties = [], allMessages = [] } = usePage().props;
+    const { stats, recentAnnouncements, upcomingExpenses, allUsers = [], allProperties = [], allMessages = [], allCondominiums = [] } = usePage().props;
     const loggedInUser = usePage().props.auth.user;
     const [impersonatedUser, setImpersonatedUser] = useState(null);
     const user = impersonatedUser || loggedInUser;
@@ -270,10 +270,151 @@ export default function Dashboard() {
     const [propertiesList, setPropertiesList] = useState(allProperties);
     const [ticketsList, setTicketsList] = useState(usePage().props.recentTickets || []);
     const [paymentsList, setPaymentsList] = useState(usePage().props.recentPayments || []);
-    const [condosList, setCondosList] = useState([
-        { id: 1, name: 'Parque del Sol', address: 'Av. Providencia 1234', city: 'Santiago', units_count: 80, status: 'active' },
-        { id: 2, name: 'Residencial MiVecino', address: 'Las Condes 5678', city: 'Santiago', units_count: 90, status: 'active' }
-    ]);
+    const [adminCondoId, setAdminCondoId] = useState(allCondominiums.length > 0 ? allCondominiums[0].id : 1);
+
+    // ─── CONDO FINANCES (ASYNCHRONOUS API CRUD) ────────────────────────
+    const [paymentsTabMode, setPaymentsTabMode] = useState('payments'); // 'payments' (copropietarios) or 'ledger' (libro diario)
+    const [ledgerSubTab, setLedgerSubTab] = useState('incomes'); // 'incomes' or 'expenses'
+    const [incomesList, setIncomesList] = useState([]);
+    const [expensesList, setExpensesList] = useState([]);
+    const [financeSummary, setFinanceSummary] = useState({ total_incomes: 0, total_expenses: 0, balance: 0, incomes_by_category: {}, expenses_by_category: {} });
+    const [financialCatalog, setFinancialCatalog] = useState({ incomes: {}, expenses: {} });
+    const [showAddIncomeForm, setShowAddIncomeForm] = useState(false);
+    const [showAddExpenseForm, setShowAddExpenseForm] = useState(false);
+    const [editingIncome, setEditingIncome] = useState(null);
+    const [editingExpense, setEditingExpense] = useState(null);
+    const [loadingFinances, setLoadingFinances] = useState(false);
+    const [selectedIncomeCategory, setSelectedIncomeCategory] = useState('all');
+    const [selectedExpenseCategory, setSelectedExpenseCategory] = useState('all');
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+    const [isMobileDevOpsSidebarOpen, setIsMobileDevOpsSidebarOpen] = useState(false);
+
+    const filteredIncomes = selectedIncomeCategory === 'all' 
+        ? incomesList 
+        : incomesList.filter(inc => inc.category === selectedIncomeCategory);
+
+    const filteredExpenses = selectedExpenseCategory === 'all' 
+        ? expensesList 
+        : expensesList.filter(exp => exp.category === selectedExpenseCategory);
+
+    const formatCategoryLabel = (catKey, label) => {
+        if (catKey === 'gastos_comunes') {
+            return 'Pagos de Gastos Comunes / Recaudación';
+        }
+        const rawLabel = label || catKey;
+        return rawLabel
+            .replace(/_/g, ' ')
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    };
+
+    const [newIncomeForm, setNewIncomeForm] = useState({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '' });
+    const [newExpenseForm, setNewExpenseForm] = useState({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '' });
+
+    // Load Catalog once
+    useEffect(() => {
+        axios.get('/api/condo-finances/catalog')
+            .then(res => setFinancialCatalog(res.data))
+            .catch(err => console.error("Error cargando catálogo financiero:", err));
+    }, []);
+
+    // Load Incomes, Expenses & Summary when condo changes
+    const fetchCondoFinances = () => {
+        if (!adminCondoId) return;
+        setLoadingFinances(true);
+        
+        Promise.all([
+            axios.get(`/api/condo-finances/summary?condominium_id=${adminCondoId}`),
+            axios.get(`/api/condo-finances/incomes?condominium_id=${adminCondoId}`),
+            axios.get(`/api/condo-finances/expenses?condominium_id=${adminCondoId}`)
+        ]).then(([summaryRes, incomesRes, expensesRes]) => {
+            setFinanceSummary(summaryRes.data);
+            setIncomesList(incomesRes.data.data || []);
+            setExpensesList(expensesRes.data.data || []);
+            setLoadingFinances(false);
+        }).catch(err => {
+            console.error("Error al cargar finanzas de condominio:", err);
+            setLoadingFinances(false);
+        });
+    };
+
+    const handleSaveIncome = (e) => {
+        e.preventDefault();
+        const data = {
+            condominium_id: adminCondoId,
+            category: newIncomeForm.category,
+            subcategory: newIncomeForm.subcategory || null,
+            amount: Number(newIncomeForm.amount),
+            date: newIncomeForm.date,
+            description: newIncomeForm.description || null,
+            property_id: newIncomeForm.property_id ? Number(newIncomeForm.property_id) : null,
+            user_id: newIncomeForm.user_id ? Number(newIncomeForm.user_id) : null,
+        };
+
+        const req = editingIncome 
+            ? axios.put(`/api/condo-finances/incomes/${editingIncome.id}`, data)
+            : axios.post('/api/condo-finances/incomes', data);
+
+        req.then(() => {
+            fetchCondoFinances();
+            setShowAddIncomeForm(false);
+            setEditingIncome(null);
+            setNewIncomeForm({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '' });
+        }).catch(err => {
+            alert("Error al guardar ingreso: " + (err.response?.data?.message || err.message));
+        });
+    };
+
+    const handleDeleteIncome = (id) => {
+        if (!confirm("¿Seguro que deseas eliminar este ingreso contable?")) return;
+        axios.delete(`/api/condo-finances/incomes/${id}`)
+            .then(() => fetchCondoFinances())
+            .catch(err => alert("Error al eliminar ingreso: " + err.message));
+    };
+
+    const handleSaveExpense = (e) => {
+        e.preventDefault();
+        const data = {
+            condominium_id: adminCondoId,
+            category: newExpenseForm.category,
+            subcategory: newExpenseForm.subcategory || null,
+            amount: Number(newExpenseForm.amount),
+            date: newExpenseForm.date,
+            description: newExpenseForm.description || null,
+            property_id: newExpenseForm.property_id ? Number(newExpenseForm.property_id) : null,
+            user_id: newExpenseForm.user_id ? Number(newExpenseForm.user_id) : null,
+        };
+
+        const req = editingExpense 
+            ? axios.put(`/api/condo-finances/expenses/${editingExpense.id}`, data)
+            : axios.post('/api/condo-finances/expenses', data);
+
+        req.then(() => {
+            fetchCondoFinances();
+            setShowAddExpenseForm(false);
+            setEditingExpense(null);
+            setNewExpenseForm({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '' });
+        }).catch(err => {
+            alert("Error al guardar egreso: " + (err.response?.data?.message || err.message));
+        });
+    };
+
+    const handleDeleteExpense = (id) => {
+        if (!confirm("¿Seguro que deseas eliminar este egreso contable?")) return;
+        axios.delete(`/api/condo-finances/expenses/${id}`)
+            .then(() => fetchCondoFinances())
+            .catch(err => alert("Error al eliminar egreso: " + err.message));
+    };
+
+    useEffect(() => {
+        fetchCondoFinances();
+    }, [adminCondoId]);
+    const [condosList, setCondosList] = useState(
+        allCondominiums.length > 0
+            ? allCondominiums.map(c => ({ id: c.id, name: c.name, address: c.address, city: c.city, units_count: c.units_count, status: c.status }))
+            : [{ id: 1, name: 'Sin Condominios', address: '', city: '', units_count: 0, status: 'inactive' }]
+    );
 
     // Chained Impersonation Filters for DevOps TI
     const [selectedImpCondo, setSelectedImpCondo] = useState('all');
@@ -282,7 +423,6 @@ export default function Dashboard() {
 
     // Administrative Portal States
     const [adminActiveTab, setAdminActiveTab] = useState('dashboard');
-    const [adminCondoId, setAdminCondoId] = useState(1);
     const [userSubTab, setUserSubTab] = useState('residents');
     const [settingsSuccess, setSettingsSuccess] = useState(false);
     const [exportingLogs, setExportingLogs] = useState(false);
@@ -762,44 +902,31 @@ export default function Dashboard() {
             hideNav={!renderAdminView}
             header={
                 <div className="flex items-center justify-between flex-wrap gap-4">
-                    <div className="flex items-center gap-3">
-                        <h2 className="text-xl font-bold leading-tight text-gray-800 dark:text-slate-100 font-sans">
-                            {renderBusinessAdmin ? 'Portal Administrativo RedVecino' : renderTiDevOps ? 'Estación DevOps RedVecino' : 'Portal MiVecino'}
-                        </h2>
-                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                            renderAdminView 
-                                ? renderTiDevOps
-                                    ? 'bg-cyan-500/10 border border-cyan-500/20 text-cyan-500'
-                                    : 'bg-indigo-500/10 border border-indigo-500/20 text-indigo-500'
-                                : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-500'
-                        }`}>
-                            {renderTiDevOps ? 'Rol: Soporte TI' : renderBusinessAdmin ? 'Rol: Administrativo' : 'Rol: Copropietario'}
-                        </span>
+                    <div className="space-y-1 text-left">
+                        <div className="flex items-center gap-3">
+                            <h2 className="text-xl font-black leading-tight text-gray-900 dark:text-white font-sans uppercase tracking-wide">
+                                {renderBusinessAdmin ? 'Portal Administrativo' : renderTiDevOps ? 'Estación DevOps' : 'Portal MiVecino'}
+                            </h2>
+                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase ${
+                                renderAdminView 
+                                    ? renderTiDevOps
+                                        ? 'bg-cyan-500/10 border border-cyan-500/20 text-cyan-500'
+                                        : 'bg-indigo-500/10 border border-indigo-500/20 text-indigo-500'
+                                    : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-500'
+                            }`}>
+                                {renderTiDevOps ? 'Soporte TI' : renderBusinessAdmin ? 'Administrativo' : 'Copropietario'}
+                            </span>
+                        </div>
+                        <p className="text-xs text-gray-500 dark:text-slate-400 font-medium">
+                            {renderTiDevOps 
+                                ? 'Consola de operaciones DevOps, infraestructura y monitoreo global de RedVecino.' 
+                                : renderBusinessAdmin 
+                                    ? 'Panel de gestión para administración de finanzas, tickets y copropiedad.' 
+                                    : 'Acceso residente a copropiedad, historial de pagos y reglamentos en MiVecino.'}
+                        </p>
                     </div>
 
                     <div className="flex items-center gap-3">
-                        {/* Interactive simulation toggle visible only for admins / TI to switch views easily */}
-                        {isActuallyAdmin && (
-                            <button
-                                onClick={() => {
-                                    setSimulationMode(!simulationMode);
-                                    setMobileTab('home');
-                                }}
-                                className={`px-4 py-2 border rounded-xl font-extrabold text-xs shadow-sm transition-all duration-200 flex items-center gap-2 ${
-                                    simulationMode 
-                                        ? 'bg-gradient-to-r from-[#0F2557] to-[#00A896] text-white border-transparent' 
-                                        : 'bg-white hover:bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-[#72B043] dark:text-[#72B043] dark:hover:bg-slate-800'
-                                }`}
-                            >
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
-                                </svg>
-                                {simulationMode ? 'Volver a RedVecino' : 'Ver Vista MiVecino (Residente)'}
-                            </button>
-                        )}
-
-                        <span className="hidden sm:block h-6 w-px bg-gray-200 dark:bg-slate-800" />
-                        
                         <div className="flex items-center gap-2">
                             <span className="text-xs text-gray-500 dark:text-slate-400">Hola,</span>
                             <span className="text-xs font-semibold text-gray-700 dark:text-slate-200">{user.name}</span>
@@ -862,56 +989,13 @@ export default function Dashboard() {
                 <div className="py-8 animate-fade-in font-sans selection:bg-[#00A896]/30">
                     <div className="mx-auto max-w-[1700px] w-full px-4 sm:px-6 lg:px-8 space-y-6">
                         
-                        {renderTiDevOps ? (
-                            /* 💻 TI DevOps Header (always active, no toggle) */
-                            <div className="flex flex-col sm:flex-row items-center justify-between p-6 bg-slate-900 border border-slate-800 rounded-2xl gap-4 shadow-sm relative overflow-hidden">
-                                <div className="absolute -top-10 -left-10 w-40 h-40 bg-[#00A896]/10 rounded-full blur-3xl pointer-events-none" />
-                                <div className="flex items-center gap-4 relative z-10">
-                                    <div className="h-12 w-12 bg-[#00A896]/10 text-[#00A896] flex items-center justify-center rounded-xl border border-[#00A896]/20 shrink-0">
-                                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 010 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.43l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 010-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0Z" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
-                                            Consola de Operaciones DevOps TI
-                                            <span className="px-2 py-0.5 bg-[#00A896]/10 border border-[#00A896]/20 text-[#00A896] text-[10px] font-bold rounded">
-                                                Estación DevOps
-                                            </span>
-                                        </h3>
-                                        <p className="text-xs text-slate-400 mt-1">Panel de infraestructura y monitoreo del sistema. Gestiona usuarios, condominios e inspecciona comunidades.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        ) : renderBusinessAdmin ? (
-                            /* 🏢 Admin Portal Header (no DevOps references) */
-                            <div className="flex flex-col sm:flex-row items-center justify-between p-6 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl gap-4 shadow-sm relative overflow-hidden">
-                                <div className="absolute -top-10 -left-10 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
-                                <div className="flex items-center gap-4 relative z-10">
-                                    <div className="h-12 w-12 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center rounded-xl border border-indigo-500/20 shrink-0">
-                                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-sm font-bold text-gray-900 dark:text-slate-100 flex items-center gap-2">
-                                            Panel de Gestión del Condominio
-                                            <span className="px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded">
-                                                RedVecino
-                                            </span>
-                                        </h3>
-                                        <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">Administra finanzas, tickets, mensajería y ocupación de tu comunidad.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        ) : null}
+
 
                         {devOpsActive ? (
                             <div className="flex bg-slate-950/80 backdrop-blur-xl border border-slate-800/80 rounded-[32px] overflow-hidden shadow-2xl h-[700px] transition-colors duration-300 relative text-slate-350">
                                 {/* 1. LEFT SIDEBAR */}
-                                <div className="w-64 bg-slate-900/90 border-r border-slate-800/80 p-6 flex flex-col justify-between shrink-0 font-sans">
-                                    <div className="space-y-6">
+                                <div className={`w-64 bg-slate-900/90 border-r border-slate-800/80 p-6 flex-col justify-between shrink-0 font-sans md:flex transition-transform duration-300 absolute md:relative inset-y-0 left-0 z-40 md:translate-x-0 ${isMobileDevOpsSidebarOpen ? 'flex translate-x-0' : 'hidden -translate-x-full md:flex'}`}>
+                                    <div className="space-y-6 text-left">
                                         <div className="flex items-center gap-3">
                                             <div className="h-9 w-9 rounded-xl bg-gradient-to-r from-[#0F2557] to-[#00A896] flex items-center justify-center shadow-lg shadow-cyan-950/30">
                                                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
@@ -940,7 +1024,10 @@ export default function Dashboard() {
                                                 <button
                                                     key={tab.id}
                                                     type="button"
-                                                    onClick={() => setTiActiveTab(tab.id)}
+                                                    onClick={() => {
+                                                        setTiActiveTab(tab.id);
+                                                        setIsMobileDevOpsSidebarOpen(false);
+                                                    }}
                                                     className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex flex-col gap-0.5 border ${
                                                         tiActiveTab === tab.id
                                                             ? 'bg-slate-800 border-slate-700 text-white shadow-md'
@@ -985,10 +1072,20 @@ export default function Dashboard() {
                                     <div className="space-y-6">
                                         {/* Dynamic Impersonation Cross-Filtering Panel */}
                                         <div className="bg-slate-900/80 border border-slate-800/80 p-5 rounded-2xl space-y-4 relative overflow-hidden shadow-lg text-left">
-                                            <div className="absolute -top-10 -right-10 w-24 h-24 bg-[#00A896]/5 rounded-full blur-2xl pointer-events-none" />
-                                            <h5 className="text-xs font-bold text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                                                👑 Matriz de Impersonación Inteligente (Cross-Filtering)
-                                            </h5>
+                                            <div className="flex items-center gap-3">
+                                                <button
+                                                    onClick={() => setIsMobileDevOpsSidebarOpen(!isMobileDevOpsSidebarOpen)}
+                                                    className="md:hidden p-2 -ml-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+                                                    aria-label="Abrir menú"
+                                                >
+                                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5-5.25h16.5m-16.5 10.5h16.5" />
+                                                    </svg>
+                                                </button>
+                                                <h5 className="text-xs font-bold text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                                    👑 Matriz de Impersonación Inteligente (Cross-Filtering)
+                                                </h5>
+                                            </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
                                                 <div>
                                                     <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">1. Condominio</label>
@@ -2570,8 +2667,8 @@ export default function Dashboard() {
                                 return (
                                     <div className="flex bg-white dark:bg-slate-900 border border-gray-150 dark:border-slate-800/80 rounded-[32px] overflow-hidden shadow-2xl min-h-[850px] transition-colors duration-300 relative text-gray-700 dark:text-slate-200 font-sans">
                                         {/* 1. LEFT SIDEBAR (Dark Premium Menu) */}
-                                        <div className="w-64 bg-slate-950 text-white p-6 flex flex-col justify-between shrink-0 font-sans">
-                                            <div className="space-y-6">
+                                        <div className={`w-64 bg-slate-950 text-white p-6 flex-col justify-between shrink-0 font-sans md:flex transition-transform duration-300 absolute md:relative inset-y-0 left-0 z-45 md:translate-x-0 ${isMobileSidebarOpen ? 'flex translate-x-0' : 'hidden -translate-x-full md:flex'}`}>
+                                            <div className="space-y-6 text-left">
                                                 {/* Logo */}
                                                 <div className="flex items-center gap-3">
                                                     <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shadow-lg shadow-indigo-500/20">
@@ -2596,8 +2693,9 @@ export default function Dashboard() {
                                                             onChange={(e) => {
                                                                 setAdminCondoId(Number(e.target.value));
                                                                 setAdminActiveTab('dashboard'); // reset to dashboard on condo switch
+                                                                setIsMobileSidebarOpen(false);
                                                             }}
-                                                            className="w-full bg-slate-950 border border-slate-800 rounded-lg py-1.5 px-3 text-xs font-bold text-slate-100 focus:ring-1 focus:ring-indigo-500 focus:outline-none cursor-pointer appearance-none pr-8"
+                                                            className="w-full bg-slate-955 border border-slate-800 rounded-lg py-1.5 px-3 text-xs font-bold text-slate-100 focus:ring-1 focus:ring-indigo-500 focus:outline-none cursor-pointer appearance-none pr-8"
                                                         >
                                                             {condosList.map(c => (
                                                                 <option key={c.id} value={c.id} className="bg-slate-900 text-slate-100">{c.name}</option>
@@ -2622,7 +2720,10 @@ export default function Dashboard() {
                                                         <button
                                                             key={tab.id}
                                                             type="button"
-                                                            onClick={() => setAdminActiveTab(tab.id)}
+                                                            onClick={() => {
+                                                                setAdminActiveTab(tab.id);
+                                                                setIsMobileSidebarOpen(false);
+                                                            }}
                                                             className={`w-full text-left px-4 py-2 rounded-xl transition-all duration-200 group flex flex-col gap-0.5 border ${
                                                                 adminActiveTab === tab.id
                                                                     ? 'bg-indigo-600/20 border-indigo-500/50 text-white shadow-md'
@@ -2673,28 +2774,39 @@ export default function Dashboard() {
                                         <div className="flex-1 flex flex-col bg-gray-50 dark:bg-slate-900/30 p-6 overflow-y-auto max-h-[850px] space-y-6">
                                             {/* Header Section */}
                                             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-gray-200 dark:border-slate-800 pb-4 gap-2 text-left">
-                                                <div>
-                                                    <h2 className="text-lg font-black text-gray-900 dark:text-slate-100 flex items-center gap-2">
-                                                        {adminActiveTab === 'dashboard' && '📊 Panel de Resumen'}
-                                                        {adminActiveTab === 'properties' && '🏢 Propiedades de la Comunidad'}
-                                                        {adminActiveTab === 'users' && '👥 Usuarios y Copropietarios'}
-                                                        {adminActiveTab === 'tickets' && '🛠️ Gestión de Tickets de Soporte'}
-                                                        {adminActiveTab === 'payments' && '💵 Registro de Pagos e Ingresos'}
-                                                        {adminActiveTab === 'fines' && '⚖️ Control de Multas y Sanciones'}
-                                                        {adminActiveTab === 'settings' && '⚙️ Configuración y Ajustes'}
-                                                        <span className="text-xs px-2.5 py-0.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-full font-bold">
-                                                            {condosList.find(c => c.id === adminCondoId)?.name}
-                                                        </span>
-                                                    </h2>
-                                                    <p className="text-xs text-gray-500 dark:text-slate-400">
-                                                        {adminActiveTab === 'dashboard' && 'Monitoreo de ingresos, ocupación, tickets y estado de la comunidad.'}
-                                                        {adminActiveTab === 'properties' && 'Registro de unidades residenciales y estados de ocupación.'}
-                                                        {adminActiveTab === 'users' && 'Listado de residentes, copropietarios y administración.'}
-                                                        {adminActiveTab === 'tickets' && 'Estado y resolución de incidencias en áreas comunes.'}
-                                                        {adminActiveTab === 'payments' && 'Registro, aprobación y control de gastos comunes.'}
-                                                        {adminActiveTab === 'fines' && 'Infracciones al reglamento interno y multas asociadas.'}
-                                                        {adminActiveTab === 'settings' && 'Edición de perfil administrativo y simulación de base de datos.'}
-                                                    </p>
+                                                <div className="flex items-center gap-3">
+                                                    <button
+                                                        onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+                                                        className="md:hidden p-2 -ml-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 transition-colors"
+                                                        aria-label="Abrir menú"
+                                                    >
+                                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5-5.25h16.5m-16.5 10.5h16.5" />
+                                                        </svg>
+                                                    </button>
+                                                    <div>
+                                                        <h2 className="text-lg font-black text-gray-900 dark:text-slate-100 flex items-center gap-2">
+                                                            {adminActiveTab === 'dashboard' && '📊 Panel de Resumen'}
+                                                            {adminActiveTab === 'properties' && '🏢 Propiedades de la Comunidad'}
+                                                            {adminActiveTab === 'users' && '👥 Usuarios y Copropietarios'}
+                                                            {adminActiveTab === 'tickets' && '🛠️ Gestión de Tickets de Soporte'}
+                                                            {adminActiveTab === 'payments' && '💵 Registro de Pagos e Ingresos'}
+                                                            {adminActiveTab === 'fines' && '⚖️ Control de Multas y Sanciones'}
+                                                            {adminActiveTab === 'settings' && '⚙️ Configuración y Ajustes'}
+                                                            <span className="text-xs px-2.5 py-0.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-full font-bold">
+                                                                {condosList.find(c => c.id === adminCondoId)?.name}
+                                                            </span>
+                                                        </h2>
+                                                        <p className="text-xs text-gray-500 dark:text-slate-400">
+                                                            {adminActiveTab === 'dashboard' && 'Monitoreo de ingresos, ocupación, tickets y estado de la comunidad.'}
+                                                            {adminActiveTab === 'properties' && 'Registro de unidades residenciales y estados de ocupación.'}
+                                                            {adminActiveTab === 'users' && 'Listado de residentes, copropietarios y administración.'}
+                                                            {adminActiveTab === 'tickets' && 'Estado y resolución de incidencias en áreas comunes.'}
+                                                            {adminActiveTab === 'payments' && 'Registro, aprobación y control de gastos comunes.'}
+                                                            {adminActiveTab === 'fines' && 'Infracciones al reglamento interno y multas asociadas.'}
+                                                            {adminActiveTab === 'settings' && 'Edición de perfil administrativo y simulación de base de datos.'}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -3384,178 +3496,773 @@ export default function Dashboard() {
                                         {/* 💵 PAYMENTS TAB */}
                                         {adminActiveTab === 'payments' && (
                                             <div className="space-y-6 animate-fade-in text-left">
-                                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                                                    <div>
-                                                        <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">
-                                                            💵 Registro de Recaudación y Gastos Comunes
-                                                        </h4>
-                                                        <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Registra transferencias, pagos con tarjetas y concilia expensas mensuales.</p>
-                                                    </div>
+                                                {/* Tabs header selector */}
+                                                <div className="flex border-b border-gray-150 dark:border-slate-800/80">
                                                     <button
-                                                        onClick={() => {
-                                                            setEditingPayment(null);
-                                                            setNewPaymentForm({ user_id: '', property_id: '', amount: '', payment_method: 'transfer', status: 'completed' });
-                                                            setShowAddPaymentForm(!showAddPaymentForm);
-                                                        }}
-                                                        className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow transition-all"
+                                                        onClick={() => setPaymentsTabMode('payments')}
+                                                        className={`px-6 py-3 font-bold text-xs uppercase tracking-wider transition-all border-b-2 ${paymentsTabMode === 'payments' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' : 'border-transparent text-gray-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
                                                     >
-                                                        {showAddPaymentForm ? 'Cerrar Form' : 'Registrar Pago'}
+                                                        💵 Recaudación (Copropietarios)
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setPaymentsTabMode('ledger')}
+                                                        className={`px-6 py-3 font-bold text-xs uppercase tracking-wider transition-all border-b-2 ${paymentsTabMode === 'ledger' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' : 'border-transparent text-gray-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
+                                                    >
+                                                        ⚖️ Libro Diario Contable
                                                     </button>
                                                 </div>
 
-                                                {showAddPaymentForm && (
-                                                    <form onSubmit={(e) => {
-                                                        e.preventDefault();
-                                                        const selectedUser = usersList.find(u => u.id === Number(newPaymentForm.user_id));
-                                                        if (editingPayment) {
-                                                            setPaymentsList(prev => prev.map(p => p.id === editingPayment.id ? {
-                                                                ...p,
-                                                                amount: Number(newPaymentForm.amount),
-                                                                payment_method: newPaymentForm.payment_method,
-                                                                status: newPaymentForm.status,
-                                                                user: selectedUser ? { id: selectedUser.id, name: selectedUser.name } : p.user
-                                                            } : p));
-                                                            setEditingPayment(null);
-                                                        } else {
-                                                            const newP = {
-                                                                id: paymentsList.length > 0 ? Math.max(...paymentsList.map(p => p.id)) + 1 : 1,
-                                                                property_id: Number(newPaymentForm.property_id),
-                                                                amount: Number(newPaymentForm.amount),
-                                                                payment_method: newPaymentForm.payment_method,
-                                                                status: newPaymentForm.status,
-                                                                payment_date: new Date().toISOString(),
-                                                                user: selectedUser ? { id: selectedUser.id, name: selectedUser.name } : { name: 'Vecino Anonimo' },
-                                                                property: { condominium_id: adminCondoId }
-                                                            };
-                                                            setPaymentsList(prev => [newP, ...prev]);
-                                                        }
-                                                        setShowAddPaymentForm(false);
-                                                        setNewPaymentForm({ user_id: '', property_id: '', amount: '', payment_method: 'transfer', status: 'completed' });
-                                                    }} className="bg-slate-50 dark:bg-slate-900/60 p-6 rounded-2xl border border-gray-200 dark:border-slate-800 space-y-4 max-w-xl text-left">
-                                                        <h5 className="text-xs font-bold text-gray-800 dark:text-slate-200 uppercase">{editingPayment ? '✏️ Editar Registro de Pago' : '💵 Registrar Nuevo Pago'}</h5>
-                                                        <div className="grid grid-cols-2 gap-4">
+                                                {paymentsTabMode === 'payments' ? (
+                                                    // --- ORIGINAL MODE: Copropietarios (Payments list & local CRUD) ---
+                                                    <div className="space-y-6 animate-fade-in text-left">
+                                                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                                                             <div>
-                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Propiedad Asociada</label>
-                                                                <select
-                                                                    required
-                                                                    value={newPaymentForm.property_id}
-                                                                    onChange={(e) => setNewPaymentForm(prev => ({ ...prev, property_id: e.target.value }))}
-                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
-                                                                >
-                                                                    <option value="">Seleccione Unidad...</option>
-                                                                    {adminFilteredProperties.map(p => (
-                                                                        <option key={p.id} value={p.id}>Depto #{p.number}</option>
-                                                                    ))}
-                                                                </select>
+                                                                <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">
+                                                                    💵 Registro de Recaudación y Gastos Comunes
+                                                                </h4>
+                                                                <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Registra transferencias, pagos con tarjetas y concilia expensas mensuales.</p>
                                                             </div>
-                                                            <div>
-                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Vecino Pagador</label>
-                                                                <select
-                                                                    required
-                                                                    value={newPaymentForm.user_id}
-                                                                    onChange={(e) => setNewPaymentForm(prev => ({ ...prev, user_id: e.target.value }))}
-                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
-                                                                >
-                                                                    <option value="">Seleccione Residente...</option>
-                                                                    {adminFilteredUsers.map(u => (
-                                                                        <option key={u.id} value={u.id}>{u.name}</option>
-                                                                    ))}
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div className="grid grid-cols-3 gap-4">
-                                                            <div>
-                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto ($)</label>
-                                                                <input
-                                                                    type="number"
-                                                                    required
-                                                                    value={newPaymentForm.amount}
-                                                                    onChange={(e) => setNewPaymentForm(prev => ({ ...prev, amount: e.target.value }))}
-                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
-                                                                />
-                                                            </div>
-                                                            <div>
-                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Medio de Pago</label>
-                                                                <select
-                                                                    value={newPaymentForm.payment_method}
-                                                                    onChange={(e) => setNewPaymentForm(prev => ({ ...prev, payment_method: e.target.value }))}
-                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-850 dark:text-white focus:outline-none"
-                                                                >
-                                                                    <option value="transfer">Transferencia</option>
-                                                                    <option value="card">Tarjeta Débito/Crédito</option>
-                                                                    <option value="cash">Efectivo / Depósito</option>
-                                                                </select>
-                                                            </div>
-                                                            <div>
-                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado Conciliación</label>
-                                                                <select
-                                                                    value={newPaymentForm.status}
-                                                                    onChange={(e) => setNewPaymentForm(prev => ({ ...prev, status: e.target.value }))}
-                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-850 dark:text-white focus:outline-none"
-                                                                >
-                                                                    <option value="completed">Completado</option>
-                                                                    <option value="pending">Pendiente</option>
-                                                                    <option value="failed">Rechazado</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex gap-2">
-                                                            <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow">
-                                                                {editingPayment ? 'Guardar Cambios' : 'Registrar'}
-                                                            </button>
-                                                            <button type="button" onClick={() => { setShowAddPaymentForm(false); setEditingPayment(null); }} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl">
-                                                                Cancelar
+                                                            <button
+                                                                onClick={() => {
+                                                                    setEditingPayment(null);
+                                                                    setNewPaymentForm({ user_id: '', property_id: '', amount: '', payment_method: 'transfer', status: 'completed' });
+                                                                    setShowAddPaymentForm(!showAddPaymentForm);
+                                                                }}
+                                                                className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow transition-all"
+                                                            >
+                                                                {showAddPaymentForm ? 'Cerrar Form' : 'Registrar Pago'}
                                                             </button>
                                                         </div>
-                                                    </form>
-                                                )}
 
-                                                <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
-                                                    <SimpleTable
-                                                        headers={['Vecino', 'Propiedad', 'Monto', 'Método', 'Fecha', 'Estado', 'Acciones']}
-                                                        rows={adminFilteredPayments.map(p => ({
-                                                            cells: [
-                                                                <span className="font-bold text-gray-900 dark:text-white">{p.user?.name || 'Vecino'}</span>,
-                                                                <span className="font-bold">Depto #{p.property_id}</span>,
-                                                                <span className="font-bold text-emerald-600 dark:text-emerald-450">${Number(p.amount).toLocaleString()}</span>,
-                                                                <span className="capitalize font-mono text-xs">{p.payment_method === 'transfer' ? 'Transferencia' : p.payment_method === 'card' ? 'Tarjeta' : 'Efectivo'}</span>,
-                                                                <span>{new Date(p.payment_date).toLocaleDateString('es-CL')}</span>,
-                                                                <StatusBadge status={p.status} type="payment" />,
-                                                                <div className="flex items-center gap-2 justify-end">
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => {
-                                                                            setEditingPayment(p);
-                                                                            setNewPaymentForm({
-                                                                                user_id: String(p.user?.id || ''),
-                                                                                property_id: String(p.property_id),
-                                                                                amount: String(p.amount),
-                                                                                payment_method: p.payment_method,
-                                                                                status: p.status
-                                                                            });
-                                                                            setShowAddPaymentForm(true);
-                                                                        }}
-                                                                        className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-[10px] font-bold rounded-lg transition-all"
-                                                                    >
-                                                                        ✏️ Editar
+                                                        {showAddPaymentForm && (
+                                                            <form onSubmit={(e) => {
+                                                                e.preventDefault();
+                                                                const selectedUser = usersList.find(u => u.id === Number(newPaymentForm.user_id));
+                                                                if (editingPayment) {
+                                                                    setPaymentsList(prev => prev.map(p => p.id === editingPayment.id ? {
+                                                                        ...p,
+                                                                        amount: Number(newPaymentForm.amount),
+                                                                        payment_method: newPaymentForm.payment_method,
+                                                                        status: newPaymentForm.status,
+                                                                        user: selectedUser ? { id: selectedUser.id, name: selectedUser.name } : p.user
+                                                                    } : p));
+                                                                    setEditingPayment(null);
+                                                                } else {
+                                                                    const newP = {
+                                                                        id: paymentsList.length > 0 ? Math.max(...paymentsList.map(p => p.id)) + 1 : 1,
+                                                                        property_id: Number(newPaymentForm.property_id),
+                                                                        amount: Number(newPaymentForm.amount),
+                                                                        payment_method: newPaymentForm.payment_method,
+                                                                        status: newPaymentForm.status,
+                                                                        payment_date: new Date().toISOString(),
+                                                                        user: selectedUser ? { id: selectedUser.id, name: selectedUser.name } : { name: 'Vecino Anonimo' },
+                                                                        property: { condominium_id: adminCondoId }
+                                                                    };
+                                                                    setPaymentsList(prev => [newP, ...prev]);
+                                                                }
+                                                                setShowAddPaymentForm(false);
+                                                                setNewPaymentForm({ user_id: '', property_id: '', amount: '', payment_method: 'transfer', status: 'completed' });
+                                                            }} className="bg-slate-50 dark:bg-slate-900/60 p-6 rounded-2xl border border-gray-200 dark:border-slate-800 space-y-4 max-w-xl text-left">
+                                                                <h5 className="text-xs font-bold text-gray-800 dark:text-slate-200 uppercase">{editingPayment ? '✏️ Editar Registro de Pago' : '💵 Registrar Nuevo Pago'}</h5>
+                                                                <div className="grid grid-cols-2 gap-4">
+                                                                    <div>
+                                                                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Propiedad Asociada</label>
+                                                                        <select
+                                                                            required
+                                                                            value={newPaymentForm.property_id}
+                                                                            onChange={(e) => setNewPaymentForm(prev => ({ ...prev, property_id: e.target.value }))}
+                                                                            className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                        >
+                                                                            <option value="">Seleccione Unidad...</option>
+                                                                            {adminFilteredProperties.map(p => (
+                                                                                <option key={p.id} value={p.id}>Depto #{p.number}</option>
+                                                                            ))}
+                                                                        </select>
+                                                                    </div>
+                                                                    <div>
+                                                                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Vecino Pagador</label>
+                                                                        <select
+                                                                            required
+                                                                            value={newPaymentForm.user_id}
+                                                                            onChange={(e) => setNewPaymentForm(prev => ({ ...prev, user_id: e.target.value }))}
+                                                                            className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                        >
+                                                                            <option value="">Seleccione Residente...</option>
+                                                                            {adminFilteredUsers.map(u => (
+                                                                                <option key={u.id} value={u.id}>{u.name}</option>
+                                                                            ))}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="grid grid-cols-3 gap-4">
+                                                                    <div>
+                                                                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto ($)</label>
+                                                                        <input
+                                                                            type="number"
+                                                                            required
+                                                                            value={newPaymentForm.amount}
+                                                                            onChange={(e) => setNewPaymentForm(prev => ({ ...prev, amount: e.target.value }))}
+                                                                            className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                        />
+                                                                    </div>
+                                                                    <div>
+                                                                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Medio de Pago</label>
+                                                                        <select
+                                                                            value={newPaymentForm.payment_method}
+                                                                            onChange={(e) => setNewPaymentForm(prev => ({ ...prev, payment_method: e.target.value }))}
+                                                                            className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-850 dark:text-white focus:outline-none"
+                                                                        >
+                                                                            <option value="transfer">Transferencia</option>
+                                                                            <option value="card">Tarjeta Débito/Crédito</option>
+                                                                            <option value="cash">Efectivo / Depósito</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div>
+                                                                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado Conciliación</label>
+                                                                        <select
+                                                                            value={newPaymentForm.status}
+                                                                            onChange={(e) => setNewPaymentForm(prev => ({ ...prev, status: e.target.value }))}
+                                                                            className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-850 dark:text-white focus:outline-none"
+                                                                        >
+                                                                            <option value="completed">Completado</option>
+                                                                            <option value="pending">Pendiente</option>
+                                                                            <option value="failed">Rechazado</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex gap-2">
+                                                                    <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-550 text-white font-bold text-xs rounded-xl shadow">
+                                                                        {editingPayment ? 'Guardar Cambios' : 'Registrar'}
                                                                     </button>
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => {
-                                                                            if (confirm('¿Desea eliminar este registro de pago?')) {
-                                                                                setPaymentsList(prev => prev.filter(item => item.id !== p.id));
-                                                                            }
-                                                                        }}
-                                                                        className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-bold rounded-lg transition-all"
-                                                                    >
-                                                                        🗑️ Eliminar
+                                                                    <button type="button" onClick={() => { setShowAddPaymentForm(false); setEditingPayment(null); }} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl">
+                                                                        Cancelar
                                                                     </button>
                                                                 </div>
-                                                            ]
-                                                        }))}
-                                                        emptyMessage="No hay cobros ni ingresos registrados para este condominio"
-                                                    />
-                                                </div>
+                                                            </form>
+                                                        )}
+
+                                                        <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+                                                            <SimpleTable
+                                                                headers={['Vecino', 'Propiedad', 'Monto', 'Método', 'Fecha', 'Estado', 'Acciones']}
+                                                                rows={adminFilteredPayments.map(p => ({
+                                                                    cells: [
+                                                                        <span className="font-bold text-gray-900 dark:text-white">{p.user?.name || 'Vecino'}</span>,
+                                                                        <span className="font-bold">Depto #{p.property_id}</span>,
+                                                                        <span className="font-bold text-emerald-600 dark:text-emerald-450">${Number(p.amount).toLocaleString()}</span>,
+                                                                        <span className="capitalize font-mono text-xs">{p.payment_method === 'transfer' ? 'Transferencia' : p.payment_method === 'card' ? 'Tarjeta' : 'Efectivo'}</span>,
+                                                                        <span>{new Date(p.payment_date).toLocaleDateString('es-CL')}</span>,
+                                                                        <StatusBadge status={p.status} type="payment" />,
+                                                                        <div className="flex items-center gap-2 justify-end">
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => {
+                                                                                    setEditingPayment(p);
+                                                                                    setNewPaymentForm({
+                                                                                        user_id: String(p.user?.id || ''),
+                                                                                        property_id: String(p.property_id),
+                                                                                        amount: String(p.amount),
+                                                                                        payment_method: p.payment_method,
+                                                                                        status: p.status
+                                                                                    });
+                                                                                    setShowAddPaymentForm(true);
+                                                                                }}
+                                                                                className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-[10px] font-bold rounded-lg transition-all"
+                                                                            >
+                                                                                ✏️ Editar
+                                                                            </button>
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => {
+                                                                                    if (confirm('¿Desea eliminar este registro de pago?')) {
+                                                                                        setPaymentsList(prev => prev.filter(item => item.id !== p.id));
+                                                                                    }
+                                                                                }}
+                                                                                className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-bold rounded-lg transition-all"
+                                                                            >
+                                                                                🗑️ Eliminar
+                                                                            </button>
+                                                                        </div>
+                                                                    ]
+                                                                }))}
+                                                                emptyMessage="No hay cobros ni ingresos registrados para este condominio"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    // --- NEW MODE: Libro Diario Contable (Real backend API with financial categories breakdown) ---
+                                                    <div className="space-y-6 animate-fade-in">
+                                                        {/* Summary KPIs */}
+                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                                                            <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm border border-gray-100 dark:border-slate-800/80">
+                                                                <div className="flex justify-between items-start">
+                                                                    <div>
+                                                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Ingresos Contables</p>
+                                                                        <h3 className="text-xl font-black text-emerald-600 dark:text-emerald-450 mt-1">${Number(financeSummary.total_incomes).toLocaleString()}</h3>
+                                                                    </div>
+                                                                    <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-500">📥</div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm border border-gray-100 dark:border-slate-800/80">
+                                                                <div className="flex justify-between items-start">
+                                                                    <div>
+                                                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Egresos Contables</p>
+                                                                        <h3 className="text-xl font-black text-rose-650 dark:text-rose-450 mt-1">${Number(financeSummary.total_expenses).toLocaleString()}</h3>
+                                                                    </div>
+                                                                    <div className="p-2 bg-rose-500/10 rounded-xl text-rose-500">📤</div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm border border-gray-100 dark:border-slate-800/80">
+                                                                <div className="flex justify-between items-start">
+                                                                    <div>
+                                                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Balance de Caja</p>
+                                                                        <h3 className={`text-xl font-black mt-1 ${Number(financeSummary.balance) >= 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-amber-600 dark:text-amber-500'}`}>
+                                                                            ${Number(financeSummary.balance).toLocaleString()}
+                                                                        </h3>
+                                                                    </div>
+                                                                    <div className={`p-2 rounded-xl ${Number(financeSummary.balance) >= 0 ? 'bg-indigo-500/10 text-indigo-500' : 'bg-amber-500/10 text-amber-500'}`}>⚖️</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Proportional Balance Bar Chart */}
+                                                        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-2.5 text-left">
+                                                            <div className="flex justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                                                <span>📥 Ingresos: ${Number(financeSummary.total_incomes).toLocaleString('es-CL')} ({Math.round(Number(financeSummary.total_incomes) / (Number(financeSummary.total_incomes) + Number(financeSummary.total_expenses) || 1) * 100)}%)</span>
+                                                                <span>📤 Egresos: ${Number(financeSummary.total_expenses).toLocaleString('es-CL')} ({Math.round(Number(financeSummary.total_expenses) / (Number(financeSummary.total_incomes) + Number(financeSummary.total_expenses) || 1) * 100)}%)</span>
+                                                            </div>
+                                                            <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-3.5 flex overflow-hidden">
+                                                                <div style={{ width: `${Number(financeSummary.total_incomes) / (Number(financeSummary.total_incomes) + Number(financeSummary.total_expenses) || 1) * 100}%` }} className="bg-emerald-500 h-full transition-all duration-500" />
+                                                                <div style={{ width: `${Number(financeSummary.total_expenses) / (Number(financeSummary.total_incomes) + Number(financeSummary.total_expenses) || 1) * 100}%` }} className="bg-rose-500 h-full transition-all duration-500" />
+                                                            </div>
+                                                        </div>
+ 
+                                                        {/* Dynamic Categories breakdown list with horizontal progress bars */}
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                            {/* Income categories breakdown */}
+                                                            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-4">
+                                                                <div>
+                                                                    <h5 className="text-xs font-black text-slate-850 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                                                                        <span>📥</span> Distribución de Ingresos
+                                                                    </h5>
+                                                                    <p className="text-[10px] text-slate-400 mt-0.5">Participación de cada categoría en la recaudación total. Haz clic en una categoría para filtrar.</p>
+                                                                </div>
+                                                                <div className="space-y-3">
+                                                                    {Object.keys(financialCatalog.incomes || {}).map(catKey => {
+                                                                        const amount = Number(financeSummary.incomes_by_category?.[catKey] || 0);
+                                                                        const totalIncomes = Number(financeSummary.total_incomes) || 1;
+                                                                        const percentage = Math.round((amount / totalIncomes) * 100);
+                                                                        const labelVal = financialCatalog.incomes[catKey]?.label || catKey;
+                                                                        const name = formatCategoryLabel(catKey, labelVal);
+                                                                        const icons = { gastos_comunes: '💵', multas: '⚖️', arriendo_espacios: '🎪', intereses_mora: '📈', cuotas_extraordinarias: '🚨', publicidad_convenio: '📢' };
+                                                                        const icon = icons[catKey] || '💰';
+                                                                        const isActive = selectedIncomeCategory === catKey;
+                                                                        
+                                                                        return (
+                                                                            <button
+                                                                                key={catKey}
+                                                                                onClick={() => {
+                                                                                    setSelectedIncomeCategory(isActive ? 'all' : catKey);
+                                                                                    setLedgerSubTab('incomes');
+                                                                                    setPaymentsTabMode('ledger');
+                                                                                }}
+                                                                                className={`w-full text-left space-y-1 p-2 rounded-xl transition-all duration-200 border hover:bg-slate-50 dark:hover:bg-slate-850 ${isActive ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-transparent border-transparent'}`}
+                                                                            >
+                                                                                <div className="flex justify-between text-xs">
+                                                                                    <span className="font-semibold text-slate-700 dark:text-slate-350">{icon} {name}</span>
+                                                                                    <span className="font-bold text-slate-850 dark:text-white">${amount.toLocaleString('es-CL')} <span className="text-[10px] text-slate-400 font-normal">({percentage}%)</span></span>
+                                                                                </div>
+                                                                                <div className="w-full bg-slate-100 dark:bg-slate-800/80 rounded-full h-2 overflow-hidden">
+                                                                                    <div style={{ width: `${percentage}%` }} className="bg-emerald-500 h-full rounded-full transition-all duration-300" />
+                                                                                </div>
+                                                                            </button>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            </div>
+ 
+                                                            {/* Expense categories breakdown */}
+                                                            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-4">
+                                                                <div>
+                                                                    <h5 className="text-xs font-black text-slate-850 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                                                                        <span>📤</span> Distribución de Egresos
+                                                                    </h5>
+                                                                    <p className="text-[10px] text-slate-400 mt-0.5">Destino de los fondos del condominio en la operación mensual. Haz clic en una categoría para filtrar.</p>
+                                                                </div>
+                                                                <div className="space-y-3">
+                                                                    {Object.keys(financialCatalog.expenses || {}).map(catKey => {
+                                                                        const amount = Number(financeSummary.expenses_by_category?.[catKey] || 0);
+                                                                        const totalExpenses = Number(financeSummary.total_expenses) || 1;
+                                                                        const percentage = Math.round((amount / totalExpenses) * 100);
+                                                                        const labelVal = financialCatalog.expenses[catKey]?.label || catKey;
+                                                                        const name = formatCategoryLabel(catKey, labelVal);
+                                                                        const icons = { personal: '👷', servicios_basicos: '💧', mantencion: '🔧', seguridad: '🛡️', limpieza: '🧹', reparacion: '🔧', seguros: '☂️', administracion: '📁', fondo_reserva: '🏦', otro: '💸' };
+                                                                        const icon = icons[catKey] || '💸';
+                                                                        const isActive = selectedExpenseCategory === catKey;
+                                                                        
+                                                                        return (
+                                                                            <button
+                                                                                key={catKey}
+                                                                                onClick={() => {
+                                                                                    setSelectedExpenseCategory(isActive ? 'all' : catKey);
+                                                                                    setLedgerSubTab('expenses');
+                                                                                    setPaymentsTabMode('ledger');
+                                                                                }}
+                                                                                className={`w-full text-left space-y-1 p-2 rounded-xl transition-all duration-200 border hover:bg-slate-50 dark:hover:bg-slate-850 ${isActive ? 'bg-rose-500/10 border-rose-500/30' : 'bg-transparent border-transparent'}`}
+                                                                            >
+                                                                                <div className="flex justify-between text-xs">
+                                                                                    <span className="font-semibold text-slate-700 dark:text-slate-350">{icon} {name}</span>
+                                                                                    <span className="font-bold text-slate-850 dark:text-white">${amount.toLocaleString('es-CL')} <span className="text-[10px] text-slate-400 font-normal">({percentage}%)</span></span>
+                                                                                </div>
+                                                                                <div className="w-full bg-slate-100 dark:bg-slate-800/80 rounded-full h-2 overflow-hidden">
+                                                                                    <div style={{ width: `${percentage}%` }} className="bg-rose-500 h-full rounded-full transition-all duration-300" />
+                                                                                </div>
+                                                                            </button>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Sub-tabs switch (Incomes vs Expenses CRUD lists) */}
+                                                        <div className="flex gap-2.5">
+                                                            <button
+                                                                onClick={() => setLedgerSubTab('incomes')}
+                                                                className={`px-4.5 py-2 rounded-xl text-xs font-extrabold transition-all border ${ledgerSubTab === 'incomes' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 shadow-sm' : 'bg-slate-100 dark:bg-slate-800/60 hover:bg-slate-200 border-transparent text-slate-500 dark:text-slate-400'}`}
+                                                            >
+                                                                📥 Libro de Ingresos Contables
+                                                            </button>
+                                                            <button
+                                                                onClick={() => setLedgerSubTab('expenses')}
+                                                                className={`px-4.5 py-2 rounded-xl text-xs font-extrabold transition-all border ${ledgerSubTab === 'expenses' ? 'bg-rose-500/10 text-rose-650 dark:text-rose-400 border-rose-500/30 shadow-sm' : 'bg-slate-100 dark:bg-slate-800/60 hover:bg-slate-200 border-transparent text-slate-500 dark:text-slate-400'}`}
+                                                            >
+                                                                📤 Libro de Egresos Contables
+                                                            </button>
+                                                        </div>
+
+                                                        {loadingFinances ? (
+                                                            <div className="flex items-center justify-center py-16 gap-3">
+                                                                <span className="animate-spin text-xl">⏳</span>
+                                                                <span className="text-xs font-bold text-slate-400">Actualizando libro contable...</span>
+                                                            </div>
+                                                        ) : ledgerSubTab === 'incomes' ? (
+                                                            // ================= INCOME SECTION =================
+                                                            <div className="space-y-4">
+                                                                <div className="flex items-center justify-between">
+                                                                    <div className="flex items-center gap-2 text-left">
+                                                                        <span className="text-xs font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Historial de Ingresos Contables ({filteredIncomes.length} / {incomesList.length})</span>
+                                                                        {selectedIncomeCategory !== 'all' && (
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => setSelectedIncomeCategory('all')}
+                                                                                className="px-2 py-0.5 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-600 dark:text-emerald-400 text-[10px] font-black rounded-lg transition-all"
+                                                                            >
+                                                                                Limpiar Filtro ×
+                                                                            </button>
+                                                                        )}
+                                                                    </div>
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            setEditingIncome(null);
+                                                                            setNewIncomeForm({ category: '', subcategory: '', amount: '', date: new Date().toISOString().substring(0, 10), description: '', property_id: '', user_id: '' });
+                                                                            setShowAddIncomeForm(!showAddIncomeForm);
+                                                                        }}
+                                                                        className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-550 text-white font-bold text-xs rounded-xl shadow transition-all"
+                                                                    >
+                                                                        {showAddIncomeForm ? 'Cerrar Formulario' : '➕ Registrar Ingreso'}
+                                                                    </button>
+                                                                </div>
+
+                                                                {showAddIncomeForm && (
+                                                                    <form onSubmit={handleSaveIncome} className="bg-slate-50 dark:bg-slate-900/60 p-6 rounded-2xl border border-gray-200 dark:border-slate-800 space-y-4 max-w-2xl text-left">
+                                                                        <h5 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">{editingIncome ? '✏️ Editar Ingreso Contable' : '📥 Registrar Nuevo Ingreso Contable'}</h5>
+                                                                        
+                                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                            <div>
+                                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Categoría Financiera</label>
+                                                                                <select
+                                                                                    required
+                                                                                    value={newIncomeForm.category}
+                                                                                    onChange={(e) => setNewIncomeForm(prev => ({ ...prev, category: e.target.value, subcategory: '' }))}
+                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                >
+                                                                                    <option value="">Seleccione Categoría...</option>
+                                                                                    {Object.entries(financialCatalog.incomes || {}).map(([key, obj]) => (
+                                                                                        <option key={key} value={key}>{formatCategoryLabel(key, obj.label)}</option>
+                                                                                    ))}
+                                                                                </select>
+                                                                            </div>
+
+                                                                            <div>
+                                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Subcategoría Específica</label>
+                                                                                <select
+                                                                                    required
+                                                                                    value={newIncomeForm.subcategory}
+                                                                                    onChange={(e) => setNewIncomeForm(prev => ({ ...prev, subcategory: e.target.value }))}
+                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    disabled={!newIncomeForm.category}
+                                                                                >
+                                                                                    <option value="">Seleccione Subcategoría...</option>
+                                                                                    {Object.entries(financialCatalog.incomes?.[newIncomeForm.category]?.subcategories || {}).map(([subKey, subName]) => (
+                                                                                        <option key={subKey} value={subName}>{subName}</option>
+                                                                                    ))}
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                                            <div>
+                                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto ($ CLP)</label>
+                                                                                <input
+                                                                                    type="number"
+                                                                                    required
+                                                                                    value={newIncomeForm.amount}
+                                                                                    onChange={(e) => setNewIncomeForm(prev => ({ ...prev, amount: e.target.value }))}
+                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    placeholder="Monto"
+                                                                                />
+                                                                            </div>
+
+                                                                            <div>
+                                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Fecha Registro</label>
+                                                                                <input
+                                                                                    type="date"
+                                                                                    required
+                                                                                    value={newIncomeForm.date}
+                                                                                    onChange={(e) => setNewIncomeForm(prev => ({ ...prev, date: e.target.value }))}
+                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                />
+                                                                            </div>
+
+                                                                            <div>
+                                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Unidad (Opcional)</label>
+                                                                                <select
+                                                                                    value={newIncomeForm.property_id}
+                                                                                    onChange={(e) => setNewIncomeForm(prev => ({ ...prev, property_id: e.target.value }))}
+                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                >
+                                                                                    <option value="">Ninguna...</option>
+                                                                                    {adminFilteredProperties.map(p => (
+                                                                                        <option key={p.id} value={p.id}>Depto #{p.number}</option>
+                                                                                    ))}
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                            <div>
+                                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Residente Copropietario (Opcional)</label>
+                                                                                <select
+                                                                                    value={newIncomeForm.user_id}
+                                                                                    onChange={(e) => setNewIncomeForm(prev => ({ ...prev, user_id: e.target.value }))}
+                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                >
+                                                                                    <option value="">Ninguno...</option>
+                                                                                    {adminFilteredUsers.map(u => (
+                                                                                        <option key={u.id} value={u.id}>{u.name}</option>
+                                                                                    ))}
+                                                                                </select>
+                                                                            </div>
+
+                                                                            <div>
+                                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Descripción / Detalles</label>
+                                                                                <input
+                                                                                    type="text"
+                                                                                    value={newIncomeForm.description}
+                                                                                    onChange={(e) => setNewIncomeForm(prev => ({ ...prev, description: e.target.value }))}
+                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    placeholder="Comentarios adicionales o detalle del pago"
+                                                                                />
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div className="flex gap-2">
+                                                                            <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-550 text-white font-bold text-xs rounded-xl shadow">
+                                                                                {editingIncome ? 'Guardar Cambios' : 'Registrar'}
+                                                                            </button>
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => {
+                                                                                    setShowAddIncomeForm(false);
+                                                                                    setEditingIncome(null);
+                                                                                    setNewIncomeForm({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '' });
+                                                                                }}
+                                                                                className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl"
+                                                                            >
+                                                                                Cancelar
+                                                                            </button>
+                                                                        </div>
+                                                                    </form>
+                                                                )}
+
+                                                                <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+                                                                    <SimpleTable
+                                                                        headers={['Categoría', 'Subcategoría', 'Monto', 'Fecha', 'Detalles', 'Unidad/Vecino', 'Acciones']}
+                                                                        rows={filteredIncomes.map(inc => {
+                                                                            const labelVal = financialCatalog.incomes?.[inc.category]?.label || inc.category;
+                                                                            const catName = formatCategoryLabel(inc.category, labelVal);
+                                                                            const subName = inc.subcategory || 'N/A';
+                                                                            
+                                                                            const icons = { gastos_comunes: '💵', multas: '⚖️', arriendo_espacios: '🎪', intereses_mora: '📈', cuotas_extraordinarias: '🚨', publicidad_convenios: '📢' };
+                                                                            const icon = icons[inc.category] || '💰';
+
+                                                                            return {
+                                                                                cells: [
+                                                                                    <span className="font-extrabold text-slate-850 dark:text-white flex items-center gap-1.5">{icon} {catName}</span>,
+                                                                                    <span className="font-semibold text-slate-500 dark:text-slate-400">{subName}</span>,
+                                                                                    <span className="font-bold text-emerald-600 dark:text-emerald-450">${Number(inc.amount).toLocaleString()}</span>,
+                                                                                    <span>{new Date(inc.date + 'T12:00:00').toLocaleDateString('es-CL')}</span>,
+                                                                                    <span className="text-xs truncate max-w-xs block text-slate-505 dark:text-slate-400" title={inc.description}>{inc.description || '—'}</span>,
+                                                                                    <div>
+                                                                                        {inc.property && <span className="font-bold block text-xs">Depto #{inc.property.number}</span>}
+                                                                                        {inc.user && <span className="text-[10px] text-slate-400 block">{inc.user.name}</span>}
+                                                                                        {!inc.property && !inc.user && <span className="text-slate-450 text-[10px]">—</span>}
+                                                                                    </div>,
+                                                                                    <div className="flex items-center gap-2 justify-end">
+                                                                                        <button
+                                                                                            type="button"
+                                                                                            onClick={() => {
+                                                                                                setEditingIncome(inc);
+                                                                                                setNewIncomeForm({
+                                                                                                    category: inc.category,
+                                                                                                    subcategory: inc.subcategory || '',
+                                                                                                    amount: String(inc.amount),
+                                                                                                    date: inc.date ? inc.date.substring(0, 10) : '',
+                                                                                                    description: inc.description || '',
+                                                                                                    property_id: inc.property_id ? String(inc.property_id) : '',
+                                                                                                    user_id: inc.user_id ? String(inc.user_id) : ''
+                                                                                                });
+                                                                                                setShowAddIncomeForm(true);
+                                                                                            }}
+                                                                                            className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-[10px] font-bold rounded-lg transition-all"
+                                                                                        >
+                                                                                            ✏️ Editar
+                                                                                        </button>
+                                                                                        <button
+                                                                                            type="button"
+                                                                                            onClick={() => handleDeleteIncome(inc.id)}
+                                                                                            className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-bold rounded-lg transition-all"
+                                                                                        >
+                                                                                            🗑️ Eliminar
+                                                                                        </button>
+                                                                                    </div>
+                                                                                ]
+                                                                            };
+                                                                        })}
+                                                                        emptyMessage="No hay ingresos contables registrados en el libro diario para este condominio"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            // ================= EXPENSE SECTION =================
+                                                            <div className="space-y-4">
+                                                                <div className="flex items-center justify-between">
+                                                                    <div className="flex items-center gap-2 text-left">
+                                                                        <span className="text-xs font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Historial de Egresos Contables ({filteredExpenses.length} / {expensesList.length})</span>
+                                                                        {selectedExpenseCategory !== 'all' && (
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => setSelectedExpenseCategory('all')}
+                                                                                className="px-2 py-0.5 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-650 dark:text-rose-455 text-[10px] font-black rounded-lg transition-all"
+                                                                            >
+                                                                                Limpiar Filtro ×
+                                                                            </button>
+                                                                        )}
+                                                                    </div>
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            setEditingExpense(null);
+                                                                            setNewExpenseForm({ category: '', subcategory: '', amount: '', date: new Date().toISOString().substring(0, 10), description: '', property_id: '', user_id: '' });
+                                                                            setShowAddExpenseForm(!showAddExpenseForm);
+                                                                        }}
+                                                                        className="px-3 py-1.5 bg-rose-650 hover:bg-rose-600 text-white font-bold text-xs rounded-xl shadow transition-all"
+                                                                    >
+                                                                        {showAddExpenseForm ? 'Cerrar Formulario' : '➕ Registrar Egreso'}
+                                                                    </button>
+                                                                </div>
+
+                                                                {showAddExpenseForm && (
+                                                                    <form onSubmit={handleSaveExpense} className="bg-slate-50 dark:bg-slate-900/60 p-6 rounded-2xl border border-gray-200 dark:border-slate-800 space-y-4 max-w-2xl text-left">
+                                                                        <h5 className="text-xs font-bold text-rose-650 dark:text-rose-455 uppercase tracking-wide">{editingExpense ? '✏️ Editar Egreso Contable' : '📤 Registrar Nuevo Egreso Contable'}</h5>
+                                                                        
+                                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                            <div>
+                                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Categoría Financiera</label>
+                                                                                <select
+                                                                                    required
+                                                                                    value={newExpenseForm.category}
+                                                                                    onChange={(e) => setNewExpenseForm(prev => ({ ...prev, category: e.target.value, subcategory: '' }))}
+                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                >
+                                                                                    <option value="">Seleccione Categoría...</option>
+                                                                                    {Object.entries(financialCatalog.expenses || {}).map(([key, obj]) => (
+                                                                                        <option key={key} value={key}>{formatCategoryLabel(key, obj.label)}</option>
+                                                                                    ))}
+                                                                                </select>
+                                                                            </div>
+
+                                                                            <div>
+                                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Subcategoría Específica</label>
+                                                                                <select
+                                                                                    required
+                                                                                    value={newExpenseForm.subcategory}
+                                                                                    onChange={(e) => setNewExpenseForm(prev => ({ ...prev, subcategory: e.target.value }))}
+                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    disabled={!newExpenseForm.category}
+                                                                                >
+                                                                                    <option value="">Seleccione Subcategoría...</option>
+                                                                                    {Object.entries(financialCatalog.expenses?.[newExpenseForm.category]?.subcategories || {}).map(([subKey, subName]) => (
+                                                                                        <option key={subKey} value={subName}>{subName}</option>
+                                                                                    ))}
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                                            <div>
+                                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto ($ CLP)</label>
+                                                                                <input
+                                                                                    type="number"
+                                                                                    required
+                                                                                    value={newExpenseForm.amount}
+                                                                                    onChange={(e) => setNewExpenseForm(prev => ({ ...prev, amount: e.target.value }))}
+                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    placeholder="Monto"
+                                                                                />
+                                                                            </div>
+
+                                                                            <div>
+                                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Fecha Registro</label>
+                                                                                <input
+                                                                                    type="date"
+                                                                                    required
+                                                                                    value={newExpenseForm.date}
+                                                                                    onChange={(e) => setNewExpenseForm(prev => ({ ...prev, date: e.target.value }))}
+                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                />
+                                                                            </div>
+
+                                                                            <div>
+                                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Unidad (Opcional)</label>
+                                                                                <select
+                                                                                    value={newExpenseForm.property_id}
+                                                                                    onChange={(e) => setNewExpenseForm(prev => ({ ...prev, property_id: e.target.value }))}
+                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                >
+                                                                                    <option value="">Ninguna...</option>
+                                                                                    {adminFilteredProperties.map(p => (
+                                                                                        <option key={p.id} value={p.id}>Depto #{p.number}</option>
+                                                                                    ))}
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                            <div>
+                                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Personal / Receptor (Opcional)</label>
+                                                                                <select
+                                                                                    value={newExpenseForm.user_id}
+                                                                                    onChange={(e) => setNewExpenseForm(prev => ({ ...prev, user_id: e.target.value }))}
+                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                >
+                                                                                    <option value="">Ninguno...</option>
+                                                                                    {adminFilteredUsers.map(u => (
+                                                                                        <option key={u.id} value={u.id}>{u.name}</option>
+                                                                                    ))}
+                                                                                </select>
+                                                                            </div>
+
+                                                                            <div>
+                                                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Descripción / Detalles</label>
+                                                                                <input
+                                                                                    type="text"
+                                                                                    value={newExpenseForm.description}
+                                                                                    onChange={(e) => setNewExpenseForm(prev => ({ ...prev, description: e.target.value }))}
+                                                                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                                                    placeholder="Comentarios adicionales o detalle del egreso"
+                                                                                />
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div className="flex gap-2">
+                                                                            <button type="submit" className="px-4 py-2 bg-rose-650 hover:bg-rose-600 text-white font-bold text-xs rounded-xl shadow">
+                                                                                {editingExpense ? 'Guardar Cambios' : 'Registrar'}
+                                                                            </button>
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => {
+                                                                                    setShowAddExpenseForm(false);
+                                                                                    setEditingExpense(null);
+                                                                                    setNewExpenseForm({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '' });
+                                                                                }}
+                                                                                className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl"
+                                                                            >
+                                                                                Cancelar
+                                                                            </button>
+                                                                        </div>
+                                                                    </form>
+                                                                )}
+
+                                                                <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+                                                                    <SimpleTable
+                                                                        headers={['Categoría', 'Subcategoría', 'Monto', 'Fecha', 'Detalles', 'Unidad/Destinatario', 'Acciones']}
+                                                                        rows={filteredExpenses.map(exp => {
+                                                                            const labelVal = financialCatalog.expenses?.[exp.category]?.label || exp.category;
+                                                                            const catName = formatCategoryLabel(exp.category, labelVal);
+                                                                            const subName = exp.subcategory || 'N/A';
+                                                                            
+                                                                            const icons = { personal: '👷', servicios_basicos: '💧', mantencion: '🔧', seguridad: '🛡️', aseo_gasto_comun: '🧹', administracion: '📁', seguros: '☂️', certificaciones: '📜', reemplazos: '🆘' };
+                                                                            const icon = icons[exp.category] || '💸';
+
+                                                                            return {
+                                                                                cells: [
+                                                                                    <span className="font-extrabold text-slate-850 dark:text-white flex items-center gap-1.5">{icon} {catName}</span>,
+                                                                                    <span className="font-semibold text-slate-500 dark:text-slate-400">{subName}</span>,
+                                                                                    <span className="font-bold text-rose-650 dark:text-rose-450">${Number(exp.amount).toLocaleString()}</span>,
+                                                                                    <span>{new Date(exp.date + 'T12:00:00').toLocaleDateString('es-CL')}</span>,
+                                                                                    <span className="text-xs truncate max-w-xs block text-slate-505 dark:text-slate-400" title={exp.description}>{exp.description || '—'}</span>,
+                                                                                    <div>
+                                                                                        {exp.property && <span className="font-bold block text-xs">Depto #{exp.property.number}</span>}
+                                                                                        {exp.user && <span className="text-[10px] text-slate-400 block">{exp.user.name}</span>}
+                                                                                        {!exp.property && !exp.user && <span className="text-slate-450 text-[10px]">—</span>}
+                                                                                    </div>,
+                                                                                    <div className="flex items-center gap-2 justify-end">
+                                                                                        <button
+                                                                                            type="button"
+                                                                                            onClick={() => {
+                                                                                                setEditingExpense(exp);
+                                                                                                setNewExpenseForm({
+                                                                                                    category: exp.category,
+                                                                                                    subcategory: exp.subcategory || '',
+                                                                                                    amount: String(exp.amount),
+                                                                                                    date: exp.date ? exp.date.substring(0, 10) : '',
+                                                                                                    description: exp.description || '',
+                                                                                                    property_id: exp.property_id ? String(exp.property_id) : '',
+                                                                                                    user_id: exp.user_id ? String(exp.user_id) : ''
+                                                                                                });
+                                                                                                setShowAddExpenseForm(true);
+                                                                                            }}
+                                                                                            className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-[10px] font-bold rounded-lg transition-all"
+                                                                                        >
+                                                                                            ✏️ Editar
+                                                                                        </button>
+                                                                                        <button
+                                                                                            type="button"
+                                                                                            onClick={() => handleDeleteExpense(exp.id)}
+                                                                                            className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-bold rounded-lg transition-all"
+                                                                                        >
+                                                                                            🗑️ Eliminar
+                                                                                        </button>
+                                                                                    </div>
+                                                                                ]
+                                                                            };
+                                                                        })}
+                                                                        emptyMessage="No hay egresos contables registrados en el libro diario para este condominio"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
 

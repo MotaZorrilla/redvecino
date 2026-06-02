@@ -51,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Condo Finances (Ingresos y Egresos)
     Route::middleware('can:view financial reports')->group(function () {
+        Route::get('/condo-finances/catalog', [CondoFinanceController::class, 'catalog']);
         Route::get('/condo-finances/summary', [CondoFinanceController::class, 'summary']);
         Route::get('/condo-finances/incomes', [CondoFinanceController::class, 'indexIncomes']);
         Route::get('/condo-finances/expenses', [CondoFinanceController::class, 'indexExpenses']);

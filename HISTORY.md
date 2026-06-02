@@ -210,9 +210,30 @@ Failures:    0 failed
 *   **Carga de Registros de Pagos SQLite:** Registrados 3 pagos mock reales y completamente validados mediante script CLI PHP que vincula propiedades y usuarios reales para el periodo de deuda activa `2026-05`.
 *   **Validación de Compilación:** Compilación impecable del bundle cliente mediante `npx vite build` en `2.39` segundos.
 
+### 3.6 Incorporación de Catálogo Financiero Básico (Sesión 02/06/2026)
+*   **Actualización de Especificaciones Técnicas (`SPEC.md`):**
+    *   Documentación exhaustiva de las tablas transaccionales de la base de datos `condo_incomes` (ingresos) y `condo_expenses` (egresos) derivadas del motor financiero, vinculando sus claves foráneas con las propiedades y copropietarios correspondientes.
+    *   Integración del **Catálogo Financiero Básico** en la especificación formal del proyecto, estableciendo de manera inequívoca la lógica de negocio para la auto-categorización del flujo de caja del condominio.
+*   **Estandarización de Cuentas Contables:**
+    *   *Clasificación de Ingresos:* Gastos comunes ordinarios (`gastos_comunes`), multas reglamentarias (`multas` asociadas a ruidos molestos, áreas comunes, estacionamientos indebidos, malos olores, mascotas, horarios e incumplimientos generales), arriendo de espacios comunes (`arriendo_espacios` como quinchos, salones, canchas y estacionamientos de visitas), intereses moratorios por pagos atrasados (`intereses_mora`), cuotas extraordinarias (`cuotas_extraordinarias` destinadas a reparaciones mayores, mejoras y emergencias) y publicidad/convenios (`publicidad_convenio` proveniente de expendedoras, antenas, avisos internos y alianzas).
+    *   *Clasificación de Egresos:* Sueldos y honorarios (`personal` que engloba conserjes, aseo, jardineros, administradores y técnicos), servicios básicos (`servicios_basicos` como agua, luz, gas, internet y telefonía), mantenciones programadas de activos comunes (`mantencion` para ascensores, bombas de agua, portones, CCTV y áreas verdes), costos de seguridad activa (`seguridad` de guardias, alarmas y control de accesos), insumos de limpieza (`limpieza`), reparaciones de infraestructura general, primas de seguros corporativos (`seguros` de incendios, responsabilidad civil y equipamiento), gastos administrativos de oficina (`administracion` de papelería, software, comisiones bancarias, contabilidad e impresiones) y aportes estatutarios al fondo de reserva general.
+
+### 3.7 Integración Frontend del Libro Diario y Robustez de Pruebas "Unhappy Paths" (Sesión 02/06/2026)
+*   **Integración de Catálogo y Dashboard Dual en Frontend:**
+    *   Se reemplazó la sección original de pagos en `Dashboard.jsx` por un selector de modo dual: **Recaudación (Copropietarios)** (manteniendo intacto el CRUD local original del MVP para evitar regresiones de interfaz) y **Libro Diario Contable**.
+    *   *KPIs Financieros Interactivos:* Implementación de tarjetas de resumen con efecto glassmorphism para el cálculo de ingresos, egresos y balance neto de caja.
+    *   *Gráfico de Proporción Nativo:* Incorporación de un gráfico de barra horizontal dinámico en Tailwind CSS para representar la proporción porcentual en tiempo real del flujo de caja.
+    *   *Distribución por Categorías:* Listas responsivas con barras de progreso individuales para las 6 categorías de ingresos y 9 de egresos alimentadas directamente del catálogo del backend.
+    *   *Formularios Dinámicos Dinamizados:* Desarrollo de selectores reactivos donde las opciones de subcategoría cargan y se etiquetan en caliente según la categoría contable superior seleccionada, consumiendo las definiciones descriptivas del catálogo financiero.
+    *   *Acciones CRUD Completas:* Tablas de visualización avanzadas (`SimpleTable` y `StatusBadge`) integradas con flujos asíncronos en caliente para editar y eliminar transacciones con recálculo automático del balance.
+*   **Aseguramiento de Calidad y Casos de Error (Unhappy Paths First):**
+    *   *Tests de Paridad para Egresos:* Se expandió la suite de pruebas agregando validaciones de casos erróneos en Egresos para asegurar simetría funcional con el flujo de Ingresos (`test_admin_cannot_create_expense_with_invalid_category` y `test_admin_cannot_create_expense_with_invalid_subcategory`).
+    *   *Tests de Límites en Importes (Amount Boundaries):* Programación de pruebas robustas (`test_amount_must_be_positive_numeric`) que verifican que montos iguales a cero, valores negativos o cadenas no numéricas sean rechazadas categóricamente con código de respuesta HTTP `422 (Unprocessable Entity)`.
+*   **QA Certificado al 100%:** Ejecución exitosa de la suite completa de pruebas. **Los 65 casos de prueba con 183 aserciones pasaron exitosamente en 23.26 segundos.** Compilación Vite finalizada limpiamente en 2.53 segundos.
+
 ---
 
 **Fecha de creación:** Mayo 2026
-**Última actualización:** 31 de Mayo de 2026 (Rediseño Estación de Trabajo del Administrador, Sincronización de Impersonación TI, SEO Exclusivo y Siembra SQLite)
-**Versión:** 2.2 (SaaS Admin Redesign & Dynamic Views Attestation)
+**Última actualización:** 2 de Junio de 2026 (Integración del Libro Diario Contable, Gráficos Interactivos Frontend y Cobertura QA Externa "Unhappy Paths")
+**Versión:** 2.4 (Real-time Cash Book Integration & High-Fidelity QA Boundary Testing)
 **Estado:** Activo y Actualizado

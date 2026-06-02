@@ -476,7 +476,127 @@ fines
 ├── due_date (DATE)
 ├── status (ENUM: pending, paid, appealed, cancelled)
 ├── created_at, updated_at
+
+condo_incomes
+├── id (PK)
+├── condominium_id (FK → condominiums)
+├── category (VARCHAR: multas, gastos_comunes, arriendo_espacios, intereses_mora, cuotas_extraordinarias, publicidad_convenio, otro)
+├── subcategory (VARCHAR, nullable)
+├── amount (DECIMAL)
+├── date (DATE)
+├── description (TEXT, nullable)
+├── property_id (FK → properties, nullable)
+├── user_id (FK → users, nullable)
+├── created_at, updated_at
+
+condo_expenses
+├── id (PK)
+├── condominium_id (FK → condominiums)
+├── category (VARCHAR: personal, mantencion, servicios_basicos, seguridad, administracion, otro)
+├── subcategory (VARCHAR, nullable)
+├── amount (DECIMAL)
+├── date (DATE)
+├── description (TEXT, nullable)
+├── property_id (FK → properties, nullable)
+├── user_id (FK → users, nullable)
+├── common_expense_id (FK → common_expenses, nullable)
+├── expense_item_id (FK → expense_items, nullable)
+├── created_at, updated_at
 ```
+
+#### Clasificación Estándar de Finanzas (Ingresos y Egresos Básicos)
+
+Esta sección define el catálogo estructurado de cuentas financieras base que opera en la plataforma RedVecino/MiVecino para el registro, categorización y visualización del flujo de caja.
+
+##### Ingresos de un Condominio (Básico)
+
+1. **Gastos Comunes** (`gastos_comunes`)
+   * Pago mensual realizado por propietarios o residentes para el funcionamiento del condominio.
+2. **Multas** (`multas`)
+   * Cobros por incumplimientos del reglamento, categorizados en:
+     * Ruidos molestos
+     * Mal uso de áreas comunes
+     * Estacionamientos indebidos
+     * Malos olores
+     * Problemas con mascotas
+     * Actividades fuera de horario
+     * Incumplimiento de normas del reglamento
+3. **Arriendos de Espacios Comunes** (`arriendo_espacios`)
+   * Ingresos por uso de:
+     * Quinchos
+     * Salón de eventos
+     * Canchas
+     * Estacionamientos de visita
+4. **Intereses por Mora** (`intereses_mora`)
+   * Cobros adicionales por pagos atrasados de gastos comunes.
+5. **Cuotas Extraordinarias** (`cuotas_extraordinarias`)
+   * Pagos especiales aprobados para:
+     * Reparaciones mayores
+     * Mejoras
+     * Emergencias
+6. **Publicidad o Convenios** (`publicidad_convenio`)
+   * Ingresos por:
+     * Máquinas expendedoras
+     * Antenas
+     * Publicidad interna
+     * Convenios con empresas
+
+##### Egresos de un Condominio (Básico)
+
+1. **Sueldos y Honorarios** (`personal`)
+   * Pagos a:
+     * Conserjes
+     * Personal de aseo
+     * Jardineros
+     * Administrador
+     * Técnicos externos
+2. **Servicios Básicos** (`servicios_basicos`)
+   * Pagos de:
+     * Agua
+     * Electricidad
+     * Gas
+     * Internet
+     * Telefonía
+3. **Mantención** (`mantencion`)
+   * Gastos en:
+     * Ascensores
+     * Bombas de agua
+     * Portones eléctricos
+     * Cámaras de seguridad
+     * Jardines
+4. **Seguridad** (`seguridad`)
+   * Costos relacionados con:
+     * Guardias
+     * CCTV
+     * Alarmas
+     * Control de acceso
+5. **Limpieza y Aseo** (`limpieza` / `otro`)
+   * Compra de:
+     * Productos de limpieza
+     * Bolsas de basura
+     * Implementos de aseo
+6. **Reparaciones** (`mantencion` / `otro`)
+   * Arreglos de:
+     * Cañerías
+     * Techos
+     * Iluminación
+     * Infraestructura común
+7. **Seguros** (`administracion` / `otro`)
+   * Pago de seguros:
+     * Incendio
+     * Responsabilidad civil
+     * Equipos
+8. **Gastos Administrativos** (`administracion`)
+   * Incluye:
+     * Papelería
+     * Software
+     * Bancos
+     * Contabilidad
+     * Impresiones
+9. **Fondo de Reserva** (`fondo_reserva` / `otro`)
+   * Dinero destinado a emergencias o proyectos futuros.
+
+---
 
 #### Tickets de Mantenimiento
 
@@ -1141,6 +1261,6 @@ Derivado de la refactorización e ingeniería de interfaz de la estación de tra
 ---
 
 **Fecha de creación:** Mayo 2026
-**Última actualización:** 31 de Mayo de 2026 (Actualizado con el Rediseño de la Estación de Trabajo del Administrador, Sincronización de Impersonación TI, SEO Exclusivo y Favicon RedVecino, además de Especificaciones del zAux 27/05/2026 y Guía 2 IA)
-**Versión:** 5.1 (Enterprise Spec & SaaS Admin Attestation)
-**Estado:** Listo para desarrollo (Con base de datos en SQLite/MySQL, suite de pruebas automatizadas, especificación de alta fidelidad PropTech y maquetación premium widescreen)
+**Última actualización:** 2 de Junio de 2026 (Actualizado con la especificación de tablas condo_incomes y condo_expenses e integración del Catálogo Financiero Básico de Ingresos y Egresos; anteriormente rediseño de Estación de Administrador, Impersonación TI, SEO y zAux)
+**Versión:** 5.2 (Enterprise Spec, SaaS Admin Attestation & Standard Financial Catalog)
+**Estado:** Listo para desarrollo (Con base de datos en SQLite/MySQL, suite de pruebas automatizadas, especificación de alta fidelidad PropTech, catálogo de cuentas base y maquetación premium widescreen)
