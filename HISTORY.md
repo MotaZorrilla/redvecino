@@ -238,9 +238,15 @@ Failures:    0 failed
 *   **Eliminación de Control de Tema en DevOps TI:** Dado que la estación DevOps TI posee un diseño oscuro fijo de alta fidelidad, se eliminó el botón interruptor de tema claro/oscuro de su cabecera para evitar confusión de usuario y simplificar la barra superior.
 *   **Certificación de Suite de Tests:** Ejecución completa de la suite de pruebas del backend con **146 casos y 597 aserciones validadas al 100%**. Compilación y construcción de Vite completada sin advertencias.
 
+### 3.9 Reestructuración Modular Completa por Roles y Unificación Widescreen (Sesión 02/06/2026)
+*   **Refactorización del Monolito `Dashboard.jsx`:** Se redujo el archivo monolítico `Dashboard.jsx` (6,350 líneas de código) a un enrutador reactivo limpio y mantenible (de unas 550 líneas) que conecta directamente los **6 layouts modulares por rol** e importa de forma declarativa sus sub-componentes.
+*   **Widescreen e Integración Estética Coherente:** Rediseño estructural de los layouts de **Administrador** (`AdminLayout.jsx`), **Comité** (`ComiteLayout.jsx`) y **Colaborador** (`ColaboradorLayout.jsx`) para que adopten el estándar de pantalla completa widescreen sin las restricciones de "estilo tarjeta" (`min-h-screen w-full`), con barras laterales fijas (`inset-y-0`) y un topbar de navegación superior semitransparente con blur.
+*   **Botones de Cambio de Tema y Logout:** Se incorporaron botones independientes de cambio de tema (claro/oscuro) y Logout (cierre de sesión) en los headers de todos los layouts de administración y soporte, unificando la experiencia de usuario (UX).
+*   **Certificación de Calidad y Pruebas:** Compilación impecable del bundle React mediante Vite (`npm run build` completado exitosamente en 2.75s) y validación de los **146 casos de prueba (597 aserciones) pasados exitosamente al 100%**.
+
 ---
 
 **Fecha de creación:** Mayo 2026
-**Última actualización:** 2 de Junio de 2026 (Resolución de Fugas en Filtros de Impersonación, Depuración de Clases Tailwind Inválidas y Certificación de Vistas TI)
-**Versión:** 2.5 (Deterministic Impersonation Scoping & Validated Widescreen Dark Theme)
+**Última actualización:** 2 de Junio de 2026 (Refactorización Modular de Dashboard, Unificación Widescreen Completa y Botones de Control de Tema y Logout)
+**Versión:** 3.0 (Modularized Multi-Role Dashboard with Widescreen Layouts & Standard QA Certified)
 **Estado:** Activo y Actualizado
