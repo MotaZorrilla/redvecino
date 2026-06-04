@@ -48,6 +48,9 @@ export default function FinancesLedger({
     usersList = [],
     readOnly = false
 }) {
+    const [selectedAviso, setSelectedAviso] = useState(null);
+    const [modalSubTab, setModalSubTab] = useState('summary');
+
     const formatCategoryLabel = (catKey, label) => {
         if (catKey === 'gastos_comunes') {
             return 'Pagos de Gastos Comunes / Recaudación';
@@ -213,7 +216,7 @@ export default function FinancesLedger({
 
                     <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
                         <SimpleTable
-                            headers={['Vecino', 'Propiedad', 'Monto', 'Método', 'Fecha', 'Estado', ...(!readOnly ? ['Acciones'] : [])]}
+                            headers={['Vecino', 'Propiedad', 'Monto', 'Método', 'Fecha', 'Estado', 'Documentos', ...(!readOnly ? ['Acciones'] : [])]}
                             rows={adminFilteredPayments.map(p => ({
                                 cells: [
                                     <span className="font-bold text-gray-900 dark:text-white" key={`user-${p.id}`}>{p.user?.name || 'Vecino'}</span>,
@@ -222,6 +225,14 @@ export default function FinancesLedger({
                                     <span className="capitalize font-mono text-xs" key={`method-${p.id}`}>{p.payment_method === 'transfer' ? 'Transferencia' : p.payment_method === 'card' ? 'Tarjeta' : 'Efectivo'}</span>,
                                     <span key={`date-${p.id}`}>{new Date(p.payment_date).toLocaleDateString('es-CL')}</span>,
                                     <StatusBadge key={`status-${p.id}`} status={p.status} type="payment" />,
+                                    <button
+                                        key={`doc-${p.id}`}
+                                        type="button"
+                                        onClick={() => setSelectedAviso(p)}
+                                        className="px-2.5 py-1 bg-indigo-500/10 hover:bg-indigo-500/25 border border-indigo-500/25 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-lg transition-all flex items-center gap-1 cursor-pointer"
+                                    >
+                                        📄 Aviso Cobro
+                                    </button>,
                                     ...(!readOnly ? [
                                         <div className="flex items-center gap-2 justify-end" key={`act-${p.id}`}>
                                             <button
@@ -237,7 +248,7 @@ export default function FinancesLedger({
                                                     });
                                                     setShowAddPaymentForm(true);
                                                 }}
-                                                className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-[10px] font-bold rounded-lg transition-all"
+                                                className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[10px] font-bold rounded-lg transition-all"
                                             >
                                                 ✏️ Editar
                                             </button>
@@ -840,6 +851,220 @@ export default function FinancesLedger({
                             </div>
                         </div>
                     )}
+                </div>
+            )}
+
+            {selectedAviso && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm" onClick={() => setSelectedAviso(null)}>
+                    <div className="relative max-w-4xl w-full bg-white text-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl overflow-y-auto max-h-[90vh] border border-gray-100" onClick={(e) => e.stopPropagation()}>
+                        {/* Close Button */}
+                        <button 
+                            onClick={() => setSelectedAviso(null)}
+                            className="absolute top-4 right-4 p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-500 transition-all cursor-pointer"
+                        >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+
+                        {/* Modal Tabs */}
+                        <div className="flex gap-2 border-b border-gray-100 pb-3 mb-6">
+                            <button 
+                                onClick={() => setModalSubTab('summary')}
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${modalSubTab === 'summary' ? 'bg-indigo-50 border-indigo-200 text-indigo-600' : 'bg-transparent border-transparent text-gray-500 hover:text-gray-700'}`}
+                            >
+                                📋 1. Aviso de Cobro (Resumen)
+                            </button>
+                            <button 
+                                onClick={() => setModalSubTab('breakdown')}
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${modalSubTab === 'breakdown' ? 'bg-indigo-50 border-indigo-200 text-indigo-600' : 'bg-transparent border-transparent text-gray-500 hover:text-gray-700'}`}
+                            >
+                                🔍 2. Desglose de Gastos del Mes
+                            </button>
+                        </div>
+
+                        {modalSubTab === 'summary' ? (
+                            <div className="space-y-6 text-left">
+                                {/* Header (encabezado tabla resumen) */}
+                                <div className="flex justify-between items-start border-b border-gray-200 pb-4 flex-wrap gap-4">
+                                    <div className="space-y-1">
+                                        <h3 className="text-sm font-black text-slate-900">Condominio Aires de Chiguayante II</h3>
+                                        <p className="text-[11px] text-gray-500">Coquimbo 615, CHIGUAYANTE</p>
+                                        <p className="text-[11px] text-gray-500 font-mono">Rut 65.219.801-5</p>
+                                        <p className="text-[11px] text-gray-500">Teléfono: 989269313</p>
+                                        <p className="text-[11px] text-gray-500">Correo: <span className="underline text-indigo-600">condominioairesdechiguayante2@gmail.com</span></p>
+                                    </div>
+                                    <div className="text-right">
+                                        <h2 className="text-lg font-black text-slate-900 tracking-tight uppercase">Aviso de Cobro Obligación Económica</h2>
+                                        <span className="inline-block px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full text-[10px] font-black uppercase mt-1">EMITIDO</span>
+                                    </div>
+                                </div>
+
+                                {/* Body Info Block */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-5 rounded-2xl border border-gray-100">
+                                    <div className="space-y-1.5 text-xs">
+                                        <div className="flex justify-between"><span className="text-gray-400 font-bold uppercase text-[9px]">Periodo:</span><span className="font-bold text-gray-900">ABRIL / 2026</span></div>
+                                        <div className="flex justify-between"><span className="text-gray-400 font-bold uppercase text-[9px]">Departamento:</span><span className="font-mono font-bold text-gray-900">TORRE 1-{selectedAviso.property_id}</span></div>
+                                        <div className="flex justify-between"><span className="text-gray-400 font-bold uppercase text-[9px]">Fecha Emisión:</span><span className="font-bold text-gray-900">06-05-2026</span></div>
+                                        <div className="flex justify-between"><span className="text-gray-400 font-bold uppercase text-[9px]">Fecha Vencimiento:</span><span className="font-bold text-rose-600">21-05-2026</span></div>
+                                        <div className="flex justify-between"><span className="text-gray-400 font-bold uppercase text-[9px]">Residente:</span><span className="font-bold text-gray-900">{selectedAviso.user?.name || 'Lucelys Elena García Cova'}</span></div>
+                                        <div className="flex justify-between"><span className="text-gray-400 font-bold uppercase text-[9px]">Propietario:</span><span className="font-bold text-gray-900">{selectedAviso.user?.name || 'Lucelys Elena García Cova'}</span></div>
+                                    </div>
+                                    <div className="space-y-1.5 text-xs border-t md:border-t-0 md:border-l border-gray-200 pt-4 md:pt-0 md:pl-6">
+                                        <div className="flex justify-between"><span className="text-gray-400 font-bold uppercase text-[9px]">Total Gastos Comunes:</span><span className="font-bold text-gray-900">$5.922.800</span></div>
+                                        <div className="flex justify-between"><span className="text-gray-400 font-bold uppercase text-[9px]">Total Gastos No Prorrateables:</span><span className="font-bold text-gray-900">$0</span></div>
+                                        <div className="flex justify-between"><span className="text-gray-400 font-bold uppercase text-[9px]">Total Ingresos:</span><span className="font-bold text-gray-900">$7.371.241</span></div>
+                                        <div className="flex justify-between"><span className="text-gray-400 font-bold uppercase text-[9px]">Prorrateo Coeficiente:</span><span className="font-mono font-bold text-gray-900">0.0067220000 (0.6722%)</span></div>
+                                        <div className="flex justify-between"><span className="text-gray-400 font-bold uppercase text-[9px]">Último Pago:</span><span className="font-bold text-gray-900">09/04/2026</span></div>
+                                        <div className="flex justify-between"><span className="text-gray-400 font-bold uppercase text-[9px]">Último Monto Pagado:</span><span className="font-bold text-gray-900">$42.773</span></div>
+                                    </div>
+                                </div>
+
+                                {/* Summary Table */}
+                                <div className="border border-gray-150 rounded-2xl overflow-hidden shadow-sm">
+                                    <table className="min-w-full divide-y divide-gray-100">
+                                        <thead>
+                                            <tr className="bg-slate-50 text-gray-400 uppercase text-[9px] font-bold tracking-wider">
+                                                <th className="px-6 py-3 text-left">Concepto / Obligación</th>
+                                                <th className="px-6 py-3 text-right">Monto</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100 text-xs">
+                                            <tr>
+                                                <td className="px-6 py-3 text-left font-medium">Gasto Común Ordinario ($5.922.800 * 0.006722)</td>
+                                                <td className="px-6 py-3 text-right font-mono font-bold text-slate-800">$39.813</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="px-6 py-3 text-left font-medium">Fondo Común de Reserva (5.000% sobre la base de $5.922.800)</td>
+                                                <td className="px-6 py-3 text-right font-mono font-bold text-slate-800">$1.991</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="px-6 py-3 text-left font-medium">Intereses acumulados</td>
+                                                <td className="px-6 py-3 text-right font-mono font-bold text-slate-800">$0</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="px-6 py-3 text-left font-medium">CGE TORRE 1 (Servicio Eléctrico Adicional)</td>
+                                                <td className="px-6 py-3 text-right font-mono font-bold text-slate-800">$2.981</td>
+                                            </tr>
+                                            <tr className="bg-slate-50/50">
+                                                <td className="px-6 py-3 text-left font-black uppercase text-[10px]">TOTAL GASTOS COMUNES DEL MES</td>
+                                                <td className="px-6 py-3 text-right font-mono font-black text-slate-900">$44.785</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="px-6 py-3 text-left font-medium">Saldo meses anteriores</td>
+                                                <td className="px-6 py-3 text-right font-mono font-bold text-slate-800">$0</td>
+                                            </tr>
+                                            <tr className="bg-slate-100/30">
+                                                <td className="px-6 py-4 text-left font-black text-indigo-600 uppercase text-[11px]">TOTAL A PAGAR (Obligación Económica Ley 21.442 Art. 2°)</td>
+                                                <td className="px-6 py-4 text-right font-mono font-black text-indigo-600 text-sm">{"$"}{Number(selectedAviso.amount).toLocaleString('es-CL')}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                {/* Footer (pie de pagina) */}
+                                <div className="bg-amber-50/20 border border-amber-200/50 p-5 rounded-2xl text-[10px] space-y-2 text-slate-600 leading-relaxed">
+                                    <span className="font-extrabold text-amber-700 block text-[11px] uppercase tracking-wider">⚠️ INFORMATIVO DE COBRO</span>
+                                    <p>1.- El presente Estado de Cuenta se considera <strong>APROBADO</strong> si al cabo de cinco días de recibido, este no ha sido objetado por la comunidad.</p>
+                                    <p>2.- Cualquier duda o consulta hacerla llegar al correo electrónico: <strong className="text-indigo-600 underline">condominioairesdechiguayante2@gmail.com</strong></p>
+                                    <p>3.- <strong>Formas de Pago GG.CC.:</strong> Cheque nominativo y cruzado a nombre de <strong>CONDOMINIO AIRES DE CHIGUAYANTE II</strong> o Transferencia Electrónica o Depósito en cuenta corriente <strong>BANCO SCOTIABANK N° 985375739, RUT N° 65.219.801-5</strong>. Enviar comprobante al mismo correo, indicando número de departamento.</p>
+                                    <p>4.- Los morosos de GG.CC. deberán pagar la Multa estipulada en el Reglamento de Copropiedad, Reglamento Interno y además los Intereses estipulados en la Ley de Copropiedad.</p>
+                                    <p className="text-rose-600 font-bold">5.- Tenga presente que la morosidad en el pago de GG.CC. permite la suspensión inmediata de la Energía Eléctrica, como se estipula en el Reglamento de Copropiedad, Reglamento Interno y en la Ley de Copropiedad.</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="space-y-6 text-left">
+                                {/* Header Desglose */}
+                                <div className="flex justify-between items-start border-b border-gray-200 pb-4 flex-wrap gap-4">
+                                    <div className="space-y-1">
+                                        <h3 className="text-sm font-black text-slate-900">Condominio Aires de Chiguayante II</h3>
+                                        <p className="text-[11px] text-gray-500 font-mono">Rut 65.219.801-5 &bull; Coquimbo 615, CHIGUAYANTE</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <h2 className="text-lg font-black text-slate-900 tracking-tight uppercase">Informe de Gastos del Mes</h2>
+                                        <p className="text-xs font-black text-indigo-600 uppercase">ABRIL de 2026</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest block">GASTOS PRORRATEABLES</span>
+                                    
+                                    {/* 0100 Gastos de Administración */}
+                                    <div className="border border-gray-150 rounded-2xl overflow-hidden">
+                                        <table className="min-w-full divide-y divide-gray-100 text-xs">
+                                            <thead>
+                                                <tr className="bg-slate-50 font-black text-slate-700">
+                                                    <th className="px-4 py-2.5 text-left w-16">Cuenta</th>
+                                                    <th className="px-4 py-2.5 text-left">Descripción - GASTOS DE ADMINISTRACION</th>
+                                                    <th className="px-4 py-2.5 text-right w-32">Monto</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-100">
+                                                <tr><td className="px-4 py-2 font-mono text-gray-400">0101</td><td className="px-4 py-2">SUELDOS LIQUIDOS</td><td className="px-4 py-2 text-right font-mono font-semibold">$2.881.159</td></tr>
+                                                <tr><td className="px-4 py-2 font-mono text-gray-400">0102</td><td className="px-4 py-2">COTIZACIONES PREVISIONALES</td><td className="px-4 py-2 text-right font-mono font-semibold">$713.533</td></tr>
+                                                <tr><td className="px-4 py-2 font-mono text-gray-400">0107</td><td className="px-4 py-2">HONORARIOS ADMINISTRADOR</td><td className="px-4 py-2 text-right font-mono font-semibold">$500.000</td></tr>
+                                                <tr><td className="px-4 py-2 font-mono text-gray-400">0109</td><td className="px-4 py-2">ANTICIPOS DE SUELDOS</td><td className="px-4 py-2 text-right font-mono font-semibold">$100.000</td></tr>
+                                                <tr><td className="px-4 py-2 font-mono text-gray-400">0113</td><td className="px-4 py-2">PLATAFORMA GASTOS COMUNES</td><td className="px-4 py-2 text-right font-mono font-semibold">$25.000</td></tr>
+                                                <tr><td className="px-4 py-2 font-mono text-gray-400">0118</td><td className="px-4 py-2">REEMPLAZO LICENCIA MEDICA</td><td className="px-4 py-2 text-right font-mono font-semibold">$480.000</td></tr>
+                                                <tr className="bg-slate-50/40 font-bold"><td colSpan={2} className="px-4 py-2 text-left uppercase text-[10px]">Total Item Gastos de Administración</td><td className="px-4 py-2 text-right font-mono">$4.699.692</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    {/* 0200 Gastos de Mantenimiento */}
+                                    <div className="border border-gray-150 rounded-2xl overflow-hidden">
+                                        <table className="min-w-full divide-y divide-gray-100 text-xs">
+                                            <thead>
+                                                <tr className="bg-slate-50 font-black text-slate-700">
+                                                    <th className="px-4 py-2.5 text-left w-16">Cuenta</th>
+                                                    <th className="px-4 py-2.5 text-left">Descripción - GASTOS DE MANTENCION</th>
+                                                    <th className="px-4 py-2.5 text-right w-32">Monto</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-100">
+                                                <tr><td className="px-4 py-2 font-mono text-gray-400">0240</td><td className="px-4 py-2">FUMIGACION, DESRATIZAC.Y SANITIZ. AREAS USO COMUN</td><td className="px-4 py-2 text-right font-mono font-semibold">$89.250</td></tr>
+                                                <tr><td className="px-4 py-2 font-mono text-gray-400">0251</td><td className="px-4 py-2">CORTE DE PASTO</td><td className="px-4 py-2 text-right font-mono font-semibold">$120.000</td></tr>
+                                                <tr><td className="px-4 py-2 font-mono text-gray-400">0252</td><td className="px-4 py-2">RIEGO Y DESMALEZADO</td><td className="px-4 py-2 text-right font-mono font-semibold">$165.000</td></tr>
+                                                <tr><td className="px-4 py-2 font-mono text-gray-400">0261</td><td className="px-4 py-2">CAMBIO POSICION FOTOCELDA PORTON SALIDA VEHICULAR</td><td className="px-4 py-2 text-right font-mono font-semibold">$66.000</td></tr>
+                                                <tr><td className="px-4 py-2 font-mono text-gray-400">0262</td><td className="px-4 py-2">REVISIÓN PORTON - CAMBIO LUMINARIA</td><td className="px-4 py-2 text-right font-mono font-semibold">$88.680</td></tr>
+                                                <tr className="bg-slate-50/40 font-bold"><td colSpan={2} className="px-4 py-2 text-left uppercase text-[10px]">Total Item Gastos de Mantención</td><td className="px-4 py-2 text-right font-mono">$528.930</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    {/* 0400 Gastos de Uso o Consumo */}
+                                    <div className="border border-gray-150 rounded-2xl overflow-hidden">
+                                        <table className="min-w-full divide-y divide-gray-100 text-xs">
+                                            <thead>
+                                                <tr className="bg-slate-50 font-black text-slate-700">
+                                                    <th className="px-4 py-2.5 text-left w-16">Cuenta</th>
+                                                    <th className="px-4 py-2.5 text-left">Descripción - GASTOS DE USO O CONSUMO</th>
+                                                    <th className="px-4 py-2.5 text-right w-32">Monto</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-100">
+                                                <tr><td className="px-4 py-2 font-mono text-gray-400">0401</td><td className="px-4 py-2">ENERGIA ELECTRICA</td><td className="px-4 py-2 text-right font-mono font-semibold">$476.000</td></tr>
+                                                <tr><td className="px-4 py-2 font-mono text-gray-400">0402</td><td className="px-4 py-2">AGUA POTABLE</td><td className="px-4 py-2 text-right font-mono font-semibold">$16.640</td></tr>
+                                                <tr><td className="px-4 py-2 font-mono text-gray-400">0406</td><td className="px-4 py-2">ARTICULOS DE ASEO</td><td className="px-4 py-2 text-right font-mono font-semibold">$78.590</td></tr>
+                                                <tr><td className="px-4 py-2 font-mono text-gray-400">0463</td><td className="px-4 py-2">GUANTES DE TRABAJO</td><td className="px-4 py-2 text-right font-mono font-semibold">$7.590</td></tr>
+                                                <tr><td className="px-4 py-2 font-mono text-gray-400">0464</td><td className="px-4 py-2">SILLA PORTERIA</td><td className="px-4 py-2 text-right font-mono font-semibold">$77.980</td></tr>
+                                                <tr><td className="px-4 py-2 font-mono text-gray-400">0465</td><td className="px-4 py-2">CERRADURA PUERTA SADA BASURA</td><td className="px-4 py-2 text-right font-mono font-semibold">$30.888</td></tr>
+                                                <tr><td className="px-4 py-2 font-mono text-gray-400">0466</td><td className="px-4 py-2">REMACHADORA</td><td className="px-4 py-2 text-right font-mono font-semibold">$6.490</td></tr>
+                                                <tr className="bg-slate-50/40 font-bold"><td colSpan={2} className="px-4 py-2 text-left uppercase text-[10px]">Total Item Gastos de Uso o Consumo</td><td className="px-4 py-2 text-right font-mono">$694.178</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    {/* Consolidated summary totals */}
+                                    <div className="bg-slate-50 border border-gray-200 p-4 rounded-2xl text-xs space-y-1.5 font-bold">
+                                        <div className="flex justify-between"><span>TOTAL GASTOS PRORRATEABLES</span><span className="font-mono">$5.922.800</span></div>
+                                        <div className="flex justify-between text-gray-400"><span>TOTAL GASTOS NO PRORRATEABLES</span><span className="font-mono">$0</span></div>
+                                        <div className="flex justify-between text-indigo-600 text-sm border-t border-gray-200 pt-1.5 mt-1.5"><span>TOTAL DE GASTOS DE LA COMUNIDAD</span><span className="font-mono font-black">$5.922.800</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
         </div>

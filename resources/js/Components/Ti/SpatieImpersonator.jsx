@@ -70,6 +70,7 @@ export default function SpatieImpersonator({
                             className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3.5 py-2.5 text-white focus:outline-none focus:border-[#00A896] hover:border-slate-700 transition-all font-medium focus:ring-0 cursor-pointer"
                         >
                             <option value="all" className="bg-slate-955 text-slate-100">Todos los Roles</option>
+                            <option value="super_usuario" className="bg-slate-955 text-slate-100">Súper Usuario</option>
                             <option value="admin" className="bg-slate-955 text-slate-100">Administrador</option>
                             <option value="propietario" className="bg-slate-955 text-slate-100">Propietario</option>
                             <option value="resident" className="bg-slate-955 text-slate-100">Residente</option>
@@ -95,7 +96,7 @@ export default function SpatieImpersonator({
                                     if (selectedImpCondo !== 'all') {
                                         const condoId = getUserCondoId(u);
                                         const isStaff = u.roles?.some(role => 
-                                            ['administrador', 'admin', 'comité', 'comite', 'colaborador', 'ti'].includes(role.toLowerCase())
+                                            ['administrador', 'admin', 'comité', 'comite', 'colaborador', 'ti', 'super_usuario', 'súper usuario'].includes(role.toLowerCase())
                                         );
                                         if (!isStaff && condoId !== Number(selectedImpCondo)) return false;
                                     }

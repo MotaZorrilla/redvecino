@@ -1256,11 +1256,32 @@ Derivado de la refactorización e ingeniería de interfaz de la estación de tra
 *   **Sincronización Dinámica de Entornos TI (Impersonation):** La interfaz de súper usuario TI se vincula reactivamente a través de un hook de efecto (`useEffect`) al rol del usuario en sesión (`isTiRole`). Al activar la impersonación de un residente o un administrador de condominio, el entorno TI debe apagar automáticamente el portal DevOps TI para desplegar con absoluta fidelidad y consistencia el portal o la app móvil del usuario simulado, restaurándose de inmediato una vez se abandona la impersonación.
 *   **Estándares de SEO y Favicon de Pestañas:** 
     -   *Páginas Públicas (Welcome):* Deben contener un marcado SEO robusto inyectando etiquetas de descripción, palabras clave (keywords), tarjetas sociales Open Graph (Facebook/LinkedIn) y Twitter Cards, vinculando la imagen principal de marca y el favicon oficial `/images/logo_redvecino.png`.
-    -   *Páginas Privadas (Dashboard/Admin):* Deben incorporar títulos dinámicos detallados para el navegador (ej: *"Dashboard RedVecino - Gestión de Condominio"*) y forzar de manera obligatoria la directiva de meta-robots `<meta name="robots" content="noindex, nofollow" />` para asegurar que las consolas administrativas internas de copropietarios y administración no sean rastreadas ni indexadas por motores de búsqueda públicos.
+    -   *Páginas Privadas (Dashboard/Admin):* Deben incorporar títulos dinámicos detallados para el navegador (ej: *"Dashboard RedVecino - Gestión de Condominio"*) y forzar de manera obligatoria la directiva de meta-robots `<meta name="robots" content="noindex, nofollow" />` para asegurar que las consolas administrativas internas de copropietarios y administración no sean rastreadas ni indexadas por raíces de búsqueda públicos.
+
+### 15.10 Especificaciones del Manual Operativo y Contable y Remuneraciones (zAux 02/06)
+Derivado de la incorporación de las directrices operativas, contables y laborales del 2 de junio de 2026, se especifican las siguientes directrices y reglas técnicas:
+*   **Jerarquía de Roles de Alta Densidad (TI, Súper Usuario, Administrador):**
+    -   *TI:* Administra la telemetría, soporte técnico, y posee la facultad de crear la cuenta del **Súper Usuario** del servicio.
+    -   *Súper Usuario:* Actúa como licenciatario comercial de la suite SaaS. Crea, modifica, suspende o elimina cuentas de administradores.
+    -   *Administrador:* Ejecuta la definición paramétrica del condominio (RUT, prorrateo por $m^2$, correlativos de unidades) y la operación financiera (ingresos/egresos) y laboral.
+*   **Esquema de Contratación de Colaboradores:**
+    -   El motor de recursos humanos exige que para puestos como conserjes, recepcionistas y personal de mantenimiento, se generen **dos contratos iniciales de plazo fijo de 3 meses cada uno** antes de emitir la vinculación contractual definitiva indefinida.
+*   **Algoritmo del Motor de Cobros de Gastos Comunes ($Total_{unidad}$):**
+    El cálculo por unidad integra la fórmula de Prorrateo, un Fondo de Reserva extraordinario del 5% y consumos de cargos individuales de la unidad:
+    -   *Gasto Común Base ($G$):* $G = E_{total} \times P_{unidad}$
+    -   *Fondo de Reserva ($FR$):* $FR = (E_{total} \times 0.05) \times P_{unidad}$
+    -   *Obligación Económica Mensual ($T_{mes}$):* $T_{mes} = G + FR + C_{ind}$
+*   **Motor de Remuneración y Cotizaciones Legales:**
+    El cálculo de la liquidación de remuneración de colaboradores sigue los porcentajes previsionales de la legislación chilena (Fonasa y AFC):
+    -   *Total Haberes ($H_{total}$):* $H_{total} = \text{Sueldo Base Imponible} + \text{Locomoción} + \text{Colación}$
+    -   *Cotización de Salud (Fonasa):* $7.00\%$ sobre el Sueldo Base Imponible.
+    -   *Fondo de Pensión (AFP):* $11.44\%$ (AFP Capital) sobre el Sueldo Base Imponible.
+    -   *Seguro de Cesantía (AFC):* $0.60\%$ sobre el Sueldo Base Imponible.
+    -   *Sueldo Líquido ($S_{liquido}$):* $S_{liquido} = H_{total} - (\text{Salud} + \text{Pensión} + \text{Cesantía})$
 
 ---
 
 **Fecha de creación:** Mayo 2026
-**Última actualización:** 2 de Junio de 2026 (Actualizado con la especificación de tablas condo_incomes y condo_expenses e integración del Catálogo Financiero Básico de Ingresos y Egresos; anteriormente rediseño de Estación de Administrador, Impersonación TI, SEO y zAux)
-**Versión:** 5.2 (Enterprise Spec, SaaS Admin Attestation & Standard Financial Catalog)
+**Última actualización:** 2 de Junio de 2026 (Refactorización Modular de Dashboard, Unificación Widescreen y Especificaciones del Manual Operativo, Contable y de Remuneraciones zAux)
+**Versión:** 6.0 (Enterprise Spec, Multi-Role Architecture, Standard GGCC & Certified Payroll Engine)
 **Estado:** Listo para desarrollo (Con base de datos en SQLite/MySQL, suite de pruebas automatizadas, especificación de alta fidelidad PropTech, catálogo de cuentas base y maquetación premium widescreen)

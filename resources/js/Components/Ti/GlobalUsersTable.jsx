@@ -45,6 +45,7 @@ export default function GlobalUsersTable({
                     >
                         <option value="all">Todos los Roles</option>
                         <option value="ti">TI</option>
+                        <option value="super_usuario">Súper Usuario</option>
                         <option value="admin">Administrador</option>
                         <option value="resident">Residente</option>
                         <option value="owner">Propietario</option>
@@ -139,6 +140,7 @@ export default function GlobalUsersTable({
                                 className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
                             >
                                 <option value="ti">TI</option>
+                                <option value="super_usuario">Súper Usuario</option>
                                 <option value="admin">Administrador</option>
                                 <option value="resident">Residente</option>
                                 <option value="owner">Propietario</option>

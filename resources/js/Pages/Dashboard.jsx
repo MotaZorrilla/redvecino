@@ -9,6 +9,7 @@ import ComiteLayout from '@/Layouts/ComiteLayout';
 import ColaboradorLayout from '@/Layouts/ColaboradorLayout';
 import PropietarioLayout from '@/Layouts/PropietarioLayout';
 import ResidentLayout from '@/Layouts/ResidentLayout';
+import SuperUsuarioLayout from '@/Layouts/SuperUsuarioLayout';
 
 // Shared Components & Loader
 import { RoleTransitionLoader } from '@/Components/DashboardShared';
@@ -289,10 +290,11 @@ export default function Dashboard() {
     // Core Role Detection
     const userRoles = user?.roles || [];
     const isTiRole = userRoles.some(role => role.toLowerCase() === 'ti');
+    const isSuperUsuarioRole = userRoles.some(role => ['super_usuario', 'súper usuario', 'superusuario'].includes(role.toLowerCase()));
     const isBusinessAdmin = userRoles.some(role => 
         ['admin', 'administrador', 'committee', 'comité', 'colaborador', 'employee'].includes(role.toLowerCase())
     );
-    const isActuallyAdmin = isTiRole || isBusinessAdmin;
+    const isActuallyAdmin = isTiRole || isBusinessAdmin || isSuperUsuarioRole;
     
     // Interactive Simulation Toggle for Admins/TI
     const [simulationMode, setSimulationMode] = useState(false);
@@ -710,6 +712,7 @@ export default function Dashboard() {
 
     // Detect exact user role mapping
     const isTi = userRoles.some(r => r.toLowerCase() === 'ti');
+    const isSuperUsuario = userRoles.some(r => ['super_usuario', 'súper usuario', 'superusuario'].includes(r.toLowerCase()));
     const isAdmin = userRoles.some(r => ['admin', 'administrador'].includes(r.toLowerCase()));
     const isComite = userRoles.some(r => ['committee', 'comité'].includes(r.toLowerCase()));
     const isColaborador = userRoles.some(r => ['employee', 'colaborador'].includes(r.toLowerCase()));
@@ -739,6 +742,19 @@ export default function Dashboard() {
                         ❌ Salir de Impersonación
                     </button>
                 </div>
+            )}
+
+            {/* 👑 ROLE 1.5: SÚPER USUARIO */}
+            {isSuperUsuario && !simulationMode && (
+                <SuperUsuarioLayout
+                    user={user}
+                    toggleTheme={toggleTheme}
+                    darkMode={darkMode}
+                    usersList={usersList}
+                    setUsersList={setUsersList}
+                    condosList={condosList}
+                    setCondosList={setCondosList}
+                />
             )}
 
             {/* 🛠️ ROLE 1: TI DEVOPS */}
