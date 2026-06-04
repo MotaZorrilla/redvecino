@@ -161,7 +161,7 @@ export default function TiTicketsGestion({
                             <select
                                 value={newTicketForm.priority}
                                 onChange={(e) => setNewTicketForm(prev => ({ ...prev, priority: e.target.value }))}
-                                className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
+                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
                             >
                                 <option value="low">Baja</option>
                                 <option value="medium">Media</option>

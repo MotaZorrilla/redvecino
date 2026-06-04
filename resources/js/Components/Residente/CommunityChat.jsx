@@ -39,7 +39,7 @@ export default function CommunityChat({
                                 ? 'mx-auto bg-slate-100 border border-slate-200/50 text-slate-500 text-[10px] text-center max-w-[90%] dark:bg-slate-950 dark:border-slate-800'
                                 : msg.sender === 'me'
                                 ? 'ml-auto bg-[#72B043] text-white rounded-br-none'
-                                : 'bg-slate-50 border border-slate-100 dark:bg-slate-955 dark:border-slate-800 text-slate-850 dark:text-slate-200 rounded-bl-none'
+                                : 'bg-slate-50 border border-slate-100 dark:bg-slate-950 dark:border-slate-800 text-slate-850 dark:text-slate-200 rounded-bl-none'
                         }`}
                     >
                         <p className="leading-relaxed font-medium">{msg.text}</p>

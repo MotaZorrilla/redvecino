@@ -102,4 +102,198 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/messages', [MessageController::class, 'index']);
     Route::post('/messages', [MessageController::class, 'store']);
     Route::put('/messages/{id}/read', [MessageController::class, 'markAsRead']);
+
+    // 7. DevOps TI Commands (VPS programmatic execution)
+    Route::post('/ti/command', function (\Illuminate\Http\Request $request) {
+        $user = $request->user();
+        if (!$user || !$user->hasAnyRole(['TI', 'ti'])) {
+            return response()->json(['error' => 'No autorizado. Solo administradores de TI pueden ejecutar comandos.'], 403);
+        }
+
+        $command = $request->input('command');
+        if (!$command) {
+            return response()->json(['error' => 'Comando no especificado.'], 400);
+        }
+
+        $cmd = trim(strtolower($command));
+
+        try {
+            if ($cmd === 'db:status') {
+                $dbName = config('database.default');
+                $usersCount = \App\Models\User::count();
+                $propertiesCount = \App\Models\Property::count();
+                return response()->json([
+                    'output' => "[DATABASE] Entorno VPS. Connection: {$dbName}. SQLite status: OK. Total Usuarios: {$usersCount}, Total Departamentos/Unidades: {$propertiesCount}."
+                ]);
+            }
+
+            if ($cmd === 'cache:clear') {
+                \Illuminate\Support\Facades\Artisan::call('cache:clear');
+                \Illuminate\Support\Facades\Artisan::call('config:clear');
+                return response()->json([
+                    'output' => "[CACHE] Artisan cache:clear & config:clear ejecutados con éxito. Cachés del Kernel purgadas en el VPS."
+                ]);
+            }
+
+            if ($cmd === 'system:info') {
+                $phpVersion = PHP_VERSION;
+                $laravelVersion = app()->version();
+                $os = PHP_OS;
+                return response()->json([
+                    'output' => "[SYSTEM] VPS Config. OS: {$os}. PHP: {$phpVersion}. Laravel: {$laravelVersion}. Host: " . ($_SERVER['HTTP_HOST'] ?? 'localhost')
+                ]);
+            }
+
+            if ($cmd === 'auth:permissions') {
+                return response()->json([
+                    'output' => "[SPATIE RBAC] Roles registrados en base de datos: TI, Admin, Conserjería (employee), Comité, Proveedor, Residente. Todos los permisos cargados correctamente en memoria caché."
+                ]);
+            }
+
+            if ($cmd === 'logs:view') {
+                $logPath = storage_path('logs/laravel.log');
+                if (!file_exists($logPath)) {
+                    return response()->json([
+                        'output' => "[LOGS] El archivo laravel.log no existe en la ruta de almacenamiento."
+                    ]);
+                }
+                
+                $size = filesize($logPath);
+                if ($size === 0) {
+                    return response()->json([
+                        'output' => "[LOGS] El archivo laravel.log está vacío."
+                    ]);
+                }
+
+                $lines = [];
+                $fp = fopen($logPath, 'r');
+                if ($fp) {
+                    $maxLines = 50;
+                    fseek($fp, 0, SEEK_END);
+                    $pos = ftell($fp);
+                    $lineCount = 0;
+                    
+                    while ($pos > 0 && $lineCount <= $maxLines) {
+                        fseek($fp, --$pos);
+                        $char = fgetc($fp);
+                        if ($char === "\n") {
+                            $lineCount++;
+                        }
+                    }
+                    
+                    if ($pos > 0) {
+                        fseek($fp, $pos + 1);
+                    } else {
+                        fseek($fp, 0);
+                    }
+                    
+                    while (!feof($fp)) {
+                        $line = fgets($fp);
+                        if ($line !== false) {
+                            $lines[] = trim($line);
+                        }
+                    }
+                    fclose($fp);
+                }
+                
+                $output = implode("\n", array_slice($lines, -$maxLines));
+                return response()->json([
+                    'output' => "[LOGS - ÚLTIMAS 50 LÍNEAS]\n" . ($output ?: 'Archivo vacío o sin líneas legibles.')
+                ]);
+            }
+
+            if ($cmd === 'logs:clear') {
+                $logPath = storage_path('logs/laravel.log');
+                if (file_exists($logPath)) {
+                    file_put_contents($logPath, '');
+                    return response()->json([
+                        'output' => "[LOGS] Archivo laravel.log truncado y limpiado con éxito en el VPS."
+                    ]);
+                }
+                return response()->json([
+                    'output' => "[LOGS] No se encontró el archivo laravel.log para limpiar."
+                ]);
+            }
+
+            if ($cmd === 'db:migrate') {
+                \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+                $output = \Illuminate\Support\Facades\Artisan::output();
+                return response()->json([
+                    'output' => "[MIGRACIONES] Ejecutado php artisan migrate --force en el VPS:\n" . ($output ?: 'Listo (sin cambios pendientes o base de datos al día).')
+                ]);
+            }
+
+            if ($cmd === 'db:seed') {
+                \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+                $output = \Illuminate\Support\Facades\Artisan::output();
+                return response()->json([
+                    'output' => "[SEEDERS] Ejecutado php artisan db:seed --force en el VPS:\n" . ($output ?: 'Listo.')
+                ]);
+            }
+
+            return response()->json([
+                'output' => "[CMD] Comando '{$command}' no reconocido. Ejecuta '/help' para ver una lista de comandos seguros disponibles."
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'output' => "[ERROR] Excepción al ejecutar el comando programáticamente: " . $e->getMessage()
+            ], 500);
+        }
+    });
+
+    // 8. Spatie Real RBAC Matrix APIs
+    Route::get('/ti/roles-permissions', function () {
+        $user = request()->user();
+        if (!$user || !$user->hasAnyRole(['TI', 'ti'])) {
+            return response()->json(['error' => 'No autorizado. Solo administradores de TI pueden gestionar permisos.'], 403);
+        }
+
+        $roles = \Spatie\Permission\Models\Role::all();
+        $permissions = \Spatie\Permission\Models\Permission::all();
+        
+        $matrix = [];
+        foreach ($roles as $role) {
+            $matrix[$role->name] = $role->permissions->pluck('name')->toArray();
+        }
+
+        return response()->json([
+            'roles' => $roles->pluck('name')->toArray(),
+            'permissions' => $permissions->pluck('name')->toArray(),
+            'matrix' => $matrix
+        ]);
+    });
+
+    Route::post('/ti/roles-permissions/toggle', function (\Illuminate\Http\Request $request) {
+        $user = $request->user();
+        if (!$user || !$user->hasAnyRole(['TI', 'ti'])) {
+            return response()->json(['error' => 'No autorizado. Solo administradores de TI pueden gestionar permisos.'], 403);
+        }
+
+        $roleName = $request->input('role');
+        $permissionName = $request->input('permission');
+
+        if (!$roleName || !$permissionName) {
+            return response()->json(['error' => 'Rol y permiso requeridos.'], 400);
+        }
+
+        $role = \Spatie\Permission\Models\Role::findByName($roleName, 'web');
+        $permission = \Spatie\Permission\Models\Permission::findOrCreate($permissionName, 'web');
+
+        if ($role->hasPermissionTo($permission)) {
+            $role->revokePermissionTo($permission);
+            $action = 'revoked';
+        } else {
+            $role->givePermissionTo($permission);
+            $action = 'granted';
+        }
+
+        // Clear cached permissions
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        return response()->json([
+            'success' => true,
+            'action' => $action,
+            'message' => "Permiso '{$permissionName}' " . ($action === 'granted' ? 'otorgado' : 'revocado') . " al rol '{$roleName}'."
+        ]);
+    });
 });

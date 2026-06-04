@@ -1279,9 +1279,23 @@ Derivado de la incorporación de las directrices operativas, contables y laboral
     -   *Seguro de Cesantía (AFC):* $0.60\%$ sobre el Sueldo Base Imponible.
     -   *Sueldo Líquido ($S_{liquido}$):* $S_{liquido} = H_{total} - (\text{Salud} + \text{Pensión} + \text{Cesantía})$
 
+### 15.11 Consola DevOps Programática, Matriz Real Spatie y Sincronización Reactiva de Sesión (zAux 04/06)
+Derivado de la integración de herramientas de diagnóstico y auditoría de permisos de la sesión de junio de 2026, se definen las siguientes especificaciones técnicas:
+*   **Consola de Emergencia TI Programática (VPS Attestation):**
+    -   *Endpoint Seguro:* `POST /api/ti/command` protegido bajo el middleware `auth:sanctum` y validación de rol de TI.
+    -   *Diagnóstico de Logs sin SSH:* El comando `logs:view` ejecuta un puntero nativo PHP (`fseek` con lectura de buffer reversible) para extraer las últimas 50 líneas de `storage/logs/laravel.log`. Esto previene la inyección de comandos y funciona bajo configuraciones restrictivas de VPS que inhabilitan `shell_exec`.
+    -   *Comandos Artisan Permitidos:* `db:status`, `cache:clear`, `system:info`, `auth:permissions`, `logs:view`, `logs:clear`, `db:migrate` (con `--force`), y `db:seed`.
+*   **Matriz Real Spatie RBAC y Persistencia de Permisos:**
+    -   *Arquitectura de API:* `GET /api/ti/roles-permissions` y `POST /api/ti/roles-permissions/toggle`.
+    -   *Toggles de Roles:* Modifica las relaciones Spatie de forma persistente llamando a `givePermissionTo` y `revokePermissionTo` en el kernel Eloquent, vaciando automáticamente la caché del package mediante `forgetCachedPermissions()`.
+    -   *Sincronización Reactiva (Session Reload):* Para evitar inconsistencias de visualización (por ejemplo, que el usuario en sesión active/desactive un permiso de su propio rol y el menú lateral no se entere), la matriz ejecuta una recarga en caliente de props mediante `router.reload()` de Inertia, actualizando las autorizaciones de la SPA en milisegundos.
+*   **Inspección del Mapa de Ocupación Sandbox:**
+    -   *Mapeo de Usuarios:* Al clickear una celda de departamento en el Sandbox de Inspección, el sistema realiza una búsqueda bidireccional por nombres de dueños y residentes (`p.owners` y `p.residents`) contra la tabla global de usuarios `usersList`.
+    -   *Auto-Impersonación:* De encontrar coincidencia de usuario activo, la interfaz inicia automáticamente la impersonación Spatie de ese residente para auditar sus privilegios y vista PropTech sin salir del sandbox.
+
 ---
 
 **Fecha de creación:** Mayo 2026
-**Última actualización:** 2 de Junio de 2026 (Refactorización Modular de Dashboard, Unificación Widescreen y Especificaciones del Manual Operativo, Contable y de Remuneraciones zAux)
-**Versión:** 6.0 (Enterprise Spec, Multi-Role Architecture, Standard GGCC & Certified Payroll Engine)
+**Última actualización:** 4 de Junio de 2026 (Consola Programática DevOps, Matriz Real Spatie, Separación de Tabs de TI, Auto-Impersonación en Mapa del Sandbox y Sincronización de Sesión)
+**Versión:** 6.1 (DevOps Spec, Real Spatie Integration, Session Reload & Interactive Sandbox Map)
 **Estado:** Listo para desarrollo (Con base de datos en SQLite/MySQL, suite de pruebas automatizadas, especificación de alta fidelidad PropTech, catálogo de cuentas base y maquetación premium widescreen)

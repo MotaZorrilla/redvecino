@@ -17,6 +17,7 @@ import { RoleTransitionLoader } from '@/Components/DashboardShared';
 // Components - TI (DevOps)
 import DevOpsTelemetry from '@/Components/Ti/DevOpsTelemetry';
 import SpatieImpersonator from '@/Components/Ti/SpatieImpersonator';
+import SpatiePermissionMatrix from '@/Components/Ti/SpatiePermissionMatrix';
 import GlobalUsersTable from '@/Components/Ti/GlobalUsersTable';
 import CondosManagement from '@/Components/Ti/CondosManagement';
 import SandboxInspeccion from '@/Components/Ti/SandboxInspeccion';
@@ -345,9 +346,11 @@ export default function Dashboard() {
 
     const [darkMode, setDarkMode] = useState(() => {
         if (typeof window !== 'undefined') {
-            return localStorage.getItem('dashboard-theme') === 'dark' || document.documentElement.classList.contains('dark');
+            const storedTheme = localStorage.getItem('dashboard-theme');
+            if (storedTheme) return storedTheme === 'dark';
+            return true; // Default to dark mode by default
         }
-        return false;
+        return true;
     });
 
     useEffect(() => {
@@ -433,12 +436,66 @@ export default function Dashboard() {
     
     // Spatie RBAC interactive matrix
     const [rbMatrix, setRbMatrix] = useState({
-        admin: { read_profile: true, pay_expenses: true, resolve_tickets: true, publish_announcements: true, config_ti: false },
-        owner: { read_profile: true, pay_expenses: true, resolve_tickets: false, publish_announcements: false, config_ti: false },
-        resident: { read_profile: true, pay_expenses: false, resolve_tickets: false, publish_announcements: false, config_ti: false },
-        committee: { read_profile: true, pay_expenses: false, resolve_tickets: false, publish_announcements: true, config_ti: false },
-        employee: { read_profile: true, pay_expenses: false, resolve_tickets: true, publish_announcements: false, config_ti: false },
-        ti: { read_profile: true, pay_expenses: true, resolve_tickets: true, publish_announcements: true, config_ti: true }
+        ti: {
+            ver_finanzas_global: true,
+            impersonar_residentes: true,
+            auditar_conversaciones: true,
+            simular_ocr_conserje: true,
+            modificar_sistema_config: true,
+            gestionar_roles_avanzados: true,
+            auditar_proveedores: true,
+            control_asambleas_ia: true
+        },
+        admin: {
+            ver_finanzas_global: true,
+            impersonar_residentes: true,
+            auditar_conversaciones: true,
+            simular_ocr_conserje: true,
+            modificar_sistema_config: false,
+            gestionar_roles_avanzados: true,
+            auditar_proveedores: true,
+            control_asambleas_ia: true
+        },
+        employee: {
+            ver_finanzas_global: false,
+            impersonar_residentes: false,
+            auditar_conversaciones: false,
+            simular_ocr_conserje: true,
+            modificar_sistema_config: false,
+            gestionar_roles_avanzados: false,
+            auditar_proveedores: false,
+            control_asambleas_ia: false
+        },
+        comite: {
+            ver_finanzas_global: true,
+            impersonar_residentes: false,
+            auditar_conversaciones: false,
+            simular_ocr_conserje: false,
+            modificar_sistema_config: false,
+            gestionar_roles_avanzados: false,
+            auditar_proveedores: false,
+            control_asambleas_ia: true
+        },
+        proveedor: {
+            ver_finanzas_global: false,
+            impersonar_residentes: false,
+            auditar_conversaciones: false,
+            simular_ocr_conserje: false,
+            modificar_sistema_config: false,
+            gestionar_roles_avanzados: false,
+            auditar_proveedores: false,
+            control_asambleas_ia: false
+        },
+        resident: {
+            ver_finanzas_global: false,
+            impersonar_residentes: false,
+            auditar_conversaciones: false,
+            simular_ocr_conserje: false,
+            modificar_sistema_config: false,
+            gestionar_roles_avanzados: false,
+            auditar_proveedores: false,
+            control_asambleas_ia: false
+        }
     });
 
     // Resident View (MiVecino) state hooks
@@ -784,11 +841,10 @@ export default function Dashboard() {
                             latency={latency}
                             terminalLogs={terminalLogs}
                             setTerminalLogs={setTerminalLogs}
-                            usersList={usersList}
-                            propertiesList={propertiesList}
-                            rbMatrix={rbMatrix}
-                            handleTogglePermission={handleTogglePermission}
                         />
+                    )}
+                    {tiActiveTab === 'matrix' && (
+                        <SpatiePermissionMatrix setTerminalLogs={setTerminalLogs} />
                     )}
                     {tiActiveTab === 'impersonation' && (
                         <SpatieImpersonator

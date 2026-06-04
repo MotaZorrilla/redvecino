@@ -53,7 +53,7 @@ export default function ShiftLogs({ adminCondoId }) {
                                 required
                                 value={newLog.conserje}
                                 onChange={(e) => setNewLog(prev => ({ ...prev, conserje: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                             />
                         </div>
                         <div>
@@ -61,7 +61,7 @@ export default function ShiftLogs({ adminCondoId }) {
                             <select
                                 value={newLog.shift}
                                 onChange={(e) => setNewLog(prev => ({ ...prev, shift: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                             >
                                 <option value="Mañana (06:00 - 14:00)">Mañana (06:00 - 14:00)</option>
                                 <option value="Tarde (14:00 - 22:00)">Tarde (14:00 - 22:00)</option>
@@ -76,7 +76,7 @@ export default function ShiftLogs({ adminCondoId }) {
                             rows="4"
                             value={newLog.notes}
                             onChange={(e) => setNewLog(prev => ({ ...prev, notes: e.target.value }))}
-                            className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
+                            className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
                             placeholder="Ej: Mantenciones, reclamos de ruidos, entrega de correspondencia especial..."
                         />
                     </div>

@@ -55,7 +55,7 @@ export default function SuperUsuarioLayout({
             </Head>
 
             {/* 1. LEFT SIDEBAR */}
-            <div className={`w-64 bg-slate-955 dark:bg-slate-950 text-white p-6 flex flex-col justify-between shrink-0 font-sans md:flex transition-transform duration-300 absolute md:relative inset-y-0 left-0 z-45 md:translate-x-0 ${isMobileSidebarOpen ? 'flex translate-x-0' : 'hidden -translate-x-full md:flex'}`}>
+            <div className={`w-64 bg-slate-950 dark:bg-slate-950 text-white p-6 flex flex-col justify-between shrink-0 font-sans md:flex transition-transform duration-300 absolute md:relative inset-y-0 left-0 z-45 md:translate-x-0 ${isMobileSidebarOpen ? 'flex translate-x-0' : 'hidden -translate-x-full md:flex'}`}>
                 <div className="space-y-6 text-left">
                     {/* Logo */}
                     <div className="flex items-center gap-3">

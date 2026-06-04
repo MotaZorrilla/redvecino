@@ -87,7 +87,7 @@ export default function TiOcupacionMap({
                             <select
                                 value={newPropForm.type}
                                 onChange={(e) => setNewPropForm(prev => ({ ...prev, type: e.target.value }))}
-                                className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
+                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
                             >
                                 <option value="apartment">Departamento</option>
                                 <option value="house">Casa</option>
@@ -100,7 +100,7 @@ export default function TiOcupacionMap({
                             <select
                                 value={newPropForm.status}
                                 onChange={(e) => setNewPropForm(prev => ({ ...prev, status: e.target.value }))}
-                                className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
+                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
                             >
                                 <option value="occupied">Ocupado (Al día)</option>
                                 <option value="delinquent">{"Moroso (>= 3 meses)"}</option>

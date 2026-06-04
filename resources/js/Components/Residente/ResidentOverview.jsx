@@ -119,7 +119,7 @@ export default function ResidentOverview({
             </div>
 
             {/* Recent activity snippet */}
-            <div className="bg-slate-50 dark:bg-slate-955/60 p-4 border border-slate-100 dark:border-slate-800 rounded-2xl space-y-2.5">
+            <div className="bg-slate-50 dark:bg-slate-950/60 p-4 border border-slate-100 dark:border-slate-800 rounded-2xl space-y-2.5">
                 <span className="text-[8px] font-extrabold uppercase tracking-widest text-slate-500 block">Resumen de Actividad Reciente</span>
                 <div className="grid grid-cols-2 gap-4 text-xs">
                     <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 p-3 rounded-xl flex items-center justify-between">

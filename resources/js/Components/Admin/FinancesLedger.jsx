@@ -144,7 +144,7 @@ export default function FinancesLedger({
                                         required
                                         value={newPaymentForm.property_id}
                                         onChange={(e) => setNewPaymentForm(prev => ({ ...prev, property_id: e.target.value }))}
-                                        className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                        className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                     >
                                         <option value="">Seleccione Unidad...</option>
                                         {adminFilteredProperties.map(p => (
@@ -158,7 +158,7 @@ export default function FinancesLedger({
                                         required
                                         value={newPaymentForm.user_id}
                                         onChange={(e) => setNewPaymentForm(prev => ({ ...prev, user_id: e.target.value }))}
-                                        className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                        className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                     >
                                         <option value="">Seleccione Residente...</option>
                                         {adminFilteredUsers.map(u => (
@@ -175,7 +175,7 @@ export default function FinancesLedger({
                                         required
                                         value={newPaymentForm.amount}
                                         onChange={(e) => setNewPaymentForm(prev => ({ ...prev, amount: e.target.value }))}
-                                        className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                        className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                     />
                                 </div>
                                 <div>
@@ -183,7 +183,7 @@ export default function FinancesLedger({
                                     <select
                                         value={newPaymentForm.payment_method}
                                         onChange={(e) => setNewPaymentForm(prev => ({ ...prev, payment_method: e.target.value }))}
-                                        className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                        className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                     >
                                         <option value="transfer">Transferencia</option>
                                         <option value="card">Tarjeta Débito/Crédito</option>
@@ -195,7 +195,7 @@ export default function FinancesLedger({
                                     <select
                                         value={newPaymentForm.status}
                                         onChange={(e) => setNewPaymentForm(prev => ({ ...prev, status: e.target.value }))}
-                                        className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                        className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                     >
                                         <option value="completed">Completado</option>
                                         <option value="pending">Pendiente</option>
@@ -467,7 +467,7 @@ export default function FinancesLedger({
                                                 required
                                                 value={newIncomeForm.category}
                                                 onChange={(e) => setNewIncomeForm(prev => ({ ...prev, category: e.target.value, subcategory: '' }))}
-                                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                             >
                                                 <option value="">Seleccione Categoría...</option>
                                                 {Object.entries(financialCatalog.incomes || {}).map(([key, obj]) => (
@@ -482,7 +482,7 @@ export default function FinancesLedger({
                                                 required
                                                 value={newIncomeForm.subcategory}
                                                 onChange={(e) => setNewIncomeForm(prev => ({ ...prev, subcategory: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                 disabled={!newIncomeForm.category}
                                             >
                                                 <option value="">Seleccione Subcategoría...</option>
@@ -501,7 +501,7 @@ export default function FinancesLedger({
                                                 required
                                                 value={newIncomeForm.amount}
                                                 onChange={(e) => setNewIncomeForm(prev => ({ ...prev, amount: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                 placeholder="Monto"
                                             />
                                         </div>
@@ -513,7 +513,7 @@ export default function FinancesLedger({
                                                 required
                                                 value={newIncomeForm.date}
                                                 onChange={(e) => setNewIncomeForm(prev => ({ ...prev, date: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                             />
                                         </div>
 
@@ -522,7 +522,7 @@ export default function FinancesLedger({
                                             <select
                                                 value={newIncomeForm.property_id}
                                                 onChange={(e) => setNewIncomeForm(prev => ({ ...prev, property_id: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                             >
                                                 <option value="">Ninguna...</option>
                                                 {adminFilteredProperties.map(p => (
@@ -538,7 +538,7 @@ export default function FinancesLedger({
                                             <select
                                                 value={newIncomeForm.user_id}
                                                 onChange={(e) => setNewIncomeForm(prev => ({ ...prev, user_id: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                             >
                                                 <option value="">Ninguno...</option>
                                                 {adminFilteredUsers.map(u => (
@@ -553,7 +553,7 @@ export default function FinancesLedger({
                                                 type="text"
                                                 value={newIncomeForm.description}
                                                 onChange={(e) => setNewIncomeForm(prev => ({ ...prev, description: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                 placeholder="Comentarios adicionales o detalle del pago"
                                             />
                                         </div>
@@ -679,7 +679,7 @@ export default function FinancesLedger({
                                                 required
                                                 value={newExpenseForm.category}
                                                 onChange={(e) => setNewExpenseForm(prev => ({ ...prev, category: e.target.value, subcategory: '' }))}
-                                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                             >
                                                 <option value="">Seleccione Categoría...</option>
                                                 {Object.entries(financialCatalog.expenses || {}).map(([key, obj]) => (
@@ -694,7 +694,7 @@ export default function FinancesLedger({
                                                 required
                                                 value={newExpenseForm.subcategory}
                                                 onChange={(e) => setNewExpenseForm(prev => ({ ...prev, subcategory: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                 disabled={!newExpenseForm.category}
                                             >
                                                 <option value="">Seleccione Subcategoría...</option>
@@ -713,7 +713,7 @@ export default function FinancesLedger({
                                                 required
                                                 value={newExpenseForm.amount}
                                                 onChange={(e) => setNewExpenseForm(prev => ({ ...prev, amount: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                 placeholder="Monto"
                                             />
                                         </div>
@@ -725,7 +725,7 @@ export default function FinancesLedger({
                                                 required
                                                 value={newExpenseForm.date}
                                                 onChange={(e) => setNewExpenseForm(prev => ({ ...prev, date: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                             />
                                         </div>
 
@@ -734,7 +734,7 @@ export default function FinancesLedger({
                                             <select
                                                 value={newExpenseForm.property_id}
                                                 onChange={(e) => setNewExpenseForm(prev => ({ ...prev, property_id: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                             >
                                                 <option value="">Ninguna...</option>
                                                 {adminFilteredProperties.map(p => (
@@ -750,7 +750,7 @@ export default function FinancesLedger({
                                             <select
                                                 value={newExpenseForm.user_id}
                                                 onChange={(e) => setNewExpenseForm(prev => ({ ...prev, user_id: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                             >
                                                 <option value="">Ninguno...</option>
                                                 {adminFilteredUsers.map(u => (
@@ -765,7 +765,7 @@ export default function FinancesLedger({
                                                 type="text"
                                                 value={newExpenseForm.description}
                                                 onChange={(e) => setNewExpenseForm(prev => ({ ...prev, description: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                                 placeholder="Comentarios adicionales o detalle del egreso"
                                             />
                                         </div>

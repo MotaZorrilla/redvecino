@@ -68,7 +68,7 @@ export default function PackageDelivery({
                         </div>
                         <div>
                             <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1 text-left">Empresa de Envío</label>
-                            <select id="colabOcrCarrierSelect" className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none cursor-pointer">
+                            <select id="colabOcrCarrierSelect" className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none cursor-pointer">
                                 <option value="Starken">Starken (Turbus)</option>
                                 <option value="Chilexpress">Chilexpress</option>
                                 <option value="CorreosChile">Correos de Chile</option>
@@ -120,7 +120,7 @@ export default function PackageDelivery({
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-xs">
                             <thead>
-                                <tr className="bg-gray-50 dark:bg-slate-955 text-gray-500 dark:text-slate-400 border-b border-gray-200 dark:border-slate-800">
+                                <tr className="bg-gray-50 dark:bg-slate-950 text-gray-500 dark:text-slate-400 border-b border-gray-200 dark:border-slate-800">
                                     <th className="p-3 font-black text-left">ID</th>
                                     <th className="p-3 font-black text-left">Tracking</th>
                                     <th className="p-3 font-black text-left">Carrier</th>

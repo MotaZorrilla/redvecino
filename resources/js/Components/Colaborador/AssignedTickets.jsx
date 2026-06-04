@@ -82,7 +82,7 @@ export default function AssignedTickets({
                                         setTicketsList(prev => prev.map(t => t.id === editingTicket.id ? { ...t, status: updatedStatus } : t));
                                         setEditingTicket(prev => ({ ...prev, status: updatedStatus }));
                                     }}
-                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
+                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
                                 >
                                     <option value="open">Abierto</option>
                                     <option value="in_progress">En Progreso / Trabajando</option>

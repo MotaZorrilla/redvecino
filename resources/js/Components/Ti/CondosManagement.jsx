@@ -108,7 +108,7 @@ export default function CondosManagement({
                                 required
                                 value={newCondoForm.address}
                                 onChange={(e) => setNewCondoForm(prev => ({ ...prev, address: e.target.value }))}
-                                className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                             />
                         </div>
                     </div>
@@ -120,7 +120,7 @@ export default function CondosManagement({
                                 required
                                 value={newCondoForm.city}
                                 onChange={(e) => setNewCondoForm(prev => ({ ...prev, city: e.target.value }))}
-                                className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                             />
                         </div>
                         <div>
@@ -130,7 +130,7 @@ export default function CondosManagement({
                                 required
                                 value={newCondoForm.units_count}
                                 onChange={(e) => setNewCondoForm(prev => ({ ...prev, units_count: e.target.value }))}
-                                className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
                             />
                         </div>
                     </div>

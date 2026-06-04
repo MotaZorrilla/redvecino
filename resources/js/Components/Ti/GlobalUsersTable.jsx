@@ -36,21 +36,21 @@ export default function GlobalUsersTable({
                         value={searchUserQuery}
                         onChange={(e) => setSearchUserQuery(e.target.value)}
                         placeholder="Buscar por Nombre, RUT..."
-                        className="px-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#00A896] w-full md:w-64"
+                        className="px-4 py-2 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#00A896] w-full md:w-64"
                     />
                     <select
                         value={roleUserFilter}
                         onChange={(e) => setRoleUserFilter(e.target.value)}
-                        className="px-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-[#00A896]"
+                        className="px-4 py-2 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl text-xs text-slate-800 dark:text-white focus:outline-none focus:border-[#00A896]"
                     >
-                        <option value="all">Todos los Roles</option>
-                        <option value="ti">TI</option>
-                        <option value="super_usuario">Súper Usuario</option>
-                        <option value="admin">Administrador</option>
-                        <option value="resident">Residente</option>
-                        <option value="owner">Propietario</option>
-                        <option value="comite">Comité</option>
-                        <option value="colaborador">Colaborador</option>
+                        <option value="all" className="bg-white dark:bg-slate-900 text-slate-800 dark:text-white">Todos los Roles</option>
+                        <option value="ti" className="bg-white dark:bg-slate-900 text-slate-800 dark:text-white">TI</option>
+                        <option value="super_usuario" className="bg-white dark:bg-slate-900 text-slate-800 dark:text-white">Súper Usuario</option>
+                        <option value="admin" className="bg-white dark:bg-slate-900 text-slate-800 dark:text-white">Administrador</option>
+                        <option value="resident" className="bg-white dark:bg-slate-900 text-slate-800 dark:text-white">Residente</option>
+                        <option value="owner" className="bg-white dark:bg-slate-900 text-slate-800 dark:text-white">Propietario</option>
+                        <option value="comite" className="bg-white dark:bg-slate-900 text-slate-800 dark:text-white">Comité</option>
+                        <option value="colaborador" className="bg-white dark:bg-slate-900 text-slate-800 dark:text-white">Colaborador</option>
                     </select>
                 </div>
             </div>
@@ -95,7 +95,7 @@ export default function GlobalUsersTable({
                                 required
                                 value={newUserForm.name}
                                 onChange={(e) => setNewUserForm(prev => ({ ...prev, name: e.target.value }))}
-                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-250 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-[#00A896]"
                             />
                         </div>
                         <div>
@@ -105,7 +105,7 @@ export default function GlobalUsersTable({
                                 required
                                 value={newUserForm.rut}
                                 onChange={(e) => setNewUserForm(prev => ({ ...prev, rut: e.target.value }))}
-                                className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-250 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-[#00A896]"
                             />
                         </div>
                     </div>
@@ -117,7 +117,7 @@ export default function GlobalUsersTable({
                                 required
                                 value={newUserForm.email}
                                 onChange={(e) => setNewUserForm(prev => ({ ...prev, email: e.target.value }))}
-                                className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-250 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-[#00A896]"
                             />
                         </div>
                         <div>
@@ -127,7 +127,7 @@ export default function GlobalUsersTable({
                                 required
                                 value={newUserForm.phone}
                                 onChange={(e) => setNewUserForm(prev => ({ ...prev, phone: e.target.value }))}
-                                className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-250 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-[#00A896]"
                             />
                         </div>
                     </div>
@@ -137,15 +137,15 @@ export default function GlobalUsersTable({
                             <select
                                 value={newUserForm.role}
                                 onChange={(e) => setNewUserForm(prev => ({ ...prev, role: e.target.value }))}
-                                className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-850 dark:text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
                             >
-                                <option value="ti">TI</option>
-                                <option value="super_usuario">Súper Usuario</option>
-                                <option value="admin">Administrador</option>
-                                <option value="resident">Residente</option>
-                                <option value="owner">Propietario</option>
-                                <option value="comite">Comité</option>
-                                <option value="colaborador">Colaborador</option>
+                                <option value="ti" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">TI</option>
+                                <option value="super_usuario" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Súper Usuario</option>
+                                <option value="admin" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Administrador</option>
+                                <option value="resident" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Residente</option>
+                                <option value="owner" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Propietario</option>
+                                <option value="comite" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Comité</option>
+                                <option value="colaborador" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Colaborador</option>
                             </select>
                         </div>
                         <div>
@@ -153,11 +153,11 @@ export default function GlobalUsersTable({
                             <select
                                 value={newUserForm.status}
                                 onChange={(e) => setNewUserForm(prev => ({ ...prev, status: e.target.value }))}
-                                className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-850 dark:text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
                             >
-                                <option value="active">Activo</option>
-                                <option value="inactive">Inactivo</option>
-                                <option value="suspended">Suspendido</option>
+                                <option value="active" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Activo</option>
+                                <option value="inactive" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Inactivo</option>
+                                <option value="suspended" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Suspendido</option>
                             </select>
                         </div>
                     </div>

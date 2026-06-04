@@ -51,7 +51,7 @@ export default function MeetingsMinutes({ adminCondoId }) {
                                 required
                                 value={newMinute.title}
                                 onChange={(e) => setNewMinute(prev => ({ ...prev, title: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                 placeholder="Ej: Asamblea Ordinaria Mayo"
                             />
                         </div>
@@ -62,7 +62,7 @@ export default function MeetingsMinutes({ adminCondoId }) {
                                 required
                                 value={newMinute.date}
                                 onChange={(e) => setNewMinute(prev => ({ ...prev, date: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                             />
                         </div>
                     </div>
@@ -74,7 +74,7 @@ export default function MeetingsMinutes({ adminCondoId }) {
                                 required
                                 value={newMinute.quorum}
                                 onChange={(e) => setNewMinute(prev => ({ ...prev, quorum: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                 placeholder="Ej: 75%"
                             />
                         </div>
@@ -83,7 +83,7 @@ export default function MeetingsMinutes({ adminCondoId }) {
                             <select
                                 value={newMinute.status}
                                 onChange={(e) => setNewMinute(prev => ({ ...prev, status: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                             >
                                 <option value="signed">Firmado por Comité</option>
                                 <option value="pending">Pendiente de Firma</option>
@@ -97,7 +97,7 @@ export default function MeetingsMinutes({ adminCondoId }) {
                             rows="3"
                             value={newMinute.decisions}
                             onChange={(e) => setNewMinute(prev => ({ ...prev, decisions: e.target.value }))}
-                            className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
+                            className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
                             placeholder="Describa los puntos aprobados y resoluciones..."
                         />
                     </div>

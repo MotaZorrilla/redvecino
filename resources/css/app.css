@@ -32,3 +32,14 @@
   animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Global Select and Option Contrast Correction */
+select option {
+  color: #1e293b !important; /* slate-800 */
+  background-color: #ffffff !important; /* white */
+}
+
+.dark select option {
+  color: #f8fafc !important; /* slate-50 */
+  background-color: #020617 !important; /* slate-950 */
+}
+

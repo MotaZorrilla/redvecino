@@ -57,7 +57,7 @@ export default function VisitorAccess({ adminCondoId }) {
                                 required
                                 value={newVisitor.name}
                                 onChange={(e) => setNewVisitor(prev => ({ ...prev, name: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                             />
                         </div>
                         <div>
@@ -67,7 +67,7 @@ export default function VisitorAccess({ adminCondoId }) {
                                 required
                                 value={newVisitor.rut}
                                 onChange={(e) => setNewVisitor(prev => ({ ...prev, rut: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                             />
                         </div>
                     </div>
@@ -77,7 +77,7 @@ export default function VisitorAccess({ adminCondoId }) {
                             <select
                                 value={newVisitor.dest}
                                 onChange={(e) => setNewVisitor(prev => ({ ...prev, dest: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                             >
                                 <option value="Depto 202">Depto 202</option>
                                 <option value="Depto 101">Depto 101</option>
@@ -90,7 +90,7 @@ export default function VisitorAccess({ adminCondoId }) {
                                 type="text"
                                 value={newVisitor.plate}
                                 onChange={(e) => setNewVisitor(prev => ({ ...prev, plate: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                 placeholder="AB-CD-12"
                             />
                         </div>
@@ -100,7 +100,7 @@ export default function VisitorAccess({ adminCondoId }) {
                                 type="text"
                                 value={newVisitor.entryTime}
                                 onChange={(e) => setNewVisitor(prev => ({ ...prev, entryTime: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                                 placeholder="E.g., 18:30"
                             />
                         </div>

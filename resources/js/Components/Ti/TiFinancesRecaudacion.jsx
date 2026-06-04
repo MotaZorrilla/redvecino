@@ -107,7 +107,7 @@ export default function TiFinancesRecaudacion({
                         <select
                             value={newPaymentForm.payment_method}
                             onChange={(e) => setNewPaymentForm(prev => ({ ...prev, payment_method: e.target.value }))}
-                            className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
                         >
                             <option value="transfer">Transferencia</option>
                             <option value="card">Tarjeta Crédito/Débito</option>

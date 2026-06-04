@@ -46,11 +46,11 @@ export default function SpatieImpersonator({
                                 setSelectedImpCondo(e.target.value);
                                 setSelectedImpUser('');
                             }}
-                            className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3.5 py-2.5 text-white focus:outline-none focus:border-[#00A896] hover:border-slate-700 transition-all font-medium focus:ring-0 cursor-pointer"
+                            className="w-full bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl text-xs px-3.5 py-2.5 text-slate-850 dark:text-white focus:outline-none focus:border-[#00A896] hover:border-slate-700 transition-all font-medium focus:ring-0 cursor-pointer"
                         >
-                            <option value="all" className="bg-slate-955 text-slate-100">Todos los Condominios</option>
+                            <option value="all" className="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100">Todos los Condominios</option>
                             {condosList.map(c => (
-                                <option key={c.id} value={c.id} className="bg-slate-955 text-slate-100">{c.name}</option>
+                                <option key={c.id} value={c.id} className="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100">{c.name}</option>
                             ))}
                         </select>
                     </div>
@@ -67,15 +67,15 @@ export default function SpatieImpersonator({
                                 setSelectedImpRole(e.target.value);
                                 setSelectedImpUser('');
                             }}
-                            className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3.5 py-2.5 text-white focus:outline-none focus:border-[#00A896] hover:border-slate-700 transition-all font-medium focus:ring-0 cursor-pointer"
+                            className="w-full bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl text-xs px-3.5 py-2.5 text-slate-850 dark:text-white focus:outline-none focus:border-[#00A896] hover:border-slate-700 transition-all font-medium focus:ring-0 cursor-pointer"
                         >
-                            <option value="all" className="bg-slate-955 text-slate-100">Todos los Roles</option>
-                            <option value="super_usuario" className="bg-slate-955 text-slate-100">Súper Usuario</option>
-                            <option value="admin" className="bg-slate-955 text-slate-100">Administrador</option>
-                            <option value="propietario" className="bg-slate-955 text-slate-100">Propietario</option>
-                            <option value="resident" className="bg-slate-955 text-slate-100">Residente</option>
-                            <option value="comite" className="bg-slate-955 text-slate-100">Comité</option>
-                            <option value="colaborador" className="bg-slate-955 text-slate-100">Colaborador</option>
+                            <option value="all" className="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100">Todos los Roles</option>
+                            <option value="super_usuario" className="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100">Súper Usuario</option>
+                            <option value="admin" className="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100">Administrador</option>
+                            <option value="propietario" className="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100">Propietario</option>
+                            <option value="resident" className="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100">Residente</option>
+                            <option value="comite" className="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100">Comité</option>
+                            <option value="colaborador" className="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100">Colaborador</option>
                         </select>
                     </div>
 
@@ -88,9 +88,9 @@ export default function SpatieImpersonator({
                         <select
                             value={selectedImpUser}
                             onChange={(e) => setSelectedImpUser(e.target.value)}
-                            className="w-full bg-slate-955 border border-slate-800 rounded-xl text-xs px-3.5 py-2.5 text-white focus:outline-none focus:border-[#00A896] hover:border-slate-700 transition-all font-medium focus:ring-0 cursor-pointer"
+                            className="w-full bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl text-xs px-3.5 py-2.5 text-slate-850 dark:text-white focus:outline-none focus:border-[#00A896] hover:border-slate-700 transition-all font-medium focus:ring-0 cursor-pointer"
                         >
-                            <option value="" className="bg-slate-955 text-slate-100">Seleccione Usuario...</option>
+                            <option value="" className="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100">Seleccione Usuario...</option>
                             {usersList
                                 .filter(u => {
                                     if (selectedImpCondo !== 'all') {
@@ -108,7 +108,7 @@ export default function SpatieImpersonator({
                                     return true;
                                 })
                                 .map(u => (
-                                    <option key={u.id} value={u.id} className="bg-slate-955 text-slate-100">{u.name} ({u.roles[0] || 'Residente'})</option>
+                                    <option key={u.id} value={u.id} className="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100">{u.name} ({u.roles[0] || 'Residente'})</option>
                                 ))
                             }
                         </select>

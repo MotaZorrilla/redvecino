@@ -279,9 +279,26 @@ Failures:    0 failed
 *   **Lista TODO actualizada en [HISTORY.md](file:///C:/xampp/htdocs/redvecino/HISTORY.md):** Sección 2.7 con desglose completo de 15 sub-tareas derivadas de los mockups (wizard + dashboards).
 *   **QA Certificado al 100%:** Compilación Vite exitosa en 2.71s. **146 tests pasados con 597 aserciones en 74.53s** sin regresiones.
 
+### 3.11 Terminal Programática de Logs VPS, Matriz Real Spatie y Mapa de Ocupación Interactivo (Sesión 04/06/2026)
+*   **Consola DevOps Conectada al Servidor VPS:**
+    *   Se reemplazaron los mocks locales en [DevOpsTelemetry.jsx](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Ti/DevOpsTelemetry.jsx) por llamadas Axios reales al endpoint `POST /api/ti/command`.
+    *   *Ampliación de Terminal:* Se duplicó la altura de la consola a **`400px`** (scroll interno de `330px`) para visualizar salidas extensas de logs de sistema de forma cómoda.
+    *   *Botones de Acciones Rápidas:* Agregado un panel de 8 botones rápidos (`Estado BD`, `Limpiar Caché`, `Info Sistema`, `Permisos Spatie`, `Ver Logs`, `Limpiar Logs`, `Migrar BD`, `Semillar BD`) para ejecutar comandos con un solo clic.
+    *   *Nuevos Comandos Seguros en PHP:* En [routes/api.php](file:///C:/xampp/htdocs/redvecino/routes/api.php), se agregaron las operaciones `logs:view` (lee las últimas 50 líneas de `laravel.log` mediante puntero fseek trasero en PHP puro, evitando comandos de sistema bloqueados en el VPS), `logs:clear` (vacía el log), `db:migrate` (corre migraciones con `--force`) y `db:seed`.
+*   **Matriz Real Spatie y Tab Independiente (`⚖️ Matriz Spatie`):**
+    *   *Resolución de Acceso TI:* Se solucionó el bug de bloqueo "No autorizado" cambiando las validaciones estrictas `$user->hasRole('ti')` por la coincidencia permisiva con mayúsculas `$user->hasAnyRole(['TI', 'ti'])` para alinearse con los seeders de base de datos.
+    *   *Pestaña Separada en Sidebar:* Se retiró la matriz del panel de impersonación y se creó el tab independiente `matrix` en [TiLayout.jsx](file:///C:/xampp/htdocs/redvecino/resources/js/Layouts/TiLayout.jsx) y [Dashboard.jsx](file:///C:/xampp/htdocs/redvecino/resources/js/Pages/Dashboard.jsx) con título "⚖️ Matriz de Permisos Spatie (Real BD)".
+    *   *Mapeo y Toggles en Caliente:* Se programó el componente [SpatiePermissionMatrix.jsx](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Ti/SpatiePermissionMatrix.jsx) para leer la tabla de base de datos y togglear relaciones en vivo mediante `POST /api/ti/roles-permissions/toggle`.
+    *   *Sincronización de Sesión:* Agregado un trigger `router.reload()` nativo de Inertia al cambiar un permiso en la matriz. Esto actualiza la sesión en caliente en el navegador para que la barra lateral y los accesos del usuario activo reflejen los nuevos permisos inmediatamente.
+*   **Mapa de Ocupación Sandbox Interactivo:**
+    *   Se reemplazó la antigua lógica rota `u.properties` por una correspondencia cruzada de nombres de propietarios y residentes en [SandboxInspeccion.jsx](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Ti/SandboxInspeccion.jsx).
+    *   *Inspección y Click-to-Impersonate:* Al hacer click en un departamento, la consola registra el evento y **auto-impersona** al usuario responsable de forma inmediata en la interfaz para auditar su perfil.
+    *   *Corrección de Colores:* Se eliminó la clase inexistente `bg-amber-955` y se normalizó con contrastes Tailwind limpios compatibles con modos claro/oscuro. Se removió el límite de 24 ítems del mapa para mostrar todo el condominio.
+*   **Modo Claro/Oscuro Adaptativo para TI:** Se rediseñó [TiLayout.jsx](file:///C:/xampp/htdocs/redvecino/resources/js/Layouts/TiLayout.jsx) con variables adaptativas a `darkMode`. Se estableció el modo oscuro por defecto en [Dashboard.jsx](file:///C:/xampp/htdocs/redvecino/resources/js/Pages/Dashboard.jsx).
+
 ---
 
 **Fecha de creación:** Mayo 2026
-**Última actualización:** 4 de Junio de 2026 (Asistente de Creación de Personas, Expansión de Dashboards Colaborador/Conserjería y Lista TODO de Mockups)
-**Versión:** 3.1 (Person Wizard + Expanded Colaborador Dashboard & Standard QA Certified)
+**Última actualización:** 4 de Junio de 2026 (Consola Programática DevOps, Matriz Real Spatie, Separación de Tabs de TI, Auto-Impersonación en Mapa del Sandbox y Sincronización de Sesión)
+**Versión:** 3.2 (DevOps Console & Real Spatie Permissions Matrix Integration, Live Attestation & Certified QA)
 **Estado:** Activo y Actualizado

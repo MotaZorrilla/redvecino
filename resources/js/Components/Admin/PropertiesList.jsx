@@ -75,7 +75,7 @@ export default function PropertiesList({
                             <select
                                 value={newPropForm.type}
                                 onChange={(e) => setNewPropForm(prev => ({ ...prev, type: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                             >
                                 <option value="apartment">Departamento</option>
                                 <option value="house">Casa</option>
@@ -90,7 +90,7 @@ export default function PropertiesList({
                                 required
                                 value={newPropForm.number}
                                 onChange={(e) => setNewPropForm(prev => ({ ...prev, number: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                             />
                         </div>
                     </div>
@@ -101,7 +101,7 @@ export default function PropertiesList({
                                 type="text"
                                 value={newPropForm.block}
                                 onChange={(e) => setNewPropForm(prev => ({ ...prev, block: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                             />
                         </div>
                         <div>
@@ -110,7 +110,7 @@ export default function PropertiesList({
                                 type="number"
                                 value={newPropForm.floor}
                                 onChange={(e) => setNewPropForm(prev => ({ ...prev, floor: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                             />
                         </div>
                         <div>
@@ -119,7 +119,7 @@ export default function PropertiesList({
                                 type="number"
                                 value={newPropForm.area_sqm}
                                 onChange={(e) => setNewPropForm(prev => ({ ...prev, area_sqm: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                             />
                         </div>
                     </div>
@@ -128,7 +128,7 @@ export default function PropertiesList({
                         <select
                             value={newPropForm.status}
                             onChange={(e) => setNewPropForm(prev => ({ ...prev, status: e.target.value }))}
-                            className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                            className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                         >
                             <option value="occupied">Ocupado</option>
                             <option value="vacant">Desocupado</option>

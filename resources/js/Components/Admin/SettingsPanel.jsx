@@ -51,7 +51,7 @@ export default function SettingsPanel({
                             type="email"
                             value={adminSettingsForm.email}
                             onChange={e => setAdminSettingsForm(prev => ({ ...prev, email: e.target.value }))}
-                            className="w-full bg-gray-50 dark:bg-slate-955 border border-gray-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-gray-800 dark:text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                            className="w-full bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-gray-800 dark:text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none"
                             required
                         />
                     </div>
@@ -62,7 +62,7 @@ export default function SettingsPanel({
                                 type="text"
                                 value={adminSettingsForm.phone}
                                 onChange={e => setAdminSettingsForm(prev => ({ ...prev, phone: e.target.value }))}
-                                className="w-full bg-gray-50 dark:bg-slate-955 border border-gray-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-gray-800 dark:text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                                className="w-full bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-gray-800 dark:text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none"
                             />
                         </div>
                         <div>
@@ -71,7 +71,7 @@ export default function SettingsPanel({
                                 type="text"
                                 value={adminSettingsForm.rut}
                                 onChange={e => setAdminSettingsForm(prev => ({ ...prev, rut: e.target.value }))}
-                                className="w-full bg-gray-50 dark:bg-slate-955 border border-gray-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-gray-800 dark:text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+                                className="w-full bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-gray-800 dark:text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none"
                                 required
                             />
                         </div>
@@ -96,7 +96,7 @@ export default function SettingsPanel({
                     </p>
 
                     <div className="space-y-3">
-                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-955 rounded-xl border border-gray-200 dark:border-slate-800">
+                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-800">
                             <div>
                                 <span className="text-xs font-bold text-gray-800 dark:text-slate-200 block">Notificaciones por Email</span>
                                 <span className="text-[10px] text-gray-500 dark:text-slate-400">Enviar correos por nuevos tickets o pagos.</span>
@@ -112,7 +112,7 @@ export default function SettingsPanel({
                             </label>
                         </div>
 
-                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-955 rounded-xl border border-gray-200 dark:border-slate-800">
+                        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-950 rounded-xl border border-gray-200 dark:border-slate-800">
                             <div>
                                 <span className="text-xs font-bold text-gray-900 dark:text-slate-200 block">Motor de Base de Datos</span>
                                 <span className="text-[10px] text-gray-500 dark:text-slate-400">Driver activo para la aplicación.</span>

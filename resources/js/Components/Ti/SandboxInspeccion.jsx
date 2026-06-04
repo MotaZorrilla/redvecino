@@ -75,11 +75,11 @@ export default function SandboxInspeccion({
                     <select
                         value={sandboxCondoId}
                         onChange={(e) => setSandboxCondoId(e.target.value)}
-                        className="bg-slate-900 border border-slate-700 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
+                        className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
                     >
-                        <option value="all">Todos los Condominios</option>
+                        <option value="all" className="bg-white dark:bg-slate-900 text-slate-800 dark:text-white">Todos los Condominios</option>
                         {condosList.map(c => (
-                            <option key={c.id} value={c.id}>{c.name}</option>
+                            <option key={c.id} value={c.id} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-white">{c.name}</option>
                         ))}
                     </select>
                 </div>
@@ -119,29 +119,38 @@ export default function SandboxInspeccion({
                     <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2">
                         {propertiesList
                             .filter(p => sandboxCondoId === 'all' || p.condominium_id === Number(sandboxCondoId))
-                            .slice(0, 24)
-                            .map(p => (
-                                <div
-                                    key={p.id}
-                                    onClick={() => {
-                                        setTerminalLogs(prev => [...prev, `[SANDBOX] Inspeccionando propiedad #${p.id}: ${p.number} (${p.status})`]);
-                                        const matched = usersList.find(u => u.properties?.includes?.(p.id));
-                                        if (matched) {
-                                            setImpersonatedUser(matched);
-                                        }
-                                    }}
-                                    className={`p-2 rounded-xl border text-center cursor-pointer transition-all hover:scale-105 ${
-                                        p.status === 'occupied'
-                                            ? 'bg-emerald-950/40 border-emerald-800/50 text-emerald-400'
-                                            : p.status === 'vacant'
-                                            ? 'bg-slate-800/40 border-slate-700/50 text-slate-400'
-                                            : 'bg-amber-955/40 border-amber-800/50 text-amber-400'
-                                    }`}
-                                >
-                                    <span className="text-[9px] font-bold block">{p.number}</span>
-                                    <span className="text-[7px] opacity-70 block">{p.type}</span>
-                                </div>
-                            ))}
+                            .map(p => {
+                                const ownerName = p.owners?.[0];
+                                const residentName = p.residents?.[0];
+                                const matched = usersList.find(u => 
+                                    (ownerName && u.name.toLowerCase() === ownerName.toLowerCase()) ||
+                                    (residentName && u.name.toLowerCase() === residentName.toLowerCase())
+                                );
+
+                                return (
+                                    <div
+                                        key={p.id}
+                                        onClick={() => {
+                                            setTerminalLogs(prev => [...prev, `[SANDBOX] Inspeccionando propiedad #${p.id}: ${p.number} (${p.status === 'occupied' ? 'Ocupado' : 'Disponible'})`]);
+                                            if (matched) {
+                                                setTerminalLogs(prev => [...prev, `[SANDBOX] Auto-impersonando usuario responsable: ${matched.name} (${matched.roles?.[0] || 'Residente'})`]);
+                                                setImpersonatedUser(matched);
+                                            } else {
+                                                setTerminalLogs(prev => [...prev, `[SANDBOX] No se encontró un usuario activo asociado a la propiedad ${p.number}.`]);
+                                            }
+                                        }}
+                                        className={`p-2 rounded-xl border text-center cursor-pointer transition-all hover:scale-105 ${
+                                            p.status === 'occupied'
+                                                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                                                : 'bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/50 text-slate-500 dark:text-slate-400'
+                                        }`}
+                                        title={matched ? `Usuario: ${matched.name} (${matched.roles?.[0] || 'Residente'})` : 'Sin asignar'}
+                                    >
+                                        <span className="text-[9px] font-bold block">{p.number}</span>
+                                        <span className="text-[7px] opacity-70 block">{p.type}</span>
+                                    </div>
+                                );
+                            })}
                     </div>
                 </div>
             )}
@@ -196,7 +205,7 @@ export default function SandboxInspeccion({
                             .filter(p => sandboxCondoId === 'all' || p.property?.condominium_id === Number(sandboxCondoId))
                             .slice(0, 6)
                             .map(p => (
-                                <div key={p.id} className="flex items-center justify-between p-2 bg-slate-955/50 rounded-xl border border-slate-800/60">
+                                <div key={p.id} className="flex items-center justify-between p-2 bg-slate-950/50 rounded-xl border border-slate-800/60">
                                     <span className="text-xs text-slate-400">{p.user?.name || '-'} — Prop #{p.property_id}</span>
                                     <span className="text-xs font-bold text-slate-200">${Number(p.amount).toLocaleString()}</span>
                                 </div>
@@ -213,7 +222,7 @@ export default function SandboxInspeccion({
                     </h5>
                     <div className="space-y-2 max-h-[300px] overflow-y-auto">
                         {auditedMessagesState.slice(0, 8).map(msg => (
-                            <div key={msg.id} className="flex items-start gap-3 p-3 bg-slate-955/50 rounded-xl border border-slate-800/60">
+                            <div key={msg.id} className="flex items-start gap-3 p-3 bg-slate-950/50 rounded-xl border border-slate-800/60">
                                 <div className="h-7 w-7 rounded-full bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-300 shrink-0">
                                     {msg.sender_name?.charAt(0)}
                                 </div>
@@ -239,7 +248,7 @@ export default function SandboxInspeccion({
                     </h5>
                     <div className="space-y-2 max-h-[300px] overflow-y-auto">
                         {packages.map(pkg => (
-                            <div key={pkg.id} className="flex items-center justify-between p-3 bg-slate-955/50 rounded-xl border border-slate-800/60">
+                            <div key={pkg.id} className="flex items-center justify-between p-3 bg-slate-950/50 rounded-xl border border-slate-800/60">
                                 <div className="flex items-center gap-3 min-w-0">
                                     <span className={`text-[10px] font-mono ${pkg.status === 'completed' ? 'text-emerald-500' : 'text-amber-500'}`}>
                                         {pkg.status === 'completed' ? '📦' : '📋'}

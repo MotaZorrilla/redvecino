@@ -72,7 +72,7 @@ export default function FinesList({
                                 required
                                 value={newFineForm.property_id}
                                 onChange={(e) => setNewFineForm(prev => ({ ...prev, property_id: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
                             >
                                 <option value="">Seleccione Unidad...</option>
                                 {adminFilteredProperties.map(p => (
@@ -87,7 +87,7 @@ export default function FinesList({
                                 required
                                 value={newFineForm.amount}
                                 onChange={(e) => setNewFineForm(prev => ({ ...prev, amount: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
                             />
                         </div>
                     </div>
@@ -98,7 +98,7 @@ export default function FinesList({
                             rows="3"
                             value={newFineForm.reason}
                             onChange={(e) => setNewFineForm(prev => ({ ...prev, reason: e.target.value }))}
-                            className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
+                            className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
                             placeholder="Describa la infracción (ej. Ruidos molestos, desacato reglamento)..."
                         />
                     </div>
@@ -107,7 +107,7 @@ export default function FinesList({
                         <select
                             value={newFineForm.status}
                             onChange={(e) => setNewFineForm(prev => ({ ...prev, status: e.target.value }))}
-                            className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
+                            className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
                         >
                             <option value="pending">Pendiente de Pago</option>
                             <option value="resolved">Pagada / Resuelta</option>

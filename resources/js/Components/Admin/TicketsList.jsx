@@ -28,7 +28,7 @@ export default function TicketsList({
                     <select
                         value={ticketStatusFilter}
                         onChange={(e) => setTicketStatusFilter(e.target.value)}
-                        className="px-3 py-1.5 bg-gray-50 dark:bg-slate-955 border border-gray-200 dark:border-slate-800/80 rounded-xl text-xs text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                        className="px-3 py-1.5 bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800/80 rounded-xl text-xs text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
                     >
                         <option value="all">Todos los Estados</option>
                         <option value="open">Abierto</option>
@@ -38,7 +38,7 @@ export default function TicketsList({
                     <select
                         value={ticketPriorityFilter}
                         onChange={(e) => setTicketPriorityFilter(e.target.value)}
-                        className="px-3 py-1.5 bg-gray-50 dark:bg-slate-955 border border-gray-200 dark:border-slate-800/80 rounded-xl text-xs text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                        className="px-3 py-1.5 bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800/80 rounded-xl text-xs text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
                     >
                         <option value="all">Todas las Prioridades</option>
                         <option value="low">Baja</option>
@@ -116,7 +116,7 @@ export default function TicketsList({
                                         setTicketsList(prev => prev.map(t => t.id === editingTicket.id ? { ...t, status: updatedStatus } : t));
                                         setEditingTicket(prev => ({ ...prev, status: updatedStatus }));
                                     }}
-                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
+                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
                                 >
                                     <option value="open">Abierto / Recibido</option>
                                     <option value="in_progress">En Progreso / Asignado</option>
@@ -134,7 +134,7 @@ export default function TicketsList({
                                         setTicketsList(prev => prev.map(t => t.id === editingTicket.id ? { ...t, assigned_to: assigneeName } : t));
                                         setEditingTicket(prev => ({ ...prev, assigned_to: assigneeName }));
                                     }}
-                                    className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
+                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
                                 >
                                     <option value="">Sin Asignar</option>
                                     {adminFilteredUsers

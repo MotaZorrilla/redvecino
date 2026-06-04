@@ -131,7 +131,7 @@ export default function UsersList({
                                 required
                                 value={newUserForm.name}
                                 onChange={(e) => setNewUserForm(prev => ({ ...prev, name: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
                             />
                         </div>
                         <div>
@@ -141,7 +141,7 @@ export default function UsersList({
                                 required
                                 value={newUserForm.rut}
                                 onChange={(e) => setNewUserForm(prev => ({ ...prev, rut: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
                             />
                         </div>
                     </div>
@@ -153,7 +153,7 @@ export default function UsersList({
                                 required
                                 value={newUserForm.email}
                                 onChange={(e) => setNewUserForm(prev => ({ ...prev, email: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
                             />
                         </div>
                         <div>
@@ -162,7 +162,7 @@ export default function UsersList({
                                 type="text"
                                 value={newUserForm.phone}
                                 onChange={(e) => setNewUserForm(prev => ({ ...prev, phone: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
                             />
                         </div>
                     </div>
@@ -172,7 +172,7 @@ export default function UsersList({
                             <select
                                 value={newUserForm.role}
                                 onChange={(e) => setNewUserForm(prev => ({ ...prev, role: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
                             >
                                 <option value="resident">Residente</option>
                                 <option value="owner">Propietario</option>
@@ -186,7 +186,7 @@ export default function UsersList({
                             <select
                                 value={newUserForm.status}
                                 onChange={(e) => setNewUserForm(prev => ({ ...prev, status: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-955 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
+                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
                             >
                                 <option value="active">Activo</option>
                                 <option value="inactive">Inactivo</option>
