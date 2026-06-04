@@ -13,7 +13,8 @@ export default function UsersList({
     editingUser,
     setEditingUser,
     userSubTab,
-    setUserSubTab
+    setUserSubTab,
+    onOpenWizard
 }) {
     const [selectedWorker, setSelectedWorker] = useState(null);
     const [selectedContract, setSelectedContract] = useState(null);
@@ -103,8 +104,19 @@ export default function UsersList({
                         }}
                         className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all cursor-pointer"
                     >
-                        {showAddUserForm ? 'Cerrar Form' : 'Añadir Usuario'}
+                        {showAddUserForm ? 'Cerrar Form' : 'Añadir Rápido'}
                     </button>
+                    {onOpenWizard && (
+                        <button
+                            onClick={onOpenWizard}
+                            className="px-3.5 py-1.5 bg-gradient-to-r from-[#00A896] to-[#72B043] hover:from-[#009886] hover:to-[#629b37] text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all cursor-pointer flex items-center gap-1.5"
+                        >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+                            </svg>
+                            Asistente de Creación
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -205,10 +217,19 @@ export default function UsersList({
                             <span className="font-bold text-gray-900 dark:text-white" key={`name-${u.id}`}>{u.name}</span>,
                             <span className="font-mono text-xs" key={`rut-${u.id}`}>{u.rut}</span>,
                             <span key={`email-${u.id}`}>{u.email}</span>,
-                            <span key={`cargo-${u.id}`} className="font-bold text-indigo-600 dark:text-indigo-400">Auxiliar de Aseo / Portería</span>,
+                            <div key={`cargo-${u.id}`} className="flex flex-col">
+                                <span className="font-bold text-indigo-600 dark:text-indigo-400">
+                                    {u.cargo || 'Auxiliar de Aseo / Portería'}
+                                </span>
+                                {u.area && (
+                                    <span className="text-[10px] text-gray-500 dark:text-slate-400">
+                                        Área: {u.area}
+                                    </span>
+                                )}
+                            </div>,
                             <div className="space-y-0.5 text-[10px]" key={`contrato-${u.id}`}>
                                 <div><span className="font-bold text-indigo-500">1º Fijo (3m):</span> Vencido</div>
-                                <div><span className="font-bold text-indigo-500">2º Fijo (3m):</span> Vigente (Cierre: 30/06/2026)</div>
+                                <div><span className="font-bold text-indigo-500">2º Fijo (3m):</span> {u.tipoContrato ? `${u.tipoContrato} (Ingreso: ${u.fechaIngreso || '01/01/2026'})` : 'Vigente (Cierre: 30/06/2026)'}</div>
                             </div>,
                             <div className="flex items-center gap-2 justify-end" key={`act-${u.id}`}>
                                 <button
@@ -237,9 +258,13 @@ export default function UsersList({
                             <span className="font-bold text-gray-900 dark:text-white" key={`name-${u.id}`}>{u.name}</span>,
                             <span className="font-mono text-xs" key={`rut-${u.id}`}>{u.rut}</span>,
                             <span key={`email-${u.id}`}>{u.email}</span>,
-                            <span key={`role-${u.id}`} className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 dark:text-indigo-400">
-                                {u.roles[0] || 'Residente'}
-                            </span>,
+                            <div key={`role-${u.id}`} className="flex flex-wrap gap-1">
+                                {(u.roles || ['Residente']).map(r => (
+                                    <span key={r} className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 dark:text-indigo-400">
+                                        {r}
+                                    </span>
+                                ))}
+                            </div>,
                             <span key={`status-${u.id}`} className={`inline-flex items-center gap-1.5 text-xs ${u.status === 'active' ? 'text-emerald-500' : 'text-slate-500'}`}>
                                 <span className={`h-1.5 w-1.5 rounded-full ${u.status === 'active' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
                                 <span className="capitalize">{u.status || 'Active'}</span>

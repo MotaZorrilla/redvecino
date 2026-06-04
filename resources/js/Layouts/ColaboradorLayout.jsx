@@ -65,9 +65,12 @@ export default function ColaboradorLayout({
                     {/* Sidebar Tabs */}
                     <nav className="space-y-1">
                         {[
+                            { id: 'attendance', label: '⏱️ Control de Asistencia', desc: 'Registro entrada y salida' },
+                            { id: 'shifts', label: '📝 Turnos y Horarios', desc: 'Bitácora y novedades' },
                             { id: 'packages', label: '📦 Encomiendas OCR', desc: 'Custodia e inventario' },
                             { id: 'visitors', label: '👮 Registro de Visitas', desc: 'Accesos peatonales/portón' },
-                            { id: 'shifts', label: '📝 Bitácora de Turnos', desc: 'Traspaso de novedades' },
+                            { id: 'contracts', label: '📋 Contratos y Liquidaciones', desc: 'Contrato laboral y sueldo' },
+                            { id: 'shopping', label: '🛒 Lista de Compras', desc: 'Insumos y suministros' },
                             { id: 'tickets', label: '🛠️ Incidencias Asignadas', desc: 'Mantenimiento del condominio' }
                         ].map(tab => (
                             <button
@@ -131,9 +134,12 @@ export default function ColaboradorLayout({
                             </svg>
                         </button>
                         <h2 className="text-lg font-black text-gray-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                            {colaboradorActiveTab === 'attendance' && '⏱️ Control de Asistencia'}
                             {colaboradorActiveTab === 'packages' && '📦 Custodia de Encomiendas'}
                             {colaboradorActiveTab === 'visitors' && '👮 Control de Accesos'}
-                            {colaboradorActiveTab === 'shifts' && '📝 Bitácora del Turno'}
+                            {colaboradorActiveTab === 'shifts' && '📝 Turnos y Horarios'}
+                            {colaboradorActiveTab === 'contracts' && '📋 Contratos y Liquidaciones'}
+                            {colaboradorActiveTab === 'shopping' && '🛒 Lista de Compras'}
                             {colaboradorActiveTab === 'tickets' && '🛠️ Tareas de Mantenimiento'}
                             <span className="text-xs px-2.5 py-0.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-full font-bold">
                                 {condosList.find(c => c.id === adminCondoId)?.name || 'Condominio'}

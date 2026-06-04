@@ -29,6 +29,7 @@ import TicketsList from '@/Components/Admin/TicketsList';
 import FinancesLedger from '@/Components/Admin/FinancesLedger';
 import FinesList from '@/Components/Admin/FinesList';
 import SettingsPanel from '@/Components/Admin/SettingsPanel';
+import PersonWizard from '@/Components/Admin/PersonWizard';
 
 // Components - Comité
 import FinancialAudit from '@/Components/Comite/FinancialAudit';
@@ -40,6 +41,9 @@ import PackageDelivery from '@/Components/Colaborador/PackageDelivery';
 import VisitorAccess from '@/Components/Colaborador/VisitorAccess';
 import ShiftLogs from '@/Components/Colaborador/ShiftLogs';
 import AssignedTickets from '@/Components/Colaborador/AssignedTickets';
+import AttendanceControl from '@/Components/Colaborador/AttendanceControl';
+import ContractViewer from '@/Components/Colaborador/ContractViewer';
+import ShoppingList from '@/Components/Colaborador/ShoppingList';
 
 // Components - Propietario
 import CommonExpensesQR from '@/Components/Propietario/CommonExpensesQR';
@@ -273,6 +277,9 @@ export default function Dashboard() {
     const [showAddPaymentForm, setShowAddPaymentForm] = useState(false);
     const [showAddCondoForm, setShowAddCondoForm] = useState(false);
 
+    // Person Wizard state
+    const [showPersonWizard, setShowPersonWizard] = useState(false);
+
     // Form inputs states
     const [newUserForm, setNewUserForm] = useState({ name: '', rut: '', email: '', phone: '', role: 'resident', status: 'active', password: 'password' });
     const [newPropForm, setNewPropForm] = useState({ condominium_id: 1, type: 'apartment', number: '', block: 'Torre A', floor: '', area_sqm: '', status: 'vacant' });
@@ -478,7 +485,7 @@ export default function Dashboard() {
 
     // Committee / Colaborador / Propietario Active Tabs
     const [comiteActiveTab, setComiteActiveTab] = useState('dashboard');
-    const [colaboradorActiveTab, setColaboradorActiveTab] = useState('packages');
+    const [colaboradorActiveTab, setColaboradorActiveTab] = useState('attendance');
     const [propietarioActiveTab, setPropietarioActiveTab] = useState('home');
 
     // Forms states
@@ -898,21 +905,69 @@ export default function Dashboard() {
                         />
                     )}
                     {adminActiveTab === 'users' && (
-                        <UsersList
-                            userSubTab={userSubTab}
-                            setUserSubTab={setUserSubTab}
-                            showAddUserForm={showAddUserForm}
-                            setShowAddUserForm={setShowAddUserForm}
-                            editingUser={editingUser}
-                            setEditingUser={setEditingUser}
-                            newUserForm={newUserForm}
-                            setNewUserForm={setNewUserForm}
-                            usersList={usersList}
-                            setUsersList={setUsersList}
-                            adminFilteredUsers={adminFilteredUsers}
-                            filteredUsersForSubtab={filteredUsersForSubtab}
-                            adminCondoId={adminCondoId}
-                        />
+                        <>
+                            <UsersList
+                                userSubTab={userSubTab}
+                                setUserSubTab={setUserSubTab}
+                                showAddUserForm={showAddUserForm}
+                                setShowAddUserForm={setShowAddUserForm}
+                                editingUser={editingUser}
+                                setEditingUser={setEditingUser}
+                                newUserForm={newUserForm}
+                                setNewUserForm={setNewUserForm}
+                                usersList={usersList}
+                                setUsersList={setUsersList}
+                                adminFilteredUsers={adminFilteredUsers}
+                                filteredUsersForSubtab={filteredUsersForSubtab}
+                                adminCondoId={adminCondoId}
+                                onOpenWizard={() => setShowPersonWizard(true)}
+                            />
+                            <PersonWizard
+                                isOpen={showPersonWizard}
+                                onClose={() => setShowPersonWizard(false)}
+                                onSave={(personData) => {
+                                    const mappedRoles = personData.roles && personData.roles.length > 0
+                                        ? personData.roles.map(r => r === 'comite' ? 'comité' : r === 'admin' ? 'admin' : r === 'colaborador' ? 'colaborador' : r === 'proveedor' ? 'proveedor' : 'resident')
+                                        : ['resident'];
+                                    const newU = {
+                                        id: usersList.length > 0 ? Math.max(...usersList.map(u => u.id)) + 1 : 1,
+                                        name: `${personData.nombres} ${personData.apellidos}`,
+                                        rut: personData.rut,
+                                        email: personData.email,
+                                        phone: personData.telefono,
+                                        status: 'active',
+                                        roles: mappedRoles,
+                                        condominium_id: adminCondoId,
+                                        asociada: personData.asociada,
+                                        torre: personData.torre,
+                                        unidad: personData.unidad,
+                                        relations: personData.relations,
+                                        cargo: personData.cargo,
+                                        area: personData.area,
+                                        fechaIngreso: personData.fechaIngreso,
+                                        tipoContrato: personData.tipoContrato,
+                                        externo: personData.externo,
+                                        comiteCargo: personData.comiteCargo,
+                                        comitePeriodo: personData.comitePeriodo,
+                                        comiteFechaInicio: personData.comiteFechaInicio,
+                                        adminTipo: personData.adminTipo,
+                                        adminRpa: personData.adminRpa,
+                                        adminFechaContrato: personData.adminFechaContrato,
+                                        provEmpresa: personData.provEmpresa,
+                                        provRut: personData.provRut,
+                                        provRubro: personData.provRubro,
+                                        hasAccess: personData.hasAccess,
+                                        username: personData.username,
+                                        password: personData.password
+                                    };
+                                    setUsersList(prev => [...prev, newU]);
+                                    setShowPersonWizard(false);
+                                }}
+                                condosList={condosList}
+                                propertiesList={propertiesList}
+                                adminCondoId={adminCondoId}
+                            />
+                        </>
                     )}
                     {adminActiveTab === 'tickets' && (
                         <TicketsList
@@ -1116,6 +1171,12 @@ export default function Dashboard() {
                     toggleTheme={toggleTheme}
                     darkMode={darkMode}
                 >
+                    {colaboradorActiveTab === 'attendance' && (
+                        <AttendanceControl
+                            user={user}
+                            adminCondoId={adminCondoId}
+                        />
+                    )}
                     {colaboradorActiveTab === 'packages' && (
                         <PackageDelivery
                             ocrScanning={ocrScanning}
@@ -1130,6 +1191,12 @@ export default function Dashboard() {
                     )}
                     {colaboradorActiveTab === 'shifts' && (
                         <ShiftLogs adminCondoId={adminCondoId} />
+                    )}
+                    {colaboradorActiveTab === 'contracts' && (
+                        <ContractViewer user={user} />
+                    )}
+                    {colaboradorActiveTab === 'shopping' && (
+                        <ShoppingList adminCondoId={adminCondoId} />
                     )}
                     {colaboradorActiveTab === 'tickets' && (
                         <AssignedTickets

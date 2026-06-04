@@ -117,6 +117,22 @@ Este checklist interactivo registra el avance global y detalla los nuevos requer
 - [ ] **Insights de Morosidad Vecinal Predictiva (IA Adaptada):** Crear la ficha de análisis de comportamiento del copropietario y recomendaciones proactivas.
 - [ ] **Vídeo-Comunicados en MiVecino con fal.ai (IA Adaptada):** Crear el generador de avatares en vídeo para los boletines semanales de la administración.
 
+### 2.7 Nuevos Requerimientos - Mockups Usuarios y Perfiles (04/06/2026)
+- [ ] **Asistente de Creación de Personas (Paso a Paso):**
+  - [ ] **Paso 1 (Datos de la Persona):** Campos de entrada para Foto, RUT, Nombres, Apellidos, Correo Electrónico y Teléfono.
+  - [ ] **Paso 2 (Relación con la Unidad):** Condicional "¿La persona vive o está asociada a una unidad?", y selectores de Torre, Unidad y Relación (Propietario, Residente, Arrendatario, Familiar, Otro).
+  - [ ] **Paso 3 (Funciones y Roles):** Selector de funciones: Colaborador (Cargo, Área, Fecha de Ingreso, Tipo de Contrato, Personal externo), Comité, Administrador, Proveedor, Ninguna.
+  - [ ] **Paso 4 (Acceso al Sistema):** Pregunta "¿Tendrá acceso?", e inputs de Nombre de usuario, Contraseña temporal autogenerada (con botón refrescar) y checkbox para enviar credenciales por correo.
+  - [ ] **Paso 5 (Resumen de la Información):** Vista previa de todos los datos recopilados, estado, fecha de creación e indicador de creador.
+  - [ ] **Ejemplos de Casos:** Sección inferior con accesos rápidos para maquetar casos comunes (Propietario que vive, Arrendatario, Colaborador externo, etc.).
+- [ ] **Estructura de Dashboards y Perfiles de Acceso:**
+  - [ ] **Dashboard Residente:** Vistas para Gastos Comunes, Pago en Línea, Notificaciones, Chat, Documentos y Reservas.
+  - [ ] **Dashboard Mantenimiento:** Vistas para Control de Asistencia, Funciones/Horarios, Contratos, Liquidaciones, Lista de Compras, Enlaces de Interés y Chat.
+  - [ ] **Dashboard Conserjería:** Vistas para Control de Asistencia, Turnos/Horarios, Libros (visitas/encomiendas), Chat, Reservas de Áreas Comunes, Contratos/Liquidaciones y Enlaces de Interés.
+  - [ ] **Dashboard Comité:** Vistas para Indicadores, Morosidad, Solicitudes, Actas, Votaciones, Comunicados y Chat.
+  - [ ] **Dashboard Administrador:** Panel integral con Dashboard General, Personas, Unidades, Gastos Comunes, Reservas, Encomiendas, Comunicaciones, Reportes y Configuración.
+  - [ ] **Lógica Multi-rol:** Permitir que los usuarios con múltiples perfiles (ej. Residente + Comité) tengan acceso a sus respectivos paneles secundarios desde su panel principal.
+
 ---
 
 ## 🚀 3. Registro de Cambios (Walkthrough) y Resultados de Pruebas
@@ -244,9 +260,28 @@ Failures:    0 failed
 *   **Botones de Cambio de Tema y Logout:** Se incorporaron botones independientes de cambio de tema (claro/oscuro) y Logout (cierre de sesión) en los headers de todos los layouts de administración y soporte, unificando la experiencia de usuario (UX).
 *   **Certificación de Calidad y Pruebas:** Compilación impecable del bundle React mediante Vite (`npm run build` completado exitosamente en 2.75s) y validación de los **146 casos de prueba (597 aserciones) pasados exitosamente al 100%**.
 
+### 3.10 Asistente de Creación de Personas y Expansión de Dashboards por Perfil (Sesión 04/06/2026)
+*   **Análisis de Mockups de UI/UX:** Se recibieron y analizaron dos mockups de WhatsApp (infografías de alto detalle) que definen el *Asistente de Creación de Personas* (wizard de 5 pasos) y el *Sistema de Dashboards según Perfil de Acceso* (5 layouts diferenciados: Residente, Mantenimiento, Conserjería, Comité, Administrador).
+*   **Componente `PersonWizard.jsx` (881 líneas):** Se implementó un modal wizard de 5 pasos completo en [PersonWizard.jsx](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Admin/PersonWizard.jsx) para la creación guiada de personas:
+    *   *Paso 1 (Datos de la Persona):* Foto, RUT, Nombres, Apellidos, Correo, Teléfono + sección de 5 plantillas de ejemplo rápidas (Propietario, Arrendatario, Colaborador externo, Administrador externo, Familiar).
+    *   *Paso 2 (Relación con la Unidad):* Condicional Sí/No con selectores dinámicos de Torre, Unidad y checkboxes de relación múltiple.
+    *   *Paso 3 (Funciones y Roles):* Cards de selección única con campos condicionales para Colaborador (Cargo, Área, Fecha Ingreso, Tipo de Contrato, Personal externo).
+    *   *Paso 4 (Acceso al Sistema):* Generación automática de usuario y contraseña temporal con botón de regenerar y checkbox de envío por correo.
+    *   *Paso 5 (Resumen):* Ficha de vista previa con 4 tarjetas coloreadas, estado, fecha de creación y acciones de guardado.
+    *   *Stepper visual:* Barra de progreso horizontal con 5 círculos numerados (completados = ✓ verde, activo = color del paso, futuros = gris).
+*   **Integración del Wizard en Admin:** El botón *"✨ Asistente de Creación"* fue agregado al componente [UsersList.jsx](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Admin/UsersList.jsx) con gradiente Teal→Verde (`from-[#00A896] to-[#72B043]`). Al guardar, se crea el usuario en el estado reactivo local con el rol correspondiente.
+*   **3 Nuevos Componentes de Colaborador/Conserjería:**
+    *   [AttendanceControl.jsx](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Colaborador/AttendanceControl.jsx): Panel de registro de entrada/salida con reloj digital, botones de Clock In/Out con animaciones, KPIs de días trabajados y promedio horario, tabla de historial.
+    *   [ContractViewer.jsx](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Colaborador/ContractViewer.jsx): Visor dual de contrato vigente (timeline de 3 contratos: 2 fijos + indefinido) y liquidaciones de sueldo con desglose completo de haberes/deducciones chilenas (Fonasa 7%, AFP 11.44%, AFC 0.6%) basado en los datos reales de `ORGANIZACION_SISTEMA.md`.
+    *   [ShoppingList.jsx](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Colaborador/ShoppingList.jsx): Lista de compras tipo checklist con prioridades (Urgente/Normal/Bajo), categorías, filtros y CRUD completo para gestionar insumos de limpieza, seguridad y mantenimiento.
+*   **Actualización de [ColaboradorLayout.jsx](file:///C:/xampp/htdocs/redvecino/resources/js/Layouts/ColaboradorLayout.jsx):** Sidebar expandido de 4 a 7 pestañas: ⏱️ Control de Asistencia, 📝 Turnos y Horarios, 📦 Encomiendas OCR, 👮 Registro de Visitas, 📋 Contratos y Liquidaciones, 🛒 Lista de Compras, 🛠️ Incidencias Asignadas.
+*   **Cableado completo en [Dashboard.jsx](file:///C:/xampp/htdocs/redvecino/resources/js/Pages/Dashboard.jsx):** Importación de los 4 nuevos componentes (`PersonWizard`, `AttendanceControl`, `ContractViewer`, `ShoppingList`), estado `showPersonWizard`, renderizado condicional por pestaña y callback `onSave` del wizard.
+*   **Lista TODO actualizada en [HISTORY.md](file:///C:/xampp/htdocs/redvecino/HISTORY.md):** Sección 2.7 con desglose completo de 15 sub-tareas derivadas de los mockups (wizard + dashboards).
+*   **QA Certificado al 100%:** Compilación Vite exitosa en 2.71s. **146 tests pasados con 597 aserciones en 74.53s** sin regresiones.
+
 ---
 
 **Fecha de creación:** Mayo 2026
-**Última actualización:** 2 de Junio de 2026 (Refactorización Modular de Dashboard, Unificación Widescreen Completa y Botones de Control de Tema y Logout)
-**Versión:** 3.0 (Modularized Multi-Role Dashboard with Widescreen Layouts & Standard QA Certified)
+**Última actualización:** 4 de Junio de 2026 (Asistente de Creación de Personas, Expansión de Dashboards Colaborador/Conserjería y Lista TODO de Mockups)
+**Versión:** 3.1 (Person Wizard + Expanded Colaborador Dashboard & Standard QA Certified)
 **Estado:** Activo y Actualizado
