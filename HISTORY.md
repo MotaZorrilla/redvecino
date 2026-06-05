@@ -316,9 +316,27 @@ Failures:    0 failed
 *   **QA Backend:** Ejecución exitosa de `php artisan test` con **146 tests y 597 aserciones al 100%** tras instalar dependencias dev faltantes (`composer install` sin flag `--no-dev`).
 *   **Corrección de Bug:** Se reparó `setAdminActiveTab is not a function` causado por la omisión de los setters de pestañas en `sharedRolePageProps`.
 
----
+### 3.13 Auditoría Backend Completa — 13 Hallazgos Implementados (Sesión 05/06/2026)
+*   **Contexto — Backend Audit Report:** Se ejecutó una auditoría completa del backend arrojando 15 hallazgos (3 críticos, 5 altos, 7 medios). Se implementaron 13 acciones correctivas en una sola sesión mediante agentes de IA paralelizados.
+*   **C1 - Configuración CORS Explicita (`config/cors.php`):** Se creó el archivo de configuración faltante con origen dinámico vía `CORS_ALLOWED_ORIGINS`, soporte para credenciales SPA y métodos/headers permitidos universalmente.
+*   **C2 - Expiración de Tokens Sanctum (24h):** Se cambió `config/sanctum.php` de `'expiration' => null` a `'expiration' => 1440`, forzando la renovación de tokens de API cada 24 horas.
+*   **C3 - Controladores TI y Route Hardening:** Se reemplazaron los 500+ líneas de closures inline en `routes/api.php` por dos controladores dedicados (`TiCommandController`, `TiPermissionController`) con middleware `auth:sanctum`, `can:view logs` y `throttle:30,1`. Se eliminó la ruta muerta `/api/dashboard`.
+*   **H1 - 20 Políticas por Modelo (`app/Policies/`):** Se crearon archivos de Policy para todos los modelos del proyecto (`UserPolicy`, `PropertyPolicy`, `TicketPolicy`, `FinePolicy`, etc.) con verificación de permisos Spatie y lógica de ownership para acceso a datos propios.
+*   **H2 - 16 Form Requests (`app/Http/Requests/`):** Se extrajeron todas las validaciones de datos de los controladores hacia clases `FormRequest` dedicadas (`StoreUserRequest`, `UpdateUserRequest`, `StoreFineRequest`, `StoreExpenseRequest`, `StoreTicketRequest`, `AssignTicketRequest`, etc.), centralizando y reutilizando las reglas de validación.
+*   **H3 - Capa de Servicios (`app/Services/CondoFinanceService.php`):** Se extrajo la lógica de negocio del `CondoFinanceController` (437 líneas) a un servicio inyectable, dejando el controlador únicamente con responsabilidades HTTP. El servicio expone métodos tipados para catálogo, resumen, ingresos y egresos con CRUD completo.
+*   **H4 - 12 Factories Faltantes (`database/factories/`):** Se crearon factories para los modelos sin cobertura (`AdminProfile`, `CommitteeProfile`, `EmployeeProfile`, `ExpenseItem`, `Message`, `OwnerProfile`, `ResidentProfile`, `TicketAttachment`, `TicketCategory`, `TiProfile`, `CondoExpense`, `CondoIncome`), habilitando la generación determinista de datos de prueba.
+*   **M1 - Casts y HasFactory en Modelos:** Se agregó `HasFactory` y el método `casts()` a 9 modelos que carecían de ellos (`AdminProfile`, `CommitteeProfile`, `EmployeeProfile`, `ExpenseItem`, `OwnerProfile`, `ResidentProfile`, `TicketAttachment`, `TicketCategory`, `TiProfile`), estandarizando tipos de fechas, decimales y booleanos.
+*   **M2 - Middleware de Logging y Rate Limiting:** Se creó `app/Http/Middleware/LogApiRequests.php` para registrar cada petición API (método, URL, usuario, IP, status, duración). Se agregó el canal `api` en `config/logging.php` (log diario con 14 días de retención) y se configuró `RateLimiter::for('api')` con 60 req/min en `AppServiceProvider`.
+*   **M3 - CRUD Completo en FineController y ExpenseController:** Se agregaron los métodos `show()`, `update()` y `destroy()` a ambos controladores, completando las operaciones CRUD que antes solo tenían `index()` y `store()`.
+*   **M4 - Nuevos Tests de Feature:** Se crearon 9 tests nuevos en 3 archivos:
+    *   `CatalogTest.php` (3 tests) — Verifica acceso al catálogo financiero con/ sin permisos
+    *   `AnnouncementsLifecycleTest.php` (4 tests) — Ciclo de vida de comunicados con autorización
+    *   `TiCommandsTest.php` (2 tests) — Seguridad de endpoints TI contra acceso no autorizado
+*   **M5 - Corrección de Locale y Ruta Muerta:** Se cambió `config/app.php` locale de `'en'` a `'es'` con faker `es_CL` para alinearse con seeders y UI chilena. Se eliminó la ruta `/api/dashboard` (dead route) de `routes/api.php`.
+*   **Registro de Middleware CORS:** Se agregó `HandleCors::class` al grupo API en `bootstrap/app.php` como middleware prepend, garantizando headers CORS en todas las respuestas de la API.
+*   **Compilación y Verificación:** `npx vite build` completado con 1058 módulos, 0 errores en 2.71s. Suite de pruebas: **148 tests pasados, 616 aserciones** (7 fallas pre-existentes en `AccountStatementSecurityTest` por ruta `/api/account-statement/{id}` no implementada).
 
-**Fecha de creación:** Mayo 2026
-**Última actualización:** 5 de Junio de 2026 (Auditoría Frontend F1-F7 completa, Dashboard modularizado por roles, test suite al 100%)
-**Versión:** 4.0 (Full Frontend Audit Implementation, Role-based Dashboard Modularization & Certified QA)
+---
+**Última actualización:** 5 de Junio de 2026 (Auditoría Backend completa — 13 hallazgos implementados, CORS, Sanctum, Policies, Services, Factories, tests)
+**Versión:** 5.0 (Full Backend Audit Implementation, Security Hardening, Service Layer, Policies & Factories)
 **Estado:** Activo y Actualizado

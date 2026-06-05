@@ -745,11 +745,36 @@ messages
 |--------|----------|-------------|------|
 | GET | `/api/expenses` | Listar gastos comunes | ✅ |
 | POST | `/api/expenses` | Crear gasto común | ✅ Admin/Comité |
+| POST | `/api/expenses/show/{id}` | Ver detalle de gasto | ✅ Admin/Comité |
+| PUT | `/api/expenses/{id}` | Actualizar gasto | ✅ Admin/Comité |
+| DELETE | `/api/expenses/{id}` | Eliminar gasto | ✅ Admin/Comité |
 | GET | `/api/payments` | Listar pagos | ✅ |
 | POST | `/api/payments` | Registrar pago | ✅ |
+| PUT | `/api/payments/{id}/reconcile` | Conciliar pago | ✅ Admin/Comité |
 | GET | `/api/account-statement/{user_id}` | Estado de cuenta | ✅ Admin/Propietario |
 | GET | `/api/fines` | Listar multas | ✅ |
 | POST | `/api/fines` | Crear multa | ✅ Admin/Comité |
+| GET | `/api/fines/{id}` | Ver multa | ✅ |
+| PUT | `/api/fines/{id}` | Actualizar multa | ✅ Admin/Comité |
+| DELETE | `/api/fines/{id}` | Eliminar multa | ✅ Admin/Comité |
+| GET | `/api/condo-finances/catalog` | Catálogo contable | ✅ |
+| GET | `/api/condo-finances/summary` | Resumen financiero | ✅ |
+| GET | `/api/condo-finances/incomes` | Listar ingresos | ✅ |
+| GET | `/api/condo-finances/expenses` | Listar egresos | ✅ |
+| POST | `/api/condo-finances/incomes` | Crear ingreso | ✅ Admin/Comité |
+| PUT | `/api/condo-finances/incomes/{id}` | Actualizar ingreso | ✅ Admin/Comité |
+| DELETE | `/api/condo-finances/incomes/{id}` | Eliminar ingreso | ✅ Admin/Comité |
+| POST | `/api/condo-finances/expenses` | Crear egreso | ✅ Admin/Comité |
+| PUT | `/api/condo-finances/expenses/{id}` | Actualizar egreso | ✅ Admin/Comité |
+| DELETE | `/api/condo-finances/expenses/{id}` | Eliminar egreso | ✅ Admin/Comité |
+
+#### DevOps / TI
+
+| Método | Endpoint | Descripción | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/ti/command` | Ejecutar comando seguro | ✅ TI (`can:view logs`) |
+| GET | `/api/ti/roles-permissions` | Matriz Spatie en vivo | ✅ TI (`can:view logs`) |
+| POST | `/api/ti/roles-permissions/toggle` | Alternar permiso en rol | ✅ TI (`can:view logs`)
 
 #### Tickets
 
@@ -790,12 +815,26 @@ redvecino/
 │   │   │   └── AnnouncementController.php
 │   │   ├── Middleware/
 │   │   │   ├── CheckRole.php
-│   │   │   └── CheckPermission.php
+│   │   │   ├── CheckPermission.php
+│   │   │   └── LogApiRequests.php
 │   │   └── Requests/
 │   │       ├── StoreUserRequest.php
 │   │       ├── UpdateUserRequest.php
 │   │       ├── StoreTicketRequest.php
-│   │       └── StorePaymentRequest.php
+│   │       ├── StorePaymentRequest.php
+│   │       ├── StoreFineRequest.php
+│   │       ├── UpdateFineRequest.php
+│   │       ├── StoreExpenseRequest.php
+│   │       ├── UpdateExpenseRequest.php
+│   │       ├── StorePropertyRequest.php
+│   │       ├── UpdatePropertyRequest.php
+│   │       ├── UpdateTicketRequest.php
+│   │       ├── AssignTicketRequest.php
+│   │       ├── ResolveTicketRequest.php
+│   │       ├── StoreTicketCategoryRequest.php
+│   │       ├── StoreAnnouncementRequest.php
+│   │       ├── StoreMessageRequest.php
+│   │       └── Auth/
 │   ├── Models/
 │   │   ├── User.php
 │   │   ├── Property.php
@@ -808,16 +847,29 @@ redvecino/
 │   │   ├── TicketCategory.php
 │   │   ├── TicketAttachment.php
 │   │   ├── Announcement.php
-│   │   └── Message.php
+│   │   ├── Message.php
+│   │   ├── CondoIncome.php
+│   │   ├── CondoExpense.php
+│   │   ├── AdminProfile.php
+│   │   ├── CommitteeProfile.php
+│   │   ├── EmployeeProfile.php
+│   │   ├── OwnerProfile.php
+│   │   ├── ResidentProfile.php
+│   │   └── TiProfile.php
 │   ├── Policies/
 │   │   ├── UserPolicy.php
 │   │   ├── PropertyPolicy.php
 │   │   ├── TicketPolicy.php
-│   │   └── PaymentPolicy.php
+│   │   ├── PaymentPolicy.php
+│   │   ├── FinePolicy.php
+│   │   ├── AnnouncementPolicy.php
+│   │   ├── MessagePolicy.php
+│   │   ├── CondoExpensePolicy.php
+│   │   ├── CondoIncomePolicy.php
+│   │   ├── CommonExpensePolicy.php
+│   │   └── ... (20 total, 1 por modelo)
 │   ├── Services/
-│   │   ├── UserService.php
-│   │   ├── PaymentService.php
-│   │   └── TicketService.php
+│   │   └── CondoFinanceService.php
 │   └── Enums/
 │       ├── UserStatus.php
 │       ├── PropertyType.php
@@ -1330,9 +1382,130 @@ Derivado de la integración de herramientas de diagnóstico y auditoría de perm
     -   *Mapeo de Usuarios:* Al clickear una celda de departamento en el Sandbox de Inspección, el sistema realiza una búsqueda bidireccional por nombres de dueños y residentes (`p.owners` y `p.residents`) contra la tabla global de usuarios `usersList`.
     -   *Auto-Impersonación:* De encontrar coincidencia de usuario activo, la interfaz inicia automáticamente la impersonación Spatie de ese residente para auditar sus privilegios y vista PropTech sin salir del sandbox.
 
+### 15.12 Estándares y Directrices de Arquitectura Backend (v1.0)
+
+Derivado de la auditoría completa del backend del 5 de Junio de 2026 (13 hallazgos corregidos), se establecen las siguientes directrices obligatorias para todo desarrollo futuro del backend Laravel:
+
+#### 15.12.1 Organización de Rutas (`routes/api.php`)
+
+- Toda ruta API debe usar un **controlador dedicado**, nunca closures inline.
+- Las rutas sensibles (admin, TI) deben agruparse bajo `auth:sanctum` y `throttle:60,1`.
+- Los comandos TI deben tener rate limiting más restrictivo (`throttle:30,1`).
+- Los permisos se asignan vía middleware `can:permission_name`, no en constructores de controladores (Laravel 11+ no soporta `$this->middleware()` en constructores).
+- No deben existir rutas "muertas" (endpoints sin controlador asignado).
+
+**Patrón obligatorio:**
+```php
+Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
+    Route::middleware('can:manage users')->group(function () {
+        Route::get('/users', [UserController::class, 'index']);
+        Route::post('/users', [UserController::class, 'store']);
+    });
+
+    Route::prefix('ti')->middleware('throttle:30,1')->group(function () {
+        Route::post('/command', [TiCommandController::class, 'execute']);
+    });
+});
+```
+
+#### 15.12.2 Seguridad y Headers
+
+- **CORS:** `config/cors.php` debe existir con `supports_credentials => true`, orígenes dinámicos vía `CORS_ALLOWED_ORIGINS`, y `HandleCors` registrado como middleware prepend en el grupo API (`bootstrap/app.php`).
+- **Sanctum:** `config/sanctum.php` debe tener `'expiration' => 1440` (24 horas). Nunca `null`.
+- **Rate Limiting:** Configurar `RateLimiter::for('api')` con 60 req/min por usuario/IP en `AppServiceProvider::boot()`.
+
+#### 15.12.3 Políticas de Autorización (Policies)
+
+- **Una Policy por modelo.** Cada modelo Eloquent debe tener su clase Policy en `app/Policies/`.
+- Toda Policy debe verificar permisos Spatie: `$user->can('permission_name')`.
+- Para recursos con owner, la Policy debe verificar ownership además del permiso:
+```php
+public function view(User $user, Ticket $ticket): bool
+{
+    return $user->can('create tickets') || $user->id === $ticket->created_by;
+}
+```
+
+#### 15.12.4 Form Requests de Validación
+
+- **Un FormRequest por operación CRUD** (ej. `StoreUserRequest`, `UpdateUserRequest`).
+- Nunca usar `$request->validate()` inline en controladores.
+- `authorize()` debe retornar `true` (permisos se controlan vía middleware).
+
+#### 15.12.5 Capa de Servicios
+
+- La lógica de negocio compleja debe extraerse a clases Service en `app/Services/`.
+- Los controladores deben delegar en servicios y solo manejar concerns HTTP (request, response, status codes, JSON formatting).
+- Los servicios deben ser inyectables vía constructor, sin estado HTTP.
+```php
+class CondoFinanceController extends Controller
+{
+    public function __construct(
+        protected CondoFinanceService $service
+    ) {}
+}
+```
+
+#### 15.12.6 Modelos Eloquent
+
+- Todo modelo debe usar `use HasFactory;` e importar su Factory.
+- Todo modelo debe definir el método `casts(): array` con tipos explícitos (date, datetime, decimal:2, boolean, integer).
+```php
+protected function casts(): array
+{
+    return [
+        'amount' => 'decimal:2',
+        'issued_date' => 'date',
+        'due_date' => 'date',
+        'is_active' => 'boolean',
+    ];
+}
+```
+
+#### 15.12.7 Factories
+
+- **Una Factory por modelo.** Toda factory debe residir en `database/factories/`.
+- Usar `User::factory()` para relaciones foráneas, no IDs hardcodeados.
+- Usar `fake()` para datos de prueba con tipos locales (`es_CL`).
+
+#### 15.12.8 Testing
+
+- **Priorizar Feature/Integration tests sobre Unit tests.** Los tests de feature verifican el comportamiento real del sistema (ruta + controlador + DB + autorización).
+- Usar `RefreshDatabase` + `$this->seed()` para estado determinista.
+- **Testear caminos de error primero** (unhappy paths): 401 (unauthenticated), 403 (unauthorized), 422 (validation).
+- Cada nuevo endpoint debe tener al menos: test de autorización (403), test de autenticación (401), test de validación (422), test de éxito (200/201).
+- No usar mocks para Eloquent o base de datos — probar contra SQLite en memoria.
+
+#### 15.12.9 Middleware
+
+- El logging de API debe implementarse como middleware dedicado (`LogApiRequests`), registrado en el grupo API de `bootstrap/app.php`.
+- Usar canales de log separados por dominio (`api` → `storage/logs/api.log`) con rotación diaria.
+```php
+'api' => [
+    'driver' => 'daily',
+    'path' => storage_path('logs/api.log'),
+    'level' => env('LOG_LEVEL', 'info'),
+    'days' => 14,
+],
+```
+
+#### 15.12.10 Registro de Middleware en Laravel 11+
+
+En `bootstrap/app.php`, el middleware se configura mediante métodos fluidos, no mediante `$middleware` arrays de kernel:
+```php
+->withMiddleware(function (Middleware $middleware): void {
+    $middleware->api(prepend: [
+        \Illuminate\Http\Middleware\HandleCors::class,
+    ]);
+    $middleware->api(append: [
+        \App\Http\Middleware\LogApiRequests::class,
+    ]);
+})
+```
+
 ---
 
 **Fecha de creación:** Mayo 2026
-**Última actualización:** 5 de Junio de 2026 (Auditoría Frontend completa F1-F7, Dashboard modularizado por roles, design tokens normalizados)
-**Versión:** 7.0 (Full Frontend Audit, Role-based Dashboard, Design Tokens & Certified QA)
-**Estado:** Listo para desarrollo (Con base de datos en SQLite/MySQL, suite de pruebas automatizadas, especificación de alta fidelidad PropTech, catálogo de cuentas base, maquetación premium widescreen y frontend auditado)
+**Última actualización:** 5 de Junio de 2026 (Auditoría Backend 13 hallazgos, Backend Architecture Standards v1, CORS, Sanctum, Policies, Services, Factories)
+**Versión:** 8.0 (Full Backend Audit, Security Hardening, Service Layer, Backend Standards & Certified QA)
+**Estado:** Listo para desarrollo (Con base de datos en SQLite/MySQL, suite de pruebas automatizadas, especificación de alta fidelidad PropTech, catálogo de cuentas base, maquetación premium widescreen, frontend auditado y backend endurecido)

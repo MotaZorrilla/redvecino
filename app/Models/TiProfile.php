@@ -3,14 +3,24 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class TiProfile extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'user_id',
         'access_level',
         'system_logs_permission',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'system_logs_permission' => 'boolean',
+        ];
+    }
 
     public function user()
     {

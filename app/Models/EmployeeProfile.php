@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class EmployeeProfile extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'user_id',
         'position',
@@ -15,6 +18,14 @@ class EmployeeProfile extends Model
         'salary',
         'hire_date',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'salary' => 'decimal:2',
+            'hire_date' => 'date',
+        ];
+    }
 
     public function user()
     {

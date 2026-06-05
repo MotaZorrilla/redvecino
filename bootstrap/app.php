@@ -17,6 +17,14 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
+        $middleware->api(append: [
+            \App\Http\Middleware\LogApiRequests::class,
+        ]);
+
+        $middleware->api(prepend: [
+            \Illuminate\Http\Middleware\HandleCors::class,
+        ]);
+
         $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
