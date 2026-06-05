@@ -2,44 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .animate-slide-down {
+    animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-scale-up {
+    animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
+
 @keyframes slideDown {
-  from {
-    transform: translateY(-20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 @keyframes scaleUp {
-  from {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
-.animate-slide-down {
-  animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-scale-up {
-  animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Global Select and Option Contrast Correction */
 select option {
-  color: #1e293b !important; /* slate-800 */
-  background-color: #ffffff !important; /* white */
+  color: #1e293b;
+  background-color: #ffffff;
 }
 
 .dark select option {
-  color: #f8fafc !important; /* slate-50 */
-  background-color: #020617 !important; /* slate-950 */
+  color: #f8fafc;
+  background-color: #020617;
 }
 

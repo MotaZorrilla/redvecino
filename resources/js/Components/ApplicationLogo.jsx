@@ -1,7 +1,25 @@
 import React from 'react';
 
+const BRAND_COLORS = {
+    redvecino: { accent: '#00A896', gradient: 'from-brand-navy to-brand-teal', shadow: 'shadow-cyan-500/20' },
+    mivecino: { accent: '#72B043', gradient: 'from-brand-green to-brand-teal', shadow: 'shadow-emerald-500/20' },
+    ti: { accent: '#00A896', gradient: 'from-brand-navy to-brand-teal', shadow: 'shadow-cyan-500/20' },
+    admin: { accent: '#6366f1', gradient: 'from-indigo-500 to-indigo-700', shadow: 'shadow-indigo-500/20' },
+    comite: { accent: '#6366f1', gradient: 'from-indigo-500 to-indigo-700', shadow: 'shadow-indigo-500/20' },
+    colaborador: { accent: '#6366f1', gradient: 'from-indigo-500 to-indigo-700', shadow: 'shadow-indigo-500/20' },
+    superusuario: { accent: '#6366f1', gradient: 'from-indigo-500 to-indigo-700', shadow: 'shadow-indigo-500/20' },
+    propietario: { accent: '#72B043', gradient: 'from-brand-green to-brand-teal', shadow: 'shadow-emerald-500/20' },
+    residente: { accent: '#72B043', gradient: 'from-brand-green to-brand-teal', shadow: 'shadow-emerald-500/20' },
+};
+
 export default function ApplicationLogo({ size = 'medium', showSubtext = true, brand = 'redvecino', className = '' }) {
-    // Sizing system for consistency
+    const colors = BRAND_COLORS[brand] || BRAND_COLORS.redvecino;
+    const isRedVecino = brand === 'redvecino' || brand === 'admin' || brand === 'ti' || brand === 'comite' || brand === 'colaborador' || brand === 'superusuario';
+    const isIconOnly = brand === 'admin' || brand === 'ti' || brand === 'comite' || brand === 'colaborador' || brand === 'superusuario';
+
+    const logoSrc = isRedVecino ? '/images/logo_redvecino.png' : '/images/logo_mivecino.png';
+    const iconSrc = isRedVecino ? '/images/icon_redvecino.png' : '/images/icon_mivecino.png';
+
     const containerSizes = {
         small: 'gap-2',
         medium: 'gap-3',
@@ -12,12 +30,6 @@ export default function ApplicationLogo({ size = 'medium', showSubtext = true, b
         small: 'h-8 w-8 rounded-lg shadow-sm',
         medium: 'h-11 w-11 rounded-xl shadow-md',
         large: 'h-16 w-16 rounded-2xl shadow-xl'
-    };
-
-    const svgSizes = {
-        small: 'w-4.5 h-4.5',
-        medium: 'w-6 h-6',
-        large: 'w-9 h-9'
     };
 
     const titleSizes = {
@@ -38,61 +50,33 @@ export default function ApplicationLogo({ size = 'medium', showSubtext = true, b
           large: 'text-center sm:text-left'
       };
 
-      const isRedVecino = brand === 'redvecino';
+      const brandName = isRedVecino ? 'RedVecino' : 'MiVecino';
+      const brandSubtext = isRedVecino ? 'La Red Inteligente de Condominios' : 'Tu comunidad, en una sola app';
+      const nameParts = isRedVecino ? ['Red', 'Vecino'] : ['Mi', 'Vecino'];
 
       return (
           <div className={`flex items-center ${containerSizes[size] || containerSizes.medium} ${className}`}>
-              {/* Visual Icon with Brand Specific Styling */}
-              <div className={`flex items-center justify-center shrink-0 text-white transition-all duration-300 ${
-                  isRedVecino 
-                      ? 'bg-gradient-to-br from-[#0F2557] to-[#00A896] shadow-cyan-500/20' 
-                      : 'bg-gradient-to-br from-[#72B043] to-[#00A896] shadow-emerald-500/20'
-              } ${iconContainerSizes[size] || iconContainerSizes.medium}`}>
-                  
-                  {isRedVecino ? (
-                      <img 
-                          src="/images/logo_redvecino.png" 
-                          alt="RedVecino Logo" 
-                          className="object-contain w-full h-full rounded-lg p-0.5"
-                          onError={(e) => {
-                              // Fallback to stylized text icon if image fails to load
-                              e.target.style.display = 'none';
-                          }}
-                      />
-                  ) : (
-                      <img 
-                          src="/images/logo_mivecino.png" 
-                          alt="MiVecino Logo" 
-                          className="object-contain w-full h-full rounded-lg p-0.5"
-                          onError={(e) => {
-                              // Fallback to stylized text icon if image fails to load
-                              e.target.style.display = 'none';
-                          }}
-                      />
-                  )}
+              <div className={`flex items-center justify-center shrink-0 text-white transition-all duration-300 bg-gradient-to-br ${colors.gradient} ${colors.shadow} ${iconContainerSizes[size] || iconContainerSizes.medium}`}>
+                  <img
+                      src={isIconOnly ? iconSrc : logoSrc}
+                      alt={`${brandName} Logo`}
+                      className="object-contain w-full h-full rounded-lg p-0.5"
+                      loading="lazy"
+                  />
               </div>
   
-              {/* Brand Title and Subtitle */}
-              <div className={`flex flex-col select-none ${textAlignment[size] || textAlignment.medium}`}>
-                  <span className={`tracking-tight text-slate-900 dark:text-white transition-colors duration-300 ${titleSizes[size] || titleSizes.medium}`}>
-                      {isRedVecino ? (
-                          <>
-                              Red<span className="text-[#00A896] font-extrabold">Vecino</span>
-                          </>
-                      ) : (
-                          <>
-                              Mi<span className="text-[#72B043] font-extrabold">Vecino</span>
-                          </>
-                      )}
-                  </span>
-                  {showSubtext && (
-                      <span className={`block font-bold tracking-widest uppercase text-slate-500 dark:text-slate-400 transition-colors duration-300 ${subtitleSizes[size] || subtitleSizes.medium}`}>
-                          {isRedVecino 
-                              ? 'La Red Inteligente de Condominios' 
-                              : 'Tu comunidad, en una sola app'}
+              {!isIconOnly && (
+                  <div className={`flex flex-col select-none ${textAlignment[size] || textAlignment.medium}`}>
+                      <span className={`tracking-tight text-slate-900 dark:text-white transition-colors duration-300 ${titleSizes[size] || titleSizes.medium}`}>
+                          {nameParts[0]}<span style={{ color: colors.accent }} className="font-extrabold">{nameParts[1]}</span>
                       </span>
-                  )}
-              </div>
+                      {showSubtext && (
+                          <span className={`block font-bold tracking-widest uppercase text-slate-500 dark:text-slate-400 transition-colors duration-300 ${subtitleSizes[size] || subtitleSizes.medium}`}>
+                              {brandSubtext}
+                          </span>
+                      )}
+                  </div>
+              )}
           </div>
       );
   }

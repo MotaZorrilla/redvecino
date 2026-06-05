@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, Head } from '@inertiajs/react';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 
 export default function ResidentLayout({
     children,
@@ -17,7 +18,7 @@ export default function ResidentLayout({
     darkMode
 }) {
     return (
-        <div className="py-8 animate-fade-in font-sans selection:bg-[#72B043]/30 selection:text-white">
+        <div className="py-8 animate-fade-in font-sans selection:bg-brand-green/30 selection:text-white">
             <Head>
                 <title>Portal MiVecino - Tu Comunidad Conectada</title>
                 <meta name="description" content="Acceso residente a copropiedad, historial de pagos y reglamentos en MiVecino." />
@@ -32,28 +33,16 @@ export default function ResidentLayout({
                         <div className="w-64 bg-slate-950 text-white p-6 flex flex-col justify-between shrink-0 font-sans">
                             <div className="space-y-6">
                                 {/* Logo */}
-                                <div className="flex items-center gap-3">
-                                    <div className="h-9 w-9 rounded-xl bg-[#72B043] flex items-center justify-center shadow-lg shadow-[#72B043]/20">
-                                        <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-base font-black tracking-tight text-white leading-none">
-                                            Mi<span className="text-[#72B043]">Vecino</span>
-                                        </h3>
-                                        <span className="text-[8px] tracking-[0.2em] font-bold text-slate-500 uppercase block mt-1">Portal Residente</span>
-                                    </div>
-                                </div>
+                                <ApplicationLogo size="small" showSubtext={false} brand="residente" />
 
                                 {/* Resident Profile Card */}
                                 <div className="p-3.5 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-3 text-left">
-                                    <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-[#72B043] to-[#EC7A08] flex items-center justify-center font-bold text-white text-sm">
+                                    <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-brand-green to-brand-orange flex items-center justify-center font-bold text-white text-sm">
                                         {user?.name?.charAt(0) || 'R'}
                                     </div>
                                     <div className="min-w-0 flex-1">
                                         <p className="text-xs font-black truncate text-white">{user?.name}</p>
-                                        <span className="text-[9px] text-[#72B043] font-bold block">Depto 202 &bull; Vecino</span>
+                                        <span className="text-[9px] text-brand-green font-bold block">Residente</span>
                                     </div>
                                 </div>
 
@@ -85,7 +74,7 @@ export default function ResidentLayout({
                                                     isReservasLocked
                                                         ? 'bg-rose-950/20 text-rose-500 border border-rose-950/20 hover:bg-rose-950/30'
                                                         : mobileTab === item.tab 
-                                                        ? 'bg-[#72B043] text-white shadow shadow-[#72B043]/10' 
+                                                        ? 'bg-brand-green text-white shadow shadow-brand-green/10' 
                                                         : 'text-slate-400 hover:bg-slate-900 hover:text-white'
                                                 }`}
                                             >
@@ -103,7 +92,7 @@ export default function ResidentLayout({
                                     type="button"
                                     className="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-[10px] font-extrabold rounded-xl transition-all flex items-center justify-center gap-1.5 text-slate-300"
                                 >
-                                    <svg className="w-3.5 h-3.5 text-[#72B043]" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                    <svg className="w-3.5 h-3.5 text-brand-green" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
                                     </svg>
                                     Ver Vista Celular
@@ -184,7 +173,7 @@ export default function ResidentLayout({
                     <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-3xl md:rounded-[40px] overflow-hidden shadow-xl flex flex-col w-full md:max-w-[390px] md:h-[720px] md:max-h-[calc(100dvh-120px)] mx-auto relative transition-colors duration-300 md:ring-12 md:ring-slate-950/90 shadow-2xl">
                         
                         {/* Inner App Header */}
-                        <div className="px-6 py-5 bg-gradient-to-br from-[#72B043] via-[#85c851] to-[#5a932f] text-white flex flex-col gap-3 shrink-0">
+                        <div className="px-6 py-5 bg-gradient-to-br from-brand-green via-emerald-500 to-emerald-700 text-white flex flex-col gap-3 shrink-0">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <div className="h-8 w-8 rounded-lg bg-white/10 flex items-center justify-center border border-white/20">
@@ -311,7 +300,7 @@ export default function ResidentLayout({
                                             isReservasLocked
                                                 ? 'text-rose-500'
                                                 : mobileTab === item.tab 
-                                                ? 'text-[#72B043] font-bold' 
+                                                ? 'text-brand-green font-bold' 
                                                 : 'text-slate-500 hover:text-slate-350'
                                         }`}
                                     >

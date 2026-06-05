@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, Head } from '@inertiajs/react';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 
 export default function ColaboradorLayout({
     children,
@@ -25,19 +26,7 @@ export default function ColaboradorLayout({
             <div className={`w-64 bg-slate-950 dark:bg-slate-950 text-white p-6 flex flex-col justify-between shrink-0 font-sans md:flex transition-transform duration-300 absolute md:relative inset-y-0 left-0 z-45 md:translate-x-0 ${isMobileSidebarOpen ? 'flex translate-x-0' : 'hidden -translate-x-full md:flex'}`}>
                 <div className="space-y-6 text-left">
                     {/* Logo */}
-                    <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.248-8.25-3.286zm0 13.036h.008v.008H12v-.008z" />
-                            </svg>
-                        </div>
-                        <div className="text-left">
-                            <h3 className="text-base font-black tracking-tight text-white leading-none">
-                                Red<span className="text-indigo-400 font-extrabold">Vecino</span>
-                            </h3>
-                            <p className="text-[9px] text-slate-400 uppercase tracking-widest font-mono mt-1">Estación Conserjería</p>
-                        </div>
-                    </div>
+                    <ApplicationLogo size="small" showSubtext={false} brand="colaborador" />
 
                     {/* Active Condo Selector */}
                     <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 space-y-1.5 text-left">

@@ -9,7 +9,8 @@
         <title inertia>{{ config('app.name', 'RedVecino') }}</title>
 
         <!-- Favicon / Tab Icon -->
-        <link rel="icon" type="image/png" href="/images/logo_redvecino.png">
+        <link rel="icon" type="image/png" href="/images/icon_redvecino.png">
+        <link rel="apple-touch-icon" href="/images/icon_redvecino.png">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">

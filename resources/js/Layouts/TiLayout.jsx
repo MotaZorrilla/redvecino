@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, Head } from '@inertiajs/react';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 
 export default function TiLayout({
     children,
@@ -12,7 +13,7 @@ export default function TiLayout({
     darkMode
 }) {
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-850 dark:text-slate-200 font-sans selection:bg-[#00A896]/30 flex flex-col md:flex-row relative w-full transition-colors duration-300">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-850 dark:text-slate-200 font-sans selection:bg-brand-teal/30 flex flex-col md:flex-row relative w-full transition-colors duration-300">
             <Head>
                 <title>Dashboard RedVecino - Estación DevOps</title>
                 <meta name="description" content="Portal interactivo de RedVecino para soporte TI y DevOps." />
@@ -21,24 +22,7 @@ export default function TiLayout({
             {/* 1. LEFT SIDEBAR */}
             <div className={`w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-between shrink-0 font-sans transition-transform duration-300 fixed inset-y-0 left-0 z-30 ${isMobileDevOpsSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
                 <div className="space-y-6 text-left">
-                    <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-xl bg-gradient-to-r from-[#0F2557] to-[#00A896] flex items-center justify-center shadow-lg shadow-cyan-950/30">
-                            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 className="text-base font-black text-slate-800 dark:text-slate-100 tracking-tight flex items-center gap-1.5">
-                                Red<span className="text-[#00A896]">Vecino</span>
-                                <span className="flex h-2 w-2 relative">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00A896] opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00A896]"></span>
-                                </span>
-                            </h3>
-                            <p className="text-[9px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-mono">DevOps Workstation</p>
-                        </div>
-                    </div>
-
+                    <ApplicationLogo size="small" showSubtext={false} brand="ti" />
                     <nav className="space-y-1">
                         {[
                             { id: 'devops', name: '💻 DevOps & Telemetría', desc: 'Monitoreo e Infraestructura' },
@@ -57,11 +41,11 @@ export default function TiLayout({
                                 }}
                                 className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex flex-col gap-0.5 border ${
                                     tiActiveTab === tab.id
-                                        ? 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-[#00A896] dark:text-white shadow-md'
+                                        ? 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-brand-teal dark:text-white shadow-md'
                                         : 'border-transparent hover:bg-slate-100/60 dark:hover:bg-slate-800/40 text-slate-500 dark:text-slate-400 hover:text-slate-850 dark:hover:text-slate-205'
-                                }`}
-                            >
-                                <span className={`text-xs font-bold ${tiActiveTab === tab.id ? 'text-[#00A896]' : 'text-slate-700 dark:text-slate-300'}`}>
+                                    }`}
+                                >
+                                    <span className={`text-xs font-bold ${tiActiveTab === tab.id ? 'text-brand-teal' : 'text-slate-700 dark:text-slate-300'}`}>
                                     {tab.name}
                                 </span>
                                 <span className="text-[10px] text-slate-400 dark:text-slate-550 font-medium">
@@ -137,7 +121,7 @@ export default function TiLayout({
                             </button>
                         )}
                         <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-950/40 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
-                            <div className="h-6 w-6 rounded bg-gradient-to-r from-[#0F2557] to-[#00A896] flex items-center justify-center font-bold text-white text-[10px]">
+                            <div className="h-6 w-6 rounded bg-gradient-to-r from-brand-navy to-brand-teal flex items-center justify-center font-bold text-white text-[10px]">
                                 {user?.name?.charAt(0) || 'T'}
                             </div>
                             <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 hidden sm:inline">{user?.name}</span>

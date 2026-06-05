@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import { toast } from '@/utils/notify';
+import ToastContainer from '@/Components/Toast';
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
     // Symmetrical Theme Hook for persistent Light/Dark synchronization
@@ -1565,8 +1567,8 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                             
                                             <div className="space-y-2">
                                                 {[
-                                                    { id: 1, title: 'Seguridad Adicional CCTV', desc: '$1,200,000 CLP &bull; Egreso Extra' },
-                                                    { id: 2, title: 'Reparación Bomba Hidráulica', desc: '$350,000 CLP &bull; Mantenimiento' }
+                                                    { id: 1, title: 'Seguridad Adicional CCTV', desc: '$1,200,000 CLP • Egreso Extra' },
+                                                    { id: 2, title: 'Reparación Bomba Hidráulica', desc: '$350,000 CLP • Mantenimiento' }
                                                 ].map(item => (
                                                     <div 
                                                         key={item.id} 
@@ -1576,7 +1578,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                     >
                                                         <div>
                                                             <span className="font-bold block">{item.title}</span>
-                                                            <span className={`text-[10px] block mt-0.5 ${simulatedDarkMode ? 'text-slate-500' : 'text-slate-400'}`} dangerouslySetInnerHTML={{ __html: item.desc }} />
+                                                            <span className={`text-[10px] block mt-0.5 ${simulatedDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>{item.desc}</span>
                                                         </div>
                                                         <div>
                                                             {approvedExpenses[item.id] ? (
@@ -2146,28 +2148,28 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                             <span className="text-xs font-black text-slate-900 dark:text-slate-400 uppercase tracking-widest block">Legal y Soporte</span>
                             <ul className="space-y-2.5 text-xs font-bold text-slate-500 dark:text-slate-400">
                                 <li>
-                                    <a href="#developers" className="hover:text-[#00A896] dark:hover:text-white transition-colors">Documentación de API</a>
+                                    <a href="#developers" className="hover:text-brand-teal dark:hover:text-white transition-colors">Documentación de API</a>
                                 </li>
                                 <li>
                                     <button 
-                                        onClick={() => alert("Términos de Servicio: El uso de la simulación RedVecino & MiVecino está destinado exclusivamente a propósitos de portafolio y demostración de capacidades bajo la licencia MIT.")}
-                                        className="hover:text-[#00A896] dark:hover:text-white transition-colors text-left font-bold"
+                                        onClick={() => toast("Términos de Servicio: El uso de la simulación RedVecino & MiVecino está destinado exclusivamente a propósitos de portafolio y demostración de capacidades bajo la licencia MIT.")}
+                                        className="hover:text-brand-teal dark:hover:text-white transition-colors text-left font-bold"
                                     >
                                         Términos de Servicio
                                     </button>
                                 </li>
                                 <li>
                                     <button 
-                                        onClick={() => alert("Políticas de Privacidad: Esta aplicación de demostración no realiza almacenamiento ni recolección de datos personales en servidores de terceros.")}
-                                        className="hover:text-[#00A896] dark:hover:text-white transition-colors text-left font-bold"
+                                        onClick={() => toast("Políticas de Privacidad: Esta aplicación de demostración no realiza almacenamiento ni recolección de datos personales en servidores de terceros.")}
+                                        className="hover:text-brand-teal dark:hover:text-white transition-colors text-left font-bold"
                                     >
                                         Políticas de Privacidad
                                     </button>
                                 </li>
                                 <li>
                                     <button 
-                                        onClick={() => alert("Licencia de Software: Distribuido bajo la Licencia MIT. Todo el material y propiedad de marca es respaldado por Neobranding.")}
-                                        className="hover:text-[#00A896] dark:hover:text-white transition-colors text-left font-bold"
+                                        onClick={() => toast("Licencia de Software: Distribuido bajo la Licencia MIT. Todo el material y propiedad de marca es respaldado por Neobranding.")}
+                                        className="hover:text-brand-teal dark:hover:text-white transition-colors text-left font-bold"
                                     >
                                         Licencia MIT Residencial
                                     </button>
@@ -2204,6 +2206,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                 </div>
             </footer>
+            <ToastContainer />
         </div>
     );
 }

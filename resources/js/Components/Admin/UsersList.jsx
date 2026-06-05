@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { SimpleTable, StatusBadge } from '@/Components/DashboardShared';
+import { generatePassword } from '@/utils/helpers';
 
 export default function UsersList({
     adminCondoId,
@@ -61,7 +62,7 @@ export default function UsersList({
             setUsersList(prev => [...prev, newU]);
         }
         setShowAddUserForm(false);
-        setNewUserForm({ name: '', rut: '', email: '', phone: '', role: 'resident', status: 'active', password: 'password' });
+        setNewUserForm({ name: '', rut: '', email: '', phone: '', role: 'resident', status: 'active', password: generatePassword() });
     };
 
     return (

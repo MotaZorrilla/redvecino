@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { generatePassword } from '@/utils/helpers';
 
 export default function GlobalUsersTable({
     usersList = [],
@@ -24,7 +25,7 @@ export default function GlobalUsersTable({
                     <button
                         onClick={() => {
                             setEditingUser(null);
-                            setNewUserForm({ name: '', rut: '', email: '', phone: '', role: 'resident', status: 'active', password: 'password' });
+                            setNewUserForm({ name: '', rut: '', email: '', phone: '', role: 'resident', status: 'active', password: generatePassword() });
                             setShowAddUserForm(!showAddUserForm);
                         }}
                         className="px-4 py-2 bg-indigo-600 hover:bg-[#00A896] text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0"

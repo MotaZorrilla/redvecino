@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, Head } from '@inertiajs/react';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 
 export default function ComiteLayout({
     children,
@@ -25,19 +26,7 @@ export default function ComiteLayout({
             <div className={`w-64 bg-slate-950 dark:bg-slate-950 text-white p-6 flex flex-col justify-between shrink-0 font-sans md:flex transition-transform duration-300 absolute md:relative inset-y-0 left-0 z-45 md:translate-x-0 ${isMobileSidebarOpen ? 'flex translate-x-0' : 'hidden -translate-x-full md:flex'}`}>
                 <div className="space-y-6 text-left">
                     {/* Logo */}
-                    <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-.778.099-1.533.284-2.253" />
-                            </svg>
-                        </div>
-                        <div className="text-left">
-                            <h3 className="text-base font-black tracking-tight text-white leading-none">
-                                Red<span className="text-indigo-400 font-extrabold">Vecino</span>
-                            </h3>
-                            <p className="text-[9px] text-slate-400 uppercase tracking-widest font-mono mt-1">Comité Administración</p>
-                        </div>
-                    </div>
+                    <ApplicationLogo size="small" showSubtext={false} brand="comite" />
 
                     {/* Active Condo Selector */}
                     <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-3 space-y-1.5 text-left">

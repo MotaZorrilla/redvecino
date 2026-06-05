@@ -28,7 +28,7 @@ Basado en el manual de identidad del proyecto, las especificaciones estéticas o
 
 - **RedVecino (Web/Admin):** Panel web responsive en React que controla los módulos críticos (Finanzas, Usuarios, Propiedades y Reportes de Incidencias).
 - **MiVecino (App/Residentes):** Interfaz móvil en React orientada al usuario final con cuadrícula táctil (6 botones principales) y barra inferior fija.
-- **Stack tecnológico definido:** Laravel 13 (backend), Inertia.js v3 + React 18 + TypeScript + shadcn/ui (frontend web), SQLite (Desarrollo) y MySQL (Producción).
+- **Stack tecnológico definido:** Laravel 12 (backend), Inertia.js v2 + React 18 + Tailwind CSS 3 (frontend web), SQLite (Desarrollo) y MySQL (Producción).
 - **Arquitectura de usuarios con 6 roles principales:** Propietario, Residente, Comité, Colaborador, Administrador, TI.
 - **Modelo de Datos:** Multi-condominio preparado a nivel de base de datos (`condominium_id` en todas las tablas transaccionales).
 
@@ -158,13 +158,13 @@ USUARIO (Base)
 
 | Capa | Tecnología |
 |------|------------|
-| Framework | Laravel 13.x (PHP 8.3+) |
-| Frontend | Inertia.js v3 + React 18 + TypeScript + Tailwind CSS v4 + shadcn/ui |
+| Framework | Laravel 12.x (PHP 8.2+) |
+| Frontend | Inertia.js v2 + React 18 + Tailwind CSS 3 + shadcn/ui |
 | Base de datos | SQLite (dev) / MySQL 8+ (prod) |
-| Autenticación | Laravel 13 Starter Kit (React/Inertia) |
-| Roles y permisos | Spatie Laravel Permission v7 |
-| Testing | Pest PHP v4 + PHPUnit |
-| Build | Vite 8 + laravel-vite-plugin |
+| Autenticación | Laravel Breeze (React/Inertia) |
+| Roles y permisos | Spatie Laravel Permission v6 |
+| Testing | PHPUnit 11 + Pest |
+| Build | Vite 7 + laravel-vite-plugin |
 | Deployment | Docker / Servidor Linux (Apache/Nginx) |
 
 ### 4.2 Configuración del Stack Frontend (Laravel 13 + Inertia v3 + React + Tailwind v4)
@@ -208,21 +208,49 @@ export default defineConfig({
 });
 ```
 
-#### Estructura del Starter Kit React (Laravel 13)
+#### Estructura Frontend Actual
 ```
 resources/js/
-├── components/      # Componentes React reutilizables
-├── hooks/           # Custom hooks de React
-├── layouts/         # Layouts de la aplicación
-├── lib/             # Utilidades y configuración
-├── pages/           # Componentes de página (Inertia)
+├── Components/      # Componentes React reutilizables
+│   ├── Admin/       # Componentes del panel de administración
+│   ├── Colaborador/ # Componentes del panel del colaborador
+│   ├── Comite/      # Componentes del panel del comité
+│   ├── Propietario/ # Componentes del panel del propietario
+│   ├── Residente/   # Componentes del portal MiVecino
+│   ├── RolePages/   # Páginas de dashboard por rol (F4)
+│   │   ├── SuperUsuarioDashboard.jsx
+│   │   ├── TiDashboard.jsx
+│   │   ├── AdminDashboard.jsx
+│   │   ├── ComiteDashboard.jsx
+│   │   ├── ColaboradorDashboard.jsx
+│   │   ├── PropietarioDashboard.jsx
+│   │   └── ResidenteDashboard.jsx
+│   ├── Ti/          # Componentes del panel de TI
+│   ├── DashboardShared.jsx
+│   ├── ApplicationLogo.jsx
+│   ├── Modal.jsx
+│   ├── Dropdown.jsx
+│   ├── Toast.jsx
+│   └── ConfirmDialog.jsx
+├── Hooks/           # Custom hooks de React
+├── Layouts/         # Layouts de la aplicación por rol
+│   ├── TiLayout.jsx
+│   ├── AdminLayout.jsx
+│   ├── ComiteLayout.jsx
+│   ├── ColaboradorLayout.jsx
+│   ├── PropietarioLayout.jsx
+│   ├── ResidentLayout.jsx
+│   └── SuperUsuarioLayout.jsx
+├── Pages/           # Componentes de página (Inertia)
 │   ├── Auth/
-│   ├── Users/
-│   ├── Properties/
-│   ├── Expenses/
-│   ├── Tickets/
-│   └── Dashboard.tsx
-└── types/           # Definiciones TypeScript
+│   ├── Dashboard.jsx  ← Orquestador (~480 líneas)
+│   ├── Welcome.jsx
+│   └── Profile/
+├── utils/           # Utilidades y helpers
+│   ├── helpers.js
+│   ├── notify.js
+│   └── constants.js
+└── bootstrap.js     # Configuración de Axios
 ```
 
 #### Configuración de Inertia v3
@@ -749,7 +777,7 @@ messages
 ### 4.6 Estructura de Directorios del Proyecto
 
 ```
-condominio-pro/
+redvecino/
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/
@@ -804,16 +832,25 @@ condominio-pro/
 │   ├── js/
 │   │   ├── Pages/
 │   │   │   ├── Auth/
-│   │   │   ├── Users/
-│   │   │   ├── Properties/
-│   │   │   ├── Expenses/
-│   │   │   ├── Tickets/
-│   │   │   └── Dashboard.tsx
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── Welcome.jsx
+│   │   │   └── Profile/
 │   │   ├── Components/
-│   │   ├── Composables/
-│   │   ├── Layouts/
-│   │   ├── Lib/
-│   │   └── Types/
+│   │   │   ├── Admin/
+│   │   │   ├── Ti/
+│   │   │   ├── Colaborador/
+│   │   │   ├── Comite/
+│   │   │   ├── Propietario/
+│   │   │   ├── Residente/
+│   │   │   ├── RolePages/
+│   │   │   ├── DashboardShared.jsx
+│   │   │   └── ApplicationLogo.jsx
+│   │   ├── Layouts/       (7 layouts por rol)
+│   │   ├── Hooks/
+│   │   └── utils/
+│   │       ├── helpers.js
+│   │       ├── notify.js
+│   │       └── constants.js
 │   └── views/
 │       └── app.blade.php
 ├── routes/
@@ -1296,6 +1333,6 @@ Derivado de la integración de herramientas de diagnóstico y auditoría de perm
 ---
 
 **Fecha de creación:** Mayo 2026
-**Última actualización:** 4 de Junio de 2026 (Consola Programática DevOps, Matriz Real Spatie, Separación de Tabs de TI, Auto-Impersonación en Mapa del Sandbox y Sincronización de Sesión)
-**Versión:** 6.1 (DevOps Spec, Real Spatie Integration, Session Reload & Interactive Sandbox Map)
-**Estado:** Listo para desarrollo (Con base de datos en SQLite/MySQL, suite de pruebas automatizadas, especificación de alta fidelidad PropTech, catálogo de cuentas base y maquetación premium widescreen)
+**Última actualización:** 5 de Junio de 2026 (Auditoría Frontend completa F1-F7, Dashboard modularizado por roles, design tokens normalizados)
+**Versión:** 7.0 (Full Frontend Audit, Role-based Dashboard, Design Tokens & Certified QA)
+**Estado:** Listo para desarrollo (Con base de datos en SQLite/MySQL, suite de pruebas automatizadas, especificación de alta fidelidad PropTech, catálogo de cuentas base, maquetación premium widescreen y frontend auditado)

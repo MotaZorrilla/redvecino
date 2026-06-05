@@ -21,14 +21,34 @@ const Dropdown = ({ children }) => {
 const Trigger = ({ children }) => {
     const { open, setOpen, toggleOpen } = useContext(DropDownContext);
 
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleOpen();
+        }
+        if (e.key === 'Escape' && open) {
+            setOpen(false);
+        }
+    };
+
     return (
         <>
-            <div onClick={toggleOpen}>{children}</div>
+            <div
+                onClick={toggleOpen}
+                onKeyDown={handleKeyDown}
+                role="button"
+                tabIndex={0}
+                aria-expanded={open}
+                aria-haspopup="true"
+            >
+                {children}
+            </div>
 
             {open && (
                 <div
                     className="fixed inset-0 z-40"
                     onClick={() => setOpen(false)}
+                    aria-hidden="true"
                 ></div>
             )}
         </>
@@ -71,6 +91,7 @@ const Content = ({
                 <div
                     className={`absolute z-50 mt-2 rounded-md shadow-lg ${alignmentClasses} ${widthClasses}`}
                     onClick={() => setOpen(false)}
+                    role="menu"
                 >
                     <div
                         className={
@@ -90,6 +111,7 @@ const DropdownLink = ({ className = '', children, ...props }) => {
     return (
         <Link
             {...props}
+            role="menuitem"
             className={
                 'block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 dark:text-slate-300 transition duration-150 ease-in-out hover:bg-gray-100 dark:hover:bg-slate-800/80 focus:bg-gray-100 dark:focus:bg-slate-800 focus:outline-none ' +
                 className

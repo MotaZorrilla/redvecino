@@ -1,65 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { Head, Link, usePage } from '@inertiajs/react';
+import { generatePassword, formatCurrency } from '@/utils/helpers';
+import { toast } from '@/utils/notify';
+import ToastContainer from '@/Components/Toast';
+import ConfirmDialog from '@/Components/ConfirmDialog';
 
-// Layouts
-import TiLayout from '@/Layouts/TiLayout';
-import AdminLayout from '@/Layouts/AdminLayout';
-import ComiteLayout from '@/Layouts/ComiteLayout';
-import ColaboradorLayout from '@/Layouts/ColaboradorLayout';
-import PropietarioLayout from '@/Layouts/PropietarioLayout';
-import ResidentLayout from '@/Layouts/ResidentLayout';
-import SuperUsuarioLayout from '@/Layouts/SuperUsuarioLayout';
+// Role Pages
+import SuperUsuarioDashboard from '@/Components/RolePages/SuperUsuarioDashboard';
+import TiDashboard from '@/Components/RolePages/TiDashboard';
+import AdminDashboard from '@/Components/RolePages/AdminDashboard';
+import ComiteDashboard from '@/Components/RolePages/ComiteDashboard';
+import ColaboradorDashboard from '@/Components/RolePages/ColaboradorDashboard';
+import PropietarioDashboard from '@/Components/RolePages/PropietarioDashboard';
+import ResidenteDashboard from '@/Components/RolePages/ResidenteDashboard';
 
-// Shared Components & Loader
 import { RoleTransitionLoader } from '@/Components/DashboardShared';
 
-// Components - TI (DevOps)
-import DevOpsTelemetry from '@/Components/Ti/DevOpsTelemetry';
-import SpatieImpersonator from '@/Components/Ti/SpatieImpersonator';
-import SpatiePermissionMatrix from '@/Components/Ti/SpatiePermissionMatrix';
-import GlobalUsersTable from '@/Components/Ti/GlobalUsersTable';
-import CondosManagement from '@/Components/Ti/CondosManagement';
-import SandboxInspeccion from '@/Components/Ti/SandboxInspeccion';
-
-// Components - Admin
-import DashboardOverview from '@/Components/Admin/DashboardOverview';
-import PropertiesList from '@/Components/Admin/PropertiesList';
-import UsersList from '@/Components/Admin/UsersList';
-import TicketsList from '@/Components/Admin/TicketsList';
-import FinancesLedger from '@/Components/Admin/FinancesLedger';
-import FinesList from '@/Components/Admin/FinesList';
-import SettingsPanel from '@/Components/Admin/SettingsPanel';
-import PersonWizard from '@/Components/Admin/PersonWizard';
-
-// Components - Comité
-import FinancialAudit from '@/Components/Comite/FinancialAudit';
-import ChatAuditLogs from '@/Components/Comite/ChatAuditLogs';
-import MeetingsMinutes from '@/Components/Comite/MeetingsMinutes';
-
-// Components - Colaborador
-import PackageDelivery from '@/Components/Colaborador/PackageDelivery';
-import VisitorAccess from '@/Components/Colaborador/VisitorAccess';
-import ShiftLogs from '@/Components/Colaborador/ShiftLogs';
-import AssignedTickets from '@/Components/Colaborador/AssignedTickets';
-import AttendanceControl from '@/Components/Colaborador/AttendanceControl';
-import ContractViewer from '@/Components/Colaborador/ContractViewer';
-import ShoppingList from '@/Components/Colaborador/ShoppingList';
-
-// Components - Propietario
-import CommonExpensesQR from '@/Components/Propietario/CommonExpensesQR';
-import FinancialReports from '@/Components/Propietario/FinancialReports';
-import BookingManager from '@/Components/Propietario/BookingManager';
-import PropertyOwnership from '@/Components/Propietario/PropertyOwnership';
-
-// Components - Residente
-import ResidentOverview from '@/Components/Residente/ResidentOverview';
-import AnnouncementsList from '@/Components/Residente/AnnouncementsList';
-import TicketsReport from '@/Components/Residente/TicketsReport';
-import CommunityChat from '@/Components/Residente/CommunityChat';
-
 export default function Dashboard() {
-    // Props initialized from inertia controller
     const { 
         stats, 
         recentAnnouncements = [], 
@@ -76,16 +34,15 @@ export default function Dashboard() {
     const [impersonatedUser, setImpersonatedUser] = useState(null);
     const user = impersonatedUser || loggedInUser;
 
-    // Reactive list states for CRUD functionality
     const [usersList, setUsersList] = useState(allUsers);
     const [propertiesList, setPropertiesList] = useState(allProperties);
     const [ticketsList, setTicketsList] = useState(usePage().props.recentTickets || []);
     const [paymentsList, setPaymentsList] = useState(recentPayments.length > 0 ? recentPayments : allPayments);
     const [adminCondoId, setAdminCondoId] = useState(allCondominiums.length > 0 ? allCondominiums[0].id : 1);
 
-    // ─── CONDO FINANCES (ASYNCHRONOUS API CRUD) ────────────────────────
-    const [paymentsTabMode, setPaymentsTabMode] = useState('payments'); 
-    const [ledgerSubTab, setLedgerSubTab] = useState('incomes'); 
+    // Condo Finances
+    const [paymentsTabMode, setPaymentsTabMode] = useState('payments');
+    const [ledgerSubTab, setLedgerSubTab] = useState('incomes');
     const [incomesList, setIncomesList] = useState([]);
     const [expensesList, setExpensesList] = useState([]);
     const [financeSummary, setFinanceSummary] = useState({ total_incomes: 0, total_expenses: 0, balance: 0, incomes_by_category: {}, expenses_by_category: {} });
@@ -100,25 +57,29 @@ export default function Dashboard() {
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
     const [isMobileDevOpsSidebarOpen, setIsMobileDevOpsSidebarOpen] = useState(false);
 
-    const filteredIncomes = selectedIncomeCategory === 'all' 
-        ? incomesList 
-        : incomesList.filter(inc => inc.category === selectedIncomeCategory);
+    const filteredIncomes = useMemo(() =>
+        selectedIncomeCategory === 'all'
+            ? incomesList
+            : incomesList.filter(inc => inc.category === selectedIncomeCategory),
+        [incomesList, selectedIncomeCategory]
+    );
 
-    const filteredExpenses = selectedExpenseCategory === 'all' 
-        ? expensesList 
-        : expensesList.filter(exp => exp.category === selectedExpenseCategory);
+    const filteredExpenses = useMemo(() =>
+        selectedExpenseCategory === 'all'
+            ? expensesList
+            : expensesList.filter(exp => exp.category === selectedExpenseCategory),
+        [expensesList, selectedExpenseCategory]
+    );
 
     const [newIncomeForm, setNewIncomeForm] = useState({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '' });
     const [newExpenseForm, setNewExpenseForm] = useState({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '' });
 
-    // Load Catalog once
     useEffect(() => {
         axios.get('/api/condo-finances/catalog')
             .then(res => setFinancialCatalog(res.data))
             .catch(err => console.error("Error cargando catálogo financiero:", err));
     }, []);
 
-    // Load Incomes, Expenses & Summary when condo changes
     const fetchCondoFinances = () => {
         if (!adminCondoId) return;
         setLoadingFinances(true);
@@ -161,7 +122,7 @@ export default function Dashboard() {
             setEditingIncome(null);
             setNewIncomeForm({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '' });
         }).catch(err => {
-            alert("Error al guardar ingreso: " + (err.response?.data?.message || err.message));
+            toast("Error al guardar ingreso: " + (err.response?.data?.message || err.message), 'error');
         });
     };
 
@@ -169,7 +130,7 @@ export default function Dashboard() {
         if (!confirm("¿Seguro que deseas eliminar este ingreso contable?")) return;
         axios.delete(`/api/condo-finances/incomes/${id}`)
             .then(() => fetchCondoFinances())
-            .catch(err => alert("Error al eliminar ingreso: " + err.message));
+            .catch(err => toast("Error al eliminar ingreso: " + err.message, 'error'));
     };
 
     const handleSaveExpense = (e) => {
@@ -195,7 +156,7 @@ export default function Dashboard() {
             setEditingExpense(null);
             setNewExpenseForm({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '' });
         }).catch(err => {
-            alert("Error al guardar egreso: " + (err.response?.data?.message || err.message));
+            toast("Error al guardar egreso: " + (err.response?.data?.message || err.message), 'error');
         });
     };
 
@@ -203,7 +164,7 @@ export default function Dashboard() {
         if (!confirm("¿Seguro que deseas eliminar este egreso contable?")) return;
         axios.delete(`/api/condo-finances/expenses/${id}`)
             .then(() => fetchCondoFinances())
-            .catch(err => alert("Error al eliminar egreso: " + err.message));
+            .catch(err => toast("Error al eliminar egreso: " + err.message, 'error'));
     };
 
     useEffect(() => {
@@ -216,12 +177,10 @@ export default function Dashboard() {
             : [{ id: 1, name: 'Sin Condominios', address: '', city: '', units_count: 0, status: 'inactive' }]
     );
 
-    // Chained Impersonation Filters for DevOps TI
     const [selectedImpCondo, setSelectedImpCondo] = useState('all');
     const [selectedImpRole, setSelectedImpRole] = useState('all');
     const [selectedImpUser, setSelectedImpUser] = useState('');
 
-    // Administrative Portal States
     const [adminActiveTab, setAdminActiveTab] = useState('dashboard');
     const [userSubTab, setUserSubTab] = useState('residents');
     const [settingsSuccess, setSettingsSuccess] = useState(false);
@@ -235,7 +194,6 @@ export default function Dashboard() {
         dbDriver: 'sqlite'
     });
 
-    // Update settings form on user change
     useEffect(() => {
         if (user) {
             setAdminSettingsForm({
@@ -249,11 +207,9 @@ export default function Dashboard() {
         }
     }, [user]);
 
-    // Dynamic Tickets pre-filters from KPI click
     const [ticketStatusFilter, setTicketStatusFilter] = useState('all');
     const [ticketPriorityFilter, setTicketPriorityFilter] = useState('all');
 
-    // Fines Reactive List and Forms
     const [finesList, setFinesList] = useState([
         { id: 1, property_id: 1, amount: 45000, reason: 'Ruidos molestos después de las 02:00 AM (música alta)', status: 'pending', date: '2026-05-10', condominium_id: 1 },
         { id: 2, property_id: 2, amount: 65000, reason: 'Uso de piscina comunitaria sin reserva previa', status: 'pending', date: '2026-05-18', condominium_id: 1 },
@@ -263,7 +219,6 @@ export default function Dashboard() {
     const [showAddFineForm, setShowAddFineForm] = useState(false);
     const [newFineForm, setNewFineForm] = useState({ property_id: '', amount: '', reason: '', status: 'pending' });
 
-    // Editing States for full inline CRUD
     const [editingUser, setEditingUser] = useState(null);
     const [editingCondo, setEditingCondo] = useState(null);
     const [editingProp, setEditingProp] = useState(null);
@@ -271,31 +226,25 @@ export default function Dashboard() {
     const [editingPayment, setEditingPayment] = useState(null);
     const [editingFine, setEditingFine] = useState(null);
 
-    // Active state for forms
     const [showAddUserForm, setShowAddUserForm] = useState(false);
     const [showAddPropForm, setShowAddPropForm] = useState(false);
     const [showAddTicketForm, setShowAddTicketForm] = useState(false);
     const [showAddPaymentForm, setShowAddPaymentForm] = useState(false);
     const [showAddCondoForm, setShowAddCondoForm] = useState(false);
-
-    // Person Wizard state
     const [showPersonWizard, setShowPersonWizard] = useState(false);
 
-    // Form inputs states
-    const [newUserForm, setNewUserForm] = useState({ name: '', rut: '', email: '', phone: '', role: 'resident', status: 'active', password: 'password' });
+    const [newUserForm, setNewUserForm] = useState({ name: '', rut: '', email: '', phone: '', role: 'resident', status: 'active', password: generatePassword() });
     const [newPropForm, setNewPropForm] = useState({ condominium_id: 1, type: 'apartment', number: '', block: 'Torre A', floor: '', area_sqm: '', status: 'vacant' });
     const [newTicketForm, setNewTicketForm] = useState({ property_id: '', title: '', description: '', priority: 'medium', category_id: 1 });
     const [newPaymentForm, setNewPaymentForm] = useState({ user_id: '', property_id: '', common_expense_id: 1, amount: '', payment_method: 'transfer' });
     const [newCondoForm, setNewCondoForm] = useState({ name: '', address: '', city: '', units_count: '' });
 
-    // Voice incidence state
     const [isListeningVoice, setIsListeningVoice] = useState(false);
     const [voiceTextSimulated, setVoiceTextSimulated] = useState('');
 
     const [showTransition, setShowTransition] = useState(true);
     const [fadeOut, setFadeOut] = useState(false);
-    
-    // Core Role Detection
+
     const userRoles = user?.roles || [];
     const isTiRole = userRoles.some(role => role.toLowerCase() === 'ti');
     const isSuperUsuarioRole = userRoles.some(role => ['super_usuario', 'súper usuario', 'superusuario'].includes(role.toLowerCase()));
@@ -303,20 +252,15 @@ export default function Dashboard() {
         ['admin', 'administrador', 'committee', 'comité', 'colaborador', 'employee'].includes(role.toLowerCase())
     );
     const isActuallyAdmin = isTiRole || isBusinessAdmin || isSuperUsuarioRole;
-    
-    // Interactive Simulation Toggle for Admins/TI
+
     const [simulationMode, setSimulationMode] = useState(false);
-    
-    // TI Sandbox: allow TI to inspect admin modules per condominium
     const [sandboxCondoId, setSandboxCondoId] = useState('all');
     const [sandboxModule, setSandboxModule] = useState('map');
-    
-    // Check if the current render should be Admin view or Resident view
+
     const renderAdminView = isActuallyAdmin && !simulationMode;
     const renderTiDevOps = isTiRole && !simulationMode;
     const renderBusinessAdmin = isBusinessAdmin && !simulationMode;
 
-    // Layout simulation states
     const [forceMobileView, setForceMobileView] = useState(false);
     const [isDesktop, setIsDesktop] = useState(false);
 
@@ -348,7 +292,7 @@ export default function Dashboard() {
         if (typeof window !== 'undefined') {
             const storedTheme = localStorage.getItem('dashboard-theme');
             if (storedTheme) return storedTheme === 'dark';
-            return true; // Default to dark mode by default
+            return true;
         }
         return true;
     });
@@ -421,20 +365,17 @@ export default function Dashboard() {
             setAuditedMessagesState(mapped);
         }
     }, [allMessages]);
-    
-    // DevOps Telemetry Stats
+
     const [cpuLoad, setCpuLoad] = useState(14);
     const [ramUsage, setRamUsage] = useState(124);
     const [latency, setLatency] = useState(8);
-    
-    // DevOps console logs
+
     const [terminalLogs, setTerminalLogs] = useState([
         '[TI-INIT] Sesión de Consola TI establecida.',
         '[INFRA] Conectado al kernel local de RedVecino & MiVecino SQLite.',
         '[SECURITY] Spatie Permisos cargados con éxito (Autenticado como TI).'
     ]);
-    
-    // Spatie RBAC interactive matrix
+
     const [rbMatrix, setRbMatrix] = useState({
         ti: {
             ver_finanzas_global: true,
@@ -498,11 +439,10 @@ export default function Dashboard() {
         }
     });
 
-    // Resident View (MiVecino) state hooks
     const [mobileTab, setMobileTab] = useState('home');
     const [simulatedMoroso, setSimulatedMoroso] = useState(false);
     const [showMorosidadModal, setShowMorosidadModal] = useState(false);
-    
+
     const [residentCondo] = useState('Condominio Alameda Loft');
     const [residentExpenses, setResidentExpenses] = useState({
         id: 421,
@@ -517,7 +457,7 @@ export default function Dashboard() {
             { name: 'Servicios Básicos Comunes', amount: 18480 }
         ]
     });
-    
+
     const [paymentHistory, setPaymentHistory] = useState([
         { id: 402, period: 'Abril 2026', amount: 165000, date: '04/04/2026', method: 'Transferencia', status: 'completed' },
         { id: 388, period: 'Marzo 2026', amount: 158000, date: '02/03/2026', method: 'Tarjeta de Crédito', status: 'completed' },
@@ -528,40 +468,36 @@ export default function Dashboard() {
         { id: 108, title: 'Falla de luminaria en pasillo C', category: 'Electricidad', priority: 'high', status: 'open', date: '25/05/2026', desc: 'La luz de emergencia parpadea continuamente.' },
         { id: 94, title: 'Puerta de piscina no cierra con pestillo', category: 'Seguridad', priority: 'medium', status: 'in_progress', date: '18/05/2026', desc: 'Riesgo para niños, necesita ajuste de bisagra.' }
     ]);
-    
+
     const [amenities, setAmenities] = useState([
         { id: 'quincho', name: 'Quincho Principal', price: 20000, cap: '25 personas', rules: 'Aseo no incluido. Música moderada hasta 23:30.' },
         { id: 'piscina', name: 'Piscina / reposeras', price: 0, cap: '8 personas por depto', rules: 'Gorra obligatoria, menores acompañados.' },
         { id: 'gym', name: 'Gimnasio Equipado', price: 0, cap: '4 personas simultáneas', rules: 'Uso máximo 1 hora por depto, zapatillas obligatorias.' },
         { id: 'sala', name: 'Sala Multiuso / Cine', price: 15000, cap: '15 personas', rules: 'Garantía reembolsable de $30.000 por limpieza.' }
     ]);
-    
+
     const [myReservations, setMyReservations] = useState([
         { id: 74, name: 'Quincho Principal', date: '30/05/2026', slot: 'Tarde (14:00 - 18:00)', price: 20000, status: 'approved' }
     ]);
 
-    // Committee / Colaborador / Propietario Active Tabs
     const [comiteActiveTab, setComiteActiveTab] = useState('dashboard');
     const [colaboradorActiveTab, setColaboradorActiveTab] = useState('attendance');
     const [propietarioActiveTab, setPropietarioActiveTab] = useState('home');
 
-    // Forms states
     const [bookingAmenity, setBookingAmenity] = useState('quincho');
     const [bookingDate, setBookingDate] = useState('');
     const [bookingSlot, setBookingSlot] = useState('Tarde (14:00 - 18:00)');
-    
+
     const [newTicketTitle, setNewTicketTitle] = useState('');
     const [newTicketDesc, setNewTicketDesc] = useState('');
     const [newTicketCat, setNewTicketCat] = useState('Electricidad');
     const [newTicketPri, setNewTicketPri] = useState('medium');
 
-    // Modal state for QR Payment
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [paymentReceiptName, setPaymentReceiptName] = useState('');
     const [isProcessingPayment, setIsProcessingPayment] = useState(false);
     const [paymentCompletedSuccess, setPaymentCompletedSuccess] = useState(false);
 
-    // Community Chat state
     const [chatInput, setChatInput] = useState('');
     const [chatMessages, setChatMessages] = useState([
         { sender: 'system', text: 'Bienvenido al canal seguro de mensajería con Conserjería y Administración.' },
@@ -569,7 +505,6 @@ export default function Dashboard() {
     ]);
     const [isTyping, setIsTyping] = useState(false);
 
-    // Telemetry logs simulated effect
     useEffect(() => {
         if (!devOpsActive) return;
         const telemetryInterval = setInterval(() => {
@@ -616,13 +551,12 @@ export default function Dashboard() {
         ]);
     };
 
-    // Simulated resident payment flow
     const executeQrPayment = () => {
         setIsProcessingPayment(true);
         setTimeout(() => {
             setIsProcessingPayment(false);
             setPaymentCompletedSuccess(true);
-            
+
             const today = new Date().toLocaleDateString('es-CL');
             setPaymentHistory(prev => [
                 {
@@ -635,22 +569,21 @@ export default function Dashboard() {
                 },
                 ...prev
             ]);
-            
+
             setResidentExpenses(prev => ({ ...prev, status: 'completed' }));
         }, 2000);
     };
 
-    // Simulated resident booking flow
     const submitBooking = (e) => {
         e.preventDefault();
         if (!bookingDate) {
-            alert('Por favor selecciona una fecha.');
+            toast('Por favor selecciona una fecha.', 'warning');
             return;
         }
-        
+
         const selectedAmenityObj = amenities.find(a => a.id === bookingAmenity);
         const formatD = bookingDate.split('-').reverse().join('/');
-        
+
         const newBooking = {
             id: Math.floor(Math.random() * 200) + 100,
             name: selectedAmenityObj.name,
@@ -659,20 +592,19 @@ export default function Dashboard() {
             price: selectedAmenityObj.price,
             status: 'pending'
         };
-        
+
         setMyReservations(prev => [newBooking, ...prev]);
-        alert(`¡Solicitud enviada! Tu reserva de ${selectedAmenityObj.name} está pendiente de confirmación.`);
+        toast(`¡Solicitud enviada! Tu reserva de ${selectedAmenityObj.name} está pendiente de confirmación.`);
         setBookingDate('');
     };
 
-    // Simulated resident ticket flow
     const submitTicket = (e) => {
         e.preventDefault();
         if (!newTicketTitle.trim() || !newTicketDesc.trim()) {
-            alert('Por favor completa todos los campos obligatorios.');
+            toast('Por favor completa todos los campos obligatorios.', 'warning');
             return;
         }
-        
+
         const newTicket = {
             id: Math.floor(Math.random() * 200) + 100,
             title: newTicketTitle,
@@ -682,24 +614,23 @@ export default function Dashboard() {
             date: new Date().toLocaleDateString('es-CL'),
             desc: newTicketDesc
         };
-        
+
         setReportedTickets(prev => [newTicket, ...prev]);
-        alert(`¡Ticket #${newTicket.id} creado con éxito! Administración ha sido notificada.`);
+        toast(`¡Ticket #${newTicket.id} creado con éxito! Administración ha sido notificada.`);
         setNewTicketTitle('');
         setNewTicketDesc('');
     };
 
-    // Simulated resident chat flow
     const sendChatMessage = (e) => {
         e.preventDefault();
         if (!chatInput.trim()) return;
-        
+
         const time = new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
         const userMsg = { sender: 'me', text: chatInput, time };
-        
+
         setChatMessages(prev => [...prev, userMsg]);
         setChatInput('');
-        
+
         setIsTyping(true);
         setTimeout(() => {
             setIsTyping(false);
@@ -724,7 +655,7 @@ export default function Dashboard() {
                 <div className="max-w-md w-full space-y-8 bg-slate-900/40 backdrop-blur-xl border border-slate-800/80 p-10 rounded-[32px] shadow-2xl relative overflow-hidden animate-fade-in">
                     <div className="absolute -top-10 -left-10 w-40 h-40 bg-[#00A896]/10 rounded-full blur-3xl pointer-events-none" />
                     <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-                    
+
                     <div className="flex flex-col items-center gap-4">
                         <div className="h-20 w-20 bg-amber-500/10 text-amber-500 flex items-center justify-center rounded-[24px] border border-amber-500/20 shadow-lg shadow-amber-950/20 shrink-0 animate-bounce">
                             <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
@@ -774,7 +705,6 @@ export default function Dashboard() {
         return userSubTab === 'residents' ? !isAd : isAd;
     });
 
-    // Detect exact user role mapping
     const isTi = userRoles.some(r => r.toLowerCase() === 'ti');
     const isSuperUsuario = userRoles.some(r => ['super_usuario', 'súper usuario', 'superusuario'].includes(r.toLowerCase()));
     const isAdmin = userRoles.some(r => ['admin', 'administrador'].includes(r.toLowerCase()));
@@ -782,11 +712,71 @@ export default function Dashboard() {
     const isColaborador = userRoles.some(r => ['employee', 'colaborador'].includes(r.toLowerCase()));
     const isPropietario = userRoles.some(r => ['owner', 'propietario'].includes(r.toLowerCase()));
 
+    const sharedRolePageProps = {
+        adminActiveTab, setAdminActiveTab,
+        comiteActiveTab, setComiteActiveTab,
+        colaboradorActiveTab, setColaboradorActiveTab,
+        propietarioActiveTab, setPropietarioActiveTab,
+        mobileTab, setMobileTab,
+        forceMobileView, setForceMobileView, isDesktop,
+        residentCondo,
+        isActuallyAdmin, simulationMode,
+        user, toggleTheme, darkMode, condosList, adminCondoId, setAdminCondoId,
+        isMobileSidebarOpen, setIsMobileSidebarOpen, adminSettingsForm,
+        adminFilteredProperties, adminFilteredUsers, adminFilteredTickets,
+        adminFilteredPayments, adminFilteredFines,
+        setTicketStatusFilter, setTicketPriorityFilter, setEditingTicket,
+        showAddPropForm, setShowAddPropForm, editingProp, setEditingProp,
+        newPropForm, setNewPropForm, propertiesList, setPropertiesList,
+        userSubTab, setUserSubTab,
+        showAddUserForm, setShowAddUserForm, editingUser, setEditingUser,
+        newUserForm, setNewUserForm, usersList, setUsersList,
+        filteredUsersForSubtab, showPersonWizard, setShowPersonWizard,
+        paymentsTabMode, setPaymentsTabMode, paymentsList, setPaymentsList,
+        showAddPaymentForm, setShowAddPaymentForm, newPaymentForm, setNewPaymentForm,
+        editingPayment, setEditingPayment, financeSummary, financialCatalog,
+        selectedIncomeCategory, setSelectedIncomeCategory, selectedExpenseCategory, setSelectedExpenseCategory,
+        ledgerSubTab, setLedgerSubTab, filteredIncomes, incomesList, filteredExpenses, expensesList,
+        showAddIncomeForm, setShowAddIncomeForm, showAddExpenseForm, setShowAddExpenseForm,
+        newIncomeForm, setNewIncomeForm, newExpenseForm, setNewExpenseForm,
+        editingIncome, setEditingIncome, editingExpense, setEditingExpense,
+        loadingFinances, handleSaveIncome, handleDeleteIncome, handleSaveExpense, handleDeleteExpense,
+        showAddFineForm, setShowAddFineForm, editingFine, setEditingFine,
+        newFineForm, setNewFineForm, finesList, setFinesList,
+        ticketsList, setTicketsList, settingsSuccess, setSettingsSuccess,
+        exportingLogs, setExportingLogs, setTerminalLogs,
+        ticketStatusFilter, ticketPriorityFilter,
+        ocrScanning, setOcrScanning, packages, setPackages,
+        selectedAuditChat, setSelectedAuditChat, auditedMessagesState,
+        setAuditedMessagesState, chatAuditReply, setChatAuditReply,
+        residentExpenses, setResidentExpenses, paymentHistory, setPaymentHistory,
+        showPaymentModal, setShowPaymentModal, paymentReceiptName, setPaymentReceiptName,
+        isProcessingPayment, setIsProcessingPayment, paymentCompletedSuccess, setPaymentCompletedSuccess,
+        executeQrPayment, simulatedMoroso, setShowMorosidadModal, amenities, setAmenities,
+        myReservations, setMyReservations, bookingAmenity, setBookingAmenity,
+        bookingDate, setBookingDate, bookingSlot, setBookingSlot, submitBooking,
+        newTicketTitle, setNewTicketTitle, newTicketDesc, setNewTicketDesc,
+        newTicketCat, setNewTicketCat, newTicketPri, setNewTicketPri, submitTicket,
+        chatMessages, setChatMessages, chatInput, setChatInput, isTyping, setIsTyping, sendChatMessage
+    };
+
+    const sharedTiPageProps = {
+        ...sharedRolePageProps,
+        tiActiveTab, setTiActiveTab, isMobileDevOpsSidebarOpen, setIsMobileDevOpsSidebarOpen,
+        globalMaintenanceMode, setGlobalMaintenanceMode, cpuLoad, ramUsage, latency, terminalLogs,
+        selectedImpCondo, setSelectedImpCondo, selectedImpRole, setSelectedImpRole,
+        selectedImpUser, setSelectedImpUser, getUserCondoId, setImpersonatedUser,
+        searchUserQuery, setSearchUserQuery, roleUserFilter, setRoleUserFilter,
+        showAddCondoForm, setShowAddCondoForm, editingCondo, setEditingCondo,
+        newCondoForm, setNewCondoForm, setCondosList,
+        sandboxCondoId, setSandboxCondoId, sandboxModule, setSandboxModule,
+        stats, packages
+    };
+
     return (
         <>
-            {/* Impersonation Warning Banner */}
             {impersonatedUser && (
-                <div className="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 text-white px-4 py-3 shadow-lg flex items-center justify-between font-sans sticky top-0 z-50 border-b border-orange-500 animate-pulse">
+                <div className="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 text-white px-4 py-3 shadow-lg flex items-center justify-between font-sans sticky top-0 z-50 border-b border-orange-500" role="alert">
                     <div className="flex items-center gap-3">
                         <span className="flex h-3 w-3 relative shrink-0">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
@@ -808,9 +798,8 @@ export default function Dashboard() {
                 </div>
             )}
 
-            {/* 👑 ROLE 1.5: SÚPER USUARIO */}
             {isSuperUsuario && !simulationMode && (
-                <SuperUsuarioLayout
+                <SuperUsuarioDashboard
                     user={user}
                     toggleTheme={toggleTheme}
                     darkMode={darkMode}
@@ -821,636 +810,40 @@ export default function Dashboard() {
                 />
             )}
 
-            {/* 🛠️ ROLE 1: TI DEVOPS */}
             {isTi && !simulationMode && (
-                <TiLayout
-                    user={user}
-                    tiActiveTab={tiActiveTab}
-                    setTiActiveTab={setTiActiveTab}
-                    isMobileDevOpsSidebarOpen={isMobileDevOpsSidebarOpen}
-                    setIsMobileDevOpsSidebarOpen={setIsMobileDevOpsSidebarOpen}
-                    toggleTheme={toggleTheme}
-                    darkMode={darkMode}
-                >
-                    {tiActiveTab === 'devops' && (
-                        <DevOpsTelemetry
-                            globalMaintenanceMode={globalMaintenanceMode}
-                            setGlobalMaintenanceMode={setGlobalMaintenanceMode}
-                            cpuLoad={cpuLoad}
-                            ramUsage={ramUsage}
-                            latency={latency}
-                            terminalLogs={terminalLogs}
-                            setTerminalLogs={setTerminalLogs}
-                        />
-                    )}
-                    {tiActiveTab === 'matrix' && (
-                        <SpatiePermissionMatrix setTerminalLogs={setTerminalLogs} />
-                    )}
-                    {tiActiveTab === 'impersonation' && (
-                        <SpatieImpersonator
-                            selectedImpCondo={selectedImpCondo}
-                            setSelectedImpCondo={setSelectedImpCondo}
-                            selectedImpRole={selectedImpRole}
-                            setSelectedImpRole={setSelectedImpRole}
-                            selectedImpUser={selectedImpUser}
-                            setSelectedImpUser={setSelectedImpUser}
-                            condosList={condosList}
-                            usersList={usersList}
-                            getUserCondoId={getUserCondoId}
-                            setAdminCondoId={setAdminCondoId}
-                            setImpersonatedUser={setImpersonatedUser}
-                            setTerminalLogs={setTerminalLogs}
-                        />
-                    )}
-                    {tiActiveTab === 'users' && (
-                        <GlobalUsersTable
-                            showAddUserForm={showAddUserForm}
-                            setShowAddUserForm={setShowAddUserForm}
-                            searchUserQuery={searchUserQuery}
-                            setSearchUserQuery={setSearchUserQuery}
-                            roleUserFilter={roleUserFilter}
-                            setRoleUserFilter={setRoleUserFilter}
-                            editingUser={editingUser}
-                            setEditingUser={setEditingUser}
-                            newUserForm={newUserForm}
-                            setNewUserForm={setNewUserForm}
-                            usersList={usersList}
-                            setUsersList={setUsersList}
-                            setTerminalLogs={setTerminalLogs}
-                            setImpersonatedUser={setImpersonatedUser}
-                        />
-                    )}
-                    {tiActiveTab === 'condos' && (
-                        <CondosManagement
-                            showAddCondoForm={showAddCondoForm}
-                            setShowAddCondoForm={setShowAddCondoForm}
-                            editingCondo={editingCondo}
-                            setEditingCondo={setEditingCondo}
-                            newCondoForm={newCondoForm}
-                            setNewCondoForm={setNewCondoForm}
-                            condosList={condosList}
-                            setCondosList={setCondosList}
-                            setTerminalLogs={setTerminalLogs}
-                            adminCondoId={adminCondoId}
-                            setAdminCondoId={setAdminCondoId}
-                        />
-                    )}
-                    {tiActiveTab === 'sandbox' && (
-                        <SandboxInspeccion
-                            sandboxCondoId={sandboxCondoId}
-                            setSandboxCondoId={setSandboxCondoId}
-                            sandboxModule={sandboxModule}
-                            setSandboxModule={setSandboxModule}
-                            condosList={condosList}
-                            propertiesList={propertiesList}
-                            setTerminalLogs={setTerminalLogs}
-                            usersList={usersList}
-                            setImpersonatedUser={setImpersonatedUser}
-                            ticketsList={ticketsList}
-                            stats={stats}
-                            paymentsList={paymentsList}
-                            auditedMessagesState={auditedMessagesState}
-                            packages={packages}
-                        />
-                    )}
-                </TiLayout>
+                <TiDashboard {...sharedTiPageProps} />
             )}
 
-            {/* 💼 ROLE 2: ADMINISTRADOR */}
             {isAdmin && !simulationMode && (
-                <AdminLayout
-                    user={user}
-                    condosList={condosList}
-                    adminCondoId={adminCondoId}
-                    setAdminCondoId={setAdminCondoId}
-                    adminActiveTab={adminActiveTab}
-                    setAdminActiveTab={setAdminActiveTab}
-                    isMobileSidebarOpen={isMobileSidebarOpen}
-                    setIsMobileSidebarOpen={setIsMobileSidebarOpen}
-                    adminSettingsForm={adminSettingsForm}
-                    toggleTheme={toggleTheme}
-                    darkMode={darkMode}
-                >
-                    {adminActiveTab === 'dashboard' && (
-                        <DashboardOverview
-                            condosList={condosList}
-                            adminCondoId={adminCondoId}
-                            adminFilteredProperties={adminFilteredProperties}
-                            adminFilteredUsers={adminFilteredUsers}
-                            adminFilteredTickets={adminFilteredTickets}
-                            adminFilteredPayments={adminFilteredPayments}
-                            adminFilteredFines={adminFilteredFines}
-                            setAdminActiveTab={setAdminActiveTab}
-                            setTicketStatusFilter={setTicketStatusFilter}
-                            setTicketPriorityFilter={setTicketPriorityFilter}
-                            setEditingTicket={setEditingTicket}
-                        />
-                    )}
-                    {adminActiveTab === 'properties' && (
-                        <PropertiesList
-                            showAddPropForm={showAddPropForm}
-                            setShowAddPropForm={setShowAddPropForm}
-                            editingProp={editingProp}
-                            setEditingProp={setEditingProp}
-                            newPropForm={newPropForm}
-                            setNewPropForm={setNewPropForm}
-                            propertiesList={propertiesList}
-                            setPropertiesList={setPropertiesList}
-                            adminFilteredProperties={adminFilteredProperties}
-                            adminCondoId={adminCondoId}
-                        />
-                    )}
-                    {adminActiveTab === 'users' && (
-                        <>
-                            <UsersList
-                                userSubTab={userSubTab}
-                                setUserSubTab={setUserSubTab}
-                                showAddUserForm={showAddUserForm}
-                                setShowAddUserForm={setShowAddUserForm}
-                                editingUser={editingUser}
-                                setEditingUser={setEditingUser}
-                                newUserForm={newUserForm}
-                                setNewUserForm={setNewUserForm}
-                                usersList={usersList}
-                                setUsersList={setUsersList}
-                                adminFilteredUsers={adminFilteredUsers}
-                                filteredUsersForSubtab={filteredUsersForSubtab}
-                                adminCondoId={adminCondoId}
-                                onOpenWizard={() => setShowPersonWizard(true)}
-                            />
-                            <PersonWizard
-                                isOpen={showPersonWizard}
-                                onClose={() => setShowPersonWizard(false)}
-                                onSave={(personData) => {
-                                    const mappedRoles = personData.roles && personData.roles.length > 0
-                                        ? personData.roles.map(r => r === 'comite' ? 'comité' : r === 'admin' ? 'admin' : r === 'colaborador' ? 'colaborador' : r === 'proveedor' ? 'proveedor' : 'resident')
-                                        : ['resident'];
-                                    const newU = {
-                                        id: usersList.length > 0 ? Math.max(...usersList.map(u => u.id)) + 1 : 1,
-                                        name: `${personData.nombres} ${personData.apellidos}`,
-                                        rut: personData.rut,
-                                        email: personData.email,
-                                        phone: personData.telefono,
-                                        status: 'active',
-                                        roles: mappedRoles,
-                                        condominium_id: adminCondoId,
-                                        asociada: personData.asociada,
-                                        torre: personData.torre,
-                                        unidad: personData.unidad,
-                                        relations: personData.relations,
-                                        cargo: personData.cargo,
-                                        area: personData.area,
-                                        fechaIngreso: personData.fechaIngreso,
-                                        tipoContrato: personData.tipoContrato,
-                                        externo: personData.externo,
-                                        comiteCargo: personData.comiteCargo,
-                                        comitePeriodo: personData.comitePeriodo,
-                                        comiteFechaInicio: personData.comiteFechaInicio,
-                                        adminTipo: personData.adminTipo,
-                                        adminRpa: personData.adminRpa,
-                                        adminFechaContrato: personData.adminFechaContrato,
-                                        provEmpresa: personData.provEmpresa,
-                                        provRut: personData.provRut,
-                                        provRubro: personData.provRubro,
-                                        hasAccess: personData.hasAccess,
-                                        username: personData.username,
-                                        password: personData.password
-                                    };
-                                    setUsersList(prev => [...prev, newU]);
-                                    setShowPersonWizard(false);
-                                }}
-                                condosList={condosList}
-                                propertiesList={propertiesList}
-                                adminCondoId={adminCondoId}
-                            />
-                        </>
-                    )}
-                    {adminActiveTab === 'tickets' && (
-                        <TicketsList
-                            ticketStatusFilter={ticketStatusFilter}
-                            setTicketStatusFilter={setTicketStatusFilter}
-                            ticketPriorityFilter={ticketPriorityFilter}
-                            setTicketPriorityFilter={setTicketPriorityFilter}
-                            editingTicket={editingTicket}
-                            setEditingTicket={setEditingTicket}
-                            ticketsList={ticketsList}
-                            setTicketsList={setTicketsList}
-                            adminFilteredTickets={adminFilteredTickets}
-                            adminFilteredUsers={adminFilteredUsers}
-                        />
-                    )}
-                    {adminActiveTab === 'payments' && (
-                        <FinancesLedger
-                            adminCondoId={adminCondoId}
-                            adminFilteredProperties={adminFilteredProperties}
-                            adminFilteredUsers={adminFilteredUsers}
-                            adminFilteredPayments={adminFilteredPayments}
-                            paymentsTabMode={paymentsTabMode}
-                            setPaymentsTabMode={setPaymentsTabMode}
-                            paymentsList={paymentsList}
-                            setPaymentsList={setPaymentsList}
-                            showAddPaymentForm={showAddPaymentForm}
-                            setShowAddPaymentForm={setShowAddPaymentForm}
-                            newPaymentForm={newPaymentForm}
-                            setNewPaymentForm={setNewPaymentForm}
-                            editingPayment={editingPayment}
-                            setEditingPayment={setEditingPayment}
-                            financeSummary={financeSummary}
-                            financialCatalog={financialCatalog}
-                            selectedIncomeCategory={selectedIncomeCategory}
-                            setSelectedIncomeCategory={setSelectedIncomeCategory}
-                            selectedExpenseCategory={selectedExpenseCategory}
-                            setSelectedExpenseCategory={setSelectedExpenseCategory}
-                            ledgerSubTab={ledgerSubTab}
-                            setLedgerSubTab={setLedgerSubTab}
-                            filteredIncomes={filteredIncomes}
-                            incomesList={incomesList}
-                            filteredExpenses={filteredExpenses}
-                            expensesList={expensesList}
-                            showAddIncomeForm={showAddIncomeForm}
-                            setShowAddIncomeForm={setShowAddIncomeForm}
-                            showAddExpenseForm={showAddExpenseForm}
-                            setShowAddExpenseForm={setShowAddExpenseForm}
-                            newIncomeForm={newIncomeForm}
-                            setNewIncomeForm={setNewIncomeForm}
-                            newExpenseForm={newExpenseForm}
-                            setNewExpenseForm={setNewExpenseForm}
-                            editingIncome={editingIncome}
-                            setEditingIncome={setEditingIncome}
-                            editingExpense={editingExpense}
-                            setEditingExpense={setEditingExpense}
-                            loadingFinances={loadingFinances}
-                            handleSaveIncome={handleSaveIncome}
-                            handleDeleteIncome={handleDeleteIncome}
-                            handleSaveExpense={handleSaveExpense}
-                            handleDeleteExpense={handleDeleteExpense}
-                            usersList={usersList}
-                            readOnly={false}
-                        />
-                    )}
-                    {adminActiveTab === 'fines' && (
-                        <FinesList
-                            showAddFineForm={showAddFineForm}
-                            setShowAddFineForm={setShowAddFineForm}
-                            editingFine={editingFine}
-                            setEditingFine={setEditingFine}
-                            newFineForm={newFineForm}
-                            setNewFineForm={setNewFineForm}
-                            finesList={finesList}
-                            setFinesList={setFinesList}
-                            adminFilteredFines={adminFilteredFines}
-                            adminFilteredProperties={adminFilteredProperties}
-                            adminCondoId={adminCondoId}
-                        />
-                    )}
-                    {adminActiveTab === 'settings' && (
-                        <SettingsPanel
-                            adminSettingsForm={adminSettingsForm}
-                            setAdminSettingsForm={setAdminSettingsForm}
-                            settingsSuccess={settingsSuccess}
-                            setSettingsSuccess={setSettingsSuccess}
-                            exportingLogs={exportingLogs}
-                            setExportingLogs={setExportingLogs}
-                            setTerminalLogs={setTerminalLogs}
-                            usersList={usersList}
-                            propertiesList={propertiesList}
-                            paymentsList={paymentsList}
-                        />
-                    )}
-                </AdminLayout>
+                <AdminDashboard {...sharedRolePageProps} />
             )}
 
-            {/* 🏛️ ROLE 3: COMITÉ DE ADMINISTRACIÓN */}
             {isComite && !simulationMode && (
-                <ComiteLayout
-                    condosList={condosList}
-                    adminCondoId={adminCondoId}
-                    setAdminCondoId={setAdminCondoId}
-                    comiteActiveTab={comiteActiveTab}
-                    setComiteActiveTab={setComiteActiveTab}
-                    isMobileSidebarOpen={isMobileSidebarOpen}
-                    setIsMobileSidebarOpen={setIsMobileSidebarOpen}
-                    user={user}
-                    toggleTheme={toggleTheme}
-                    darkMode={darkMode}
-                >
-                    {comiteActiveTab === 'dashboard' && (
-                        <DashboardOverview
-                            condosList={condosList}
-                            adminCondoId={adminCondoId}
-                            adminFilteredProperties={adminFilteredProperties}
-                            adminFilteredUsers={adminFilteredUsers}
-                            adminFilteredTickets={adminFilteredTickets}
-                            adminFilteredPayments={adminFilteredPayments}
-                            adminFilteredFines={adminFilteredFines}
-                            setAdminActiveTab={setComiteActiveTab}
-                            setTicketStatusFilter={setTicketStatusFilter}
-                            setTicketPriorityFilter={setTicketPriorityFilter}
-                            setEditingTicket={setEditingTicket}
-                        />
-                    )}
-                    {comiteActiveTab === 'finances' && (
-                        <FinancialAudit
-                            adminCondoId={adminCondoId}
-                            adminFilteredProperties={adminFilteredProperties}
-                            adminFilteredUsers={adminFilteredUsers}
-                            adminFilteredPayments={adminFilteredPayments}
-                            paymentsTabMode={paymentsTabMode}
-                            setPaymentsTabMode={setPaymentsTabMode}
-                            paymentsList={paymentsList}
-                            setPaymentsList={setPaymentsList}
-                            showAddPaymentForm={showAddPaymentForm}
-                            setShowAddPaymentForm={setShowAddPaymentForm}
-                            newPaymentForm={newPaymentForm}
-                            setNewPaymentForm={setNewPaymentForm}
-                            editingPayment={editingPayment}
-                            setEditingPayment={setEditingPayment}
-                            financeSummary={financeSummary}
-                            financialCatalog={financialCatalog}
-                            selectedIncomeCategory={selectedIncomeCategory}
-                            setSelectedIncomeCategory={setSelectedIncomeCategory}
-                            selectedExpenseCategory={selectedExpenseCategory}
-                            setSelectedExpenseCategory={setSelectedExpenseCategory}
-                            ledgerSubTab={ledgerSubTab}
-                            setLedgerSubTab={setLedgerSubTab}
-                            filteredIncomes={filteredIncomes}
-                            incomesList={incomesList}
-                            filteredExpenses={filteredExpenses}
-                            expensesList={expensesList}
-                            showAddIncomeForm={showAddIncomeForm}
-                            setShowAddIncomeForm={setShowAddIncomeForm}
-                            showAddExpenseForm={showAddExpenseForm}
-                            setShowAddExpenseForm={setShowAddExpenseForm}
-                            newIncomeForm={newIncomeForm}
-                            setNewIncomeForm={setNewIncomeForm}
-                            newExpenseForm={newExpenseForm}
-                            setNewExpenseForm={setNewExpenseForm}
-                            editingIncome={editingIncome}
-                            setEditingIncome={setEditingIncome}
-                            editingExpense={editingExpense}
-                            setEditingExpense={setEditingExpense}
-                            loadingFinances={loadingFinances}
-                            handleSaveIncome={handleSaveIncome}
-                            handleDeleteIncome={handleDeleteIncome}
-                            handleSaveExpense={handleSaveExpense}
-                            handleDeleteExpense={handleDeleteExpense}
-                            usersList={usersList}
-                        />
-                    )}
-                    {comiteActiveTab === 'chats' && (
-                        <ChatAuditLogs
-                            selectedAuditChat={selectedAuditChat}
-                            setSelectedAuditChat={setSelectedAuditChat}
-                            auditedMessagesState={auditedMessagesState}
-                            setAuditedMessagesState={setAuditedMessagesState}
-                            chatAuditReply={chatAuditReply}
-                            setChatAuditReply={setChatAuditReply}
-                        />
-                    )}
-                    {comiteActiveTab === 'actas' && (
-                        <MeetingsMinutes adminCondoId={adminCondoId} />
-                    )}
-                </ComiteLayout>
+                <ComiteDashboard {...sharedRolePageProps} />
             )}
 
-            {/* 👮 ROLE 4: COLABORADOR / CONSERJERÍA */}
             {isColaborador && !simulationMode && (
-                <ColaboradorLayout
-                    condosList={condosList}
-                    adminCondoId={adminCondoId}
-                    setAdminCondoId={setAdminCondoId}
-                    colaboradorActiveTab={colaboradorActiveTab}
-                    setColaboradorActiveTab={setColaboradorActiveTab}
-                    isMobileSidebarOpen={isMobileSidebarOpen}
-                    setIsMobileSidebarOpen={setIsMobileSidebarOpen}
-                    user={user}
-                    toggleTheme={toggleTheme}
-                    darkMode={darkMode}
-                >
-                    {colaboradorActiveTab === 'attendance' && (
-                        <AttendanceControl
-                            user={user}
-                            adminCondoId={adminCondoId}
-                        />
-                    )}
-                    {colaboradorActiveTab === 'packages' && (
-                        <PackageDelivery
-                            ocrScanning={ocrScanning}
-                            setOcrScanning={setOcrScanning}
-                            packages={packages}
-                            setPackages={setPackages}
-                            setTerminalLogs={setTerminalLogs}
-                        />
-                    )}
-                    {colaboradorActiveTab === 'visitors' && (
-                        <VisitorAccess adminCondoId={adminCondoId} />
-                    )}
-                    {colaboradorActiveTab === 'shifts' && (
-                        <ShiftLogs adminCondoId={adminCondoId} />
-                    )}
-                    {colaboradorActiveTab === 'contracts' && (
-                        <ContractViewer user={user} />
-                    )}
-                    {colaboradorActiveTab === 'shopping' && (
-                        <ShoppingList adminCondoId={adminCondoId} />
-                    )}
-                    {colaboradorActiveTab === 'tickets' && (
-                        <AssignedTickets
-                            user={user}
-                            ticketsList={ticketsList}
-                            setTicketsList={setTicketsList}
-                        />
-                    )}
-                </ColaboradorLayout>
+                <ColaboradorDashboard {...sharedRolePageProps} />
             )}
 
-            {/* 💵 ROLE 5: PROPIETARIO INVERSIONISTA */}
             {isPropietario && !simulationMode && (
-                <PropietarioLayout
-                    user={user}
-                    propietarioActiveTab={propietarioActiveTab}
-                    setPropietarioActiveTab={setPropietarioActiveTab}
-                    isMobileSidebarOpen={isMobileSidebarOpen}
-                    setIsMobileSidebarOpen={setIsMobileSidebarOpen}
-                    toggleTheme={toggleTheme}
-                    darkMode={darkMode}
-                >
-                    {propietarioActiveTab === 'home' && (
-                        <CommonExpensesQR
-                            user={user}
-                            residentExpenses={residentExpenses}
-                            setResidentExpenses={setResidentExpenses}
-                            paymentHistory={paymentHistory}
-                            setPaymentHistory={setPaymentHistory}
-                            showPaymentModal={showPaymentModal}
-                            setShowPaymentModal={setShowPaymentModal}
-                            paymentReceiptName={paymentReceiptName}
-                            setPaymentReceiptName={setPaymentReceiptName}
-                            isProcessingPayment={isProcessingPayment}
-                            setIsProcessingPayment={setIsProcessingPayment}
-                            paymentCompletedSuccess={paymentCompletedSuccess}
-                            setPaymentCompletedSuccess={setPaymentCompletedSuccess}
-                            executeQrPayment={executeQrPayment}
-                        />
-                    )}
-                    {propietarioActiveTab === 'reports' && (
-                        <FinancialReports user={user} />
-                    )}
-                    {propietarioActiveTab === 'booking' && (
-                        <BookingManager
-                            user={user}
-                            simulatedMoroso={simulatedMoroso}
-                            setShowMorosidadModal={setShowMorosidadModal}
-                            amenities={amenities}
-                            setAmenities={setAmenities}
-                            myReservations={myReservations}
-                            setMyReservations={setMyReservations}
-                            bookingAmenity={bookingAmenity}
-                            setBookingAmenity={setBookingAmenity}
-                            bookingDate={bookingDate}
-                            setBookingDate={setBookingDate}
-                            bookingSlot={bookingSlot}
-                            setBookingSlot={setBookingSlot}
-                            submitBooking={submitBooking}
-                        />
-                    )}
-                    {propietarioActiveTab === 'units' && (
-                        <PropertyOwnership
-                            user={user}
-                            propertiesList={propertiesList}
-                        />
-                    )}
-                </PropietarioLayout>
+                <PropietarioDashboard {...sharedRolePageProps} />
             )}
 
-            {/* 🏠 ROLE 6: RESIDENTE / SIMULATED PORTAL */}
             {(!isActuallyAdmin && !isPropietario || simulationMode) && (
-                <ResidentLayout
-                    user={user}
-                    isDesktop={isDesktop}
-                    forceMobileView={forceMobileView}
-                    setForceMobileView={setForceMobileView}
-                    mobileTab={mobileTab}
-                    setMobileTab={setMobileTab}
-                    simulatedMoroso={simulatedMoroso}
-                    setSimulatedMoroso={setSimulatedMoroso}
-                    setShowMorosidadModal={setShowMorosidadModal}
-                    residentCondo={residentCondo}
-                    toggleTheme={toggleTheme}
-                    darkMode={darkMode}
-                >
-                    {mobileTab === 'home' && (
-                        <ResidentOverview
-                            user={user}
-                            simulatedMoroso={simulatedMoroso}
-                            residentExpenses={residentExpenses}
-                            setMobileTab={setMobileTab}
-                            setShowMorosidadModal={setShowMorosidadModal}
-                            reportedTickets={reportedTickets}
-                            myReservations={myReservations}
-                        />
-                    )}
-                    {mobileTab === 'comunicados' && (
-                        <AnnouncementsList />
-                    )}
-                    {mobileTab === 'reservas' && (
-                        <BookingManager
-                            user={user}
-                            simulatedMoroso={simulatedMoroso}
-                            setShowMorosidadModal={setShowMorosidadModal}
-                            amenities={amenities}
-                            setAmenities={setAmenities}
-                            myReservations={myReservations}
-                            setMyReservations={setMyReservations}
-                            bookingAmenity={bookingAmenity}
-                            setBookingAmenity={setBookingAmenity}
-                            bookingDate={bookingDate}
-                            setBookingDate={setBookingDate}
-                            bookingSlot={bookingSlot}
-                            setBookingSlot={setBookingSlot}
-                            submitBooking={submitBooking}
-                        />
-                    )}
-                    {mobileTab === 'pagos' && (
-                        <CommonExpensesQR
-                            user={user}
-                            residentExpenses={residentExpenses}
-                            setResidentExpenses={setResidentExpenses}
-                            paymentHistory={paymentHistory}
-                            setPaymentHistory={setPaymentHistory}
-                            showPaymentModal={showPaymentModal}
-                            setShowPaymentModal={setShowPaymentModal}
-                            paymentReceiptName={paymentReceiptName}
-                            setPaymentReceiptName={setPaymentReceiptName}
-                            isProcessingPayment={isProcessingPayment}
-                            setIsProcessingPayment={setIsProcessingPayment}
-                            paymentCompletedSuccess={paymentCompletedSuccess}
-                            setPaymentCompletedSuccess={setPaymentCompletedSuccess}
-                            executeQrPayment={executeQrPayment}
-                        />
-                    )}
-                    {mobileTab === 'incidencias' && (
-                        <TicketsReport
-                            newTicketTitle={newTicketTitle}
-                            setNewTicketTitle={setNewTicketTitle}
-                            newTicketDesc={newTicketDesc}
-                            setNewTicketDesc={setNewTicketDesc}
-                            newTicketCat={newTicketCat}
-                            setNewTicketCat={setNewTicketCat}
-                            newTicketPri={newTicketPri}
-                            setNewTicketPri={setNewTicketPri}
-                            reportedTickets={reportedTickets}
-                            setReportedTickets={setReportedTickets}
-                            submitTicket={submitTicket}
-                        />
-                    )}
-                    {mobileTab === 'comunidad' && (
-                        <CommunityChat
-                            chatMessages={chatMessages}
-                            setChatMessages={setChatMessages}
-                            chatInput={chatInput}
-                            setChatInput={setChatInput}
-                            isTyping={isTyping}
-                            setIsTyping={setIsTyping}
-                            sendChatMessage={sendChatMessage}
-                        />
-                    )}
-                    {mobileTab === 'documentos' && (
-                        <div className="bg-white dark:bg-slate-900 p-6 border border-slate-100 dark:border-slate-800 rounded-3xl space-y-4 shadow-sm animate-scale-up text-xs border-gray-100">
-                            <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 block border-b pb-2 dark:border-slate-800">Biblioteca Completa de Documentos</span>
-                            <div className="grid md:grid-cols-2 gap-4">
-                                {[
-                                    { title: 'Reglamento de Copropiedad Oficial', type: 'PDF', size: '2.4 MB', date: '01/01/2026' },
-                                    { title: 'Minuta Asamblea Extraordinaria - Mayo', type: 'PDF', size: '820 KB', date: '12/05/2026' },
-                                    { title: 'Balance Consolidado Gastos Comunes Q1', type: 'XLSX', size: '1.2 MB', date: '10/04/2026' }
-                                ].map((doc, i) => (
-                                    <div key={i} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl flex items-center justify-between shadow-sm hover:border-[#72B043]/30 transition-all text-left">
-                                        <div>
-                                            <p className="font-black text-slate-800 dark:text-white text-xs">{doc.title}</p>
-                                            <span className="text-[9px] text-slate-400 block mt-0.5">{doc.type} &bull; {doc.size} &bull; Subido el {doc.date}</span>
-                                        </div>
-                                        <button type="button" onClick={() => alert(`Descargando ${doc.title}...`)} className="px-4 py-2 bg-[#72B043]/10 hover:bg-[#72B043]/20 text-[#72B043] font-bold rounded-xl transition-all">
-                                            Descargar
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </ResidentLayout>
+                <ResidenteDashboard {...sharedRolePageProps} />
             )}
 
-            {/* 🔴 QR CODE SIMULATION MODAL FOR MIVECINO RESIDENT */}
             {showPaymentModal && (
-                <div 
+                <div
                     className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
                     onClick={() => setShowPaymentModal(false)}
                 >
-                    <div 
+                    <div
                         className="relative max-w-sm w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl animate-scale-up font-sans text-slate-800 dark:text-slate-200 text-left"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <button 
+                        <button
                             onClick={() => setShowPaymentModal(false)}
                             className="absolute top-4 right-4 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-950 text-slate-500 transition-all"
                         >
@@ -1491,7 +884,7 @@ export default function Dashboard() {
 
                                 <div className="space-y-1 text-xs">
                                     <label className="text-[9px] text-slate-400 uppercase font-extrabold block">Adjuntar Comprobante (Simulado)</label>
-                                    <input 
+                                    <input
                                         type="file"
                                         onChange={(e) => setPaymentReceiptName(e.target.files[0]?.name || '')}
                                         className="w-full text-[10px] file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-[#72B043]/15 file:text-[#72B043] hover:file:bg-[#72B043]/20 focus:outline-none"
@@ -1501,7 +894,7 @@ export default function Dashboard() {
                                     )}
                                 </div>
 
-                                <button 
+                                <button
                                     onClick={executeQrPayment}
                                     disabled={isProcessingPayment}
                                     className="w-full py-2.5 bg-[#72B043] hover:bg-[#629b37] disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-md transition-colors"
@@ -1511,14 +904,11 @@ export default function Dashboard() {
                             </div>
                         ) : (
                             <div className="text-center py-6 space-y-4 animate-scale-up">
-                                <div className="h-16 w-16 bg-emerald-500/10 border border-emerald-500/30 text-[#72B043] rounded-full flex items-center justify-center mx-auto text-3xl">
-                                    ✓
-                                </div>
+                                <div className="h-16 w-16 bg-emerald-500/10 border border-emerald-500/30 text-[#72B043] rounded-full flex items-center justify-center mx-auto text-3xl">✓</div>
                                 <div className="space-y-1">
                                     <h3 className="text-base font-black text-slate-900 dark:text-white">¡Transacción Exitosa!</h3>
                                     <p className="text-[10px] text-slate-500 px-3">Tu pago del Gasto Común de Mayo ha sido registrado en la base de datos local SQLite y validado por administración.</p>
                                 </div>
-                                
                                 <div className="p-3 bg-slate-50 dark:bg-slate-950 border rounded-xl border-slate-100 dark:border-slate-800 max-w-[240px] mx-auto text-[9px] font-mono text-slate-500 space-y-0.5 text-left">
                                     <span className="font-bold block text-slate-700 dark:text-slate-300 border-b pb-1 mb-1">COMPROBANTE DE RECIBO</span>
                                     <div>Folio: REC-421-2026</div>
@@ -1526,8 +916,7 @@ export default function Dashboard() {
                                     <div>Método: Transferencia QR</div>
                                     <div>Estado: Acreditado</div>
                                 </div>
-
-                                <button 
+                                <button
                                     onClick={() => {
                                         setShowPaymentModal(false);
                                         setMobileTab('home');
@@ -1542,17 +931,16 @@ export default function Dashboard() {
                 </div>
             )}
 
-            {/* 🔒 SUSPENSIÓN DE BENEFICIOS (MOROSIDAD MODAL) */}
             {showMorosidadModal && (
-                <div 
+                <div
                     className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
                     onClick={() => setShowMorosidadModal(false)}
                 >
-                    <div 
+                    <div
                         className="relative max-w-sm w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl animate-scale-up font-sans text-slate-800 dark:text-slate-200 text-left"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <button 
+                        <button
                             onClick={() => setShowMorosidadModal(false)}
                             className="absolute top-4 right-4 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-950 text-slate-500 transition-all"
                         >
@@ -1562,9 +950,7 @@ export default function Dashboard() {
                         </button>
 
                         <div className="text-center space-y-4">
-                            <div className="h-14 w-14 bg-rose-500/10 border border-rose-500/30 text-rose-500 rounded-full flex items-center justify-center mx-auto text-2xl animate-bounce">
-                                🔒
-                            </div>
+                            <div className="h-14 w-14 bg-rose-500/10 border border-rose-500/30 text-rose-500 rounded-full flex items-center justify-center mx-auto text-2xl animate-bounce">🔒</div>
                             <div className="space-y-1.5">
                                 <span className="text-[9px] font-mono text-rose-500 font-bold uppercase tracking-widest block">Restricción de Servicios Comunes</span>
                                 <h3 className="text-base font-black text-slate-900 dark:text-white">Beneficios Suspendidos</h3>
@@ -1572,7 +958,7 @@ export default function Dashboard() {
                                     De acuerdo con el Reglamento de Copropiedad de <strong>{residentCondo}</strong>, las unidades con <strong>3 o más meses</strong> de gastos comunes impagos pierden el acceso a reservas de áreas comunes y automatizaciones de portón.
                                 </p>
                             </div>
-                            
+
                             <div className="p-4 bg-rose-50/30 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-950 rounded-2xl text-[10px] space-y-1.5 text-left font-mono">
                                 <div className="flex justify-between">
                                     <span className="text-slate-500">Unidad Afectada:</span>
@@ -1589,13 +975,13 @@ export default function Dashboard() {
                             </div>
 
                             <div className="flex gap-2">
-                                <button 
+                                <button
                                     onClick={() => setShowMorosidadModal(false)}
                                     className="flex-1 py-2 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold rounded-xl shadow-sm transition-colors"
                                 >
                                     Cerrar
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => {
                                         setShowMorosidadModal(false);
                                         setMobileTab('pagos');
@@ -1609,6 +995,8 @@ export default function Dashboard() {
                     </div>
                 </div>
             )}
+
+            <ToastContainer />
         </>
     );
 }

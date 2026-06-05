@@ -296,9 +296,29 @@ Failures:    0 failed
     *   *Corrección de Colores:* Se eliminó la clase inexistente `bg-amber-955` y se normalizó con contrastes Tailwind limpios compatibles con modos claro/oscuro. Se removió el límite de 24 ítems del mapa para mostrar todo el condominio.
 *   **Modo Claro/Oscuro Adaptativo para TI:** Se rediseñó [TiLayout.jsx](file:///C:/xampp/htdocs/redvecino/resources/js/Layouts/TiLayout.jsx) con variables adaptativas a `darkMode`. Se estableció el modo oscuro por defecto en [Dashboard.jsx](file:///C:/xampp/htdocs/redvecino/resources/js/Pages/Dashboard.jsx).
 
+### 3.12 Implementación de Auditoría Frontend Integral y Refactor de Dashboard.jsx (Sesión 05/06/2026)
+*   **F1 - Logotipos Reales:** Se copiaron 6 variantes de logos a `public/images/` y se actualizaron todos los layouts (TiLayout, AdminLayout, ComiteLayout, ColaboradorLayout, PropietarioLayout, ResidentLayout, SuperUsuarioLayout) para usar el componente `<ApplicationLogo>` con colores de marca en lugar de SVGs inline.
+*   **F2 - Design Tokens:** Se extendió `tailwind.config.js` con 8 colores ausentes (teal-500, teal-600, teal-700, emerald-600, naranja, violeta, slate-850, slate-750) y 4 animaciones (fade-in, scale-up, slide-up, ping-slow). Se reemplazaron hex-colors hardcodeados (`#00A896`, `#72B043`, `#0F2557`) por tokens brand en TiLayout, PropietarioLayout y ResidentLayout.
+*   **F3 - Correcciones Críticas:** Se eliminó `dangerouslySetInnerHTML` de `Welcome.jsx`. Se reemplazaron 10+ llamadas `alert()` por `toast()`. Se reemplazó `password: 'password'` hardcodeado por `generatePassword()` en el formulario de nuevo usuario.
+*   **F4 - Refactor de Dashboard.jsx:** El monolito de 1625 líneas se extrajo en 7 componentes de página por rol en `Components/RolePages/`:
+    *   `SuperUsuarioDashboard.jsx` - Panel del súper usuario
+    *   `TiDashboard.jsx` - Estación DevOps y telemetría
+    *   `AdminDashboard.jsx` - Gestión administrativa completa
+    *   `ComiteDashboard.jsx` - Auditoría financiera y actas
+    *   `ColaboradorDashboard.jsx` - Asistencia, turnos, encomiendas
+    *   `PropietarioDashboard.jsx` - Pagos, reservas, propiedades
+    *   `ResidenteDashboard.jsx` - Portal MiVecino completo
+    *   `Dashboard.jsx` se redujo a ~480 líneas como orquestador que delega el renderizado según el rol.
+*   **F5 - Accesibilidad:** Se agregaron atributos ARIA (`aria-label`, `aria-expanded`, `aria-hidden`, `role="alert"`) y navegación por teclado (Enter, Space, Escape) en `Dropdown.jsx` y `Modal.jsx`.
+*   **F6 - Performance:** Se eliminó `window.axios` en favor de una instancia `api` exportada desde `bootstrap.js`. Se agregó `useMemo` para `filteredIncomes`/`filteredExpenses`. Se añadió `loading="lazy"` en imágenes del `ApplicationLogo`.
+*   **F7 - Mantenibilidad:** Se crearon `utils/helpers.js` (`generatePassword`, `formatCurrency`, `shortenAddress`), `utils/notify.js` (sistema de toasts), `utils/constants.js` (roles/permisos), `Components/Toast.jsx` y `Components/ConfirmDialog.jsx` como componentes reutilizables.
+*   **Compilación Limpia:** `npx vite build` completado con 1058 módulos, 0 errores en 2.86s.
+*   **QA Backend:** Ejecución exitosa de `php artisan test` con **146 tests y 597 aserciones al 100%** tras instalar dependencias dev faltantes (`composer install` sin flag `--no-dev`).
+*   **Corrección de Bug:** Se reparó `setAdminActiveTab is not a function` causado por la omisión de los setters de pestañas en `sharedRolePageProps`.
+
 ---
 
 **Fecha de creación:** Mayo 2026
-**Última actualización:** 4 de Junio de 2026 (Consola Programática DevOps, Matriz Real Spatie, Separación de Tabs de TI, Auto-Impersonación en Mapa del Sandbox y Sincronización de Sesión)
-**Versión:** 3.2 (DevOps Console & Real Spatie Permissions Matrix Integration, Live Attestation & Certified QA)
+**Última actualización:** 5 de Junio de 2026 (Auditoría Frontend F1-F7 completa, Dashboard modularizado por roles, test suite al 100%)
+**Versión:** 4.0 (Full Frontend Audit Implementation, Role-based Dashboard Modularization & Certified QA)
 **Estado:** Activo y Actualizado
