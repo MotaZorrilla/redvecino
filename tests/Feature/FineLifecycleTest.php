@@ -216,4 +216,101 @@ class FineLifecycleTest extends TestCase
             ]);
         }
     }
+
+    public function test_authorized_roles_can_update_fines(): void
+    {
+        $admin = $this->getUserByRole('Administrador');
+        $targetUser = User::first();
+        $property = Property::first();
+
+        $fine = Fine::create([
+            'user_id' => $targetUser->id,
+            'property_id' => $property->id,
+            'reason' => 'Original reason',
+            'amount' => 50000,
+            'issued_date' => '2026-06-01',
+            'due_date' => '2026-06-15',
+        ]);
+
+        $response = $this->actingAs($admin)->putJson("/api/fines/{$fine->id}", [
+            'reason' => 'Updated reason',
+            'amount' => 75000,
+            'issued_date' => '2026-06-02',
+            'due_date' => '2026-06-20',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('amount', 75000);
+        $this->assertDatabaseHas('fines', [
+            'id' => $fine->id,
+            'reason' => 'Updated reason',
+            'amount' => 75000,
+        ]);
+    }
+
+    public function test_unauthorized_roles_cannot_update_fines(): void
+    {
+        $blockedRoles = ['Propietario', 'Residente', 'Colaborador', 'TI'];
+        $targetUser = User::first();
+        $property = Property::first();
+
+        $fine = Fine::create([
+            'user_id' => $targetUser->id,
+            'property_id' => $property->id,
+            'reason' => 'Blocked update test',
+            'amount' => 30000,
+            'issued_date' => '2026-06-01',
+            'due_date' => '2026-06-15',
+        ]);
+
+        foreach ($blockedRoles as $roleName) {
+            $user = $this->getUserByRole($roleName);
+            $this->actingAs($user)->putJson("/api/fines/{$fine->id}", [
+                'reason' => 'Hacked',
+                'amount' => 100,
+            ])->assertStatus(403);
+        }
+    }
+
+    public function test_authorized_roles_can_delete_fines(): void
+    {
+        $admin = $this->getUserByRole('Administrador');
+        $targetUser = User::first();
+        $property = Property::first();
+
+        $fine = Fine::create([
+            'user_id' => $targetUser->id,
+            'property_id' => $property->id,
+            'reason' => 'To be deleted',
+            'amount' => 20000,
+            'issued_date' => '2026-06-01',
+            'due_date' => '2026-06-15',
+        ]);
+
+        $response = $this->actingAs($admin)->deleteJson("/api/fines/{$fine->id}");
+
+        $response->assertStatus(200);
+        $this->assertDatabaseMissing('fines', ['id' => $fine->id]);
+    }
+
+    public function test_unauthorized_roles_cannot_delete_fines(): void
+    {
+        $blockedRoles = ['Propietario', 'Residente', 'Colaborador', 'TI'];
+        $targetUser = User::first();
+        $property = Property::first();
+
+        $fine = Fine::create([
+            'user_id' => $targetUser->id,
+            'property_id' => $property->id,
+            'reason' => 'Blocked delete test',
+            'amount' => 25000,
+            'issued_date' => '2026-06-01',
+            'due_date' => '2026-06-15',
+        ]);
+
+        foreach ($blockedRoles as $roleName) {
+            $user = $this->getUserByRole($roleName);
+            $this->actingAs($user)->deleteJson("/api/fines/{$fine->id}")->assertStatus(403);
+        }
+    }
 }

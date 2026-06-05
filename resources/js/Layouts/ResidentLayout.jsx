@@ -30,7 +30,7 @@ export default function ResidentLayout({
                     <div className="flex bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[32px] overflow-hidden shadow-2xl h-[780px] transition-colors duration-300">
                         
                         {/* 1. LEFT SIDEBAR */}
-                        <div className="w-64 bg-slate-950 text-white p-6 flex flex-col justify-between shrink-0 font-sans">
+                        <aside aria-label="Navegación principal" className="w-64 bg-slate-950 text-white p-6 flex flex-col justify-between shrink-0 font-sans">
                             <div className="space-y-6">
                                 {/* Logo */}
                                 <ApplicationLogo size="small" showSubtext={false} brand="residente" />
@@ -47,7 +47,7 @@ export default function ResidentLayout({
                                 </div>
 
                                 {/* Nav Links */}
-                                <div className="space-y-1 pt-4">
+                                <nav aria-label="Menú principal" className="space-y-1 pt-4">
                                     {[
                                         { tab: 'home', label: '🏠 Inicio / Resumen' },
                                         { tab: 'comunicados', label: '📢 Comunicados' },
@@ -70,19 +70,20 @@ export default function ResidentLayout({
                                                         setMobileTab(item.tab);
                                                     }
                                                 }}
-                                                className={`w-full text-left px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
-                                                    isReservasLocked
-                                                        ? 'bg-rose-950/20 text-rose-500 border border-rose-950/20 hover:bg-rose-950/30'
-                                                        : mobileTab === item.tab 
-                                                        ? 'bg-brand-green text-white shadow shadow-brand-green/10' 
-                                                        : 'text-slate-400 hover:bg-slate-900 hover:text-white'
-                                                }`}
+                                                aria-current={isReservasLocked ? undefined : (mobileTab === item.tab ? 'page' : undefined)}
+                                                className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+                                                     isReservasLocked
+                                                         ? 'bg-rose-950/20 text-rose-500 border border-rose-950/20 hover:bg-rose-950/30'
+                                                         : mobileTab === item.tab 
+                                                         ? 'bg-brand-green text-white shadow shadow-brand-green/10' 
+                                                         : 'text-slate-400 hover:bg-slate-900 hover:text-white'
+                                                 }`}
                                             >
                                                 {isReservasLocked ? '📅 Reservas 🔒' : item.label}
                                             </button>
                                         );
                                     })}
-                                </div>
+                                </nav>
                             </div>
 
                             {/* Sidebar Footer Controls */}
@@ -102,7 +103,7 @@ export default function ResidentLayout({
                                     <span>v1.2.0</span>
                                 </div>
                             </div>
-                        </div>
+                        </aside>
 
                         {/* 2. RIGHT WORKSPACE CONTENT PANELS */}
                         <div className="flex-1 flex flex-col min-w-0 bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
@@ -135,7 +136,7 @@ export default function ResidentLayout({
                                                 : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                                         }`}
                                     >
-                                        <span className={`h-1.5 w-1.5 rounded-full ${simulatedMoroso ? 'bg-rose-500 animate-pulse' : 'bg-slate-400'}`} />
+                                        <span aria-live="polite" className={`h-1.5 w-1.5 rounded-full ${simulatedMoroso ? 'bg-rose-500 animate-pulse' : 'bg-slate-400'}`} />
                                         {simulatedMoroso ? '🔴 Morosidad Simulada ⚠️' : '⚪ Simular Morosidad'}
                                     </button>
                                     <span className="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-bold rounded-md uppercase tracking-wider">
@@ -143,7 +144,7 @@ export default function ResidentLayout({
                                     </span>
                                     <button
                                         onClick={toggleTheme}
-                                        className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-350 transition-colors duration-200"
+                                        className="p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-350 transition-colors duration-200"
                                         aria-label="Toggle Theme"
                                         title="Cambiar tema"
                                     >
@@ -161,9 +162,9 @@ export default function ResidentLayout({
                             </div>
 
                             {/* Content */}
-                            <div className="flex-1 overflow-y-auto p-6 md:p-12 space-y-6">
+                            <main className="flex-1 overflow-y-auto p-6 md:p-12 space-y-6">
                                 {children}
-                            </div>
+                            </main>
                         </div>
                     </div>
                 </div>
@@ -264,7 +265,7 @@ export default function ResidentLayout({
                                     <span className="text-[10px] font-bold text-emerald-100 uppercase tracking-widest block">Vecino Autenticado</span>
                                     <h4 className="text-sm font-extrabold flex items-center gap-1.5">
                                         ¡Hola, {user?.name}! 
-                                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 animate-pulse" />
+                                        <span aria-live="polite" className="h-1.5 w-1.5 rounded-full bg-emerald-300 animate-pulse" />
                                     </h4>
                                 </div>
                                 <span className="px-2 py-0.5 bg-white/15 border border-white/25 rounded-md text-[9px] font-mono tracking-wider font-extrabold">Depto 202</span>
@@ -272,12 +273,12 @@ export default function ResidentLayout({
                         </div>
 
                         {/* Inner App Content (Tab views) */}
-                        <div className="flex-1 overflow-y-auto p-6 pb-20 space-y-6 text-left">
+                        <main className="flex-1 overflow-y-auto p-6 pb-20 space-y-6 text-left">
                             {children}
-                        </div>
+                        </main>
 
                         {/* Smartphone Bottom Tab Bar Navigation */}
-                        <nav className="h-16 bg-slate-950 dark:bg-slate-950 border-t border-slate-900/60 flex justify-around items-center px-4 shrink-0 z-20 absolute bottom-0 left-0 right-0">
+                        <nav style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} className="h-16 bg-slate-950 dark:bg-slate-950 border-t border-slate-900/60 flex justify-around items-center px-4 shrink-0 z-20 absolute bottom-0 left-0 right-0">
                             {[
                                 { tab: 'home', label: 'Inicio', icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg> },
                                 { tab: 'reservas', label: 'Reservas', icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" /></svg> },
@@ -296,13 +297,14 @@ export default function ResidentLayout({
                                             }
                                         }}
                                         type="button"
+                                        aria-current={isReservasLocked ? undefined : (mobileTab === item.tab ? 'page' : undefined)}
                                         className={`flex flex-col items-center justify-center w-12 h-full transition-colors ${
-                                            isReservasLocked
-                                                ? 'text-rose-500'
-                                                : mobileTab === item.tab 
-                                                ? 'text-brand-green font-bold' 
-                                                : 'text-slate-500 hover:text-slate-350'
-                                        }`}
+                                             isReservasLocked
+                                                 ? 'text-rose-500'
+                                                 : mobileTab === item.tab 
+                                                 ? 'text-brand-green font-bold' 
+                                                 : 'text-slate-500 hover:text-slate-350'
+                                         }`}
                                     >
                                         {item.icon}
                                         <span className="text-[9px] mt-0.5 font-bold uppercase tracking-wider">{item.label}</span>

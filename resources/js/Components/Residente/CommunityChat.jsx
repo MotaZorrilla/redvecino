@@ -13,7 +13,7 @@ export default function CommunityChat({
             <div className="flex items-center gap-2 border-b pb-3 dark:border-slate-800 shrink-0">
                 <button 
                     onClick={() => setMobileTab('home')} 
-                    className="text-slate-400 hover:text-slate-650 transition-colors"
+                    className="text-slate-500 hover:text-slate-700 transition-colors"
                     type="button"
                 >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
@@ -31,6 +31,13 @@ export default function CommunityChat({
 
             {/* Message thread */}
             <div className="flex-1 overflow-y-auto pr-1 py-2 space-y-3 font-sans text-xs">
+                {chatMessages.length === 0 && (
+                    <div className="flex flex-col items-center justify-center h-full text-center py-8">
+                        <span className="text-3xl mb-2">💬</span>
+                        <span className="text-xs text-slate-400 font-bold">No hay mensajes aún</span>
+                        <span className="text-[9px] text-slate-400 mt-1">Envía un mensaje para iniciar la conversación con conserjería</span>
+                    </div>
+                )}
                 {chatMessages.map((msg, i) => (
                     <div 
                         key={i} 
@@ -69,7 +76,7 @@ export default function CommunityChat({
                 />
                 <button 
                     type="submit"
-                    className="px-4 py-2 bg-[#72B043] hover:bg-[#629b37] text-white text-xs font-bold rounded-xl shadow transition-colors"
+                    className="px-4 py-2 bg-brand-green hover:bg-brand-green-dark text-white text-xs font-bold rounded-xl shadow transition-colors"
                 >
                     Enviar
                 </button>

@@ -33,7 +33,7 @@ const STEP_META = [
     { label: 'Persona',           icon: '👤', color: 'bg-[#0F2557]', ring: 'ring-[#0F2557]', text: 'text-[#0F2557]', btnBg: 'bg-[#0F2557] hover:bg-[#1a3578]' },
     { label: 'Relación',          icon: '🏠', color: 'bg-[#00A896]', ring: 'ring-[#00A896]', text: 'text-[#00A896]', btnBg: 'bg-[#00A896] hover:bg-[#00c4af]' },
     { label: 'Funciones',         icon: '👔', color: 'bg-[#EC7A08]', ring: 'ring-[#EC7A08]', text: 'text-[#EC7A08]', btnBg: 'bg-[#EC7A08] hover:bg-[#f59325]' },
-    { label: 'Acceso',            icon: '🔐', color: 'bg-indigo-600', ring: 'ring-indigo-600', text: 'text-indigo-600', btnBg: 'bg-indigo-600 hover:bg-indigo-500' },
+    { label: 'Acceso',            icon: '🔐', color: 'bg-brand-teal', ring: 'ring-brand-teal', text: 'text-brand-teal', btnBg: 'bg-brand-teal hover:bg-brand-teal-light' },
     { label: 'Resumen',           icon: '📋', color: 'bg-[#72B043]', ring: 'ring-[#72B043]', text: 'text-[#72B043]', btnBg: 'bg-[#72B043] hover:bg-[#85c155]' },
 ];
 
@@ -113,10 +113,10 @@ const EXAMPLE_PROFILES = [
 
 /* ── Componente de entrada reutilizable ──────────────────────────────────── */
 
-function InputField({ label, children }) {
+function InputField({ label, htmlFor, children }) {
     return (
         <div>
-            <label className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider block mb-1">
+            <label htmlFor={htmlFor} className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider block mb-1">
                 {label}
             </label>
             {children}
@@ -372,7 +372,7 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
        ════════════════════════════════════════════════════════════════════ */
     return (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm font-[Montserrat] p-4">
-            <div className="relative max-w-3xl w-full h-[680px] max-h-[90vh] bg-white dark:bg-slate-900 rounded-3xl shadow-2xl animate-scale-up flex flex-col">
+            <div className="relative max-w-3xl w-full h-[680px] max-h-[90vh] bg-white dark:bg-slate-900 rounded-modal shadow-2xl animate-scale-up flex flex-col">
 
                 {/* ── Botón cerrar ───────────────────────────────────────── */}
                 <button
@@ -454,7 +454,7 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
                                                 <span className="text-3xl text-gray-300 dark:text-slate-600">📷</span>
                                             )}
                                         </div>
-                                        <span className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs shadow-lg group-hover:scale-110 transition-transform">
+                                        <span className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-brand-teal text-white flex items-center justify-center text-xs shadow-lg group-hover:scale-110 transition-transform">
                                             +
                                         </span>
                                         <input
@@ -469,8 +469,9 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
 
                                 {/* Campos */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <InputField label="RUT / Identificación *">
+                                    <InputField htmlFor="pw-rut" label="RUT / Identificación *">
                                         <input
+                                            id="pw-rut"
                                             type="text"
                                             required
                                             value={rut}
@@ -479,8 +480,9 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
                                             className={inputCls}
                                         />
                                     </InputField>
-                                    <InputField label="Correo Electrónico *">
+                                    <InputField htmlFor="pw-email" label="Correo Electrónico *">
                                         <input
+                                            id="pw-email"
                                             type="email"
                                             required
                                             value={email}
@@ -489,8 +491,9 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
                                             className={inputCls}
                                         />
                                     </InputField>
-                                    <InputField label="Nombres *">
+                                    <InputField htmlFor="pw-nombres" label="Nombres *">
                                         <input
+                                            id="pw-nombres"
                                             type="text"
                                             required
                                             value={nombres}
@@ -499,8 +502,9 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
                                             className={inputCls}
                                         />
                                     </InputField>
-                                    <InputField label="Apellidos *">
+                                    <InputField htmlFor="pw-apellidos" label="Apellidos *">
                                         <input
+                                            id="pw-apellidos"
                                             type="text"
                                             required
                                             value={apellidos}
@@ -510,12 +514,13 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
                                         />
                                     </InputField>
                                     <div className="sm:col-span-2">
-                                        <InputField label="Teléfono">
+                                        <InputField htmlFor="pw-telefono" label="Teléfono">
                                             <div className="flex">
                                                 <span className="inline-flex items-center px-3 text-xs font-bold text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 border border-r-0 border-gray-300 dark:border-slate-800 rounded-l-xl">
                                                     +56
                                                 </span>
                                                 <input
+                                                    id="pw-telefono"
                                                     type="text"
                                                     value={telefono}
                                                     onChange={e => setTelefono(e.target.value)}
@@ -584,8 +589,9 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
                             {asociada === true && (
                                 <div className="bg-slate-50 dark:bg-slate-950/50 border border-gray-200 dark:border-slate-800 rounded-2xl p-5 space-y-5 animate-fade-in">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <InputField label="Torre / Edificio">
+                                        <InputField htmlFor="pw-torre" label="Torre / Edificio">
                                             <select
+                                                id="pw-torre"
                                                 value={torre}
                                                 onChange={e => setTorre(e.target.value)}
                                                 className={selectCls}
@@ -602,8 +608,9 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
                                                 })}
                                             </select>
                                         </InputField>
-                                        <InputField label="Unidad / Departamento">
+                                        <InputField htmlFor="pw-unidad" label="Unidad / Departamento">
                                             <select
+                                                id="pw-unidad"
                                                 value={unidad}
                                                 onChange={e => setUnidad(e.target.value)}
                                                 className={selectCls}
@@ -712,28 +719,29 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
                                         🔧 Detalles del Colaborador
                                     </p>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <InputField label="Cargo">
-                                            <select value={cargo} onChange={e => setCargo(e.target.value)} className={selectCls}>
+                                        <InputField htmlFor="pw-cargo" label="Cargo">
+                                            <select id="pw-cargo" value={cargo} onChange={e => setCargo(e.target.value)} className={selectCls}>
                                                 <option value="">Seleccionar cargo...</option>
                                                 {CARGO_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
                                             </select>
                                         </InputField>
-                                        <InputField label="Área">
-                                            <select value={area} onChange={e => setArea(e.target.value)} className={selectCls}>
+                                        <InputField htmlFor="pw-area" label="Área">
+                                            <select id="pw-area" value={area} onChange={e => setArea(e.target.value)} className={selectCls}>
                                                 <option value="">Seleccionar área...</option>
                                                 {AREA_OPTIONS.map(a => <option key={a} value={a}>{a}</option>)}
                                             </select>
                                         </InputField>
-                                        <InputField label="Fecha de Ingreso">
+                                        <InputField htmlFor="pw-fecha-ingreso" label="Fecha de Ingreso">
                                             <input
+                                                id="pw-fecha-ingreso"
                                                 type="date"
                                                 value={fechaIngreso}
                                                 onChange={e => setFechaIngreso(e.target.value)}
                                                 className={inputCls}
                                             />
                                         </InputField>
-                                        <InputField label="Tipo de Contrato">
-                                            <select value={tipoContrato} onChange={e => setTipoContrato(e.target.value)} className={selectCls}>
+                                        <InputField htmlFor="pw-tipo-contrato" label="Tipo de Contrato">
+                                            <select id="pw-tipo-contrato" value={tipoContrato} onChange={e => setTipoContrato(e.target.value)} className={selectCls}>
                                                 <option value="">Seleccionar tipo...</option>
                                                 {CONTRATO_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
                                             </select>
@@ -760,8 +768,8 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
                                         🏛️ Detalles del Comité Administrativo
                                     </p>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <InputField label="Cargo en el Comité">
-                                            <select value={comiteCargo} onChange={e => setComiteCargo(e.target.value)} className={selectCls}>
+                                        <InputField htmlFor="pw-comite-cargo" label="Cargo en el Comité">
+                                            <select id="pw-comite-cargo" value={comiteCargo} onChange={e => setComiteCargo(e.target.value)} className={selectCls}>
                                                 <option value="">Seleccionar cargo...</option>
                                                 <option value="Presidente">Presidente</option>
                                                 <option value="Secretario">Secretario</option>
@@ -769,8 +777,8 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
                                                 <option value="Director / Vocal">Director / Vocal</option>
                                             </select>
                                         </InputField>
-                                        <InputField label="Duración del Período">
-                                            <select value={comitePeriodo} onChange={e => setComitePeriodo(e.target.value)} className={selectCls}>
+                                        <InputField htmlFor="pw-comite-periodo" label="Duración del Período">
+                                            <select id="pw-comite-periodo" value={comitePeriodo} onChange={e => setComitePeriodo(e.target.value)} className={selectCls}>
                                                 <option value="">Seleccionar duración...</option>
                                                 <option value="1 Año">1 Año</option>
                                                 <option value="2 Años">2 Años</option>
@@ -778,8 +786,9 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
                                             </select>
                                         </InputField>
                                         <div className="sm:col-span-2">
-                                            <InputField label="Fecha de Inicio del Período">
+                                            <InputField htmlFor="pw-comite-fecha" label="Fecha de Inicio del Período">
                                                 <input
+                                                    id="pw-comite-fecha"
                                                     type="date"
                                                     value={comiteFechaInicio}
                                                     onChange={e => setComiteFechaInicio(e.target.value)}
@@ -798,16 +807,17 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
                                         ⚙️ Detalles de la Administración
                                     </p>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <InputField label="Tipo de Administrador">
-                                            <select value={adminTipo} onChange={e => setAdminTipo(e.target.value)} className={selectCls}>
+                                        <InputField htmlFor="pw-admin-tipo" label="Tipo de Administrador">
+                                            <select id="pw-admin-tipo" value={adminTipo} onChange={e => setAdminTipo(e.target.value)} className={selectCls}>
                                                 <option value="">Seleccionar tipo...</option>
                                                 <option value="Administrador General">Administrador General</option>
                                                 <option value="Co-administrador">Co-administrador</option>
                                                 <option value="Asistente de Administración">Asistente de Administración</option>
                                             </select>
                                         </InputField>
-                                        <InputField label="Registro Nacional (RPA) / ID">
+                                        <InputField htmlFor="pw-admin-rpa" label="Registro Nacional (RPA) / ID">
                                             <input
+                                                id="pw-admin-rpa"
                                                 type="text"
                                                 value={adminRpa}
                                                 onChange={e => setAdminRpa(e.target.value)}
@@ -816,8 +826,9 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
                                             />
                                         </InputField>
                                         <div className="sm:col-span-2">
-                                            <InputField label="Fecha de Contratación">
+                                            <InputField htmlFor="pw-admin-fecha" label="Fecha de Contratación">
                                                 <input
+                                                    id="pw-admin-fecha"
                                                     type="date"
                                                     value={adminFechaContrato}
                                                     onChange={e => setAdminFechaContrato(e.target.value)}
@@ -836,8 +847,9 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
                                         📦 Detalles del Proveedor Permanente
                                     </p>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <InputField label="Empresa / Razón Social">
+                                        <InputField htmlFor="pw-prov-empresa" label="Empresa / Razón Social">
                                             <input
+                                                id="pw-prov-empresa"
                                                 type="text"
                                                 value={provEmpresa}
                                                 onChange={e => setProvEmpresa(e.target.value)}
@@ -845,8 +857,9 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
                                                 className={inputCls}
                                             />
                                         </InputField>
-                                        <InputField label="RUT de la Empresa">
+                                        <InputField htmlFor="pw-prov-rut" label="RUT de la Empresa">
                                             <input
+                                                id="pw-prov-rut"
                                                 type="text"
                                                 value={provRut}
                                                 onChange={e => setProvRut(e.target.value)}
@@ -855,8 +868,8 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
                                             />
                                         </InputField>
                                         <div className="sm:col-span-2">
-                                            <InputField label="Rubro / Especialidad">
-                                                <select value={provRubro} onChange={e => setProvRubro(e.target.value)} className={selectCls}>
+                                            <InputField htmlFor="pw-prov-rubro" label="Rubro / Especialidad">
+                                                <select id="pw-prov-rubro" value={provRubro} onChange={e => setProvRubro(e.target.value)} className={selectCls}>
                                                     <option value="">Seleccionar rubro...</option>
                                                     <option value="Mantenimiento de Ascensores">Mantenimiento de Ascensores</option>
                                                     <option value="Seguridad / Conserjería Externa">Seguridad / Conserjería Externa</option>
@@ -900,7 +913,7 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
                                             : 'border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-gray-300'
                                     }`}
                                 >
-                                    <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${hasAccess === true ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-slate-800 text-gray-400'}`}>
+                                    <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${hasAccess === true ? 'bg-brand-teal text-white' : 'bg-gray-100 dark:bg-slate-800 text-gray-400'}`}>
                                         🔓
                                     </span>
                                     <div>
@@ -934,8 +947,9 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
                                         🔑 Credenciales de Acceso
                                     </p>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <InputField label="Nombre de Usuario">
+                                        <InputField htmlFor="pw-username" label="Nombre de Usuario">
                                             <input
+                                                id="pw-username"
                                                 type="text"
                                                 value={username}
                                                 onChange={e => setUsername(e.target.value)}
@@ -943,7 +957,7 @@ export default function PersonWizard({ isOpen, onClose, onSave, condosList = [],
                                                 placeholder="usuario.ejemplo"
                                             />
                                         </InputField>
-                                        <InputField label="Contraseña Temporal">
+                                        <InputField htmlFor="pw-password" label="Contraseña Temporal">
                                             <div className="flex gap-2">
                                                 <input
                                                     type="text"

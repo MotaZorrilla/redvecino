@@ -20,13 +20,13 @@ export default function PropietarioLayout({
             </Head>
 
             {/* 1. LEFT SIDEBAR */}
-            <div className={`w-64 bg-slate-950 text-white p-6 flex flex-col justify-between shrink-0 font-sans md:flex transition-transform duration-300 absolute md:relative inset-y-0 left-0 z-45 md:translate-x-0 ${isMobileSidebarOpen ? 'flex translate-x-0' : 'hidden -translate-x-full md:flex'}`}>
+            <aside aria-label="Navegación principal" className={`w-64 bg-slate-950 text-white p-6 flex flex-col justify-between shrink-0 font-sans transition-transform duration-300 fixed md:relative inset-y-0 left-0 z-45 ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
                 <div className="space-y-6 text-left">
                     {/* Logo */}
                     <ApplicationLogo size="small" showSubtext={false} brand="propietario" />
 
                     {/* Sidebar Tabs */}
-                    <nav className="space-y-1">
+                    <nav aria-label="Menú principal" className="space-y-1">
                         {[
                             { id: 'home', label: '🏠 Resumen Financiero', desc: 'Saldos y gastos comunes' },
                             { id: 'reports', label: '📊 Rendición Cuentas', desc: 'Balances mensuales de administración' },
@@ -40,11 +40,12 @@ export default function PropietarioLayout({
                                     setPropietarioActiveTab(tab.id);
                                     setIsMobileSidebarOpen(false);
                                 }}
-                                className={`w-full text-left px-4 py-2 rounded-xl transition-all duration-200 group flex flex-col gap-0.5 border ${
-                                    propietarioActiveTab === tab.id
-                                        ? 'bg-brand-green/20 border-brand-green/40 text-white shadow-md'
-                                        : 'border-transparent hover:bg-slate-900 text-slate-400 hover:text-slate-200'
-                                }`}
+                                aria-current={propietarioActiveTab === tab.id ? 'page' : undefined}
+                                className={`w-full text-left px-4 py-2.5 rounded-xl transition-all duration-200 group flex flex-col gap-0.5 border ${
+                                     propietarioActiveTab === tab.id
+                                         ? 'bg-brand-green/20 border-brand-green/40 text-white shadow-md'
+                                         : 'border-transparent hover:bg-slate-900 text-slate-400 hover:text-slate-200'
+                                 }`}
                             >
                                 <span className={`text-xs font-bold ${propietarioActiveTab === tab.id ? 'text-brand-green' : 'text-slate-300'}`}>
                                     {tab.label}
@@ -69,16 +70,27 @@ export default function PropietarioLayout({
                         </div>
                     </div>
                 </div>
-            </div>
+            </aside>
+
+            {/* Mobile sidebar overlay backdrop */}
+            {isMobileSidebarOpen && (
+                <div 
+                    onClick={() => setIsMobileSidebarOpen(false)}
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Escape' && setIsMobileSidebarOpen(false)}
+                />
+            )}
 
             {/* 2. RIGHT CONTENT PANEL */}
-            <div className="flex-1 flex flex-col bg-gray-50 dark:bg-slate-900/30 px-6 md:px-12 py-8 md:py-10 overflow-y-auto max-h-[850px] space-y-6">
+            <main className="flex-1 flex flex-col bg-gray-50 dark:bg-slate-900/30 px-6 md:px-12 py-8 md:py-10 overflow-y-auto max-h-[850px] space-y-6">
                 {/* Header Section */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-gray-200 dark:border-slate-800 pb-4 gap-2 text-left">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-                            className="md:hidden p-2 -ml-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 transition-colors"
+                            className="md:hidden p-2.5 -ml-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 transition-colors"
                             aria-label="Abrir menú"
                         >
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
@@ -103,7 +115,7 @@ export default function PropietarioLayout({
                     <div className="flex items-center gap-2 shrink-0">
                         <button
                             onClick={toggleTheme}
-                            className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-350 transition-colors duration-200"
+                            className="p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-350 transition-colors duration-200"
                             aria-label="Toggle Theme"
                             title="Cambiar tema"
                         >
@@ -121,7 +133,7 @@ export default function PropietarioLayout({
                 </div>
 
                 {children}
-            </div>
+            </main>
         </div>
     );
 }

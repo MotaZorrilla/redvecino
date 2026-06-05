@@ -69,6 +69,7 @@ export default function TicketsList({
                                     <button
                                         key={`act-${t.id}`}
                                         type="button"
+                                        aria-label={`Inspeccionar ticket ${t.title}`}
                                         onClick={() => setEditingTicket(t)}
                                         className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-indigo-200 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-lg transition-all"
                                     >
@@ -108,8 +109,9 @@ export default function TicketsList({
 
                             {/* Status Update */}
                             <div>
-                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado de la Solicitud</label>
+                                <label htmlFor="ticket-status" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado de la Solicitud</label>
                                 <select
+                                    id="ticket-status"
                                     value={editingTicket.status}
                                     onChange={(e) => {
                                         const updatedStatus = e.target.value;
@@ -126,8 +128,9 @@ export default function TicketsList({
 
                             {/* Employee Assignment */}
                             <div>
-                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Asignar Operador / Conserje</label>
+                                <label htmlFor="ticket-assignee" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Asignar Operador / Conserje</label>
                                 <select
+                                    id="ticket-assignee"
                                     value={editingTicket.assigned_to || ''}
                                     onChange={(e) => {
                                         const assigneeName = e.target.value;

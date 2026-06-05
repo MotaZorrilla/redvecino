@@ -22,7 +22,7 @@ export default function TiOcupacionMap({
                     </h4>
                     <button
                         onClick={() => setShowAddPropForm(!showAddPropForm)}
-                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all animate-fade-in shrink-0"
+                        className="px-4 py-2 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow-lg transition-all animate-fade-in shrink-0"
                     >
                         {showAddPropForm ? 'Cerrar Formulario' : 'Crear Propiedad'}
                     </button>
@@ -59,35 +59,38 @@ export default function TiOcupacionMap({
                     <h5 className="text-xs font-bold text-slate-300 uppercase">Detalles de la Unidad</h5>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Número de Depto</label>
+                            <label htmlFor="om-number" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Número de Depto</label>
                             <input
+                                id="om-number"
                                 type="text"
                                 required
                                 placeholder="Ej: 504"
                                 value={newPropForm.number}
                                 onChange={(e) => setNewPropForm(prev => ({ ...prev, number: e.target.value }))}
-                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-brand-teal"
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Piso</label>
+                            <label htmlFor="om-floor" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Piso</label>
                             <input
+                                id="om-floor"
                                 type="number"
                                 required
                                 placeholder="Ej: 5"
                                 value={newPropForm.floor}
                                 onChange={(e) => setNewPropForm(prev => ({ ...prev, floor: e.target.value }))}
-                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-brand-teal"
                             />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Tipo de Propiedad</label>
+                            <label htmlFor="om-type" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Tipo de Propiedad</label>
                             <select
+                                id="om-type"
                                 value={newPropForm.type}
                                 onChange={(e) => setNewPropForm(prev => ({ ...prev, type: e.target.value }))}
-                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
+                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-brand-teal cursor-pointer"
                             >
                                 <option value="apartment">Departamento</option>
                                 <option value="house">Casa</option>
@@ -96,11 +99,12 @@ export default function TiOcupacionMap({
                             </select>
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado de Pago / Convivencia</label>
+                            <label htmlFor="om-status" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado de Pago / Convivencia</label>
                             <select
+                                id="om-status"
                                 value={newPropForm.status}
                                 onChange={(e) => setNewPropForm(prev => ({ ...prev, status: e.target.value }))}
-                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
+                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-brand-teal cursor-pointer"
                             >
                                 <option value="occupied">Ocupado (Al día)</option>
                                 <option value="delinquent">{"Moroso (>= 3 meses)"}</option>
@@ -109,7 +113,7 @@ export default function TiOcupacionMap({
                             </select>
                         </div>
                     </div>
-                    <button type="submit" className="px-4 py-2 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-bold text-xs rounded-xl shadow-md">
+                    <button type="submit" className="px-4 py-2 bg-brand-teal text-white font-bold text-xs rounded-xl shadow-md">
                         Guardar Propiedad
                     </button>
                 </form>
@@ -206,7 +210,7 @@ export default function TiOcupacionMap({
                                 setImpersonatedUser(matched);
                                 setTerminalLogs(prev => [...prev, `[IMPERSONATION] Impersonando desde mapa 2D: ${matched.name}`]);
                             }}
-                            className="w-full mt-6 py-2.5 bg-[#00A896]/10 hover:bg-[#00A896]/20 border border-[#00A896]/30 text-[#00A896] font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2"
+                            className="w-full mt-6 py-2.5 bg-brand-teal/10 hover:bg-brand-teal/20 border border-brand-teal/30 text-brand-teal font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2"
                         >
                             <span>💻 Impersonar Residente</span>
                         </button>

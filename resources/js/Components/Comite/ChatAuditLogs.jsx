@@ -95,7 +95,7 @@ export default function ChatAuditLogs({
                         />
                         <button
                             type="submit"
-                            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all shrink-0"
+                            className="px-4 py-2 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow transition-all shrink-0"
                         >
                             Enviar
                         </button>

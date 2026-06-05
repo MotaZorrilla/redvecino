@@ -36,7 +36,7 @@ export default function ShiftLogs({ adminCondoId }) {
                 </div>
                 <button
                     onClick={() => setShowAddForm(!showAddForm)}
-                    className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all"
+                    className="px-3.5 py-1.5 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow transition-all"
                 >
                     {showAddForm ? 'Cerrar Form' : 'Nueva Entrada'}
                 </button>
@@ -47,8 +47,9 @@ export default function ShiftLogs({ adminCondoId }) {
                     <h5 className="text-xs font-bold text-gray-800 dark:text-slate-200 uppercase">📝 Añadir Entrada a Bitácora</h5>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre del Conserje</label>
+                            <label htmlFor="logConserje" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre del Conserje</label>
                             <input
+                                id="logConserje"
                                 type="text"
                                 required
                                 value={newLog.conserje}
@@ -57,8 +58,9 @@ export default function ShiftLogs({ adminCondoId }) {
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Horario del Turno</label>
+                            <label htmlFor="logShift" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Horario del Turno</label>
                             <select
+                                id="logShift"
                                 value={newLog.shift}
                                 onChange={(e) => setNewLog(prev => ({ ...prev, shift: e.target.value }))}
                                 className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
@@ -70,18 +72,19 @@ export default function ShiftLogs({ adminCondoId }) {
                         </div>
                     </div>
                     <div>
-                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Novedades / Notas del Turno</label>
-                        <textarea
-                            required
-                            rows="4"
-                            value={newLog.notes}
+                            <label htmlFor="logNotes" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Novedades / Notas del Turno</label>
+                            <textarea
+                                id="logNotes"
+                                required
+                                rows="4"
+                                value={newLog.notes}
                             onChange={(e) => setNewLog(prev => ({ ...prev, notes: e.target.value }))}
                             className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
                             placeholder="Ej: Mantenciones, reclamos de ruidos, entrega de correspondencia especial..."
                         />
                     </div>
                     <div className="flex gap-2">
-                        <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow">
+                        <button type="submit" className="px-4 py-2 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow">
                             Guardar Nota
                         </button>
                         <button type="button" onClick={() => setShowAddForm(false)} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl">

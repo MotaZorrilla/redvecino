@@ -20,7 +20,7 @@ export default function SpatieImpersonator({
         <div className="space-y-6 animate-fade-in text-left max-w-4xl mx-auto">
             <div className="bg-slate-900/80 border border-slate-800/80 p-6 md:p-8 rounded-3xl space-y-6 relative overflow-hidden shadow-2xl">
                 {/* Decorative gradient overlay */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-[#00A896]/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-teal/10 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
                 <div className="border-b border-slate-800 pb-4">
@@ -37,8 +37,8 @@ export default function SpatieImpersonator({
                     {/* Step 1: Condo selection */}
                     <div className="space-y-2">
                         <div className="flex items-center gap-2">
-                            <span className="h-5 w-5 rounded-full bg-[#00A896]/10 border border-[#00A896]/30 text-[#00A896] flex items-center justify-center text-[10px] font-black font-mono">1</span>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Condominio</label>
+                            <span className="h-5 w-5 rounded-full bg-brand-teal/10 border border-brand-teal/30 text-brand-teal flex items-center justify-center text-[10px] font-black font-mono">1</span>
+                            <label htmlFor="imp-condo" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Condominio</label>
                         </div>
                         <select
                             value={selectedImpCondo}
@@ -46,7 +46,7 @@ export default function SpatieImpersonator({
                                 setSelectedImpCondo(e.target.value);
                                 setSelectedImpUser('');
                             }}
-                            className="w-full bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl text-xs px-3.5 py-2.5 text-slate-850 dark:text-white focus:outline-none focus:border-[#00A896] hover:border-slate-700 transition-all font-medium focus:ring-0 cursor-pointer"
+                            className="w-full bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl text-xs px-3.5 py-2.5 text-slate-850 dark:text-white focus:outline-none focus:border-brand-teal hover:border-slate-700 transition-all font-medium focus:ring-0 cursor-pointer"
                         >
                             <option value="all" className="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100">Todos los Condominios</option>
                             {condosList.map(c => (
@@ -58,16 +58,17 @@ export default function SpatieImpersonator({
                     {/* Step 2: Role selection */}
                     <div className="space-y-2">
                         <div className="flex items-center gap-2">
-                            <span className="h-5 w-5 rounded-full bg-[#00A896]/10 border border-[#00A896]/30 text-[#00A896] flex items-center justify-center text-[10px] font-black font-mono">2</span>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Rol de Acceso</label>
+                            <span className="h-5 w-5 rounded-full bg-brand-teal/10 border border-brand-teal/30 text-brand-teal flex items-center justify-center text-[10px] font-black font-mono">2</span>
+                            <label htmlFor="imp-role" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Rol de Acceso</label>
                         </div>
                         <select
+                            id="imp-role"
                             value={selectedImpRole}
                             onChange={(e) => {
                                 setSelectedImpRole(e.target.value);
                                 setSelectedImpUser('');
                             }}
-                            className="w-full bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl text-xs px-3.5 py-2.5 text-slate-850 dark:text-white focus:outline-none focus:border-[#00A896] hover:border-slate-700 transition-all font-medium focus:ring-0 cursor-pointer"
+                            className="w-full bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl text-xs px-3.5 py-2.5 text-slate-850 dark:text-white focus:outline-none focus:border-brand-teal hover:border-slate-700 transition-all font-medium focus:ring-0 cursor-pointer"
                         >
                             <option value="all" className="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100">Todos los Roles</option>
                             <option value="super_usuario" className="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100">Súper Usuario</option>
@@ -82,13 +83,13 @@ export default function SpatieImpersonator({
                     {/* Step 3: User selection */}
                     <div className="space-y-2">
                         <div className="flex items-center gap-2">
-                            <span className="h-5 w-5 rounded-full bg-[#00A896]/10 border border-[#00A896]/30 text-[#00A896] flex items-center justify-center text-[10px] font-black font-mono">3</span>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Usuario Destino</label>
+                            <span className="h-5 w-5 rounded-full bg-brand-teal/10 border border-brand-teal/30 text-brand-teal flex items-center justify-center text-[10px] font-black font-mono">3</span>
+                            <label htmlFor="imp-user" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Usuario Destino</label>
                         </div>
                         <select
                             value={selectedImpUser}
                             onChange={(e) => setSelectedImpUser(e.target.value)}
-                            className="w-full bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl text-xs px-3.5 py-2.5 text-slate-850 dark:text-white focus:outline-none focus:border-[#00A896] hover:border-slate-700 transition-all font-medium focus:ring-0 cursor-pointer"
+                            className="w-full bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl text-xs px-3.5 py-2.5 text-slate-850 dark:text-white focus:outline-none focus:border-brand-teal hover:border-slate-700 transition-all font-medium focus:ring-0 cursor-pointer"
                         >
                             <option value="" className="bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100">Seleccione Usuario...</option>
                             {usersList
@@ -119,13 +120,13 @@ export default function SpatieImpersonator({
                 {selectedUserObj && (
                     <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-5 mt-4 flex items-center justify-between gap-4 animate-fade-in text-left">
                         <div className="flex items-center gap-4">
-                            <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-[#0F2557] to-[#00A896] flex items-center justify-center font-extrabold text-white text-lg shadow-lg">
+                            <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-[#0F2557] to-brand-teal flex items-center justify-center font-extrabold text-white text-lg shadow-lg">
                                 {selectedUserObj.name.charAt(0)}
                             </div>
                             <div>
                                 <div className="flex items-center gap-2 flex-wrap">
                                     <h5 className="text-sm font-bold text-slate-100">{selectedUserObj.name}</h5>
-                                    <span className="text-[9px] bg-[#00A896]/10 border border-[#00A896]/30 text-[#00A896] font-extrabold uppercase px-2 py-0.5 rounded">
+                                    <span className="text-[9px] bg-brand-teal/10 border border-brand-teal/30 text-brand-teal font-extrabold uppercase px-2 py-0.5 rounded">
                                         {selectedUserObj.roles?.[0] || 'Residente'}
                                     </span>
                                     <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded ${
@@ -175,7 +176,7 @@ export default function SpatieImpersonator({
                                 setTerminalLogs(prev => [...prev, `[IMPERSONATION] Impersonando a ${targetUser.name} (${targetUser.roles[0]})`]);
                             }
                         }}
-                        className="px-6 py-2.5 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-[#00A896]/20 transition-all flex items-center gap-2 duration-200 transform active:scale-95"
+                        className="px-6 py-2.5 bg-brand-teal hover:bg-brand-teal-light text-white font-extrabold text-xs rounded-xl shadow-lg shadow-brand-teal/20 transition-all flex items-center gap-2 duration-200 transform active:scale-95"
                     >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />

@@ -74,8 +74,9 @@ export default function AssignedTickets({
 
                             {/* Status Update */}
                             <div>
-                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Actualizar Estado</label>
+                                <label htmlFor="editTicketStatus" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Actualizar Estado</label>
                                 <select
+                                    id="editTicketStatus"
                                     value={editingTicket.status}
                                     onChange={(e) => {
                                         const updatedStatus = e.target.value;

@@ -66,7 +66,7 @@ export default function ShoppingList({ adminCondoId }) {
                 </div>
                 <button
                     onClick={() => setShowAddForm(!showAddForm)}
-                    className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all cursor-pointer"
+                    className="px-3.5 py-1.5 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow transition-all cursor-pointer"
                 >
                     {showAddForm ? 'Cerrar' : '+ Agregar Artículo'}
                 </button>
@@ -94,8 +94,9 @@ export default function ShoppingList({ adminCondoId }) {
                     <h5 className="text-xs font-bold text-gray-800 dark:text-slate-200 uppercase">🛒 Nuevo Artículo</h5>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="col-span-2">
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre del Artículo</label>
+                            <label htmlFor="itemName" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre del Artículo</label>
                             <input
+                                id="itemName"
                                 type="text"
                                 required
                                 value={newItem.name}
@@ -105,8 +106,9 @@ export default function ShoppingList({ adminCondoId }) {
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Categoría</label>
+                            <label htmlFor="itemCategory" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Categoría</label>
                             <select
+                                id="itemCategory"
                                 value={newItem.category}
                                 onChange={(e) => setNewItem(prev => ({ ...prev, category: e.target.value }))}
                                 className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
@@ -119,8 +121,9 @@ export default function ShoppingList({ adminCondoId }) {
                             </select>
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Prioridad</label>
+                            <label htmlFor="itemPriority" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Prioridad</label>
                             <select
+                                id="itemPriority"
                                 value={newItem.priority}
                                 onChange={(e) => setNewItem(prev => ({ ...prev, priority: e.target.value }))}
                                 className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
@@ -131,8 +134,9 @@ export default function ShoppingList({ adminCondoId }) {
                             </select>
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Cantidad</label>
+                            <label htmlFor="itemQuantity" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Cantidad</label>
                             <input
+                                id="itemQuantity"
                                 type="number"
                                 min="1"
                                 value={newItem.quantity}
@@ -141,8 +145,9 @@ export default function ShoppingList({ adminCondoId }) {
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Unidad</label>
+                            <label htmlFor="itemUnit" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Unidad</label>
                             <input
+                                id="itemUnit"
                                 type="text"
                                 value={newItem.unit}
                                 onChange={(e) => setNewItem(prev => ({ ...prev, unit: e.target.value }))}
@@ -151,7 +156,7 @@ export default function ShoppingList({ adminCondoId }) {
                         </div>
                     </div>
                     <div className="flex gap-2">
-                        <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow cursor-pointer">
+                        <button type="submit" className="px-4 py-2 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow cursor-pointer">
                             Agregar
                         </button>
                         <button type="button" onClick={() => setShowAddForm(false)} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl cursor-pointer">

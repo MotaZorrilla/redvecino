@@ -75,6 +75,8 @@ export default function Dashboard() {
     const [newExpenseForm, setNewExpenseForm] = useState({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '' });
 
     useEffect(() => {
+        const canView = user?.roles?.some(r => ['admin', 'administrador', 'committee', 'comité'].includes(r.toLowerCase()));
+        if (!canView) return;
         axios.get('/api/condo-finances/catalog')
             .then(res => setFinancialCatalog(res.data))
             .catch(err => console.error("Error cargando catálogo financiero:", err));
@@ -168,6 +170,8 @@ export default function Dashboard() {
     };
 
     useEffect(() => {
+        const canView = user?.roles?.some(r => ['admin', 'administrador', 'committee', 'comité'].includes(r.toLowerCase()));
+        if (!canView) return;
         fetchCondoFinances();
     }, [adminCondoId]);
 
@@ -652,8 +656,8 @@ export default function Dashboard() {
     if (globalMaintenanceMode && !isActuallyAdmin) {
         return (
             <div className="min-h-screen bg-[#090d16] flex flex-col items-center justify-center font-sans p-6 text-white text-center">
-                <div className="max-w-md w-full space-y-8 bg-slate-900/40 backdrop-blur-xl border border-slate-800/80 p-10 rounded-[32px] shadow-2xl relative overflow-hidden animate-fade-in">
-                    <div className="absolute -top-10 -left-10 w-40 h-40 bg-[#00A896]/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="max-w-md w-full space-y-8 bg-slate-900/40 backdrop-blur-xl border border-slate-800/80 p-10 rounded-modal shadow-2xl relative overflow-hidden animate-fade-in">
+                    <div className="absolute -top-10 -left-10 w-40 h-40 bg-brand-teal/10 rounded-full blur-3xl pointer-events-none" />
                     <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
                     <div className="flex flex-col items-center gap-4">
@@ -673,11 +677,11 @@ export default function Dashboard() {
                     <div className="border-t border-slate-800/60 pt-6 space-y-4">
                         <div className="flex items-center gap-3 bg-slate-950/50 p-4 rounded-2xl border border-slate-800/60">
                             <span className="flex h-2.5 w-2.5 relative shrink-0">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00A896] opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00A896]"></span>
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-teal opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-teal"></span>
                             </span>
                             <span className="text-xs text-slate-400 text-left">
-                                Estado de Infraestructura: <strong className="font-bold text-[#00A896]">Despliegue Activo</strong>
+                                Estado de Infraestructura: <strong className="font-bold text-brand-teal">Despliegue Activo</strong>
                             </span>
                         </div>
                         <p className="text-[10px] text-slate-500 leading-normal">
@@ -725,7 +729,7 @@ export default function Dashboard() {
         isMobileSidebarOpen, setIsMobileSidebarOpen, adminSettingsForm,
         adminFilteredProperties, adminFilteredUsers, adminFilteredTickets,
         adminFilteredPayments, adminFilteredFines,
-        setTicketStatusFilter, setTicketPriorityFilter, setEditingTicket,
+        setTicketStatusFilter, setTicketPriorityFilter, editingTicket, setEditingTicket,
         showAddPropForm, setShowAddPropForm, editingProp, setEditingProp,
         newPropForm, setNewPropForm, propertiesList, setPropertiesList,
         userSubTab, setUserSubTab,
@@ -778,7 +782,7 @@ export default function Dashboard() {
             {impersonatedUser && (
                 <div className="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 text-white px-4 py-3 shadow-lg flex items-center justify-between font-sans sticky top-0 z-50 border-b border-orange-500" role="alert">
                     <div className="flex items-center gap-3">
-                        <span className="flex h-3 w-3 relative shrink-0">
+                        <span className="flex h-3 w-3 relative shrink-0" aria-live="polite">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
                         </span>
@@ -791,7 +795,7 @@ export default function Dashboard() {
                     </div>
                     <button
                         onClick={() => setImpersonatedUser(null)}
-                        className="px-4 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 text-xs font-bold rounded-lg transition-all"
+                        className="px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 text-xs font-bold rounded-lg transition-all"
                     >
                         ❌ Salir de Impersonación
                     </button>
@@ -838,6 +842,7 @@ export default function Dashboard() {
                 <div
                     className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
                     onClick={() => setShowPaymentModal(false)}
+                    role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Escape' || e.key === ' ') setShowPaymentModal(false); }}
                 >
                     <div
                         className="relative max-w-sm w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl animate-scale-up font-sans text-slate-800 dark:text-slate-200 text-left"
@@ -855,7 +860,7 @@ export default function Dashboard() {
                         {!paymentCompletedSuccess ? (
                             <div className="space-y-5">
                                 <div className="text-center space-y-1">
-                                    <span className="text-[9px] font-mono text-[#72B043] font-bold uppercase tracking-widest">Escaneo QR Bancario Express</span>
+                                    <span className="text-[9px] font-mono text-brand-green font-bold uppercase tracking-widest">Escaneo QR Bancario Express</span>
                                     <h3 className="text-base font-black">Pagar Gasto Común</h3>
                                     <p className="text-[10px] text-slate-400 dark:text-slate-500">Realiza tu transferencia o escanea directamente desde tu App del Banco.</p>
                                 </div>
@@ -866,7 +871,7 @@ export default function Dashboard() {
                                         <path d="M65,5 h30 v30 h-30 z M75,15 h10 v10 h-10 z" />
                                         <path d="M5,65 h30 v30 h-30 z M15,75 h10 v10 h-10 z" />
                                         <path d="M45,10 h10 v10 h-10 z M50,30 h10 v10 h-10 z M40,50 h20 v10 h-20 z M45,70 h15 v5 h-15 z M75,45 h10 v15 h-10 z M80,75 h15 v15 h-15 z" />
-                                        <circle cx="50" cy="50" r="7" className="text-[#72B043]" />
+                                        <circle cx="50" cy="50" r="7" className="text-brand-green" />
                                     </svg>
                                     <span className="text-[9px] text-slate-400 mt-2 font-mono">Doble Enlace Cifrado Local</span>
                                 </div>
@@ -878,7 +883,7 @@ export default function Dashboard() {
                                         <div className="flex justify-between"><span>Tipo:</span><span className="font-bold text-slate-800 dark:text-slate-200">Cuenta Corriente</span></div>
                                         <div className="flex justify-between"><span>N° Cuenta:</span><span className="font-bold text-slate-800 dark:text-slate-200">20260526-99</span></div>
                                         <div className="flex justify-between"><span>RUT:</span><span className="font-bold text-slate-800 dark:text-slate-200">77.777.777-7</span></div>
-                                        <div className="flex justify-between text-[#72B043] font-bold"><span>Monto:</span><span>$165.000 CLP</span></div>
+                                        <div className="flex justify-between text-brand-green font-bold"><span>Monto:</span><span>$165.000 CLP</span></div>
                                     </div>
                                 </div>
 
@@ -887,7 +892,7 @@ export default function Dashboard() {
                                     <input
                                         type="file"
                                         onChange={(e) => setPaymentReceiptName(e.target.files[0]?.name || '')}
-                                        className="w-full text-[10px] file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-[#72B043]/15 file:text-[#72B043] hover:file:bg-[#72B043]/20 focus:outline-none"
+                                        className="w-full text-[10px] file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-brand-green/15 file:text-brand-green hover:file:bg-brand-green/20 focus:outline-none"
                                     />
                                     {paymentReceiptName && (
                                         <span className="text-[9px] text-emerald-500 font-bold block mt-1">✓ Comprobante listo: {paymentReceiptName}</span>
@@ -897,14 +902,14 @@ export default function Dashboard() {
                                 <button
                                     onClick={executeQrPayment}
                                     disabled={isProcessingPayment}
-                                    className="w-full py-2.5 bg-[#72B043] hover:bg-[#629b37] disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-md transition-colors"
+                                    className="w-full py-2.5 bg-brand-green hover:bg-brand-green-dark disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-md transition-colors"
                                 >
                                     {isProcessingPayment ? 'Validando Comprobante...' : 'Confirmar Transferencia / Escaneo'}
                                 </button>
                             </div>
                         ) : (
                             <div className="text-center py-6 space-y-4 animate-scale-up">
-                                <div className="h-16 w-16 bg-emerald-500/10 border border-emerald-500/30 text-[#72B043] rounded-full flex items-center justify-center mx-auto text-3xl">✓</div>
+                                <div className="h-16 w-16 bg-emerald-500/10 border border-emerald-500/30 text-brand-green rounded-full flex items-center justify-center mx-auto text-3xl">✓</div>
                                 <div className="space-y-1">
                                     <h3 className="text-base font-black text-slate-900 dark:text-white">¡Transacción Exitosa!</h3>
                                     <p className="text-[10px] text-slate-500 px-3">Tu pago del Gasto Común de Mayo ha sido registrado en la base de datos local SQLite y validado por administración.</p>
@@ -921,7 +926,7 @@ export default function Dashboard() {
                                         setShowPaymentModal(false);
                                         setMobileTab('home');
                                     }}
-                                    className="px-6 py-2 bg-[#72B043] hover:bg-[#629b37] text-white text-xs font-bold rounded-xl shadow transition-colors"
+                                    className="px-6 py-2 bg-brand-green hover:bg-brand-green-dark text-white text-xs font-bold rounded-xl shadow transition-colors"
                                 >
                                     Volver al Inicio
                                 </button>
@@ -935,6 +940,7 @@ export default function Dashboard() {
                 <div
                     className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
                     onClick={() => setShowMorosidadModal(false)}
+                    role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Escape' || e.key === ' ') setShowMorosidadModal(false); }}
                 >
                     <div
                         className="relative max-w-sm w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl animate-scale-up font-sans text-slate-800 dark:text-slate-200 text-left"
@@ -986,7 +992,7 @@ export default function Dashboard() {
                                         setShowMorosidadModal(false);
                                         setMobileTab('pagos');
                                     }}
-                                    className="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md shadow-rose-500/10 transition-colors"
+                                    className="flex-1 py-2 bg-brand-error hover:bg-brand-navy-dark text-white text-xs font-bold rounded-xl shadow-md shadow-rose-500/10 transition-colors"
                                 >
                                     Ir a Pagar Deuda
                                 </button>

@@ -25,8 +25,8 @@ export default function TiOcrSimulator({
                     <div className="bg-slate-950 aspect-[4/3] rounded-2xl border border-slate-800 flex items-center justify-center relative overflow-hidden">
                         {ocrScanning ? (
                             <div className="space-y-2 text-center z-10">
-                                <div className="animate-spin h-6 w-6 border-2 border-t-transparent border-[#00A896] rounded-full mx-auto" />
-                                <span className="text-[9px] font-mono text-[#00A896] block animate-pulse">Lector OCR: Analizando etiqueta...</span>
+                                <div className="animate-spin h-6 w-6 border-2 border-t-transparent border-brand-teal rounded-full mx-auto" />
+                                <span className="text-[9px] font-mono text-brand-teal block animate-pulse">Lector OCR: Analizando etiqueta...</span>
                             </div>
                         ) : (
                             <div className="text-center z-10 space-y-2">
@@ -60,15 +60,15 @@ export default function TiOcrSimulator({
 
                     <div className="space-y-3">
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1 text-left">Destinatario / Residencia</label>
-                            <select id="ocrDeptSelect" className="w-full bg-slate-900 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] cursor-pointer">
+                            <label htmlFor="ocrDeptSelect" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1 text-left">Destinatario / Residencia</label>
+                            <select id="ocrDeptSelect" className="w-full bg-slate-900 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-brand-teal cursor-pointer">
                                 <option value="Depto 202">Residente Demo (Depto 202)</option>
                                 <option value="Depto 101">Propietario Demo (Depto 101)</option>
                             </select>
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1 text-left">Empresa de Envío</label>
-                            <select id="ocrCarrierSelect" className="w-full bg-slate-900 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] cursor-pointer">
+                            <label htmlFor="ocrCarrierSelect" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1 text-left">Empresa de Envío</label>
+                            <select id="ocrCarrierSelect" className="w-full bg-slate-900 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-brand-teal cursor-pointer">
                                 <option value="Starken">Starken (Turbus)</option>
                                 <option value="Chilexpress">Chilexpress</option>
                                 <option value="CorreosChile">Correos de Chile</option>
@@ -102,7 +102,7 @@ export default function TiOcrSimulator({
                                     alert("OCR exitoso: Se registró el paquete " + randTracking + " de " + carrier + " para " + dept + ".");
                                 }, 1500);
                             }}
-                            className="w-full py-2.5 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
+                            className="w-full py-2.5 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
                         >
                             <span>📷 Simular Escaneo OCR</span>
                         </button>
@@ -130,7 +130,7 @@ export default function TiOcrSimulator({
                                 {packages.map((pkg) => (
                                     <tr key={pkg.id} className="hover:bg-slate-900/50">
                                         <td className="p-3 font-bold text-slate-200 text-left">{pkg.id}</td>
-                                        <td className="p-3 font-mono text-[#00A896] text-left">{pkg.tracking}</td>
+                                        <td className="p-3 font-mono text-brand-teal text-left">{pkg.tracking}</td>
                                         <td className="p-3 text-left">{pkg.carrier}</td>
                                         <td className="p-3 font-bold text-slate-100 text-left">{pkg.resident}</td>
                                         <td className="p-3 font-mono text-left">{pkg.property}</td>

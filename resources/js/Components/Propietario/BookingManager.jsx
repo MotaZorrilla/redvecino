@@ -14,6 +14,7 @@ export default function BookingManager({
     setShowMorosidadModal
 }) {
     const selectedAmenityObj = amenities.find(a => a.id === bookingAmenity) || amenities[0];
+    const [showBookingSuccess, setShowBookingSuccess] = useState(false);
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 text-left">
@@ -40,7 +41,7 @@ export default function BookingManager({
                         </button>
                     </div>
                 ) : (
-                    <form onSubmit={submitBooking} className="space-y-4">
+                    <form onSubmit={(e) => { submitBooking(e); setShowBookingSuccess(true); setTimeout(() => setShowBookingSuccess(false), 3000); }} className="space-y-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-1">
                                 <label className="text-[9px] text-slate-400 dark:text-slate-500 uppercase font-extrabold block">Selecciona el Área Común</label>
@@ -98,11 +99,18 @@ export default function BookingManager({
 
                         <button
                             type="submit"
-                            className="w-full py-2.5 bg-[#72B043] hover:bg-[#629b37] text-white text-xs font-bold rounded-xl shadow-md transition-colors"
+                            className="w-full py-2.5 bg-brand-green hover:bg-brand-green-dark text-white text-xs font-bold rounded-xl shadow-md transition-colors"
                         >
                             Enviar Solicitud de Reserva
                         </button>
                     </form>
+                )}
+
+                {showBookingSuccess && (
+                    <div className="fixed bottom-6 right-6 z-[200] bg-emerald-500 text-white px-5 py-3 rounded-2xl shadow-2xl text-xs font-bold flex items-center gap-2 animate-scale-up">
+                        <span>✅</span>
+                        <span>¡Reserva enviada con éxito!</span>
+                    </div>
                 )}
             </div>
 

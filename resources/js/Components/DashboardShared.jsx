@@ -3,35 +3,35 @@ import { Link, usePage } from '@inertiajs/react';
 export function StatCard({ title, value, icon, description, color = 'indigo', onClick }) {
     const colors = {
         indigo: {
-            bg: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400 dark:border dark:border-indigo-500/20',
-            text: 'text-indigo-600 dark:text-indigo-400'
+            bg: 'bg-brand-navy/10 text-brand-navy dark:bg-brand-navy/30 dark:text-brand-navy dark:border dark:border-brand-navy/20',
+            text: 'text-brand-navy dark:text-brand-navy'
         },
         emerald: {
-            bg: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border dark:border-emerald-500/20',
-            text: 'text-emerald-600 dark:text-emerald-400'
+            bg: 'bg-brand-green/10 text-brand-green dark:bg-brand-green/30 dark:text-brand-green dark:border dark:border-brand-green/20',
+            text: 'text-brand-green dark:text-brand-green'
         },
         amber: {
-            bg: 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 dark:border dark:border-amber-500/20',
-            text: 'text-amber-600 dark:text-amber-400'
+            bg: 'bg-brand-orange/10 text-brand-orange dark:bg-brand-orange/30 dark:text-brand-orange dark:border dark:border-brand-orange/20',
+            text: 'text-brand-orange dark:text-brand-orange'
         },
         rose: {
-            bg: 'bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400 dark:border dark:border-rose-500/20',
-            text: 'text-rose-600 dark:text-rose-400'
+            bg: 'bg-brand-error/10 text-brand-error dark:bg-brand-error/30 dark:text-brand-error dark:border dark:border-brand-error/20',
+            text: 'text-brand-error dark:text-brand-error'
         },
         violet: {
-            bg: 'bg-violet-50 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400 dark:border dark:border-violet-500/20',
-            text: 'text-violet-600 dark:text-violet-400'
+            bg: 'bg-brand-purple/10 text-brand-purple dark:bg-brand-purple/30 dark:text-brand-purple dark:border dark:border-brand-purple/20',
+            text: 'text-brand-purple dark:text-brand-purple'
         },
         cyan: {
-            bg: 'bg-cyan-50 text-cyan-600 dark:bg-cyan-950/40 dark:text-cyan-400 dark:border dark:border-cyan-500/20',
-            text: 'text-cyan-600 dark:text-cyan-400'
+            bg: 'bg-brand-teal/10 text-brand-teal dark:bg-brand-teal/30 dark:text-brand-teal dark:border dark:border-brand-teal/20',
+            text: 'text-brand-teal dark:text-brand-teal'
         },
     };
 
     const activeColor = colors[color] || colors.indigo;
 
     return (
-        <div className={`relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm border border-gray-100 dark:border-slate-800/80 hover:shadow-md transition-all duration-200 ${onClick ? 'cursor-pointer hover:border-[#00A896]/60 hover:bg-slate-50/50 dark:hover:bg-slate-800/10 active:scale-98' : ''}`} onClick={onClick}>
+        <div className={`relative overflow-hidden rounded-card bg-white dark:bg-slate-900 p-6 shadow-sm border border-gray-100 dark:border-slate-800/80 hover:shadow-md transition-all duration-200 ${onClick ? 'cursor-pointer hover:border-brand-teal/60 hover:bg-slate-50/50 dark:hover:bg-slate-800/10 active:scale-98' : ''}`} onClick={onClick}>
             <div className="flex items-start justify-between">
                 <div>
                     <p className="text-sm font-medium text-gray-500 dark:text-slate-400">{title}</p>
@@ -51,11 +51,11 @@ export function StatCard({ title, value, icon, description, color = 'indigo', on
 export function Badge({ children, variant = 'default' }) {
     const variants = {
         default: 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-300 dark:border dark:border-slate-700/60',
-        success: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-500 dark:border dark:border-emerald-500/20',
-        warning: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 dark:border dark:border-amber-500/20',
-        danger: 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 dark:border dark:border-rose-500/20',
-        info: 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 dark:border dark:border-blue-500/20',
-        purple: 'bg-violet-100 text-violet-700 dark:bg-violet-950/40 dark:text-violet-400 dark:border dark:border-violet-500/20',
+        success: 'bg-brand-green/10 text-brand-green dark:bg-brand-green/30 dark:text-brand-green dark:border dark:border-brand-green/20',
+        warning: 'bg-brand-orange/10 text-brand-orange dark:bg-brand-orange/30 dark:text-brand-orange dark:border dark:border-brand-orange/20',
+        danger: 'bg-brand-error/10 text-brand-error dark:bg-brand-error/30 dark:text-brand-error dark:border dark:border-brand-error/20',
+        info: 'bg-brand-info/10 text-brand-info dark:bg-brand-info/30 dark:text-brand-info dark:border dark:border-brand-info/20',
+        purple: 'bg-brand-purple/10 text-brand-purple dark:bg-brand-purple/30 dark:text-brand-purple dark:border dark:border-brand-purple/20',
     };
 
     return (
@@ -112,7 +112,7 @@ export function StatRow({ label, value, icon }) {
 
 export function SectionCard({ title, link, children, emptyMessage = 'No hay datos disponibles' }) {
     return (
-        <div className="rounded-2xl bg-white dark:bg-slate-900 shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
+        <div className="rounded-card bg-white dark:bg-slate-900 shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-slate-800">
                 <h3 className="text-base font-semibold text-gray-900 dark:text-white">{title}</h3>
                 {link && (
@@ -173,7 +173,7 @@ export function RoleTransitionLoader({ user, fadeOut }) {
     );
 
     return (
-        <div className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-all duration-500 ease-in-out ${
+        <div className={`fixed inset-0 z-modal-backdrop flex flex-col items-center justify-center transition-all duration-500 ease-in-out ${
             fadeOut ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'
         } ${
             isAdminSide 

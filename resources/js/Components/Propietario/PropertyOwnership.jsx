@@ -64,7 +64,7 @@ export default function PropertyOwnership() {
                                     </div>
                                     <div className="flex justify-between py-2">
                                         <span className="text-slate-400 dark:text-slate-500">Residente / Ocupante:</span>
-                                        <span className="font-semibold text-gray-800 dark:text-slate-200 truncate max-w-[150px]">{p.resident}</span>
+                                        <span className="font-semibold text-gray-800 dark:text-slate-200 truncate max-w-full">{p.resident}</span>
                                     </div>
                                 </div>
                             </div>

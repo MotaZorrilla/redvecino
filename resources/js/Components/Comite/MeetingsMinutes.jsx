@@ -34,7 +34,7 @@ export default function MeetingsMinutes({ adminCondoId }) {
                 </div>
                 <button
                     onClick={() => setShowAddForm(!showAddForm)}
-                    className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all"
+                    className="px-3.5 py-1.5 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow transition-all"
                 >
                     {showAddForm ? 'Cerrar Form' : 'Subir Acta Firmada'}
                 </button>
@@ -45,8 +45,9 @@ export default function MeetingsMinutes({ adminCondoId }) {
                     <h5 className="text-xs font-bold text-gray-800 dark:text-slate-200 uppercase">📄 Registrar Acta de Asamblea</h5>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Título de Asamblea</label>
+                            <label htmlFor="minuteTitle" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Título de Asamblea</label>
                             <input
+                                id="minuteTitle"
                                 type="text"
                                 required
                                 value={newMinute.title}
@@ -56,8 +57,9 @@ export default function MeetingsMinutes({ adminCondoId }) {
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Fecha</label>
+                            <label htmlFor="minuteDate" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Fecha</label>
                             <input
+                                id="minuteDate"
                                 type="date"
                                 required
                                 value={newMinute.date}
@@ -68,8 +70,9 @@ export default function MeetingsMinutes({ adminCondoId }) {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Quorum (%)</label>
+                            <label htmlFor="minuteQuorum" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Quorum (%)</label>
                             <input
+                                id="minuteQuorum"
                                 type="text"
                                 required
                                 value={newMinute.quorum}
@@ -79,8 +82,9 @@ export default function MeetingsMinutes({ adminCondoId }) {
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado Firma</label>
+                            <label htmlFor="minuteStatus" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado Firma</label>
                             <select
+                                id="minuteStatus"
                                 value={newMinute.status}
                                 onChange={(e) => setNewMinute(prev => ({ ...prev, status: e.target.value }))}
                                 className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
@@ -91,18 +95,19 @@ export default function MeetingsMinutes({ adminCondoId }) {
                         </div>
                     </div>
                     <div>
-                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Decisiones / Resoluciones Principales</label>
-                        <textarea
-                            required
-                            rows="3"
-                            value={newMinute.decisions}
+                            <label htmlFor="minuteDecisions" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Decisiones / Resoluciones Principales</label>
+                            <textarea
+                                id="minuteDecisions"
+                                required
+                                rows="3"
+                                value={newMinute.decisions}
                             onChange={(e) => setNewMinute(prev => ({ ...prev, decisions: e.target.value }))}
                             className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
                             placeholder="Describa los puntos aprobados y resoluciones..."
                         />
                     </div>
                     <div className="flex gap-2">
-                        <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow">
+                        <button type="submit" className="px-4 py-2 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow">
                             Registrar Acta
                         </button>
                         <button type="button" onClick={() => setShowAddForm(false)} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl">
@@ -133,7 +138,7 @@ export default function MeetingsMinutes({ adminCondoId }) {
                             <div className="flex items-center gap-2" key={`act-${m.id}`}>
                                 <button
                                     onClick={() => alert(`Descargando acta oficial en PDF: ${m.title}`)}
-                                    className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-indigo-200 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-lg transition-all"
+                                    className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-brand-teal/30 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-lg transition-all"
                                 >
                                     📥 PDF
                                 </button>

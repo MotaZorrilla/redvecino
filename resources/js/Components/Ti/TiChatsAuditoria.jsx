@@ -38,7 +38,7 @@ export default function TiChatsAuditoria({
                             </div>
                             <div className="text-right shrink-0">
                                 <span className="text-[9px] font-mono text-slate-600 block">{ch.depto}</span>
-                                {ch.count > 0 && <span className="inline-block px-1.5 py-0.5 bg-[#00A896] text-white text-[8px] font-black rounded-full mt-1.5">NUEVO</span>}
+                                {ch.count > 0 && <span className="inline-block px-1.5 py-0.5 bg-brand-teal text-white text-[8px] font-black rounded-full mt-1.5">NUEVO</span>}
                             </div>
                         </button>
                     ))}
@@ -55,7 +55,7 @@ export default function TiChatsAuditoria({
                                     <div key={m.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                                         <div className={`p-3 rounded-2xl max-w-[70%] text-xs ${
                                             isMe
-                                                ? 'bg-[#00A896]/15 border border-[#00A896]/30 text-white rounded-br-none'
+                                                ? 'bg-brand-teal/15 border border-brand-teal/30 text-white rounded-br-none'
                                                 : 'bg-slate-900/80 border border-slate-800 text-slate-200 rounded-bl-none'
                                         }`}>
                                             <p className="font-bold text-[9px] text-slate-400 mb-1">{m.sender_name}</p>
@@ -91,11 +91,11 @@ export default function TiChatsAuditoria({
                             value={chatAuditReply}
                             onChange={(e) => setChatAuditReply(e.target.value)}
                             placeholder={`Responder oficialmente a ${selectedAuditChat}...`}
-                            className="flex-1 bg-slate-900 border border-slate-800 rounded-xl text-xs px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-[#00A896]"
+                            className="flex-1 bg-slate-900 border border-slate-800 rounded-xl text-xs px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-brand-teal"
                         />
                         <button
                             type="submit"
-                            className="px-4 py-2 bg-[#00A896] hover:bg-[#00A896]/85 text-white font-bold text-xs rounded-xl shadow transition-all shrink-0"
+                            className="px-4 py-2 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow transition-all shrink-0"
                         >
                             Enviar
                         </button>

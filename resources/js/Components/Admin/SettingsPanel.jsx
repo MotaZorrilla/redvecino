@@ -36,8 +36,9 @@ export default function SettingsPanel({
                     }
                 }} className="space-y-3">
                     <div>
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Nombre Completo</label>
+                        <label htmlFor="settings-name" className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Nombre Completo</label>
                         <input
+                            id="settings-name"
                             type="text"
                             value={adminSettingsForm.name}
                             onChange={e => setAdminSettingsForm(prev => ({ ...prev, name: e.target.value }))}
@@ -46,8 +47,9 @@ export default function SettingsPanel({
                         />
                     </div>
                     <div>
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Correo Electrónico</label>
+                        <label htmlFor="settings-email" className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Correo Electrónico</label>
                         <input
+                            id="settings-email"
                             type="email"
                             value={adminSettingsForm.email}
                             onChange={e => setAdminSettingsForm(prev => ({ ...prev, email: e.target.value }))}
@@ -57,8 +59,9 @@ export default function SettingsPanel({
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Teléfono</label>
+                            <label htmlFor="settings-phone" className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Teléfono</label>
                             <input
+                                id="settings-phone"
                                 type="text"
                                 value={adminSettingsForm.phone}
                                 onChange={e => setAdminSettingsForm(prev => ({ ...prev, phone: e.target.value }))}
@@ -66,8 +69,9 @@ export default function SettingsPanel({
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">RUT</label>
+                            <label htmlFor="settings-rut" className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">RUT</label>
                             <input
+                                id="settings-rut"
                                 type="text"
                                 value={adminSettingsForm.rut}
                                 onChange={e => setAdminSettingsForm(prev => ({ ...prev, rut: e.target.value }))}
@@ -78,7 +82,7 @@ export default function SettingsPanel({
                     </div>
                     <button
                         type="submit"
-                        className="w-full mt-2 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition-all border border-transparent"
+                        className="w-full mt-2 py-2 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow-md transition-all border border-transparent"
                     >
                         Guardar Cambios
                     </button>
@@ -108,7 +112,7 @@ export default function SettingsPanel({
                                     onChange={e => setAdminSettingsForm(prev => ({ ...prev, notificationToggle: e.target.checked }))}
                                     className="sr-only peer"
                                 />
-                                <div className="w-9 h-5 bg-gray-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                                <div className="w-9 h-5 bg-gray-200 dark:bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-teal"></div>
                             </label>
                         </div>
 
@@ -156,7 +160,7 @@ export default function SettingsPanel({
                             }, 1000);
                         }}
                         disabled={exportingLogs}
-                        className={`w-full py-2 ${exportingLogs ? 'bg-indigo-600/40 text-slate-400 cursor-not-allowed' : 'bg-slate-900 hover:bg-slate-800 text-white'} border border-slate-700 font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2`}
+                        className={`w-full py-2 ${exportingLogs ? 'bg-brand-teal/40 text-slate-400 cursor-not-allowed' : 'bg-slate-900 hover:bg-slate-800 text-white'} border border-slate-700 font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2`}
                     >
                         {exportingLogs ? (
                             <>

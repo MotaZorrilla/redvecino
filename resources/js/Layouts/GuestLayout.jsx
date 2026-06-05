@@ -16,7 +16,7 @@ export default function GuestLayout({ children }) {
     }, []);
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 p-4 transition-colors duration-300 relative overflow-hidden">
+        <main className="flex min-h-screen flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 p-4 transition-colors duration-300 relative overflow-hidden">
             {/* Elegant glassmorphic background decoration meshes */}
             <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none -z-10" />
             <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-violet-500/5 dark:bg-violet-500/10 rounded-full blur-[120px] pointer-events-none -z-10" />
@@ -36,6 +36,6 @@ export default function GuestLayout({ children }) {
                     {children}
                 </div>
             </div>
-        </div>
+        </main>
     );
 }

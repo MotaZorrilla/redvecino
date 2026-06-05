@@ -46,7 +46,7 @@ class AccountStatementSecurityTest extends TestCase
     public function test_unauthenticated_cannot_access_account_statement(): void
     {
         $targetUser = User::first();
-        $response = $this->getJson("/api/account-statement/{$targetUser->id}");
+        $response = $this->getJson("/api/users/{$targetUser->id}/account-statement");
         $response->assertStatus(401);
     }
 
@@ -58,7 +58,7 @@ class AccountStatementSecurityTest extends TestCase
         $resident = $this->getUserByRole('Residente');
         $otherUser = User::where('id', '!=', $resident->id)->first();
 
-        $response = $this->actingAs($resident)->getJson("/api/account-statement/{$otherUser->id}");
+        $response = $this->actingAs($resident)->getJson("/api/users/{$otherUser->id}/account-statement");
         $response->assertStatus(403);
     }
 
@@ -70,7 +70,7 @@ class AccountStatementSecurityTest extends TestCase
         $propietario = $this->getUserByRole('Propietario');
         $otherUser = User::where('id', '!=', $propietario->id)->first();
 
-        $response = $this->actingAs($propietario)->getJson("/api/account-statement/{$otherUser->id}");
+        $response = $this->actingAs($propietario)->getJson("/api/users/{$otherUser->id}/account-statement");
         $response->assertStatus(403);
     }
 
@@ -82,7 +82,7 @@ class AccountStatementSecurityTest extends TestCase
         $colaborador = $this->getUserByRole('Colaborador');
         $otherUser = User::where('id', '!=', $colaborador->id)->first();
 
-        $response = $this->actingAs($colaborador)->getJson("/api/account-statement/{$otherUser->id}");
+        $response = $this->actingAs($colaborador)->getJson("/api/users/{$otherUser->id}/account-statement");
         $response->assertStatus(403);
     }
 
@@ -97,7 +97,7 @@ class AccountStatementSecurityTest extends TestCase
     {
         $resident = $this->getUserByRole('Residente');
 
-        $response = $this->actingAs($resident)->getJson("/api/account-statement/{$resident->id}");
+        $response = $this->actingAs($resident)->getJson("/api/users/{$resident->id}/account-statement");
         
         $response->assertStatus(200);
         $response->assertJsonStructure([
@@ -116,7 +116,7 @@ class AccountStatementSecurityTest extends TestCase
         $admin = $this->getUserByRole('Administrador');
         $targetUser = $this->getUserByRole('Residente');
 
-        $response = $this->actingAs($admin)->getJson("/api/account-statement/{$targetUser->id}");
+        $response = $this->actingAs($admin)->getJson("/api/users/{$targetUser->id}/account-statement");
         
         $response->assertStatus(200);
         $response->assertJsonPath('user.id', $targetUser->id);
@@ -130,7 +130,7 @@ class AccountStatementSecurityTest extends TestCase
         $committee = $this->getUserByRole('Comité');
         $targetUser = $this->getUserByRole('Residente');
 
-        $response = $this->actingAs($committee)->getJson("/api/account-statement/{$targetUser->id}");
+        $response = $this->actingAs($committee)->getJson("/api/users/{$targetUser->id}/account-statement");
         
         $response->assertStatus(200);
         $response->assertJsonPath('user.id', $targetUser->id);

@@ -54,7 +54,7 @@ export default function TiFinancesRecaudacion({
                 </h4>
                 <button
                     onClick={() => setShowAddPaymentForm(!showAddPaymentForm)}
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0"
+                    className="px-4 py-2 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0"
                 >
                     {showAddPaymentForm ? 'Cerrar Formulario' : 'Registrar Pago'}
                 </button>
@@ -80,41 +80,44 @@ export default function TiFinancesRecaudacion({
                 }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl">
                     <h5 className="text-xs font-bold text-slate-300 uppercase">Detalles del Pago</h5>
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto ($)</label>
-                            <input
-                                type="number"
-                                required
-                                value={newPaymentForm.amount}
-                                onChange={(e) => setNewPaymentForm(prev => ({ ...prev, amount: e.target.value }))}
-                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
-                            />
-                        </div>
-                        <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Departamento</label>
-                            <input
-                                type="text"
-                                required
-                                placeholder="Ej: 202"
-                                value={newPaymentForm.property_id}
-                                onChange={(e) => setNewPaymentForm(prev => ({ ...prev, property_id: e.target.value }))}
-                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
-                            />
+                    <div>
+                        <label htmlFor="fr-amount" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto ($)</label>
+                        <input
+                            id="fr-amount"
+                            type="number"
+                            required
+                            value={newPaymentForm.amount}
+                            onChange={(e) => setNewPaymentForm(prev => ({ ...prev, amount: e.target.value }))}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-brand-teal"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="fr-depto" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Departamento</label>
+                        <input
+                            id="fr-depto"
+                            type="text"
+                            required
+                            placeholder="Ej: 202"
+                            value={newPaymentForm.property_id}
+                            onChange={(e) => setNewPaymentForm(prev => ({ ...prev, property_id: e.target.value }))}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-brand-teal"
+                        />
                         </div>
                     </div>
                     <div>
-                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Método de Pago</label>
+                        <label htmlFor="fr-method" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Método de Pago</label>
                         <select
+                            id="fr-method"
                             value={newPaymentForm.payment_method}
                             onChange={(e) => setNewPaymentForm(prev => ({ ...prev, payment_method: e.target.value }))}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-brand-teal cursor-pointer"
                         >
                             <option value="transfer">Transferencia</option>
                             <option value="card">Tarjeta Crédito/Débito</option>
                             <option value="cash">Efectivo</option>
                         </select>
                     </div>
-                    <button type="submit" className="px-4 py-2 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-bold text-xs rounded-xl shadow-md">
+                    <button type="submit" className="px-4 py-2 bg-brand-teal text-white font-bold text-xs rounded-xl shadow-md">
                         Registrar Pago
                     </button>
                 </form>

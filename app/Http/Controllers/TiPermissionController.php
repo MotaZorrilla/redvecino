@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Exceptions\RoleDoesNotExist;
 use Spatie\Permission\PermissionRegistrar;
 
 class TiPermissionController extends Controller
@@ -33,7 +34,11 @@ class TiPermissionController extends Controller
             'permission' => 'required|string',
         ]);
 
-        $role = Role::findByName($request->role, 'web');
+        try {
+            $role = Role::findByName($request->role, 'web');
+        } catch (RoleDoesNotExist $e) {
+            return response()->json(['error' => "Rol '{$request->role}' no encontrado."], 404);
+        }
         $permission = Permission::findOrCreate($request->permission, 'web');
 
         if ($role->hasPermissionTo($permission)) {

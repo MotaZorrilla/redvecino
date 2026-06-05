@@ -55,7 +55,7 @@ export default function CondosManagement({
                         setNewCondoForm({ name: '', address: '', city: '', units_count: '' });
                         setShowAddCondoForm(!showAddCondoForm);
                     }}
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0"
+                    className="px-4 py-2 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0"
                 >
                     {showAddCondoForm ? 'Cerrar Formulario' : 'Crear Condominio'}
                 </button>
@@ -91,51 +91,55 @@ export default function CondosManagement({
                 }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl">
                     <h5 className="text-xs font-bold text-slate-300 uppercase">{editingCondo ? 'Editar Condominio' : 'Detalles del Condominio'}</h5>
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre</label>
-                            <input
-                                type="text"
-                                required
-                                value={newCondoForm.name}
-                                onChange={(e) => setNewCondoForm(prev => ({ ...prev, name: e.target.value }))}
-                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
-                            />
-                        </div>
-                        <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Dirección</label>
-                            <input
-                                type="text"
-                                required
-                                value={newCondoForm.address}
-                                onChange={(e) => setNewCondoForm(prev => ({ ...prev, address: e.target.value }))}
-                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
-                            />
+                    <div>
+                        <label htmlFor="condo-name" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre</label>
+                        <input
+                            id="condo-name"
+                            type="text"
+                            required
+                            value={newCondoForm.name}
+                            onChange={(e) => setNewCondoForm(prev => ({ ...prev, name: e.target.value }))}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-brand-teal"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="condo-address" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Dirección</label>
+                        <input
+                            id="condo-address"
+                            type="text"
+                            required
+                            value={newCondoForm.address}
+                            onChange={(e) => setNewCondoForm(prev => ({ ...prev, address: e.target.value }))}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-brand-teal"
+                        />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Ciudad</label>
-                            <input
-                                type="text"
-                                required
-                                value={newCondoForm.city}
-                                onChange={(e) => setNewCondoForm(prev => ({ ...prev, city: e.target.value }))}
-                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
-                            />
-                        </div>
-                        <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Número de Unidades</label>
-                            <input
-                                type="number"
-                                required
-                                value={newCondoForm.units_count}
-                                onChange={(e) => setNewCondoForm(prev => ({ ...prev, units_count: e.target.value }))}
-                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
-                            />
+                    <div>
+                        <label htmlFor="condo-city" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Ciudad</label>
+                        <input
+                            id="condo-city"
+                            type="text"
+                            required
+                            value={newCondoForm.city}
+                            onChange={(e) => setNewCondoForm(prev => ({ ...prev, city: e.target.value }))}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-brand-teal"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="condo-units" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Número de Unidades</label>
+                        <input
+                            id="condo-units"
+                            type="number"
+                            required
+                            value={newCondoForm.units_count}
+                            onChange={(e) => setNewCondoForm(prev => ({ ...prev, units_count: e.target.value }))}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-brand-teal"
+                        />
                         </div>
                     </div>
                     <div className="flex gap-2">
-                        <button type="submit" className="px-4 py-2 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-bold text-xs rounded-xl shadow-md">
+                        <button type="submit" className="px-4 py-2 bg-brand-teal text-white font-bold text-xs rounded-xl shadow-md">
                             {editingCondo ? 'Actualizar Condominio' : 'Guardar Condominio'}
                         </button>
                         {editingCondo && (

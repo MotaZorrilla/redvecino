@@ -1506,6 +1506,6 @@ En `bootstrap/app.php`, el middleware se configura mediante métodos fluidos, no
 ---
 
 **Fecha de creación:** Mayo 2026
-**Última actualización:** 5 de Junio de 2026 (Auditoría Backend 13 hallazgos, Backend Architecture Standards v1, CORS, Sanctum, Policies, Services, Factories)
-**Versión:** 8.0 (Full Backend Audit, Security Hardening, Service Layer, Backend Standards & Certified QA)
-**Estado:** Listo para desarrollo (Con base de datos en SQLite/MySQL, suite de pruebas automatizadas, especificación de alta fidelidad PropTech, catálogo de cuentas base, maquetación premium widescreen, frontend auditado y backend endurecido)
+**Última actualización:** 5 de Junio de 2026 (QA Audit + Hotfixes — 179 tests, 0 fallas, 2 errores runtime corregidos)
+**Versión:** 9.0 (Full Frontend UX/UI Audit, Backend Audit, QA Audit, Runtime Hotfixes)
+**Estado:** Listo para desarrollo (Suite completa: 179 tests verdes, 0 errores build, frontend auditado, backend endurecido, QA certificado)

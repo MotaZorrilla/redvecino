@@ -12,7 +12,7 @@ export default function AdminDashboard({
     user, condosList, adminCondoId, setAdminCondoId, adminActiveTab, setAdminActiveTab,
     isMobileSidebarOpen, setIsMobileSidebarOpen, adminSettingsForm, toggleTheme, darkMode,
     adminFilteredProperties, adminFilteredUsers, adminFilteredTickets, adminFilteredPayments,
-    adminFilteredFines, setTicketStatusFilter, setTicketPriorityFilter, setEditingTicket,
+    adminFilteredFines, setTicketStatusFilter, setTicketPriorityFilter, editingTicket, setEditingTicket,
     showAddPropForm, setShowAddPropForm, editingProp, setEditingProp, newPropForm, setNewPropForm,
     propertiesList, setPropertiesList, userSubTab, setUserSubTab, showAddUserForm, setShowAddUserForm,
     editingUser, setEditingUser, newUserForm, setNewUserForm, usersList, setUsersList,

@@ -40,7 +40,7 @@ export default function VisitorAccess({ adminCondoId }) {
                 </div>
                 <button
                     onClick={() => setShowAddForm(!showAddForm)}
-                    className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all"
+                    className="px-3.5 py-1.5 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow transition-all"
                 >
                     {showAddForm ? 'Cerrar Form' : 'Registrar Ingreso'}
                 </button>
@@ -51,8 +51,9 @@ export default function VisitorAccess({ adminCondoId }) {
                     <h5 className="text-xs font-bold text-gray-800 dark:text-slate-200 uppercase">👮 Registrar Visita</h5>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre Completo</label>
+                            <label htmlFor="visitorName" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre Completo</label>
                             <input
+                                id="visitorName"
                                 type="text"
                                 required
                                 value={newVisitor.name}
@@ -61,8 +62,9 @@ export default function VisitorAccess({ adminCondoId }) {
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">RUT / Identificación</label>
+                            <label htmlFor="visitorRut" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">RUT / Identificación</label>
                             <input
+                                id="visitorRut"
                                 type="text"
                                 required
                                 value={newVisitor.rut}
@@ -73,8 +75,9 @@ export default function VisitorAccess({ adminCondoId }) {
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Unidad Destino</label>
+                            <label htmlFor="visitorDest" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Unidad Destino</label>
                             <select
+                                id="visitorDest"
                                 value={newVisitor.dest}
                                 onChange={(e) => setNewVisitor(prev => ({ ...prev, dest: e.target.value }))}
                                 className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
@@ -85,8 +88,9 @@ export default function VisitorAccess({ adminCondoId }) {
                             </select>
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Patente (Opcional)</label>
+                            <label htmlFor="visitorPlate" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Patente (Opcional)</label>
                             <input
+                                id="visitorPlate"
                                 type="text"
                                 value={newVisitor.plate}
                                 onChange={(e) => setNewVisitor(prev => ({ ...prev, plate: e.target.value }))}
@@ -95,8 +99,9 @@ export default function VisitorAccess({ adminCondoId }) {
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Hora Ingreso</label>
+                            <label htmlFor="visitorEntryTime" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Hora Ingreso</label>
                             <input
+                                id="visitorEntryTime"
                                 type="text"
                                 value={newVisitor.entryTime}
                                 onChange={(e) => setNewVisitor(prev => ({ ...prev, entryTime: e.target.value }))}
@@ -106,7 +111,7 @@ export default function VisitorAccess({ adminCondoId }) {
                         </div>
                     </div>
                     <div className="flex gap-2">
-                        <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow">
+                        <button type="submit" className="px-4 py-2 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow">
                             Registrar Ingreso
                         </button>
                         <button type="button" onClick={() => setShowAddForm(false)} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl">

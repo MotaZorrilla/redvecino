@@ -181,4 +181,24 @@ class FinanzasLifecycleTest extends TestCase
         $response = $this->actingAs($resident)->putJson("/api/payments/{$payment->id}/reconcile");
         $response->assertStatus(403);
     }
+
+    public function test_comite_can_create_common_expense(): void
+    {
+        $comite = $this->getUserByRole('Comité');
+        $property = Property::first();
+
+        $response = $this->actingAs($comite)->postJson('/api/expenses', [
+            'condominium_id' => $property->condominium_id,
+            'period' => 'Julio 2026',
+            'amount' => 200000,
+            'description' => 'Gasto común generado por Comité.',
+            'due_date' => '2026-08-05',
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('common_expenses', [
+            'period' => 'Julio 2026',
+            'amount' => 200000,
+        ]);
+    }
 }

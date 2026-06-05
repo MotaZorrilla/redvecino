@@ -28,7 +28,7 @@ export default function GlobalUsersTable({
                             setNewUserForm({ name: '', rut: '', email: '', phone: '', role: 'resident', status: 'active', password: generatePassword() });
                             setShowAddUserForm(!showAddUserForm);
                         }}
-                        className="px-4 py-2 bg-indigo-600 hover:bg-[#00A896] text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0"
+                        className="px-4 py-2 bg-brand-teal text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0"
                     >
                         {showAddUserForm ? 'Cerrar Form' : 'Crear Usuario'}
                     </button>
@@ -37,12 +37,12 @@ export default function GlobalUsersTable({
                         value={searchUserQuery}
                         onChange={(e) => setSearchUserQuery(e.target.value)}
                         placeholder="Buscar por Nombre, RUT..."
-                        className="px-4 py-2 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#00A896] w-full md:w-64"
+                        className="px-4 py-2 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:border-brand-teal w-full md:w-64"
                     />
                     <select
                         value={roleUserFilter}
                         onChange={(e) => setRoleUserFilter(e.target.value)}
-                        className="px-4 py-2 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl text-xs text-slate-800 dark:text-white focus:outline-none focus:border-[#00A896]"
+                        className="px-4 py-2 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl text-xs text-slate-800 dark:text-white focus:outline-none focus:border-brand-teal"
                     >
                         <option value="all" className="bg-white dark:bg-slate-900 text-slate-800 dark:text-white">Todos los Roles</option>
                         <option value="ti" className="bg-white dark:bg-slate-900 text-slate-800 dark:text-white">TI</option>
@@ -89,80 +89,86 @@ export default function GlobalUsersTable({
                 }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl text-left mb-6">
                     <h5 className="text-xs font-bold text-slate-300 uppercase">{editingUser ? '✏️ Editar Usuario' : 'Detalles del Usuario'}</h5>
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre completo</label>
-                            <input
-                                type="text"
-                                required
-                                value={newUserForm.name}
-                                onChange={(e) => setNewUserForm(prev => ({ ...prev, name: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-950 border border-gray-250 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-[#00A896]"
-                            />
-                        </div>
-                        <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">RUT / Identificación</label>
-                            <input
-                                type="text"
-                                required
-                                value={newUserForm.rut}
-                                onChange={(e) => setNewUserForm(prev => ({ ...prev, rut: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-950 border border-gray-250 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-[#00A896]"
-                            />
+                    <div>
+                        <label htmlFor="gu-name" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre completo</label>
+                        <input
+                            id="gu-name"
+                            type="text"
+                            required
+                            value={newUserForm.name}
+                            onChange={(e) => setNewUserForm(prev => ({ ...prev, name: e.target.value }))}
+                            className="w-full bg-white dark:bg-slate-950 border border-gray-250 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-brand-teal"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="gu-rut" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">RUT / Identificación</label>
+                        <input
+                            id="gu-rut"
+                            type="text"
+                            required
+                            value={newUserForm.rut}
+                            onChange={(e) => setNewUserForm(prev => ({ ...prev, rut: e.target.value }))}
+                            className="w-full bg-white dark:bg-slate-950 border border-gray-250 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-brand-teal"
+                        />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Correo Electrónico</label>
-                            <input
-                                type="email"
-                                required
-                                value={newUserForm.email}
-                                onChange={(e) => setNewUserForm(prev => ({ ...prev, email: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-950 border border-gray-250 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-[#00A896]"
-                            />
-                        </div>
-                        <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Teléfono</label>
-                            <input
-                                type="text"
-                                required
-                                value={newUserForm.phone}
-                                onChange={(e) => setNewUserForm(prev => ({ ...prev, phone: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-950 border border-gray-250 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-[#00A896]"
-                            />
+                    <div>
+                        <label htmlFor="gu-email" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Correo Electrónico</label>
+                        <input
+                            id="gu-email"
+                            type="email"
+                            required
+                            value={newUserForm.email}
+                            onChange={(e) => setNewUserForm(prev => ({ ...prev, email: e.target.value }))}
+                            className="w-full bg-white dark:bg-slate-950 border border-gray-250 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-brand-teal"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="gu-phone" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Teléfono</label>
+                        <input
+                            id="gu-phone"
+                            type="text"
+                            required
+                            value={newUserForm.phone}
+                            onChange={(e) => setNewUserForm(prev => ({ ...prev, phone: e.target.value }))}
+                            className="w-full bg-white dark:bg-slate-950 border border-gray-250 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-brand-teal"
+                        />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Rol</label>
-                            <select
-                                value={newUserForm.role}
-                                onChange={(e) => setNewUserForm(prev => ({ ...prev, role: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-850 dark:text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
-                            >
-                                <option value="ti" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">TI</option>
-                                <option value="super_usuario" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Súper Usuario</option>
-                                <option value="admin" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Administrador</option>
-                                <option value="resident" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Residente</option>
-                                <option value="owner" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Propietario</option>
-                                <option value="comite" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Comité</option>
-                                <option value="colaborador" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Colaborador</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado</label>
-                            <select
-                                value={newUserForm.status}
-                                onChange={(e) => setNewUserForm(prev => ({ ...prev, status: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-850 dark:text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
-                            >
-                                <option value="active" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Activo</option>
-                                <option value="inactive" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Inactivo</option>
-                                <option value="suspended" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Suspendido</option>
-                            </select>
-                        </div>
+                    <div>
+                        <label htmlFor="gu-role" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Rol</label>
+                        <select
+                            id="gu-role"
+                            value={newUserForm.role}
+                            onChange={(e) => setNewUserForm(prev => ({ ...prev, role: e.target.value }))}
+                            className="w-full bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-850 dark:text-white focus:outline-none focus:border-brand-teal cursor-pointer"
+                        >
+                            <option value="ti" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">TI</option>
+                            <option value="super_usuario" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Súper Usuario</option>
+                            <option value="admin" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Administrador</option>
+                            <option value="resident" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Residente</option>
+                            <option value="owner" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Propietario</option>
+                            <option value="comite" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Comité</option>
+                            <option value="colaborador" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Colaborador</option>
+                        </select>
                     </div>
-                    <button type="submit" className="px-4 py-2 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-bold text-xs rounded-xl shadow-md transition-all">
+                    <div>
+                        <label htmlFor="gu-status" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado</label>
+                        <select
+                            id="gu-status"
+                            value={newUserForm.status}
+                            onChange={(e) => setNewUserForm(prev => ({ ...prev, status: e.target.value }))}
+                            className="w-full bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-850 dark:text-white focus:outline-none focus:border-brand-teal cursor-pointer"
+                        >
+                            <option value="active" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Activo</option>
+                            <option value="inactive" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Inactivo</option>
+                            <option value="suspended" className="bg-white dark:bg-slate-950 text-slate-850 dark:text-white">Suspendido</option>
+                        </select>
+                    </div>
+                    </div>
+                    <button type="submit" className="px-4 py-2 bg-brand-teal text-white font-bold text-xs rounded-xl shadow-md transition-all">
                         Guardar Usuario
                     </button>
                 </form>
@@ -218,7 +224,7 @@ export default function GlobalUsersTable({
                                                         setImpersonatedUser(u);
                                                         setTerminalLogs(prev => [...prev, `[IMPERSONATION] Iniciando sesión como usuario: ${u.name}`]);
                                                     }}
-                                                    className="px-2.5 py-1 bg-[#00A896]/10 hover:bg-[#00A896]/20 border border-[#00A896]/30 text-[#00A896] text-[10px] font-bold rounded-lg transition-all"
+                                                    className="px-2.5 py-1 bg-brand-teal/10 hover:bg-brand-teal/20 border border-brand-teal/30 text-brand-teal text-[10px] font-bold rounded-lg transition-all"
                                                 >
                                                     💻 Impersonar
                                                 </button>
@@ -238,6 +244,7 @@ export default function GlobalUsersTable({
                                                         setShowAddUserForm(true);
                                                     }}
                                                     className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[10px] font-bold rounded-lg transition-all"
+                                                    aria-label="Editar usuario"
                                                 >
                                                     ✏️ Editar
                                                 </button>
@@ -249,11 +256,12 @@ export default function GlobalUsersTable({
                                                             setTerminalLogs(prev => [...prev, `[DELETE] Usuario eliminado: ${u.name} (ID: ${u.id})`]);
                                                         }
                                                     }}
-                                                    className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 text-[10px] font-bold rounded-lg transition-all"
-                                                >
-                                                    🗑️ Eliminar
-                                                </button>
-                                            </div>
+                                                className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 text-[10px] font-bold rounded-lg transition-all"
+                                                    aria-label="Eliminar usuario"
+                                            >
+                                                🗑️ Eliminar
+                                            </button>
+                                        </div>
                                         </td>
                                     </tr>
                                 ))

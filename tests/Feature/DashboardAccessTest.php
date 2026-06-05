@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
 class DashboardAccessTest extends TestCase
@@ -13,31 +14,49 @@ class DashboardAccessTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        // Sembrar roles, permisos y cuentas demo
         $this->seed();
     }
 
-    public function test_administrador_can_access_dashboard_with_finances_data(): void
+    private function getUserByRole(string $roleName): User
     {
-        $user = User::whereHas('roles', function($q) {
-            $q->where('name', 'Administrador');
+        $user = User::whereHas('roles', function ($q) use ($roleName) {
+            $q->where('name', $roleName);
         })->first();
 
-        $response = $this->actingAs($user)->get('/dashboard');
+        if (!$user) {
+            $this->fail("No user found with role: {$roleName}");
+        }
 
-        $response->assertStatus(200);
+        return $user;
     }
 
-    public function test_ti_can_access_dashboard_with_ti_roles(): void
+    public function test_administrador_can_access_dashboard(): void
     {
-        $user = User::whereHas('roles', function($q) {
-            $q->where('name', 'TI');
-        })->first();
+        $user = $this->getUserByRole('Administrador');
 
         $response = $this->actingAs($user)->get('/dashboard');
 
         $response->assertStatus(200);
-        $response->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Dashboard')
+            ->has('stats.finances')
+            ->has('allCondominiums')
+            ->has('allUsers')
+            ->has('allProperties')
+            ->has('allPayments')
+            ->has('recentTickets')
+            ->has('allMessages')
+        );
+    }
+
+    public function test_ti_can_access_dashboard(): void
+    {
+        $user = $this->getUserByRole('TI');
+
+        $response = $this->actingAs($user)->get('/dashboard');
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component('Dashboard')
             ->has('allUsers')
             ->has('allProperties')
@@ -45,47 +64,52 @@ class DashboardAccessTest extends TestCase
         );
     }
 
-    public function test_residente_can_access_dashboard_with_resident_roles(): void
+    public function test_residente_can_access_dashboard(): void
     {
-        $user = User::whereHas('roles', function($q) {
-            $q->where('name', 'Residente');
-        })->first();
+        $user = $this->getUserByRole('Residente');
 
         $response = $this->actingAs($user)->get('/dashboard');
 
         $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Dashboard')
+        );
     }
 
-    public function test_propietario_can_access_dashboard_with_owner_roles(): void
+    public function test_propietario_can_access_dashboard(): void
     {
-        $user = User::whereHas('roles', function($q) {
-            $q->where('name', 'Propietario');
-        })->first();
+        $user = $this->getUserByRole('Propietario');
 
         $response = $this->actingAs($user)->get('/dashboard');
 
         $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Dashboard')
+        );
     }
 
-    public function test_comite_can_access_dashboard_with_committee_roles(): void
+    public function test_comite_can_access_dashboard(): void
     {
-        $user = User::whereHas('roles', function($q) {
-            $q->where('name', 'Comité');
-        })->first();
+        $user = $this->getUserByRole('Comité');
 
         $response = $this->actingAs($user)->get('/dashboard');
 
         $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Dashboard')
+            ->has('stats.finances')
+        );
     }
 
-    public function test_colaborador_can_access_dashboard_with_employee_roles(): void
+    public function test_colaborador_can_access_dashboard(): void
     {
-        $user = User::whereHas('roles', function($q) {
-            $q->where('name', 'Colaborador');
-        })->first();
+        $user = $this->getUserByRole('Colaborador');
 
         $response = $this->actingAs($user)->get('/dashboard');
 
         $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Dashboard')
+        );
     }
 }

@@ -62,8 +62,8 @@ export default function ResidentOverview({
                             onClick={() => setMobileTab('pagos')}
                             className={`px-4 py-2 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-1 ${
                                 simulatedMoroso 
-                                    ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-500/10' 
-                                    : 'bg-[#72B043] hover:bg-[#629b37] shadow-[#72B043]/10 hover:shadow-[#72B043]/20'
+                                    ? 'bg-brand-error hover:bg-brand-navy-dark shadow-rose-500/10' 
+                                    : 'bg-brand-green hover:bg-brand-green-dark shadow-[#72B043]/10 hover:shadow-[#72B043]/20'
                             }`}
                         >
                             Pagar
@@ -80,8 +80,8 @@ export default function ResidentOverview({
                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 block">Tu Taller de MiVecino</span>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                     {[
-                        { tab: 'comunicados', label: 'Comunicados', color: 'bg-indigo-50/80 hover:border-indigo-500/30 text-indigo-600 border-indigo-100 dark:bg-slate-950 dark:border-slate-800 dark:text-indigo-400', icon: '📢', desc: 'Mural de circulares' },
-                        { tab: 'reservas', label: 'Reservas', color: 'bg-violet-50/80 hover:border-violet-500/30 text-violet-650 border-violet-100 dark:bg-slate-950 dark:border-slate-800 dark:text-violet-400', icon: '📅', desc: 'Quincho, piscina, gym' },
+                        { tab: 'comunicados', label: 'Comunicados', color: 'bg-indigo-50/80 hover:border-brand-teal/30 text-brand-purple border-indigo-100 dark:bg-slate-950 dark:border-slate-800 dark:text-brand-purple', icon: '📢', desc: 'Mural de circulares' },
+                        { tab: 'reservas', label: 'Reservas', color: 'bg-violet-50/80 hover:border-brand-purple/30 text-brand-purple border-violet-100 dark:bg-slate-950 dark:border-slate-800 dark:text-brand-purple', icon: '📅', desc: 'Quincho, piscina, gym' },
                         { tab: 'pagos', label: 'Pagos', color: 'bg-emerald-50/80 hover:border-emerald-500/30 text-emerald-600 border-emerald-100 dark:bg-slate-950 dark:border-slate-800 dark:text-emerald-400', icon: '💵', desc: 'Gastos y comprobantes' },
                         { tab: 'incidencias', label: 'Incidencias', color: 'bg-rose-50/80 hover:border-rose-500/30 text-rose-600 border-rose-100 dark:bg-slate-950 dark:border-slate-800 dark:text-rose-400', icon: '🛠️', desc: 'Reportar avería' },
                         { tab: 'documentos', label: 'Documentos', color: 'bg-cyan-50/80 hover:border-cyan-500/30 text-cyan-600 border-cyan-100 dark:bg-slate-950 dark:border-slate-800 dark:text-cyan-400', icon: '📄', desc: 'Reglamentos y actas' },

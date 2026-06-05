@@ -17,14 +17,14 @@ export default function ToastContainer() {
     if (toasts.length === 0) return null;
 
     return (
-        <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2 max-w-sm">
+        <div className="fixed bottom-6 right-6 z-toast flex flex-col gap-2 max-w-sm">
             {toasts.map(t => (
                 <div
                     key={t.id}
-                    className={`animate-fade-in px-4 py-3 rounded-xl shadow-xl text-sm font-bold text-white flex items-center gap-2 ${
-                        t.type === 'error' ? 'bg-rose-600' :
-                        t.type === 'warning' ? 'bg-amber-600' :
-                        'bg-emerald-600'
+                    className={`animate-fade-in px-4 py-3 rounded-modal shadow-xl text-sm font-bold text-white flex items-center gap-2 ${
+                        t.type === 'error' ? 'bg-brand-error' :
+                        t.type === 'warning' ? 'bg-brand-warning' :
+                        'bg-brand-success'
                     }`}
                     role="alert"
                 >

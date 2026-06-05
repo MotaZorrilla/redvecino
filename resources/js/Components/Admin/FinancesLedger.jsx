@@ -127,7 +127,7 @@ export default function FinancesLedger({
                                     setNewPaymentForm({ user_id: '', property_id: '', amount: '', payment_method: 'transfer', status: 'completed' });
                                     setShowAddPaymentForm(!showAddPaymentForm);
                                 }}
-                                className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all"
+                                className="px-3.5 py-1.5 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow transition-all"
                             >
                                 {showAddPaymentForm ? 'Cerrar Form' : 'Registrar Pago'}
                             </button>
@@ -139,8 +139,9 @@ export default function FinancesLedger({
                             <h5 className="text-xs font-bold text-gray-800 dark:text-slate-200 uppercase">{editingPayment ? '✏️ Editar Registro de Pago' : '💵 Registrar Nuevo Pago'}</h5>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Propiedad Asociada</label>
+                                    <label htmlFor="payment-property" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Propiedad Asociada</label>
                                     <select
+                                        id="payment-property"
                                         required
                                         value={newPaymentForm.property_id}
                                         onChange={(e) => setNewPaymentForm(prev => ({ ...prev, property_id: e.target.value }))}
@@ -153,8 +154,9 @@ export default function FinancesLedger({
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Vecino Pagador</label>
+                                    <label htmlFor="payment-user" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Vecino Pagador</label>
                                     <select
+                                        id="payment-user"
                                         required
                                         value={newPaymentForm.user_id}
                                         onChange={(e) => setNewPaymentForm(prev => ({ ...prev, user_id: e.target.value }))}
@@ -169,8 +171,9 @@ export default function FinancesLedger({
                             </div>
                             <div className="grid grid-cols-3 gap-4">
                                 <div>
-                                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto ($)</label>
+                                    <label htmlFor="payment-amount" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto ($)</label>
                                     <input
+                                        id="payment-amount"
                                         type="number"
                                         required
                                         value={newPaymentForm.amount}
@@ -179,8 +182,9 @@ export default function FinancesLedger({
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Medio de Pago</label>
+                                    <label htmlFor="payment-method" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Medio de Pago</label>
                                     <select
+                                        id="payment-method"
                                         value={newPaymentForm.payment_method}
                                         onChange={(e) => setNewPaymentForm(prev => ({ ...prev, payment_method: e.target.value }))}
                                         className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
@@ -191,8 +195,9 @@ export default function FinancesLedger({
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado Conciliación</label>
+                                    <label htmlFor="payment-status" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado Conciliación</label>
                                     <select
+                                        id="payment-status"
                                         value={newPaymentForm.status}
                                         onChange={(e) => setNewPaymentForm(prev => ({ ...prev, status: e.target.value }))}
                                         className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
@@ -204,7 +209,7 @@ export default function FinancesLedger({
                                 </div>
                             </div>
                             <div className="flex gap-2">
-                                <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow">
+                                <button type="submit" className="px-4 py-2 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow">
                                     {editingPayment ? 'Guardar Cambios' : 'Registrar'}
                                 </button>
                                 <button type="button" onClick={() => { setShowAddPaymentForm(false); setEditingPayment(null); }} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl">
@@ -228,6 +233,7 @@ export default function FinancesLedger({
                                     <button
                                         key={`doc-${p.id}`}
                                         type="button"
+                                        aria-label={`Ver aviso de cobro para pago de ${p.user?.name || 'vecino'}`}
                                         onClick={() => setSelectedAviso(p)}
                                         className="px-2.5 py-1 bg-indigo-500/10 hover:bg-indigo-500/25 border border-indigo-500/25 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-lg transition-all flex items-center gap-1 cursor-pointer"
                                     >
@@ -237,6 +243,7 @@ export default function FinancesLedger({
                                         <div className="flex items-center gap-2 justify-end" key={`act-${p.id}`}>
                                             <button
                                                 type="button"
+                                                aria-label={`Editar pago de ${p.user?.name || 'vecino'}`}
                                                 onClick={() => {
                                                     setEditingPayment(p);
                                                     setNewPaymentForm({
@@ -254,6 +261,7 @@ export default function FinancesLedger({
                                             </button>
                                             <button
                                                 type="button"
+                                                aria-label={`Eliminar pago de ${p.user?.name || 'vecino'}`}
                                                 onClick={() => {
                                                     if (confirm('¿Desea eliminar este registro de pago?')) {
                                                         setPaymentsList(prev => prev.filter(item => item.id !== p.id));
@@ -462,8 +470,9 @@ export default function FinancesLedger({
                                     
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Categoría Financiera</label>
+                                            <label htmlFor="income-category" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Categoría Financiera</label>
                                             <select
+                                                id="income-category"
                                                 required
                                                 value={newIncomeForm.category}
                                                 onChange={(e) => setNewIncomeForm(prev => ({ ...prev, category: e.target.value, subcategory: '' }))}
@@ -477,8 +486,9 @@ export default function FinancesLedger({
                                         </div>
 
                                         <div>
-                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Subcategoría Específica</label>
+                                            <label htmlFor="income-subcategory" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Subcategoría Específica</label>
                                             <select
+                                                id="income-subcategory"
                                                 required
                                                 value={newIncomeForm.subcategory}
                                                 onChange={(e) => setNewIncomeForm(prev => ({ ...prev, subcategory: e.target.value }))}
@@ -495,8 +505,9 @@ export default function FinancesLedger({
 
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div>
-                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto ($ CLP)</label>
+                                            <label htmlFor="income-amount" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto ($ CLP)</label>
                                             <input
+                                                id="income-amount"
                                                 type="number"
                                                 required
                                                 value={newIncomeForm.amount}
@@ -507,8 +518,9 @@ export default function FinancesLedger({
                                         </div>
 
                                         <div>
-                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Fecha Registro</label>
+                                            <label htmlFor="income-date" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Fecha Registro</label>
                                             <input
+                                                id="income-date"
                                                 type="date"
                                                 required
                                                 value={newIncomeForm.date}
@@ -518,8 +530,9 @@ export default function FinancesLedger({
                                         </div>
 
                                         <div>
-                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Unidad (Opcional)</label>
+                                            <label htmlFor="income-property" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Unidad (Opcional)</label>
                                             <select
+                                                id="income-property"
                                                 value={newIncomeForm.property_id}
                                                 onChange={(e) => setNewIncomeForm(prev => ({ ...prev, property_id: e.target.value }))}
                                                 className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
@@ -534,8 +547,9 @@ export default function FinancesLedger({
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Residente Copropietario (Opcional)</label>
+                                            <label htmlFor="income-user" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Residente Copropietario (Opcional)</label>
                                             <select
+                                                id="income-user"
                                                 value={newIncomeForm.user_id}
                                                 onChange={(e) => setNewIncomeForm(prev => ({ ...prev, user_id: e.target.value }))}
                                                 className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
@@ -548,8 +562,9 @@ export default function FinancesLedger({
                                         </div>
 
                                         <div>
-                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Descripción / Detalles</label>
+                                            <label htmlFor="income-description" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Descripción / Detalles</label>
                                             <input
+                                                id="income-description"
                                                 type="text"
                                                 value={newIncomeForm.description}
                                                 onChange={(e) => setNewIncomeForm(prev => ({ ...prev, description: e.target.value }))}
@@ -605,6 +620,7 @@ export default function FinancesLedger({
                                                     <div className="flex items-center gap-2 justify-end" key={`act-${inc.id}`}>
                                                         <button
                                                             type="button"
+                                                            aria-label={`Editar ingreso ${inc.description || inc.category}`}
                                                             onClick={() => {
                                                                 setEditingIncome(inc);
                                                                 setNewIncomeForm({
@@ -624,6 +640,7 @@ export default function FinancesLedger({
                                                         </button>
                                                         <button
                                                             type="button"
+                                                            aria-label={`Eliminar ingreso ${inc.description || inc.category}`}
                                                             onClick={() => handleDeleteIncome(inc.id)}
                                                             className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-bold rounded-lg transition-all"
                                                         >
@@ -674,8 +691,9 @@ export default function FinancesLedger({
                                     
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Categoría Financiera</label>
+                                            <label htmlFor="expense-category" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Categoría Financiera</label>
                                             <select
+                                                id="expense-category"
                                                 required
                                                 value={newExpenseForm.category}
                                                 onChange={(e) => setNewExpenseForm(prev => ({ ...prev, category: e.target.value, subcategory: '' }))}
@@ -689,8 +707,9 @@ export default function FinancesLedger({
                                         </div>
 
                                         <div>
-                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Subcategoría Específica</label>
+                                            <label htmlFor="expense-subcategory" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Subcategoría Específica</label>
                                             <select
+                                                id="expense-subcategory"
                                                 required
                                                 value={newExpenseForm.subcategory}
                                                 onChange={(e) => setNewExpenseForm(prev => ({ ...prev, subcategory: e.target.value }))}
@@ -707,8 +726,9 @@ export default function FinancesLedger({
 
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div>
-                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto ($ CLP)</label>
+                                            <label htmlFor="expense-amount" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto ($ CLP)</label>
                                             <input
+                                                id="expense-amount"
                                                 type="number"
                                                 required
                                                 value={newExpenseForm.amount}
@@ -719,8 +739,9 @@ export default function FinancesLedger({
                                         </div>
 
                                         <div>
-                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Fecha Registro</label>
+                                            <label htmlFor="expense-date" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Fecha Registro</label>
                                             <input
+                                                id="expense-date"
                                                 type="date"
                                                 required
                                                 value={newExpenseForm.date}
@@ -730,8 +751,9 @@ export default function FinancesLedger({
                                         </div>
 
                                         <div>
-                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Unidad (Opcional)</label>
+                                            <label htmlFor="expense-property" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Unidad (Opcional)</label>
                                             <select
+                                                id="expense-property"
                                                 value={newExpenseForm.property_id}
                                                 onChange={(e) => setNewExpenseForm(prev => ({ ...prev, property_id: e.target.value }))}
                                                 className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
@@ -746,8 +768,9 @@ export default function FinancesLedger({
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Personal / Receptor (Opcional)</label>
+                                            <label htmlFor="expense-user" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Personal / Receptor (Opcional)</label>
                                             <select
+                                                id="expense-user"
                                                 value={newExpenseForm.user_id}
                                                 onChange={(e) => setNewExpenseForm(prev => ({ ...prev, user_id: e.target.value }))}
                                                 className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
@@ -760,8 +783,9 @@ export default function FinancesLedger({
                                         </div>
 
                                         <div>
-                                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Descripción / Detalles</label>
+                                            <label htmlFor="expense-description" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Descripción / Detalles</label>
                                             <input
+                                                id="expense-description"
                                                 type="text"
                                                 value={newExpenseForm.description}
                                                 onChange={(e) => setNewExpenseForm(prev => ({ ...prev, description: e.target.value }))}
@@ -817,6 +841,7 @@ export default function FinancesLedger({
                                                     <div className="flex items-center gap-2 justify-end" key={`act-${exp.id}`}>
                                                         <button
                                                             type="button"
+                                                            aria-label={`Editar egreso ${exp.description || exp.category}`}
                                                             onClick={() => {
                                                                 setEditingExpense(exp);
                                                                 setNewExpenseForm({
@@ -836,6 +861,7 @@ export default function FinancesLedger({
                                                         </button>
                                                         <button
                                                             type="button"
+                                                            aria-label={`Eliminar egreso ${exp.description || exp.category}`}
                                                             onClick={() => handleDeleteExpense(exp.id)}
                                                             className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-bold rounded-lg transition-all"
                                                         >

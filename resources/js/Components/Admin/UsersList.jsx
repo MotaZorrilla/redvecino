@@ -20,6 +20,7 @@ export default function UsersList({
     const [selectedWorker, setSelectedWorker] = useState(null);
     const [selectedContract, setSelectedContract] = useState(null);
     const [selectedFiniquito, setSelectedFiniquito] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Filter based on selected sub-tab
     const filteredUsersForSubtab = adminFilteredUsers.filter(u => {
@@ -37,6 +38,7 @@ export default function UsersList({
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
         if (editingUser) {
             setUsersList(prev => prev.map(u => u.id === editingUser.id ? {
                 ...u,
@@ -63,6 +65,7 @@ export default function UsersList({
         }
         setShowAddUserForm(false);
         setNewUserForm({ name: '', rut: '', email: '', phone: '', role: 'resident', status: 'active', password: generatePassword() });
+        setIsSubmitting(false);
     };
 
     return (
@@ -103,14 +106,14 @@ export default function UsersList({
                             setNewUserForm({ name: '', rut: '', email: '', phone: '', role: userSubTab === 'admins' ? 'admin' : userSubTab === 'staff' ? 'colaborador' : 'resident', status: 'active', password: 'password' });
                             setShowAddUserForm(!showAddUserForm);
                         }}
-                        className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all cursor-pointer"
+                        className="px-3.5 py-1.5 bg-brand-teal hover:bg-[#00c2ad] text-white font-bold text-xs rounded-xl shadow transition-all cursor-pointer"
                     >
                         {showAddUserForm ? 'Cerrar Form' : 'Añadir Rápido'}
                     </button>
                     {onOpenWizard && (
                         <button
                             onClick={onOpenWizard}
-                            className="px-3.5 py-1.5 bg-gradient-to-r from-[#00A896] to-[#72B043] hover:from-[#009886] hover:to-[#629b37] text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all cursor-pointer flex items-center gap-1.5"
+                            className="px-3.5 py-1.5 bg-gradient-to-r from-brand-teal to-brand-green text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all cursor-pointer flex items-center gap-1.5"
                         >
                             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
@@ -126,8 +129,9 @@ export default function UsersList({
                     <h5 className="text-xs font-bold text-gray-800 dark:text-slate-200 uppercase">{editingUser ? '✏️ Editar Usuario' : '👥 Detalles del Usuario'}</h5>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre completo</label>
+                            <label htmlFor="user-name" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre completo</label>
                             <input
+                                id="user-name"
                                 type="text"
                                 required
                                 value={newUserForm.name}
@@ -136,8 +140,9 @@ export default function UsersList({
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">RUT / Identificación</label>
+                            <label htmlFor="user-rut" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">RUT / Identificación</label>
                             <input
+                                id="user-rut"
                                 type="text"
                                 required
                                 value={newUserForm.rut}
@@ -148,8 +153,9 @@ export default function UsersList({
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Correo Electrónico</label>
+                            <label htmlFor="user-email" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Correo Electrónico</label>
                             <input
+                                id="user-email"
                                 type="email"
                                 required
                                 value={newUserForm.email}
@@ -158,8 +164,9 @@ export default function UsersList({
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Teléfono</label>
+                            <label htmlFor="user-phone" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Teléfono</label>
                             <input
+                                id="user-phone"
                                 type="text"
                                 value={newUserForm.phone}
                                 onChange={(e) => setNewUserForm(prev => ({ ...prev, phone: e.target.value }))}
@@ -169,8 +176,9 @@ export default function UsersList({
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Rol</label>
+                            <label htmlFor="user-role" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Rol</label>
                             <select
+                                id="user-role"
                                 value={newUserForm.role}
                                 onChange={(e) => setNewUserForm(prev => ({ ...prev, role: e.target.value }))}
                                 className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
@@ -183,8 +191,9 @@ export default function UsersList({
                             </select>
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado</label>
+                            <label htmlFor="user-status" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado</label>
                             <select
+                                id="user-status"
                                 value={newUserForm.status}
                                 onChange={(e) => setNewUserForm(prev => ({ ...prev, status: e.target.value }))}
                                 className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
@@ -196,7 +205,7 @@ export default function UsersList({
                         </div>
                     </div>
                     <div className="flex gap-2">
-                        <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow cursor-pointer">
+                        <button type="submit" disabled={isSubmitting} className="px-4 py-2 bg-brand-teal hover:bg-[#00c2ad] text-white font-bold text-xs rounded-xl shadow cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                             {editingUser ? 'Guardar Cambios' : 'Añadir Usuario'}
                         </button>
                         <button type="button" onClick={() => { setShowAddUserForm(false); setEditingUser(null); }} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl cursor-pointer">

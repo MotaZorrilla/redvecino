@@ -32,7 +32,7 @@ export default function FinancialReports() {
                         placeholder="Buscar informes..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 text-xs border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-xl focus:outline-none focus:border-[#72B043] dark:text-slate-200"
+                        className="w-full pl-9 pr-4 py-2 text-xs border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950 rounded-xl focus:outline-none focus:border-brand-green dark:text-slate-200"
                     />
                     <div className="absolute left-3 top-2.5 text-slate-400">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
@@ -49,7 +49,7 @@ export default function FinancialReports() {
                             onClick={() => setFilterCategory(cat)}
                             className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all border ${
                                 filterCategory === cat
-                                    ? 'bg-[#72B043] border-[#72B043] text-white'
+                                    ? 'bg-brand-green border-brand-green text-white'
                                     : 'bg-gray-50 border-gray-200 hover:bg-gray-100 text-gray-600 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-900'
                             }`}
                         >
@@ -65,11 +65,11 @@ export default function FinancialReports() {
                     filteredReports.map((doc, idx) => (
                         <div
                             key={idx}
-                            className="bg-white dark:bg-slate-900 border border-gray-150 dark:border-slate-800 rounded-3xl p-5 hover:border-[#72B043]/30 dark:hover:border-[#72B043]/30 transition-all flex flex-col justify-between shadow-sm space-y-4"
+                            className="bg-white dark:bg-slate-900 border border-gray-150 dark:border-slate-800 rounded-3xl p-5 hover:border-brand-green/30 dark:hover:border-brand-green/30 transition-all flex flex-col justify-between shadow-sm space-y-4"
                         >
                             <div className="space-y-2">
                                 <div className="flex justify-between items-start gap-2">
-                                    <span className="px-2 py-0.5 bg-[#72B043]/15 text-[#72B043] dark:bg-[#72B043]/10 text-[9px] font-extrabold uppercase rounded-md tracking-wider">
+                                    <span className="px-2 py-0.5 bg-brand-green/15 text-brand-green dark:bg-brand-green/10 text-[9px] font-extrabold uppercase rounded-md tracking-wider">
                                         {doc.category}
                                     </span>
                                     <span className="text-[10px] text-slate-400 font-mono font-medium">{doc.date}</span>
@@ -86,7 +86,7 @@ export default function FinancialReports() {
                                 </span>
                                 <button
                                     onClick={() => handleDownload(doc.title)}
-                                    className="px-3.5 py-1.5 rounded-xl bg-[#72B043]/10 hover:bg-[#72B043] border border-[#72B043]/20 hover:border-transparent text-[#72B043] hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
+                                    className="px-3.5 py-1.5 rounded-xl bg-brand-green/10 hover:bg-brand-green border-brand-green/20 hover:border-transparent text-brand-green hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
                                 >
                                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />

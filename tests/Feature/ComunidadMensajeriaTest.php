@@ -145,4 +145,23 @@ class ComunidadMensajeriaTest extends TestCase
         // Debe denegarse con 403
         $response->assertStatus(403);
     }
+
+    public function test_sender_cannot_mark_own_message_as_read(): void
+    {
+        $resident = $this->getUserByRole('Residente');
+        $employee = $this->getUserByRole('Colaborador');
+
+        $message = Message::create([
+            'sender_id' => $resident->id,
+            'receiver_id' => $employee->id,
+            'subject' => 'Test sender read',
+            'content' => 'El remitente no debe poder marcar como leído',
+            'is_read' => false
+        ]);
+
+        // El remitente (residente) intenta marcar como leído un mensaje que él envió
+        $response = $this->actingAs($resident)->putJson("/api/messages/{$message->id}/read");
+
+        $response->assertStatus(403);
+    }
 }

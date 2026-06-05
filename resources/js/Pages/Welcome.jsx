@@ -276,7 +276,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#F8FAFC] via-[#F1F5F9] to-[#E2E8F0] dark:from-[#0F2557] dark:via-[#132c66] dark:to-[#0A183A] text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-[#00A896]/30 selection:text-white overflow-x-hidden transition-colors duration-300">
+        <div className="min-h-screen bg-gradient-to-br from-[#F8FAFC] via-[#F1F5F9] to-[#E2E8F0] dark:from-brand-navy dark:via-brand-navy dark:to-brand-navy-dark text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-brand-teal/30 selection:text-white overflow-x-hidden transition-colors duration-300">
             <Head>
                 <title>RedVecino - La Red Inteligente de Condominios</title>
                 <meta name="description" content="RedVecino es la plataforma de administración e integración social más completa e inteligente para condominios y edificios. Gestiona finanzas, seguridad y comunicación de tu comunidad." />
@@ -297,12 +297,12 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
             </Head>
 
             {/* Glowing background meshes (opacity-attenuated in light mode) */}
-            <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#00A896]/5 dark:bg-[#00A896]/15 rounded-full blur-[120px] pointer-events-none -z-10 transition-opacity duration-300" />
-            <div className="absolute top-[30%] right-10 w-[600px] h-[600px] bg-[#72B043]/5 dark:bg-[#72B043]/15 rounded-full blur-[150px] pointer-events-none -z-10 transition-opacity duration-300" />
-            <div className="absolute bottom-[20%] left-10 w-[500px] h-[500px] bg-[#EC7A08]/5 dark:bg-[#EC7A08]/10 rounded-full blur-[130px] pointer-events-none -z-10 transition-opacity duration-300" />
+            <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-brand-teal/5 dark:bg-brand-teal/15 rounded-full blur-[120px] pointer-events-none -z-10 transition-opacity duration-300" />
+            <div className="absolute top-[30%] right-10 w-[600px] h-[600px] bg-brand-green/5 dark:bg-brand-green/15 rounded-full blur-[150px] pointer-events-none -z-10 transition-opacity duration-300" />
+            <div className="absolute bottom-[20%] left-10 w-[500px] h-[500px] bg-brand-orange/5 dark:bg-brand-orange/10 rounded-full blur-[130px] pointer-events-none -z-10 transition-opacity duration-300" />
 
             {/* Premium Header/Navigation */}
-            <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-[#0F2557]/80 backdrop-blur-lg border-b border-slate-200/50 dark:border-white/5 transition-colors duration-300 shadow-sm shadow-slate-100/50 dark:shadow-none">
+            <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-brand-navy/80 backdrop-blur-lg border-b border-slate-200/50 dark:border-white/5 transition-colors duration-300 shadow-sm shadow-slate-100/50 dark:shadow-none">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-20">
                         {/* Logo */}
@@ -312,12 +312,12 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                         {/* Navigation links */}
                         <nav className="hidden md:flex items-center gap-8">
-                            <a href="#simulator" className="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors">Simulador de Roles</a>
-                            <a href="#modules" className="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors">Módulos Core</a>
-                            <a href="#calculator" className="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors">Calculadora</a>
-                            <a href="#mobile-app" className="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors">App Android</a>
-                            <a href="#roadmap" className="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors">Plan Técnico</a>
-                            <a href="#developers" className="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors">Arquitectura</a>
+                            <a href="#simulator" className="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-brand-teal dark:hover:text-white dark:text-slate-400 hover:text-brand-teal dark:hover:text-white transition-colors">Simulador de Roles</a>
+                            <a href="#modules" className="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-brand-teal dark:hover:text-white dark:text-slate-400 hover:text-brand-teal dark:hover:text-white transition-colors">Módulos Core</a>
+                            <a href="#calculator" className="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-brand-teal dark:hover:text-white dark:text-slate-400 hover:text-brand-teal dark:hover:text-white transition-colors">Calculadora</a>
+                            <a href="#mobile-app" className="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-brand-teal dark:hover:text-white dark:text-slate-400 hover:text-brand-teal dark:hover:text-white transition-colors">App Android</a>
+                            <a href="#roadmap" className="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-brand-teal dark:hover:text-white dark:text-slate-400 hover:text-brand-teal dark:hover:text-white transition-colors">Plan Técnico</a>
+                            <a href="#developers" className="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-brand-teal dark:hover:text-white dark:text-slate-400 hover:text-brand-teal dark:hover:text-white transition-colors">Arquitectura</a>
                         </nav>
 
                         {/* Auth actions and theme switcher */}
@@ -349,7 +349,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
                                     </svg>
                                 ) : (
-                                    <svg className="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                    <svg className="w-5 h-5 text-brand-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                                     </svg>
                                 )}
@@ -358,7 +358,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                             {auth && auth.user ? (
                                 <Link
                                     href={route('dashboard')}
-                                    className="relative group inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-violet-600 text-white text-sm font-semibold rounded-xl hover:opacity-95 shadow-md shadow-indigo-500/20 transition-all overflow-hidden"
+                                    className="relative group inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-brand-teal to-brand-purple text-white text-sm font-semibold rounded-xl hover:opacity-95 shadow-md shadow-brand-purple/20 transition-all overflow-hidden"
                                 >
                                     <span className="relative z-10">Ir al Dashboard</span>
                                     <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
@@ -369,7 +369,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                 <>
                                     <Link
                                         href={route('login')}
-                                        className="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-white px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-900 transition-all"
+                                        className="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-brand-teal dark:hover:text-white px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-900 transition-all"
                                     >
                                         Iniciar Sesión
                                     </Link>
@@ -388,47 +388,47 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
             {/* Mobile Navigation Drawer Overlay */}
             {mobileMenuOpen && (
-                <div className="md:hidden fixed top-20 left-0 right-0 bg-white/95 dark:bg-[#0F2557]/95 backdrop-blur-xl border-b border-slate-200/50 dark:border-white/5 py-6 px-6 shadow-xl animate-fade-in z-[45] max-h-[calc(100vh-80px)] overflow-y-auto font-sans text-left transition-colors duration-300">
+                <div className="md:hidden fixed top-20 left-0 right-0 bg-white/95 dark:bg-brand-navy/95 backdrop-blur-xl border-b border-slate-200/50 dark:border-white/5 py-6 px-6 shadow-xl animate-fade-in z-[45] max-h-[calc(100vh-80px)] overflow-y-auto font-sans text-left transition-colors duration-300">
                     <nav className="flex flex-col gap-4">
                         <a 
                             onClick={() => setMobileMenuOpen(false)}
                             href="#simulator"
-                            className="text-sm font-extrabold text-slate-700 dark:text-slate-300 hover:text-[#00A896] dark:hover:text-white py-2 border-b border-slate-100 dark:border-white/5 block transition-colors"
+                            className="text-sm font-extrabold text-slate-700 dark:text-slate-300 hover:text-brand-teal dark:hover:text-white py-2 border-b border-slate-100 dark:border-white/5 block transition-colors"
                         >
                             Simulador de Roles
                         </a>
                         <a 
                             onClick={() => setMobileMenuOpen(false)}
                             href="#modules"
-                            className="text-sm font-extrabold text-slate-700 dark:text-slate-300 hover:text-[#00A896] dark:hover:text-white py-2 border-b border-slate-100 dark:border-white/5 block transition-colors"
+                            className="text-sm font-extrabold text-slate-700 dark:text-slate-300 hover:text-brand-teal dark:hover:text-white py-2 border-b border-slate-100 dark:border-white/5 block transition-colors"
                         >
                             Módulos Core
                         </a>
                         <a 
                             onClick={() => setMobileMenuOpen(false)}
                             href="#calculator"
-                            className="text-sm font-extrabold text-slate-700 dark:text-slate-300 hover:text-[#00A896] dark:hover:text-white py-2 border-b border-slate-100 dark:border-white/5 block transition-colors"
+                            className="text-sm font-extrabold text-slate-700 dark:text-slate-300 hover:text-brand-teal dark:hover:text-white py-2 border-b border-slate-100 dark:border-white/5 block transition-colors"
                         >
                             Calculadora
                         </a>
                         <a 
                             onClick={() => setMobileMenuOpen(false)}
                             href="#mobile-app"
-                            className="text-sm font-extrabold text-slate-700 dark:text-slate-300 hover:text-[#00A896] dark:hover:text-white py-2 border-b border-slate-100 dark:border-white/5 block transition-colors"
+                            className="text-sm font-extrabold text-slate-700 dark:text-slate-300 hover:text-brand-teal dark:hover:text-white py-2 border-b border-slate-100 dark:border-white/5 block transition-colors"
                         >
                             App Android
                         </a>
                         <a 
                             onClick={() => setMobileMenuOpen(false)}
                             href="#roadmap"
-                            className="text-sm font-extrabold text-slate-700 dark:text-slate-300 hover:text-[#00A896] dark:hover:text-white py-2 border-b border-slate-100 dark:border-white/5 block transition-colors"
+                            className="text-sm font-extrabold text-slate-700 dark:text-slate-300 hover:text-brand-teal dark:hover:text-white py-2 border-b border-slate-100 dark:border-white/5 block transition-colors"
                         >
                             Plan Técnico
                         </a>
                         <a 
                             onClick={() => setMobileMenuOpen(false)}
                             href="#developers"
-                            className="text-sm font-extrabold text-slate-700 dark:text-slate-300 hover:text-[#00A896] dark:hover:text-white py-2 border-b border-slate-100 dark:border-white/5 block transition-colors"
+                            className="text-sm font-extrabold text-slate-700 dark:text-slate-300 hover:text-brand-teal dark:hover:text-white py-2 border-b border-slate-100 dark:border-white/5 block transition-colors"
                         >
                             Arquitectura
                         </a>
@@ -438,7 +438,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                 <Link
                                     href={route('dashboard')}
                                     onClick={() => setMobileMenuOpen(false)}
-                                    className="w-full text-center py-3 bg-gradient-to-r from-indigo-500 to-violet-600 text-white text-sm font-bold rounded-xl hover:opacity-95 shadow-md transition-all"
+                                    className="w-full text-center py-3 bg-gradient-to-r from-brand-teal to-brand-purple text-white text-sm font-bold rounded-xl hover:opacity-95 shadow-md transition-all"
                                 >
                                     Ir al Dashboard
                                 </Link>
@@ -473,15 +473,15 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                         <div className="lg:col-span-6 text-center lg:text-left space-y-6">
                             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/70 dark:bg-white/[0.03] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-slate-200 text-xs font-semibold rounded-full shadow-sm">
                                 <span className="flex h-2 w-2 relative">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00A896] opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00A896]"></span>
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-teal opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-teal"></span>
                                 </span>
                                 Versión 3.1 &middot; Listo para Producción
                             </div>
 
                             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
                                 La plataforma definitiva para
-                                <span className="block mt-2 bg-clip-text text-transparent bg-gradient-to-r from-[#00A896] via-[#72B043] to-[#EC7A08] leading-normal font-black">
+                                <span className="block mt-2 bg-clip-text text-transparent bg-gradient-to-r from-brand-teal via-brand-green to-brand-orange leading-normal font-black">
                                     Gestión de Condominios
                                 </span>
                             </h1>
@@ -493,7 +493,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
                                 <a
                                     href="#simulator"
-                                    className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#0F2557] to-[#00A896] hover:from-[#132c66] hover:to-[#00c2ad] text-white font-bold rounded-2xl shadow-lg shadow-teal-500/10 hover:shadow-teal-500/20 transition-all gap-2"
+                                    className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-brand-navy to-brand-teal hover:from-brand-navy hover:to-brand-teal-light text-white font-bold rounded-2xl shadow-lg shadow-teal-500/10 hover:shadow-teal-500/20 transition-all gap-2"
                                 >
                                     Probar Simulador de Roles
                                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
@@ -502,7 +502,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                 </a>
                                 <a
                                     href="#modules"
-                                    className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-white dark:bg-[#0F2557]/20 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-semibold rounded-2xl hover:bg-slate-50 dark:hover:bg-white/[0.05] transition-all"
+                                    className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-white dark:bg-brand-navy/20 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-semibold rounded-2xl hover:bg-slate-50 dark:hover:bg-white/[0.05] transition-all"
                                 >
                                     Ver Módulos Core
                                 </a>
@@ -527,10 +527,10 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                         {/* Hero Interactive Mockup */}
                         <div className="lg:col-span-6 relative">
-                            <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-violet-600 rounded-3xl blur-[80px] opacity-20 -z-10" />
+                            <div className="absolute inset-0 bg-gradient-to-tr from-brand-teal to-brand-purple rounded-3xl blur-[80px] opacity-20 -z-10" />
                             
                             {/* Glass Card Dashboard Mockup */}
-                            <div className="relative border border-slate-200 dark:border-white/5 bg-white/80 dark:bg-[#0F2557]/60 backdrop-blur-xl rounded-3xl p-6 shadow-2xl shadow-slate-200/40 dark:shadow-none transition-all duration-300">
+                            <div className="relative border border-slate-200 dark:border-white/5 bg-white/80 dark:bg-brand-navy/60 backdrop-blur-xl rounded-3xl p-6 shadow-2xl shadow-slate-200/40 dark:shadow-none transition-all duration-300">
                                 {/* Header of mockup */}
                                 <div className="flex items-center justify-between pb-4 border-b border-slate-200/50 dark:border-white/5 mb-6">
                                     <div className="flex items-center gap-2">
@@ -546,12 +546,12 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                                 {/* Mock Stats */}
                                 <div className="grid grid-cols-2 gap-4 mb-6">
-                                    <div className="bg-slate-50/80 dark:bg-[#0B1A3E] border border-slate-100 dark:border-white/5 p-4 rounded-2xl transition-colors duration-300">
+                                    <div className="bg-slate-50/80 dark:bg-brand-navy-dark border border-slate-100 dark:border-white/5 p-4 rounded-2xl transition-colors duration-300">
                                         <span className="text-slate-500 dark:text-slate-400 text-xs font-semibold block">Recaudación Mensual</span>
                                         <span className="text-xl font-bold text-slate-900 dark:text-white block mt-1">{formatCurrency(18450000)}</span>
                                         <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium block mt-1">&uarr; +14.2% este mes</span>
                                     </div>
-                                    <div className="bg-slate-50/80 dark:bg-[#0B1A3E] border border-slate-100 dark:border-white/5 p-4 rounded-2xl transition-colors duration-300">
+                                    <div className="bg-slate-50/80 dark:bg-brand-navy-dark border border-slate-100 dark:border-white/5 p-4 rounded-2xl transition-colors duration-300">
                                         <span className="text-slate-500 dark:text-slate-400 text-xs font-semibold block">Tickets Resueltos</span>
                                         <span className="text-xl font-bold text-slate-900 dark:text-white block mt-1">94.8%</span>
                                         <span className="text-[10px] text-teal-600 dark:text-teal-400 font-medium block mt-1">Eficiencia Operativa</span>
@@ -567,8 +567,8 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                             <span className="text-slate-400">Seguridad & Conserjería</span>
                                             <span className="text-slate-200 font-semibold">44.4%</span>
                                         </div>
-                                        <div className="w-full bg-slate-100 dark:bg-[#0B1A3E] rounded-full h-2">
-                                            <div className="bg-[#00A896] h-2 rounded-full" style={{ width: '44.4%' }} />
+                                        <div className="w-full bg-slate-100 dark:bg-brand-navy-dark rounded-full h-2">
+                                            <div className="bg-brand-teal h-2 rounded-full" style={{ width: '44.4%' }} />
                                         </div>
                                     </div>
 
@@ -577,8 +577,8 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                             <span className="text-slate-500 dark:text-slate-400">Limpieza & Ornato</span>
                                             <span className="text-slate-700 dark:text-slate-200 font-semibold">25.0%</span>
                                         </div>
-                                        <div className="w-full bg-slate-100 dark:bg-[#0B1A3E] rounded-full h-2">
-                                            <div className="bg-[#72B043] h-2 rounded-full" style={{ width: '25.0%' }} />
+                                        <div className="w-full bg-slate-100 dark:bg-brand-navy-dark rounded-full h-2">
+                                            <div className="bg-brand-green h-2 rounded-full" style={{ width: '25.0%' }} />
                                         </div>
                                     </div>
 
@@ -587,14 +587,14 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                             <span className="text-slate-500 dark:text-slate-400">Mantención Ascensores / Bombas</span>
                                             <span className="text-slate-700 dark:text-slate-200 font-semibold">19.4%</span>
                                         </div>
-                                        <div className="w-full bg-slate-100 dark:bg-[#0B1A3E] rounded-full h-2">
-                                            <div className="bg-[#EC7A08] h-2 rounded-full" style={{ width: '19.4%' }} />
+                                        <div className="w-full bg-slate-100 dark:bg-brand-navy-dark rounded-full h-2">
+                                            <div className="bg-brand-orange h-2 rounded-full" style={{ width: '19.4%' }} />
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Float floating badges */}
-                                <div className="absolute -bottom-6 -right-6 bg-white dark:bg-[#0B1A3E] border border-slate-200 dark:border-white/5 p-3 rounded-2xl shadow-xl flex items-center gap-3 animate-bounce" style={{ animationDuration: '6s' }}>
+                                <div className="absolute -bottom-6 -right-6 bg-white dark:bg-brand-navy-dark border border-slate-200 dark:border-white/5 p-3 rounded-2xl shadow-xl flex items-center gap-3 animate-bounce" style={{ animationDuration: '6s' }}>
                                     <div className="h-8 w-8 bg-emerald-500/10 text-emerald-400 flex items-center justify-center rounded-lg">
                                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -612,19 +612,19 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
             </section>
 
             {/* Android Mobile App Mockup Section */}
-            <section id="mobile-app" className="py-24 border-t border-slate-200/50 dark:border-white/5 bg-white/40 dark:bg-[#0F2557]/20 backdrop-blur-md relative overflow-hidden transition-colors duration-300">
+            <section id="mobile-app" className="py-24 border-t border-slate-200/50 dark:border-white/5 bg-white/40 dark:bg-brand-navy/20 backdrop-blur-md relative overflow-hidden transition-colors duration-300">
                 {/* Visual decoration glows */}
-                <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] bg-[#00A896]/5 rounded-full blur-[140px] pointer-events-none -translate-x-1/2 -translate-y-1/2 -z-10" />
+                <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] bg-brand-teal/5 rounded-full blur-[140px] pointer-events-none -translate-x-1/2 -translate-y-1/2 -z-10" />
                 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid lg:grid-cols-12 gap-12 items-center">
                         
                         {/* Left column: Text and simulator control */}
                         <div className="lg:col-span-7 space-y-6">
-                            <span className="text-xs font-bold text-[#72B043] uppercase tracking-widest block">Acceso Móvil Copropietario</span>
+                            <span className="text-xs font-bold text-brand-green uppercase tracking-widest block">Acceso Móvil Copropietario</span>
                             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-none transition-colors duration-300">
                                 MiVecino Mobile <br/>
-                                <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#72B043] to-[#EC7A08] font-black">Tu Comunidad en tu Bolsillo</span>
+                                <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-green to-brand-orange font-black">Tu Comunidad en tu Bolsillo</span>
                             </h2>
                             <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl transition-colors duration-300">
                                 Conectada de forma segura mediante tokens cifrados de Laravel Sanctum a la base de datos central. Los residentes pueden gestionar todo su hogar desde su smartphone Android de manera ágil e integrada.
@@ -633,7 +633,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                             {/* Features grids */}
                             <div className="grid sm:grid-cols-2 gap-4 pt-4">
                                 <div className="p-4 bg-white/80 dark:bg-white/[0.02] dark:backdrop-blur-md border border-slate-200/50 dark:border-white/5 rounded-2xl flex gap-3 shadow-sm transition-all duration-300 hover:scale-[1.01]">
-                                    <div className="h-10 w-10 shrink-0 bg-[#72B043]/10 text-[#72B043] flex items-center justify-center rounded-lg">
+                                    <div className="h-10 w-10 shrink-0 bg-brand-green/10 text-brand-green flex items-center justify-center rounded-lg">
                                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
                                         </svg>
@@ -655,7 +655,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                     </div>
                                 </div>
                                 <div className="p-4 bg-white/80 dark:bg-white/[0.02] dark:backdrop-blur-md border border-slate-200/50 dark:border-white/5 rounded-2xl flex gap-3 shadow-sm transition-all duration-300 hover:scale-[1.01]">
-                                    <div className="h-10 w-10 shrink-0 bg-[#EC7A08]/10 text-[#EC7A08] flex items-center justify-center rounded-lg">
+                                    <div className="h-10 w-10 shrink-0 bg-brand-orange/10 text-brand-orange flex items-center justify-center rounded-lg">
                                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a9.001 9.001 0 01-11.963-3.07 9.001 9.001 0 013.07-11.963c.48-.277 1.012-.456 1.56-.532a.75.75 0 01.815.58l.492 2.213a.75.75 0 01-.419.824l-1.077.538a6.502 6.502 0 003.003 3.003l.538-1.077a.75.75 0 01.824-.419l2.213.493a.75.75 0 01.58.815c-.076.548-.255 1.08-.532 1.56z" />
                                         </svg>
@@ -666,7 +666,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                     </div>
                                 </div>
                                 <div className="p-4 bg-white/80 dark:bg-white/[0.02] dark:backdrop-blur-md border border-slate-200/50 dark:border-white/5 rounded-2xl flex gap-3 shadow-sm transition-all duration-300 hover:scale-[1.01]">
-                                    <div className="h-10 w-10 shrink-0 bg-[#72B043]/10 text-[#72B043] flex items-center justify-center rounded-lg">
+                                    <div className="h-10 w-10 shrink-0 bg-brand-green/10 text-brand-green flex items-center justify-center rounded-lg">
                                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5h.007v.008H3.75V4.5zM3 16.25h1.5m-1.5 3h1.5" />
                                         </svg>
@@ -689,11 +689,11 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                         }}
                                         className={`px-4 py-2.5 border text-xs font-bold rounded-xl flex items-center justify-center sm:justify-start gap-2 transition-all shadow ${
                                             mobileTab === 'home' 
-                                                ? 'bg-[#72B043]/10 border-[#72B043]/40 text-[#72B043] dark:text-[#72B043] font-extrabold' 
+                                                ? 'bg-brand-green/10 border-brand-green/40 text-brand-green dark:text-brand-green font-extrabold' 
                                                 : 'bg-white/80 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/[0.05] border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white'
                                         }`}
                                     >
-                                        <span className="h-2 w-2 rounded-full bg-[#72B043] animate-pulse" />
+                                        <span className="h-2 w-2 rounded-full bg-brand-green animate-pulse" />
                                         1. Finanzas Móviles
                                     </button>
                                     <button 
@@ -704,11 +704,11 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                         }}
                                         className={`px-4 py-2.5 border text-xs font-bold rounded-xl flex items-center justify-center sm:justify-start gap-2 transition-all shadow ${
                                             mobileTab === 'qr' && mobileGeneratedQr
-                                                ? 'bg-[#EC7A08]/10 border-[#EC7A08]/40 text-[#EC7A08] dark:text-[#EC7A08] font-extrabold' 
+                                                ? 'bg-brand-orange/10 border-brand-orange/40 text-brand-orange dark:text-brand-orange font-extrabold' 
                                                 : 'bg-white/80 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/[0.05] border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white'
                                         }`}
                                     >
-                                        <span className="h-2 w-2 rounded-full bg-[#EC7A08] animate-pulse" />
+                                        <span className="h-2 w-2 rounded-full bg-brand-orange animate-pulse" />
                                         2. Invitación QR
                                     </button>
                                     <button 
@@ -727,7 +727,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                     </button>
                                     <button 
                                         onClick={simulatePushNotification}
-                                        className="px-4 py-2.5 bg-white/80 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/[0.05] border border-slate-200 dark:border-white/5 text-xs font-bold rounded-xl flex items-center justify-center sm:justify-start gap-2 text-slate-600 dark:text-slate-400 dark:hover:text-white hover:border-indigo-500/30 transition-all shadow"
+                                        className="px-4 py-2.5 bg-white/80 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/[0.05] border border-slate-200 dark:border-white/5 text-xs font-bold rounded-xl flex items-center justify-center sm:justify-start gap-2 text-slate-600 dark:text-slate-400 dark:hover:text-white hover:border-brand-purple/30 transition-all shadow"
                                     >
                                         <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
                                         4. Notificaciones Push
@@ -737,7 +737,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                         className={`px-4 py-2.5 border text-xs font-bold rounded-xl flex items-center justify-center sm:justify-start gap-2 transition-all shadow ${
                                             simulatedMobileDarkMode 
                                                 ? 'bg-amber-500/10 border-amber-500/40 text-amber-600 dark:text-amber-400 font-extrabold hover:bg-amber-500/20' 
-                                                : 'bg-[#72B043]/10 border-[#72B043]/40 text-[#72B043] dark:text-[#72B043] font-extrabold hover:bg-[#72B043]/20'
+                                                : 'bg-brand-green/10 border-brand-green/40 text-brand-green dark:text-brand-green font-extrabold hover:bg-brand-green/20'
                                         }`}
                                     >
                                         <span className="h-2 w-2 rounded-full bg-indigo-550 animate-pulse" />
@@ -758,7 +758,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                 </div>
                                 
                                 {/* Inner application screen */}
-                                <div className={`w-full h-full rounded-[32px] overflow-hidden border relative flex flex-col z-10 font-sans select-none transition-colors duration-300 ${simulatedMobileDarkMode ? "bg-[#0B1A3E] border-[#132c66] text-slate-200" : "bg-[#F8FAFC] border-slate-200 text-slate-800"}`}>
+                                <div className={`w-full h-full rounded-[32px] overflow-hidden border relative flex flex-col z-10 font-sans select-none transition-colors duration-300 ${simulatedMobileDarkMode ? "bg-brand-navy-dark border-brand-navy text-slate-200" : "bg-[#F8FAFC] border-slate-200 text-slate-800"}`}>
                                     
                                     {/* Smartphone Status Bar */}
                                     <div className={`h-8 px-6 pt-2 flex items-center justify-between text-[10px] font-bold font-mono tracking-tight shrink-0 select-none z-20 transition-colors duration-300 ${simulatedMobileDarkMode ? "text-slate-400" : "text-slate-500"}`}>
@@ -774,7 +774,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                             </svg>
                                             {/* Battery icon */}
                                             <div className="w-5 h-2.5 border border-slate-500 rounded-sm p-0.5 flex items-center">
-                                                <div className="w-[85%] h-full bg-indigo-500 rounded-[1px]" />
+                                                <div className="w-[85%] h-full bg-brand-purple rounded-[1px]" />
                                             </div>
                                         </div>
                                     </div>
@@ -782,13 +782,13 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                     {/* Float Toast / Push Notification Simulation inside Phone Screen */}
                                     {activeToast && (
                                         <div className={`absolute top-9 left-2.5 right-2.5 p-3 backdrop-blur-md border rounded-2xl shadow-lg z-30 flex items-start gap-2.5 animate-slide-down transition-all duration-300 ${simulatedMobileDarkMode ? "bg-slate-900/95 border-slate-800 shadow-black/50 text-slate-200" : "bg-white/95 border-slate-200 shadow-slate-200/50 text-slate-900"}`}>
-                                            <div className="h-8 w-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center shrink-0">
+                                            <div className="h-8 w-8 rounded-lg bg-brand-purple/10 text-indigo-400 flex items-center justify-center shrink-0">
                                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a9.001 9.001 0 01-11.963-3.07 9.001 9.001 0 013.07-11.963c.48-.277 1.012-.456 1.56-.532a.75.75 0 01.815.58l.492 2.213a.75.75 0 01-.419.824l-1.077.538a6.502 6.502 0 003.003 3.003l.538-1.077a.75.75 0 01.824-.419l2.213.493a.75.75 0 01.58.815c-.076.548-.255 1.08-.532 1.56z" />
                                                 </svg>
                                             </div>
                                             <div className="min-w-0 flex-1">
-                                                <p className="text-[10px] font-bold text-[#EC7A08] uppercase tracking-widest">Alerta MiVecino</p>
+                                                <p className="text-[10px] font-bold text-brand-orange uppercase tracking-widest">Alerta MiVecino</p>
                                                 <p className="text-[11px] font-bold text-indigo-300 mt-0.5 truncate">{activeToast.title}</p>
                                                 <p className="text-[9px] text-slate-400 mt-0.5 leading-snug">{activeToast.desc}</p>
                                             </div>
@@ -809,7 +809,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                     <span className="flex-1">Depto 202</span>
                                                     <button 
                                                         onClick={() => setSimulatedMobileDarkMode(!simulatedMobileDarkMode)}
-                                                        className={`p-1 rounded-lg border text-[8px] flex items-center justify-center transition-all ${simulatedMobileDarkMode ? "bg-slate-900 border-slate-800 text-amber-400" : "bg-white border-slate-200 text-indigo-600 shadow-sm"}`}
+                                                        className={`p-1 rounded-lg border text-[8px] flex items-center justify-center transition-all ${simulatedMobileDarkMode ? "bg-slate-900 border-slate-800 text-amber-400" : "bg-white border-slate-200 text-brand-purple shadow-sm"}`}
                                                         title="Cambiar tema móvil"
                                                     >
                                                         {simulatedMobileDarkMode ? "☀️" : "🌙"}
@@ -818,18 +818,18 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                                                         </h3>
                                                     </div>
-                                                    <span className={`px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/20 text-[8px] font-mono rounded-md ${simulatedMobileDarkMode ? "text-indigo-400" : "text-indigo-600 font-bold"}`}>Propietario</span>
+                                                    <span className={`px-2 py-0.5 bg-brand-purple/10 border border-brand-purple/20 text-[8px] font-mono rounded-md ${simulatedMobileDarkMode ? "text-indigo-400" : "text-brand-purple font-bold"}`}>Propietario</span>
                                                 </div>
                                                 
                                                 {/* Simulated common expense balance card */}
-                                                <div className={`p-4 border rounded-2xl space-y-2 relative overflow-hidden transition-all duration-300 ${simulatedMobileDarkMode ? "bg-gradient-to-br from-indigo-500/10 to-violet-600/10 border-indigo-500/20" : "bg-gradient-to-br from-indigo-50/70 to-violet-50/70 border-indigo-200"}`}>
-                                                    <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-xl" />
-                                                    <span className={`text-[9px] font-extrabold uppercase tracking-widest block ${simulatedMobileDarkMode ? "text-indigo-400" : "text-indigo-600"}`}>Gasto Común Mayo</span>
+                                                <div className={`p-4 border rounded-2xl space-y-2 relative overflow-hidden transition-all duration-300 ${simulatedMobileDarkMode ? "bg-gradient-to-br from-brand-teal/10 to-brand-purple/10 border-brand-purple/20" : "bg-gradient-to-br from-indigo-50/70 to-violet-50/70 border-indigo-200"}`}>
+                                                    <div className="absolute top-0 right-0 w-24 h-24 bg-brand-purple/5 rounded-full blur-xl" />
+                                                    <span className={`text-[9px] font-extrabold uppercase tracking-widest block ${simulatedMobileDarkMode ? "text-indigo-400" : "text-brand-purple"}`}>Gasto Común Mayo</span>
                                                     <div className="flex items-baseline gap-1">
                                                         <span className={`text-xl font-black ${simulatedMobileDarkMode ? "text-white" : "text-slate-900"}`}>$165.000</span>
                                                         <span className="text-[9px] text-slate-400">CLP</span>
                                                     </div>
-                                                    <div className={`flex items-center justify-between pt-1 border-t text-[9px] ${simulatedMobileDarkMode ? "border-indigo-500/10 text-slate-500" : "border-indigo-200 text-slate-600"}`}>
+                                                    <div className={`flex items-center justify-between pt-1 border-t text-[9px] ${simulatedMobileDarkMode ? "border-brand-purple/10 text-slate-500" : "border-indigo-200 text-slate-600"}`}>
                                                         <span className="text-slate-500">Vencimiento: 05 Jun</span>
                                                         <span className={`px-1.5 py-0.5 bg-amber-500/10 border border-amber-500/20 font-bold rounded ${simulatedMobileDarkMode ? "text-amber-400" : "text-amber-600"}`}>PENDIENTE</span>
                                                     </div>
@@ -841,7 +841,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                     <div className="grid grid-cols-2 gap-2">
                                                         <button 
                                                             onClick={() => setMobileTab('access')}
-                                                            className={`p-3 border rounded-xl text-left transition-all ${simulatedMobileDarkMode ? "bg-slate-900 border-slate-800 hover:border-indigo-500/30 text-slate-400" : "bg-white border-slate-200 text-slate-600 hover:border-indigo-600/30 shadow-sm"}`}
+                                                            className={`p-3 border rounded-xl text-left transition-all ${simulatedMobileDarkMode ? "bg-slate-900 border-slate-800 hover:border-brand-purple/30 text-slate-400" : "bg-white border-slate-200 text-slate-600 hover:border-brand-purple/30 shadow-sm"}`}
                                                         >
                                                             <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
@@ -851,7 +851,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                         </button>
                                                         <button 
                                                             onClick={() => setMobileTab('qr')}
-                                                            className={`p-3 border rounded-xl text-left transition-all ${simulatedMobileDarkMode ? "bg-slate-900 border-slate-800 hover:border-indigo-500/30 text-slate-400" : "bg-white border-slate-200 text-slate-600 hover:border-indigo-600/30 shadow-sm"}`}
+                                                            className={`p-3 border rounded-xl text-left transition-all ${simulatedMobileDarkMode ? "bg-slate-900 border-slate-800 hover:border-brand-purple/30 text-slate-400" : "bg-white border-slate-200 text-slate-600 hover:border-brand-purple/30 shadow-sm"}`}
                                                         >
                                                             <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z" />
@@ -876,7 +876,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                         {mobileTab === 'access' && (
                                             <div className="space-y-4 flex flex-col h-full justify-between pb-2">
                                                 <div className="space-y-1.5 text-center">
-                                                    <span className={`text-[9px] font-extrabold uppercase tracking-widest ${simulatedMobileDarkMode ? "text-indigo-400" : "text-indigo-600"}`}>NFC & IoT Integrado</span>
+                                                    <span className={`text-[9px] font-extrabold uppercase tracking-widest ${simulatedMobileDarkMode ? "text-indigo-400" : "text-brand-purple"}`}>NFC & IoT Integrado</span>
                                                     <h3 className={`text-xs font-bold uppercase tracking-wider ${simulatedMobileDarkMode ? "text-white" : "text-slate-900"}`}>Apertura de Portón</h3>
                                                     <p className="text-[9px] text-slate-500 max-w-[200px] mx-auto">Coloca tu huella digital para activar la antena del acceso vehicular por API.</p>
                                                 </div>
@@ -889,12 +889,12 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                             mobileFingerprintSuccess 
                                                                 ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400 shadow-lg shadow-emerald-500/10 scale-105' 
                                                                 : mobileFingerprintScanning 
-                                                                ? 'bg-indigo-500/5 border-indigo-500/50 text-indigo-400 animate-pulse' 
-                                                                : (simulatedMobileDarkMode ? 'bg-slate-900 border-slate-800 text-slate-400 hover:border-indigo-500/40 hover:text-indigo-400 shadow' : 'bg-white border-slate-200 text-slate-500 hover:border-indigo-600/40 hover:text-indigo-600 shadow-sm')
+                                                                ? 'bg-brand-purple/5 border-brand-purple/50 text-indigo-400 animate-pulse' 
+                                                                : (simulatedMobileDarkMode ? 'bg-slate-900 border-slate-800 text-slate-400 hover:border-brand-purple/40 hover:text-indigo-400 shadow' : 'bg-white border-slate-200 text-slate-500 hover:border-brand-purple/40 hover:text-brand-purple shadow-sm')
                                                         }`}
                                                     >
                                                         {mobileFingerprintScanning && (
-                                                            <div className="absolute inset-2 border-2 border-indigo-500/20 rounded-full animate-ping" />
+                                                            <div className="absolute inset-2 border-2 border-brand-purple/20 rounded-full animate-ping" />
                                                         )}
                                                         <svg className={`w-12 h-12 transition-transform duration-300 ${mobileFingerprintScanning ? 'scale-90' : ''}`} fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
                                                             <path strokeLinecap="round" strokeLinejoin="round" d="M10.05 4.575a1 1 0 011.6-.8l8 6a1 1 0 010 1.6l-8 6a1 1 0 01-1.6-.8V4.575z" />
@@ -907,7 +907,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                         mobileFingerprintSuccess 
                                                             ? 'text-emerald-500 animate-pulse' 
                                                             : mobileFingerprintScanning 
-                                                            ? (simulatedMobileDarkMode ? 'text-indigo-400' : 'text-indigo-600') 
+                                                            ? (simulatedMobileDarkMode ? 'text-indigo-400' : 'text-brand-purple') 
                                                             : 'text-slate-500'
                                                     }`}>
                                                         {mobileFingerprintSuccess 
@@ -935,7 +935,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                         {mobileTab === 'qr' && (
                                             <div className="space-y-4">
                                                 <div className="space-y-1 text-center">
-                                                    <span className={`text-[9px] font-extrabold uppercase tracking-widest ${simulatedMobileDarkMode ? "text-indigo-400" : "text-indigo-600"}`}>Invitaciones Express</span>
+                                                    <span className={`text-[9px] font-extrabold uppercase tracking-widest ${simulatedMobileDarkMode ? "text-indigo-400" : "text-brand-purple"}`}>Invitaciones Express</span>
                                                     <h3 className={`text-xs font-bold uppercase tracking-wider ${simulatedMobileDarkMode ? "text-white" : "text-slate-900"}`}>Generador de QR</h3>
                                                 </div>
                                                 
@@ -948,7 +948,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                                 placeholder="Ej: Juan Pérez"
                                                                 value={mobileGuestName}
                                                                 onChange={(e) => setMobileGuestName(e.target.value)}
-                                                                className={`w-full px-3 py-2 rounded-xl text-[10px] focus:outline-none focus:border-indigo-500/50 transition-colors ${simulatedMobileDarkMode ? "bg-slate-900 border-slate-800 text-white placeholder-slate-600" : "bg-white border-slate-200 text-slate-900 placeholder-slate-400"}`}
+                                                                className={`w-full px-3 py-2 rounded-xl text-[10px] focus:outline-none focus:ring-2 focus:ring-brand-teal focus:border-brand-teal/50 transition-colors ${simulatedMobileDarkMode ? "bg-slate-900 border-slate-800 text-white placeholder-slate-600" : "bg-white border-slate-200 text-slate-900 placeholder-slate-400"}`}
                                                             />
                                                         </div>
                                                         
@@ -971,7 +971,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                         <button 
                                                             onClick={() => generateGuestQr(mobileGuestName)}
                                                             disabled={!mobileGuestName.trim()}
-                                                            className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:hover:bg-indigo-600 text-white text-[10px] font-bold rounded-xl shadow transition-colors"
+                                                            className="w-full py-2 bg-brand-purple hover:bg-indigo-700 disabled:opacity-50 disabled:hover:bg-brand-purple text-white text-[10px] font-bold rounded-xl shadow transition-colors"
                                                         >
                                                             Generar Código QR
                                                         </button>
@@ -985,7 +985,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                                 <path d="M65,5 h30 v30 h-30 z M75,15 h10 v10 h-10 z" />
                                                                 <path d="M5,65 h30 v30 h-30 z M15,75 h10 v10 h-10 z" />
                                                                 <path d="M45,10 h10 v10 h-10 z M50,30 h10 v10 h-10 z M40,50 h20 v10 h-20 z M45,70 h15 v5 h-15 z M75,45 h10 v15 h-10 z M80,75 h15 v15 h-15 z" />
-                                                                <circle cx="50" cy="50" r="8" className="text-indigo-600" />
+                                                                <circle cx="50" cy="50" r="8" className="text-brand-purple" />
                                                             </svg>
                                                         </div>
                                                         
@@ -1006,7 +1006,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                             </button>
                                                             <button 
                                                                 onClick={() => alert(`Pase temporal copiado para compartir por WhatsApp.`)}
-                                                                className="py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[8px] font-bold transition-colors"
+                                                                className="py-1.5 bg-brand-purple hover:bg-indigo-700 text-white rounded-lg text-[8px] font-bold transition-colors"
                                                             >
                                                                 Compartir Pase
                                                             </button>
@@ -1020,7 +1020,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                         {mobileTab === 'notices' && (
                                             <div className="space-y-3">
                                                 <div className="space-y-1 text-center">
-                                                    <span className={`text-[9px] font-extrabold uppercase tracking-widest ${simulatedMobileDarkMode ? "text-indigo-400" : "text-indigo-600"}`}>Alertas del Condominio</span>
+                                                    <span className={`text-[9px] font-extrabold uppercase tracking-widest ${simulatedMobileDarkMode ? "text-indigo-400" : "text-brand-purple"}`}>Alertas del Condominio</span>
                                                     <h3 className={`text-xs font-bold uppercase tracking-wider ${simulatedMobileDarkMode ? "text-white" : "text-slate-900"}`}>Centro de Notificaciones</h3>
                                                 </div>
                                                 
@@ -1035,7 +1035,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                             }`}
                                                         >
                                                             {!n.read && (
-                                                                <span className={`absolute top-3 right-3 h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse border ${simulatedMobileDarkMode ? "border-slate-950" : "border-white"}`} />
+                                                                <span className={`absolute top-3 right-3 h-1.5 w-1.5 rounded-full bg-brand-purple animate-pulse border ${simulatedMobileDarkMode ? "border-slate-950" : "border-white"}`} />
                                                             )}
                                                             <div className="flex items-center justify-between text-[8px] font-extrabold uppercase tracking-widest text-slate-500">
                                                                 <span>{n.title}</span>
@@ -1053,7 +1053,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                     <div className="h-14 bg-slate-900 border-t border-slate-800 flex items-center justify-around text-slate-500 shrink-0 z-20">
                                         <button 
                                             onClick={() => setMobileTab('home')}
-                                            className={`flex flex-col items-center justify-center w-12 h-full transition-colors ${mobileTab === 'home' ? (simulatedMobileDarkMode ? 'text-indigo-400' : 'text-indigo-600 font-extrabold') : (simulatedMobileDarkMode ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-700')}`}
+                                            className={`flex flex-col items-center justify-center w-12 h-full transition-colors ${mobileTab === 'home' ? (simulatedMobileDarkMode ? 'text-indigo-400' : 'text-brand-purple font-extrabold') : (simulatedMobileDarkMode ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-700')}`}
                                         >
                                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
@@ -1066,7 +1066,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                 setMobileTab('access');
                                                 triggerIotApertura();
                                             }}
-                                            className={`flex flex-col items-center justify-center w-12 h-full transition-colors ${mobileTab === 'access' ? (simulatedMobileDarkMode ? 'text-indigo-400' : 'text-indigo-600 font-extrabold') : (simulatedMobileDarkMode ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-700')}`}
+                                            className={`flex flex-col items-center justify-center w-12 h-full transition-colors ${mobileTab === 'access' ? (simulatedMobileDarkMode ? 'text-indigo-400' : 'text-brand-purple font-extrabold') : (simulatedMobileDarkMode ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-700')}`}
                                         >
                                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
@@ -1076,7 +1076,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                         
                                         <button 
                                             onClick={() => setMobileTab('qr')}
-                                            className={`flex flex-col items-center justify-center w-12 h-full transition-colors ${mobileTab === 'qr' ? (simulatedMobileDarkMode ? 'text-indigo-400' : 'text-indigo-600 font-extrabold') : (simulatedMobileDarkMode ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-700')}`}
+                                            className={`flex flex-col items-center justify-center w-12 h-full transition-colors ${mobileTab === 'qr' ? (simulatedMobileDarkMode ? 'text-indigo-400' : 'text-brand-purple font-extrabold') : (simulatedMobileDarkMode ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-700')}`}
                                         >
                                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z" />
@@ -1086,10 +1086,10 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                         
                                         <button 
                                             onClick={() => setMobileTab('notices')}
-                                            className={`flex flex-col items-center justify-center w-12 h-full transition-colors relative ${mobileTab === 'notices' ? (simulatedMobileDarkMode ? 'text-indigo-400' : 'text-indigo-600 font-extrabold') : (simulatedMobileDarkMode ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-700')}`}
+                                            className={`flex flex-col items-center justify-center w-12 h-full transition-colors relative ${mobileTab === 'notices' ? (simulatedMobileDarkMode ? 'text-indigo-400' : 'text-brand-purple font-extrabold') : (simulatedMobileDarkMode ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-700')}`}
                                         >
                                             {mobileNotifications.some(n => !n.read) && (
-                                                <span className="absolute top-2.5 right-3 h-2 w-2 bg-indigo-500 rounded-full border border-slate-900" />
+                                                <span className="absolute top-2.5 right-3 h-2 w-2 bg-brand-purple rounded-full border border-slate-900" />
                                             )}
                                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a9.001 9.001 0 01-11.963-3.07 9.001 9.001 0 013.07-11.963c.48-.277 1.012-.456 1.56-.532a.75.75 0 01.815.58l.492 2.213a.75.75 0 01-.419.824l-1.077.538a6.502 6.502 0 003.003 3.003l.538-1.077a.75.75 0 01.824-.419l2.213.493a.75.75 0 01.58.815c-.076.548-.255 1.08-.532 1.56z" />
@@ -1114,7 +1114,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
             <section id="branding-gallery" className="py-24 border-t border-slate-200/50 dark:border-white/5 bg-transparent relative transition-colors duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center max-w-3xl mx-auto mb-16">
-                        <span className="text-xs font-bold text-[#00A896] uppercase tracking-widest block mb-2">Identidad Visual y Planificación</span>
+                        <span className="text-xs font-bold text-brand-teal uppercase tracking-widest block mb-2">Identidad Visual y Planificación</span>
                         <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                             Manual de Marca y Hojas de Ruta
                         </h2>
@@ -1128,7 +1128,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                         {brandAssets.map((asset) => (
                             <div 
                                 key={asset.id}
-                                className="bg-white/80 dark:bg-white/[0.02] dark:backdrop-blur-md border border-slate-200/50 dark:border-white/5 rounded-3xl overflow-hidden shadow-sm hover:shadow-md hover:border-[#00A896]/30 dark:hover:border-[#00A896]/30 hover:scale-[1.01] transition-all group flex flex-col justify-between"
+                                className="bg-white/80 dark:bg-white/[0.02] dark:backdrop-blur-md border border-slate-200/50 dark:border-white/5 rounded-3xl overflow-hidden shadow-sm hover:shadow-md hover:border-brand-teal/30 dark:hover:border-brand-teal/30 hover:scale-[1.01] transition-all group flex flex-col justify-between"
                             >
                                 <div>
                                     <div className="relative aspect-video overflow-hidden bg-slate-100 dark:bg-slate-950 flex items-center justify-center">
@@ -1147,7 +1147,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                 onClick={() => setSelectedImage(asset)}
                                                 className="p-3 bg-white text-slate-900 rounded-full font-bold text-xs shadow-lg flex items-center gap-1.5 hover:scale-105 transition-transform"
                                             >
-                                                <svg className="w-4 h-4 text-[#00A896]" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                                <svg className="w-4 h-4 text-brand-teal" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z" />
                                                 </svg>
                                                 Ampliar Vista
@@ -1159,7 +1159,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                         </div>
                                     </div>
                                     <div className="p-6 space-y-3">
-                                        <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold bg-[#00A896]/10 text-[#00A896] dark:bg-[#00A896]/20 dark:text-[#00A896]">
+                                        <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold bg-brand-teal/10 text-brand-teal dark:bg-brand-teal/20 dark:text-brand-teal">
                                             {asset.tag}
                                         </span>
                                         <h3 className="text-base font-extrabold text-slate-900 dark:text-white transition-colors">{asset.title}</h3>
@@ -1171,7 +1171,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                         onClick={() => setSelectedImage(asset)}
                                         className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-white/[0.03] dark:hover:bg-white/[0.08] border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-355 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors"
                                     >
-                                        <svg className="w-4 h-4 text-[#00A896]" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                        <svg className="w-4 h-4 text-brand-teal" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.644L3.098 10.98a10.002 10.002 0 0117.804 0l1.062 1.258a1.012 1.012 0 010 .644l-1.062 1.258a10.002 10.002 0 01-17.804 0l-1.062-1.258z" />
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
@@ -1188,9 +1188,10 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     <div 
                         className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm transition-opacity duration-300"
                         onClick={() => setSelectedImage(null)}
+                        role="dialog" aria-modal="true" tabIndex={-1} onKeyDown={(e) => { if (e.key === 'Escape') setSelectedImage(null); }}
                     >
                         <div 
-                            className="relative max-w-5xl w-full max-h-[90vh] overflow-y-auto bg-[#0F2557] border border-white/10 rounded-3xl shadow-2xl animate-scale-up"
+                            className="relative max-w-5xl w-full max-h-[90vh] overflow-y-auto bg-brand-navy border border-white/10 rounded-3xl shadow-2xl animate-scale-up"
                             onClick={(e) => e.stopPropagation()}
                         >
                             {/* Close button */}
@@ -1226,7 +1227,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                 {/* Text explanation side */}
                                 <div className="lg:col-span-4 p-8 flex flex-col justify-between space-y-6 text-left">
                                     <div className="space-y-4">
-                                        <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold bg-[#00A896]/20 text-cyan-300">
+                                        <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold bg-brand-teal/20 text-cyan-300">
                                             {selectedImage.tag}
                                         </span>
                                         <h3 className="text-xl font-black text-white">{selectedImage.title}</h3>
@@ -1249,7 +1250,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                                     <button 
                                         onClick={() => setSelectedImage(null)}
-                                        className="w-full py-3 bg-gradient-to-r from-[#00A896] to-[#72B043] text-white font-bold text-xs rounded-xl shadow-lg transition-transform hover:scale-[1.01]"
+                                        className="w-full py-3 bg-gradient-to-r from-brand-teal to-brand-green text-white font-bold text-xs rounded-xl shadow-lg transition-transform hover:scale-[1.01]"
                                     >
                                         Aceptar y Volver
                                     </button>
@@ -1261,10 +1262,10 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
             </section>
 
             {/* Interactive Role Simulator Section */}
-            <section id="simulator" className="py-24 border-t border-slate-200/50 dark:border-white/5 bg-white/40 dark:bg-[#0F2557]/20 backdrop-blur-md relative transition-colors duration-300">
+            <section id="simulator" className="py-24 border-t border-slate-200/50 dark:border-white/5 bg-white/40 dark:bg-brand-navy/20 backdrop-blur-md relative transition-colors duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center max-w-3xl mx-auto mb-16 transition-colors duration-300">
-                        <span className="text-xs font-bold text-[#00A896] uppercase tracking-widest block mb-2">Simulador en Tiempo Real</span>
+                        <span className="text-xs font-bold text-brand-teal uppercase tracking-widest block mb-2">Simulador en Tiempo Real</span>
                         <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                             6 Perfiles, un solo Condominio
                         </h2>
@@ -1281,7 +1282,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                 onClick={() => setActiveRole(roleKey)}
                                 className={`flex-1 min-w-[120px] px-4 py-3 text-xs sm:text-sm font-bold rounded-xl transition-all ${
                                     activeRole === roleKey
-                                        ? 'bg-gradient-to-r from-[#0F2557] to-[#00A896] dark:from-[#00A896] dark:to-[#72B043] text-white shadow-md shadow-teal-500/10'
+                                        ? 'bg-gradient-to-r from-brand-navy to-brand-teal dark:from-brand-teal dark:to-brand-green text-white shadow-md shadow-teal-500/10'
                                         : 'text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.04]'
                                 }`}
                             >
@@ -1297,7 +1298,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                         <div className="lg:col-span-5 bg-white/80 dark:bg-white/[0.02] dark:backdrop-blur-xl border border-slate-200/50 dark:border-white/5 rounded-3xl p-8 flex flex-col justify-between shadow-xl shadow-slate-100/30 dark:shadow-none transition-all duration-300">
                             <div>
                                 <div className="flex items-center justify-between mb-4">
-                                    <span className="px-3 py-1 bg-[#00A896]/10 border border-[#00A896]/20 text-[#00A896] text-xs font-bold rounded-full uppercase tracking-wider">
+                                    <span className="px-3 py-1 bg-brand-teal/10 border border-brand-teal/20 text-brand-teal text-xs font-bold rounded-full uppercase tracking-wider">
                                         Rol: {activeRole}
                                     </span>
                                     <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">
@@ -1334,7 +1335,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                     {/* Right Column: Visual Dashboard Simulator */}
                         <div className={`lg:col-span-7 backdrop-blur-xl border rounded-3xl p-6 shadow-xl relative flex flex-col justify-between min-h-[480px] transition-all duration-300 ${
                             simulatedDarkMode 
-                                ? 'bg-[#0F2557]/40 border-teal-500/15 text-slate-100 shadow-[0_0_30px_rgba(0,168,150,0.05)]' 
+                                ? 'bg-brand-navy/40 border-teal-500/15 text-slate-100 shadow-[0_0_30px_rgba(0,168,150,0.05)]' 
                                 : 'bg-white/90 border-slate-200/60 text-slate-900 shadow-slate-100/30'
                         }`}>
                             
@@ -1356,7 +1357,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                         className={`px-2.5 py-1.5 border rounded-lg text-[10px] font-bold flex items-center gap-1.5 transition-all shadow-sm ${
                                             simulatedDarkMode 
                                                 ? 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700' 
-                                                : 'bg-slate-50 border-slate-200 text-slate-700 hover:text-indigo-600 hover:border-slate-300'
+                                                : 'bg-slate-50 border-slate-200 text-slate-700 hover:text-brand-purple hover:border-slate-300'
                                         }`}
                                     >
                                         {simulatedDarkMode ? (
@@ -1365,7 +1366,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                             </>
                                         ) : (
                                             <>
-                                                <span className="text-indigo-600">🌙</span> Oscuro
+                                                <span className="text-brand-purple">🌙</span> Oscuro
                                             </>
                                         )}
                                     </button>
@@ -1387,7 +1388,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                 onClick={() => {
                                                     alert('Ejecutado: Los gastos comunes se han generado para las 50 unidades y notificado por correo.');
                                                 }}
-                                                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition-colors"
+                                                className="px-4 py-2 bg-brand-purple hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition-colors"
                                             >
                                                 Emitir Gastos Comunes
                                             </button>
@@ -1409,8 +1410,8 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                         onClick={() => alert(act.action)} 
                                                         className={`p-3 text-left text-xs rounded-xl border transition-all shadow-sm ${
                                                             simulatedDarkMode 
-                                                                ? 'bg-slate-950 hover:bg-slate-900 border-slate-800 text-white hover:border-indigo-500/30' 
-                                                                : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-900 hover:border-indigo-600/35'
+                                                                ? 'bg-slate-950 hover:bg-slate-900 border-slate-800 text-white hover:border-brand-purple/30' 
+                                                                : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-900 hover:border-brand-purple/35'
                                                         }`}
                                                     >
                                                         <span className="font-bold block">{act.title}</span>
@@ -1433,7 +1434,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                             <div>
                                                 <span className={`text-xs font-semibold block ${simulatedDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>Dpto 402 - Torre A</span>
                                                 <span className="text-lg font-extrabold mt-1 block">
-                                                    Mayo 2026: <span className="` + (simulatedDarkMode ? 'text-indigo-400' : 'text-indigo-600') + ` font-extrabold`">{formatCurrency(45000)}</span>
+                                                    Mayo 2026: <span className="` + (simulatedDarkMode ? 'text-indigo-400' : 'text-brand-purple') + ` font-extrabold`">{formatCurrency(45000)}</span>
                                                 </span>
                                                 <span className={`text-[10px] block mt-1 ${simulatedDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>Vence el 05 de Junio, 2026</span>
                                             </div>
@@ -1443,7 +1444,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                         <span className={`px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-xs font-bold rounded-full uppercase tracking-wider ${simulatedDarkMode ? "text-emerald-400" : "text-emerald-600"}`}>
                                                             Pagado
                                                         </span>
-                                                        <button onClick={handleResetPayment} className={`text-[10px] hover:underline font-bold ${simulatedDarkMode ? "text-indigo-400" : "text-indigo-600"}`}>
+                                                        <button onClick={handleResetPayment} className={`text-[10px] hover:underline font-bold ${simulatedDarkMode ? "text-indigo-400" : "text-brand-purple"}`}>
                                                             Resetear simulación
                                                         </button>
                                                     </div>
@@ -1473,7 +1474,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                 <span className={`text-xs font-bold uppercase tracking-wider transition-colors duration-300 ${
                                                     simulatedDarkMode ? 'text-slate-400' : 'text-slate-600'
                                                 }`}>Tus Solicitudes de Soporte</span>
-                                                <button onClick={() => alert('Creando ticket de mantenimiento en Dpto 402')} className={`text-xs font-bold hover:underline ${simulatedDarkMode ? "text-indigo-400" : "text-indigo-600"}`}>Crear Ticket</button>
+                                                <button onClick={() => alert('Creando ticket de mantenimiento en Dpto 402')} className={`text-xs font-bold hover:underline ${simulatedDarkMode ? "text-indigo-400" : "text-brand-purple"}`}>Crear Ticket</button>
                                             </div>
                                             <div className="space-y-2">
                                                 <div className={`flex items-center justify-between p-2.5 rounded-xl border text-xs transition-colors duration-300 ${
@@ -1520,20 +1521,20 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                         <div className="grid grid-cols-2 gap-3 text-center">
                                             <button onClick={() => alert('Abriendo creador de incidencias comunes')} className={`p-4 border rounded-2xl transition-all shadow-sm ${
                                                 simulatedDarkMode 
-                                                    ? 'bg-slate-950 hover:bg-slate-900 border-slate-800 hover:border-indigo-500/30' 
-                                                    : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-indigo-600/30 shadow-sm'
+                                                    ? 'bg-slate-950 hover:bg-slate-900 border-slate-800 hover:border-brand-purple/30' 
+                                                    : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-brand-purple/30 shadow-sm'
                                             }`}>
-                                                <svg className="w-6 h-6 text-indigo-500 mx-auto mb-2" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                                                <svg className="w-6 h-6 text-brand-purple mx-auto mb-2" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg>
                                                 <span className="text-xs font-bold block">Reportar Avería Común</span>
                                             </button>
                                             <button onClick={() => alert('Abriendo mensajería interna con conserjería')} className={`p-4 border rounded-2xl transition-all shadow-sm ${
                                                 simulatedDarkMode 
-                                                    ? 'bg-slate-950 hover:bg-slate-900 border-slate-800 hover:border-indigo-500/30' 
-                                                    : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-indigo-600/30 shadow-sm'
+                                                    ? 'bg-slate-950 hover:bg-slate-900 border-slate-800 hover:border-brand-purple/30' 
+                                                    : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-brand-purple/30 shadow-sm'
                                             }`}>
-                                                <svg className="w-6 h-6 text-indigo-600 mx-auto mb-2" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                                                <svg className="w-6 h-6 text-brand-purple mx-auto mb-2" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
                                                 </svg>
                                                 <span className="text-xs font-bold block">Enviar Mensaje</span>
@@ -1556,7 +1557,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                 simulatedDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
                                             }`}>
                                                 <span className={`text-[10px] font-semibold block uppercase ${simulatedDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>Pendientes de Aprobación</span>
-                                                <span className="text-lg font-bold block mt-1 text-indigo-500">2 Presupuestos</span>
+                                                <span className="text-lg font-bold block mt-1 text-brand-purple">2 Presupuestos</span>
                                             </div>
                                         </div>
 
@@ -1588,7 +1589,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                             ) : (
                                                                 <button 
                                                                     onClick={() => handleApproveExpense(item.id)}
-                                                                    className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition-colors"
+                                                                    className="px-3 py-1.5 bg-brand-purple hover:bg-indigo-700 text-white font-bold rounded-lg transition-colors"
                                                                 >
                                                                     Aprobar
                                                                 </button>
@@ -1652,7 +1653,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                                             ) : (
                                                                 <button 
                                                                     onClick={() => handleTicketStatusChange(ticket.id, 'in_progress')}
-                                                                    className="w-full sm:w-auto px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow transition-colors"
+                                                                    className="w-full sm:w-auto px-3 py-1.5 bg-brand-purple hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow transition-colors"
                                                                 >
                                                                     Comenzar
                                                                 </button>
@@ -1715,7 +1716,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                 simulatedDarkMode ? 'border-white/5 text-slate-500' : 'border-slate-100 text-slate-500'
                             }`}>
                                 <span>Sistema de simulación frontend reactivo</span>
-                                <span className={`font-mono transition-colors duration-300 ${simulatedDarkMode ? 'text-teal-400' : 'text-[#00A896] font-bold'}`}>redvecino.cl</span>
+                                <span className={`font-mono transition-colors duration-300 ${simulatedDarkMode ? 'text-teal-400' : 'text-brand-teal font-bold'}`}>redvecino.cl</span>
                             </div>
                         </div>
                     </div>
@@ -1726,7 +1727,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
             <section id="modules" className="py-24 border-t border-slate-200/50 dark:border-white/5 bg-transparent relative transition-colors duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center max-w-3xl mx-auto mb-20">
-                        <span className="text-xs font-bold text-[#72B043] uppercase tracking-widest block mb-2 transition-colors duration-300">Características del MVP</span>
+                        <span className="text-xs font-bold text-brand-green uppercase tracking-widest block mb-2 transition-colors duration-300">Características del MVP</span>
                         <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight transition-colors duration-300">
                             Gestión Integral Automatizada
                         </h2>
@@ -1737,8 +1738,8 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {/* Financial Module Card */}
-                        <div className="bg-white/75 dark:bg-white/[0.02] dark:backdrop-blur-md border border-slate-200/50 dark:border-white/5 p-8 rounded-3xl space-y-6 hover:border-[#00A896]/30 dark:hover:border-[#00A896]/30 hover:scale-[1.01] transition-all group shadow-sm dark:shadow-none">
-                            <div className="h-14 w-14 rounded-2xl bg-[#00A896]/10 border border-[#00A896]/20 text-[#00A896] dark:text-[#00A896] flex items-center justify-center group-hover:bg-[#00A896] group-hover:text-white transition-all shadow-inner">
+                        <div className="bg-white/75 dark:bg-white/[0.02] dark:backdrop-blur-md border border-slate-200/50 dark:border-white/5 p-8 rounded-3xl space-y-6 hover:border-brand-teal/30 dark:hover:border-brand-teal/30 hover:scale-[1.01] transition-all group shadow-sm dark:shadow-none">
+                            <div className="h-14 w-14 rounded-2xl bg-brand-teal/10 border border-brand-teal/20 text-brand-teal dark:text-brand-teal flex items-center justify-center group-hover:bg-brand-teal group-hover:text-white transition-all shadow-inner">
                                 <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -1755,8 +1756,8 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                         </div>
 
                         {/* Tickets Module Card */}
-                        <div className="bg-white/75 dark:bg-white/[0.02] dark:backdrop-blur-md border border-slate-200/50 dark:border-white/5 p-8 rounded-3xl space-y-6 hover:border-[#72B043]/30 dark:hover:border-[#72B043]/30 hover:scale-[1.01] transition-all group shadow-sm dark:shadow-none">
-                            <div className="h-14 w-14 rounded-2xl bg-[#72B043]/10 border border-[#72B043]/20 text-[#72B043] dark:text-[#72B043] flex items-center justify-center group-hover:bg-[#72B043] group-hover:text-white transition-all shadow-inner">
+                        <div className="bg-white/75 dark:bg-white/[0.02] dark:backdrop-blur-md border border-slate-200/50 dark:border-white/5 p-8 rounded-3xl space-y-6 hover:border-brand-green/30 dark:hover:border-brand-green/30 hover:scale-[1.01] transition-all group shadow-sm dark:shadow-none">
+                            <div className="h-14 w-14 rounded-2xl bg-brand-green/10 border border-brand-green/20 text-brand-green dark:text-brand-green flex items-center justify-center group-hover:bg-brand-green group-hover:text-white transition-all shadow-inner">
                                 <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17l-5.646 5.647a1.5 1.5 0 01-2.121-2.121l5.646-5.646m0 0l5.646-5.646m-5.646 5.646L16.5 3M12 21h9" />
                                 </svg>
@@ -1773,8 +1774,8 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                         </div>
 
                         {/* Communication Module Card */}
-                        <div className="bg-white/75 dark:bg-white/[0.02] dark:backdrop-blur-md border border-slate-200/50 dark:border-white/5 p-8 rounded-3xl space-y-6 hover:border-[#EC7A08]/30 dark:hover:border-[#EC7A08]/30 hover:scale-[1.01] transition-all group shadow-sm dark:shadow-none">
-                            <div className="h-14 w-14 rounded-2xl bg-[#EC7A08]/10 border border-[#EC7A08]/20 text-[#EC7A08] dark:text-[#EC7A08] flex items-center justify-center group-hover:bg-[#EC7A08] group-hover:text-white transition-all shadow-inner">
+                        <div className="bg-white/75 dark:bg-white/[0.02] dark:backdrop-blur-md border border-slate-200/50 dark:border-white/5 p-8 rounded-3xl space-y-6 hover:border-brand-orange/30 dark:hover:border-brand-orange/30 hover:scale-[1.01] transition-all group shadow-sm dark:shadow-none">
+                            <div className="h-14 w-14 rounded-2xl bg-brand-orange/10 border border-brand-orange/20 text-brand-orange dark:text-brand-orange flex items-center justify-center group-hover:bg-brand-orange group-hover:text-white transition-all shadow-inner">
                                 <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
                                 </svg>
@@ -1794,13 +1795,13 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
             </section>
 
             {/* Common Expenses Calculator Widget */}
-            <section id="calculator" className="py-24 border-t border-slate-200/50 dark:border-white/5 bg-white/40 dark:bg-[#0F2557]/20 backdrop-blur-md relative transition-colors duration-300">
+            <section id="calculator" className="py-24 border-t border-slate-200/50 dark:border-white/5 bg-white/40 dark:bg-brand-navy/20 backdrop-blur-md relative transition-colors duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid lg:grid-cols-12 gap-12 items-center max-w-6xl mx-auto">
                         
                         {/* Left Column: Explanations */}
                         <div className="lg:col-span-5 space-y-6">
-                            <span className="text-xs font-bold text-[#00A896] uppercase tracking-widest block">Simulador Financiero</span>
+                            <span className="text-xs font-bold text-brand-teal uppercase tracking-widest block">Simulador Financiero</span>
                             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight transition-colors duration-300">
                                 Transparencia Absoluta en el Cálculo de Gastos
                             </h2>
@@ -1821,7 +1822,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                         </div>
 
                         {/* Right Column: Calculator Widget */}
-                        <div className="lg:col-span-7 bg-white/80 dark:bg-[#0F2557]/40 dark:backdrop-blur-xl border border-slate-200/50 dark:border-white/5 p-6 sm:p-8 rounded-3xl shadow-xl dark:shadow-[0_0_30px_rgba(0,168,150,0.02)] space-y-6 transition-all duration-300">
+                        <div className="lg:col-span-7 bg-white/80 dark:bg-brand-navy/40 dark:backdrop-blur-xl border border-slate-200/50 dark:border-white/5 p-6 sm:p-8 rounded-3xl shadow-xl dark:shadow-[0_0_30px_rgba(0,168,150,0.02)] space-y-6 transition-all duration-300">
                             <h3 className="text-lg font-bold text-slate-900 dark:text-white uppercase tracking-wider pb-3 border-b border-slate-200 dark:border-slate-800 transition-colors duration-300">
                                 Ajuste del Presupuesto Comunitario
                             </h3>
@@ -1837,7 +1838,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                     <input 
                                         type="range" min="10" max="150" step="5" value={units}
                                         onChange={(e) => setUnits(parseInt(e.target.value))}
-                                        className="w-full accent-[#00A896] bg-slate-200 dark:bg-[#0B1A3E] rounded-lg appearance-none h-2 cursor-pointer"
+                                        className="w-full accent-brand-teal bg-slate-200 dark:bg-brand-navy-dark rounded-lg appearance-none h-2 cursor-pointer"
                                     />
                                 </div>
 
@@ -1850,7 +1851,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                     <input 
                                         type="range" min="200000" max="3000000" step="50000" value={securityBudget}
                                         onChange={(e) => setSecurityBudget(parseInt(e.target.value))}
-                                        className="w-full accent-[#00A896] bg-slate-200 dark:bg-[#0B1A3E] rounded-lg appearance-none h-2 cursor-pointer"
+                                        className="w-full accent-brand-teal bg-slate-200 dark:bg-brand-navy-dark rounded-lg appearance-none h-2 cursor-pointer"
                                     />
                                 </div>
 
@@ -1863,7 +1864,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                     <input 
                                         type="range" min="100000" max="1500000" step="50000" value={cleaningBudget}
                                         onChange={(e) => setCleaningBudget(parseInt(e.target.value))}
-                                        className="w-full accent-[#00A896] bg-slate-200 dark:bg-[#0B1A3E] rounded-lg appearance-none h-2 cursor-pointer"
+                                        className="w-full accent-brand-teal bg-slate-200 dark:bg-brand-navy-dark rounded-lg appearance-none h-2 cursor-pointer"
                                     />
                                 </div>
 
@@ -1876,7 +1877,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                     <input 
                                         type="range" min="100000" max="1500000" step="50000" value={maintenanceBudget}
                                         onChange={(e) => setMaintenanceBudget(parseInt(e.target.value))}
-                                        className="w-full accent-[#00A896] bg-slate-200 dark:bg-[#0B1A3E] rounded-lg appearance-none h-2 cursor-pointer"
+                                        className="w-full accent-brand-teal bg-slate-200 dark:bg-brand-navy-dark rounded-lg appearance-none h-2 cursor-pointer"
                                     />
                                 </div>
 
@@ -1889,18 +1890,18 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                     <input 
                                         type="range" min="50000" max="1000000" step="50000" value={utilitiesBudget}
                                         onChange={(e) => setUtilitiesBudget(parseInt(e.target.value))}
-                                        className="w-full accent-[#00A896] bg-slate-200 dark:bg-[#0B1A3E] rounded-lg appearance-none h-2 cursor-pointer"
+                                        className="w-full accent-brand-teal bg-slate-200 dark:bg-brand-navy-dark rounded-lg appearance-none h-2 cursor-pointer"
                                     />
                                 </div>
                             </div>
 
                             {/* Total Result Panel */}
-                            <div className="bg-slate-50 dark:bg-[#0B1A3E] border border-slate-200/60 dark:border-white/5 p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mt-6 transition-all duration-300">
+                            <div className="bg-slate-50 dark:bg-brand-navy-dark border border-slate-200/60 dark:border-white/5 p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mt-6 transition-all duration-300">
                                 <div>
                                     <span className="text-[10px] text-slate-500 font-extrabold uppercase tracking-widest block">Gasto Total Común del Condominio</span>
                                     <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-350 block mt-1">{formatCurrency(totalExpenses)}</span>
                                 </div>
-                                <div className="p-3 bg-[#00A896]/10 border border-[#00A896]/20 text-[#00A896] dark:text-[#00A896] rounded-xl">
+                                <div className="p-3 bg-brand-teal/10 border border-brand-teal/20 text-brand-teal dark:text-brand-teal rounded-xl">
                                     <span className="text-[9px] font-extrabold uppercase tracking-widest block">Cuota por Departamento</span>
                                     <span className="text-xl sm:text-2xl font-black block mt-0.5">{formatCurrency(expensePerUnit)}</span>
                                 </div>
@@ -1917,7 +1918,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
             <section id="roadmap" className="py-24 border-t border-slate-200/50 dark:border-white/5 bg-transparent relative transition-colors duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center max-w-3xl mx-auto mb-16 transition-colors duration-300">
-                        <span className="text-xs font-bold text-[#00A896] uppercase tracking-widest block mb-2">Hoja de Ruta del Proyecto</span>
+                        <span className="text-xs font-bold text-brand-teal uppercase tracking-widest block mb-2">Hoja de Ruta del Proyecto</span>
                         <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight transition-colors duration-300">
                             Fases de Implementación Técnica
                         </h2>
@@ -1931,11 +1932,11 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                         
                         {/* Step 1 */}
                         <div className="relative md:text-center space-y-4">
-                            <div className="md:mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#72B043]/15 border-2 border-[#72B043] text-[#72B043] font-bold text-sm shadow-lg shadow-[#72B043]/10">
+                            <div className="md:mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-brand-green/15 border-2 border-brand-green text-brand-green font-bold text-sm shadow-lg shadow-brand-green/10">
                                 01
                             </div>
                             <div className="space-y-1">
-                                <span className="text-[10px] text-[#72B043] font-bold uppercase tracking-wider block">Fase 1: Setup & Core</span>
+                                <span className="text-[10px] text-brand-green font-bold uppercase tracking-wider block">Fase 1: Setup & Core</span>
                                 <h4 className="text-sm font-bold text-slate-900 dark:text-white">Configuración Inicial</h4>
                                 <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed md:max-w-[200px] md:mx-auto transition-colors duration-300">
                                     Instalación de Laravel 13, SQLite local, Tailwind CSS v4, e integración del Starter Kit de React + Inertia.js v3.
@@ -1945,11 +1946,11 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                         {/* Step 2 */}
                         <div className="relative md:text-center space-y-4">
-                            <div className="md:mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#72B043]/15 border-2 border-[#72B043] text-[#72B043] font-bold text-sm shadow-lg shadow-[#72B043]/10">
+                            <div className="md:mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-brand-green/15 border-2 border-brand-green text-brand-green font-bold text-sm shadow-lg shadow-brand-green/10">
                                 02
                             </div>
                             <div className="space-y-1">
-                                <span className="text-[10px] text-[#72B043] font-bold uppercase tracking-wider block">Fase 2: Estructura</span>
+                                <span className="text-[10px] text-brand-green font-bold uppercase tracking-wider block">Fase 2: Estructura</span>
                                 <h4 className="text-sm font-bold text-slate-900 dark:text-white">Usuarios & Propiedades</h4>
                                 <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed md:max-w-[200px] md:mx-auto transition-colors duration-300">
                                     Base de datos relacional de condominios y unidades. Formularios de registro específicos según los 6 perfiles dinámicos.
@@ -1959,11 +1960,11 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                         {/* Step 3 */}
                         <div className="relative md:text-center space-y-4">
-                            <div className="md:mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#72B043]/15 border-2 border-[#72B043] text-[#72B043] font-bold text-sm shadow-lg shadow-[#72B043]/10">
+                            <div className="md:mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-brand-green/15 border-2 border-brand-green text-brand-green font-bold text-sm shadow-lg shadow-brand-green/10">
                                 03
                             </div>
                             <div className="space-y-1">
-                                <span className="text-[10px] text-[#72B043] font-bold uppercase tracking-wider block">Fase 3: Finanzas</span>
+                                <span className="text-[10px] text-brand-green font-bold uppercase tracking-wider block">Fase 3: Finanzas</span>
                                 <h4 className="text-sm font-bold text-slate-900 dark:text-white">Gastos Comunes</h4>
                                 <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed md:max-w-[200px] md:mx-auto transition-colors duration-300">
                                     Algoritmo de facturación por prorrateo, portal de registro de pagos digitales, estados de cuenta descargables y multas.
@@ -1973,11 +1974,11 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                         {/* Step 4 */}
                         <div className="relative md:text-center space-y-4">
-                            <div className="md:mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#EC7A08]/15 border-2 border-[#EC7A08] text-[#EC7A08] font-bold text-sm shadow-lg shadow-[#EC7A08]/10">
+                            <div className="md:mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-brand-orange/15 border-2 border-brand-orange text-brand-orange font-bold text-sm shadow-lg shadow-brand-orange/10">
                                 04
                             </div>
                             <div className="space-y-1">
-                                <span className="text-[10px] text-[#EC7A08] font-bold uppercase tracking-wider block animate-pulse">Fase 4: Operaciones</span>
+                                <span className="text-[10px] text-brand-orange font-bold uppercase tracking-wider block animate-pulse">Fase 4: Operaciones</span>
                                 <h4 className="text-sm font-bold text-slate-900 dark:text-white">Mantenimiento & Chat</h4>
                                 <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed md:max-w-[200px] md:mx-auto transition-colors duration-300">
                                     Módulo de tickets de averías con asignación a técnicos. Pizarrón digital de comunicados y mensajería privada.
@@ -1987,7 +1988,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                         {/* Step 5 */}
                         <div className="relative md:text-center space-y-4">
-                            <div className="md:mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-white/80 dark:bg-[#0B1A3E] border-2 border-slate-200/60 dark:border-white/5 text-slate-400 dark:text-slate-500 font-bold text-sm transition-colors duration-300">
+                            <div className="md:mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-white/80 dark:bg-brand-navy-dark border-2 border-slate-200/60 dark:border-white/5 text-slate-400 dark:text-slate-500 font-bold text-sm transition-colors duration-300">
                                 05
                             </div>
                             <div className="space-y-1">
@@ -2010,10 +2011,10 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                         
                         {/* Left: Terminal Mockup */}
                         <div className="lg:col-span-7 relative">
-                            <div className="absolute inset-0 bg-[#00A896]/10 rounded-2xl blur-3xl -z-10" />
-                            <div className="bg-[#0B1A3E] border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+                            <div className="absolute inset-0 bg-brand-teal/10 rounded-2xl blur-3xl -z-10" />
+                            <div className="bg-brand-navy-dark border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
                                 {/* Header bar */}
-                                <div className="bg-[#0A183A] px-4 py-3 flex items-center justify-between border-b border-white/5">
+                                <div className="bg-brand-navy-dark px-4 py-3 flex items-center justify-between border-b border-white/5">
                                     <div className="flex items-center gap-1.5">
                                         <span className="w-3 h-3 rounded-full bg-rose-500" />
                                         <span className="w-3 h-3 rounded-full bg-amber-500" />
@@ -2022,7 +2023,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                     <span className="text-xs font-mono text-slate-500">spatie_permission_seeder.php</span>
                                 </div>
                                 {/* Code Editor mockup */}
-                                <pre className="p-6 font-mono text-[11px] sm:text-xs text-teal-300 leading-relaxed overflow-x-auto bg-[#0A183A]/60">
+                                <pre className="p-6 font-mono text-[11px] sm:text-xs text-teal-300 leading-relaxed overflow-x-auto bg-brand-navy-dark/60">
 <code><span className="text-slate-500">// database/seeders/RoleSeeder.php</span>{"\n"}
 <span className="text-violet-400">use</span> Spatie\Permission\Models\Role;{"\n"}
 <span className="text-violet-400">use</span> Spatie\Permission\Models\Permission;{"\n"}{"\n"}
@@ -2044,7 +2045,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                         {/* Right: Technical Explanation */}
                         <div className="lg:col-span-5 space-y-6">
-                            <span className="text-xs font-bold text-[#00A896] uppercase tracking-widest block">Arquitectura Limpia</span>
+                            <span className="text-xs font-bold text-brand-teal uppercase tracking-widest block">Arquitectura Limpia</span>
                             <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white leading-tight transition-colors duration-300">
                                 Diseñado para Ingenieros
                             </h2>
@@ -2077,8 +2078,8 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
             </section>
 
             {/* Premium CTA Section */}
-            <section className="py-24 border-t border-slate-200/50 dark:border-white/5 bg-slate-100/30 dark:bg-[#0A183A]/60 relative overflow-hidden transition-colors duration-300">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#00A896]/10 to-[#72B043]/10 pointer-events-none" />
+            <section className="py-24 border-t border-slate-200/50 dark:border-white/5 bg-slate-100/30 dark:bg-brand-navy-dark/60 relative overflow-hidden transition-colors duration-300">
+                <div className="absolute inset-0 bg-gradient-to-r from-brand-teal/10 to-brand-green/10 pointer-events-none" />
                 <div className="max-w-4xl mx-auto text-center px-4 relative z-10 space-y-6">
                     <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight transition-colors duration-300">
                         ¿Listo para llevar tu comunidad al siguiente nivel?
@@ -2089,7 +2090,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     <div className="pt-4 flex flex-col sm:flex-row justify-center items-center gap-4">
                         <Link
                             href={route('register')}
-                            className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#0F2557] to-[#00A896] hover:from-[#132c66] hover:to-[#00c2ad] text-white font-bold rounded-2xl shadow-xl transition-all"
+                            className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-brand-navy to-brand-teal hover:from-brand-navy hover:to-brand-teal-light text-white font-bold rounded-2xl shadow-xl transition-all"
                         >
                             Comenzar Registro Gratis
                         </Link>
@@ -2104,7 +2105,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
             </section>
 
             {/* Robust Corporate Footer (Neobranding & Author Credits) */}
-            <footer className="py-20 border-t border-slate-200/50 dark:border-white/5 bg-slate-100/50 dark:bg-[#0A183A] text-slate-600 dark:text-slate-400 transition-all duration-300 relative z-10">
+            <footer className="py-20 border-t border-slate-200/50 dark:border-white/5 bg-slate-100/50 dark:bg-brand-navy-dark text-slate-600 dark:text-slate-400 transition-all duration-300 relative z-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     
                     {/* Columns Grid */}
@@ -2117,7 +2118,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                 Ecosistema SaaS residencial diseñado para automatizar la gestión administrativa, la fiscalización de egresos, la seguridad en accesos y la convivencia vecinal.
                             </p>
                             <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                                Diseñado y desarrollado por <a href="https://github.com/motazorrilla" target="_blank" rel="noopener noreferrer" className="text-[#00A896] hover:underline font-bold">@Motazorrilla</a> en colaboración con <a href="https://neobranding.cl" target="_blank" rel="noopener noreferrer" className="text-[#00A896] hover:underline font-bold">Neobranding.cl</a>.
+                                Diseñado y desarrollado por <a href="https://github.com/motazorrilla" target="_blank" rel="noopener noreferrer" className="text-brand-teal hover:underline font-bold">@Motazorrilla</a> en colaboración con <a href="https://neobranding.cl" target="_blank" rel="noopener noreferrer" className="text-brand-teal hover:underline font-bold">Neobranding.cl</a>.
                             </div>
                         </div>
 
@@ -2126,19 +2127,19 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                             <span className="text-xs font-black text-slate-900 dark:text-slate-400 uppercase tracking-widest block">Plataforma</span>
                             <ul className="space-y-2.5 text-xs font-bold text-slate-500 dark:text-slate-400">
                                 <li>
-                                    <a href="#simulator" className="hover:text-[#00A896] dark:hover:text-white transition-colors">Simulador de Roles</a>
+                                    <a href="#simulator" className="hover:text-brand-teal dark:hover:text-white transition-colors">Simulador de Roles</a>
                                 </li>
                                 <li>
-                                    <a href="#modules" className="hover:text-[#00A896] dark:hover:text-white transition-colors">Módulos Core</a>
+                                    <a href="#modules" className="hover:text-brand-teal dark:hover:text-white transition-colors">Módulos Core</a>
                                 </li>
                                 <li>
-                                    <a href="#calculator" className="hover:text-[#00A896] dark:hover:text-white transition-colors">Calculadora Financiera</a>
+                                    <a href="#calculator" className="hover:text-brand-teal dark:hover:text-white transition-colors">Calculadora Financiera</a>
                                 </li>
                                 <li>
-                                    <a href="#mobile-app" className="hover:text-[#00A896] dark:hover:text-white transition-colors">Aplicación Móvil</a>
+                                    <a href="#mobile-app" className="hover:text-brand-teal dark:hover:text-white transition-colors">Aplicación Móvil</a>
                                 </li>
                                 <li>
-                                    <a href="#roadmap" className="hover:text-[#00A896] dark:hover:text-white transition-colors">Plan Técnico</a>
+                                    <a href="#roadmap" className="hover:text-brand-teal dark:hover:text-white transition-colors">Plan Técnico</a>
                                 </li>
                             </ul>
                         </div>

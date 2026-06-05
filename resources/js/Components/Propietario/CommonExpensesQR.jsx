@@ -66,8 +66,8 @@ export default function CommonExpensesQR({
                             }}
                             className={`w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-white shadow-lg transition-all active:scale-95 ${
                                 simulatedMoroso
-                                    ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/10'
-                                    : 'bg-[#72B043] hover:bg-[#629b37] shadow-[#72B043]/10 hover:shadow-[#72B043]/20'
+                                    ? 'bg-brand-error hover:bg-brand-navy-dark shadow-rose-600/10'
+                                    : 'bg-brand-green hover:bg-brand-green-dark shadow-[#72B043]/10 hover:shadow-[#72B043]/20'
                             }`}
                         >
                             Pagar Gasto Común Express
@@ -157,11 +157,12 @@ export default function CommonExpensesQR({
                                 </div>
 
                                 <div className="space-y-1 text-xs">
-                                    <label className="text-[9px] text-slate-400 uppercase font-extrabold block">Adjuntar Comprobante (Simulado)</label>
+                                    <label htmlFor="paymentReceipt" className="text-[9px] text-slate-400 uppercase font-extrabold block">Adjuntar Comprobante (Simulado)</label>
                                     <input
+                                        id="paymentReceipt"
                                         type="file"
                                         onChange={(e) => setPaymentReceiptName(e.target.files[0]?.name || '')}
-                                        className="w-full text-[10px] file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-[#72B043]/15 file:text-[#72B043] hover:file:bg-[#72B043]/20 focus:outline-none"
+                                        className="w-full text-[10px] file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-brand-green/15 file:text-brand-green hover:file:bg-brand-green/20 focus:outline-none"
                                     />
                                     {paymentReceiptName && (
                                         <span className="text-[9px] text-emerald-500 font-bold block mt-1">✓ Comprobante listo: {paymentReceiptName}</span>
@@ -171,7 +172,7 @@ export default function CommonExpensesQR({
                                 <button
                                     onClick={executeQrPayment}
                                     disabled={isProcessingPayment}
-                                    className="w-full py-2.5 bg-[#72B043] hover:bg-[#629b37] disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-md transition-colors"
+                                    className="w-full py-2.5 bg-brand-green hover:bg-brand-green-dark disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-md transition-colors"
                                 >
                                     {isProcessingPayment ? 'Validando Comprobante...' : 'Confirmar Transferencia / Escaneo'}
                                 </button>
@@ -187,7 +188,7 @@ export default function CommonExpensesQR({
                                 </div>
                                 <button
                                     onClick={() => setShowPaymentModal(false)}
-                                    className="w-full py-2.5 bg-[#72B043] hover:bg-[#629b37] text-white text-xs font-bold rounded-xl shadow-md transition-colors"
+                                    className="w-full py-2.5 bg-brand-green hover:bg-brand-green-dark text-white text-xs font-bold rounded-xl shadow-md transition-colors"
                                 >
                                     Entendido
                                 </button>

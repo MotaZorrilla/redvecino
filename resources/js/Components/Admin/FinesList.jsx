@@ -14,8 +14,11 @@ export default function FinesList({
     editingFine,
     setEditingFine
 }) {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const handleFormSubmit = (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
         if (editingFine) {
             setFinesList(prev => prev.map(f => f.id === editingFine.id ? {
                 ...f,
@@ -39,6 +42,7 @@ export default function FinesList({
         }
         setShowAddFineForm(false);
         setNewFineForm({ property_id: '', amount: '', reason: '', status: 'pending' });
+        setIsSubmitting(false);
     };
 
     return (
@@ -56,7 +60,7 @@ export default function FinesList({
                         setNewFineForm({ property_id: '', amount: '', reason: '', status: 'pending' });
                         setShowAddFineForm(!showAddFineForm);
                     }}
-                    className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all"
+                    className="px-3.5 py-1.5 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow transition-all"
                 >
                     {showAddFineForm ? 'Cerrar Form' : 'Cursar Multa'}
                 </button>
@@ -67,8 +71,9 @@ export default function FinesList({
                     <h5 className="text-xs font-bold text-gray-800 dark:text-slate-200 uppercase">{editingFine ? '✏️ Editar Multa' : '⚖️ Detalles de la Multa / Sanción'}</h5>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Propiedad Infractora</label>
+                            <label htmlFor="fine-property" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Propiedad Infractora</label>
                             <select
+                                id="fine-property"
                                 required
                                 value={newFineForm.property_id}
                                 onChange={(e) => setNewFineForm(prev => ({ ...prev, property_id: e.target.value }))}
@@ -81,8 +86,9 @@ export default function FinesList({
                             </select>
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto de la Sanción ($)</label>
+                            <label htmlFor="fine-amount" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto de la Sanción ($)</label>
                             <input
+                                id="fine-amount"
                                 type="number"
                                 required
                                 value={newFineForm.amount}
@@ -92,8 +98,9 @@ export default function FinesList({
                         </div>
                     </div>
                     <div>
-                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Motivo / Infracción Detallada</label>
+                        <label htmlFor="fine-reason" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Motivo / Infracción Detallada</label>
                         <textarea
+                            id="fine-reason"
                             required
                             rows="3"
                             value={newFineForm.reason}
@@ -103,8 +110,9 @@ export default function FinesList({
                         />
                     </div>
                     <div>
-                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado</label>
+                        <label htmlFor="fine-status" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado</label>
                         <select
+                            id="fine-status"
                             value={newFineForm.status}
                             onChange={(e) => setNewFineForm(prev => ({ ...prev, status: e.target.value }))}
                             className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
@@ -115,7 +123,7 @@ export default function FinesList({
                         </select>
                     </div>
                     <div className="flex gap-2">
-                        <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow">
+                        <button type="submit" disabled={isSubmitting} className="px-4 py-2 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow disabled:opacity-50 disabled:cursor-not-allowed">
                             {editingFine ? 'Guardar Cambios' : 'Cursar Multa'}
                         </button>
                         <button type="button" onClick={() => { setShowAddFineForm(false); setEditingFine(null); }} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl">

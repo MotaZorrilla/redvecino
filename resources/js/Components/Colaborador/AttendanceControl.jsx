@@ -70,7 +70,7 @@ export default function AttendanceControl({ user, adminCondoId }) {
                             {!isClockedIn ? (
                                 <button
                                     onClick={handleClockIn}
-                                    className="w-full max-w-xs px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm rounded-2xl shadow-lg shadow-emerald-500/20 transition-all transform hover:scale-[1.02] active:scale-95 cursor-pointer"
+                                    className="w-full max-w-xs px-8 py-4 bg-brand-green hover:bg-brand-green-dark text-white font-black text-sm rounded-2xl shadow-lg shadow-emerald-500/20 transition-all transform hover:scale-[1.02] active:scale-95 cursor-pointer"
                                 >
                                     <span className="flex items-center justify-center gap-2">
                                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
@@ -92,7 +92,7 @@ export default function AttendanceControl({ user, adminCondoId }) {
                                     </div>
                                     <button
                                         onClick={handleClockOut}
-                                        className="w-full max-w-xs px-8 py-4 bg-rose-600 hover:bg-rose-500 text-white font-black text-sm rounded-2xl shadow-lg shadow-rose-500/20 transition-all transform hover:scale-[1.02] active:scale-95 cursor-pointer"
+                                        className="w-full max-w-xs px-8 py-4 bg-brand-error hover:bg-brand-navy-dark text-white font-black text-sm rounded-2xl shadow-lg shadow-rose-500/20 transition-all transform hover:scale-[1.02] active:scale-95 cursor-pointer"
                                     >
                                         <span className="flex items-center justify-center gap-2">
                                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">

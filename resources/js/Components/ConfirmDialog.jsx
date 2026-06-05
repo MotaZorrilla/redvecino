@@ -2,7 +2,7 @@ import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 
 export default function ConfirmDialog({ open, onClose, onConfirm, title, message, confirmText = 'Eliminar', cancelText = 'Cancelar', danger = false }) {
     return (
-        <Dialog open={open} onClose={() => onClose(false)} className="relative z-[9999]">
+        <Dialog open={open} onClose={() => onClose(false)} className="relative z-modal-backdrop">
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" />
             <div className="fixed inset-0 flex items-center justify-center p-4">
                 <DialogPanel className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 max-w-sm w-full border border-slate-200 dark:border-slate-800">
@@ -25,8 +25,8 @@ export default function ConfirmDialog({ open, onClose, onConfirm, title, message
                             onClick={() => { onConfirm(); onClose(false); }}
                             className={`px-4 py-2 text-xs font-bold rounded-xl text-white transition-colors ${
                                 danger
-                                    ? 'bg-rose-600 hover:bg-rose-700'
-                                    : 'bg-indigo-600 hover:bg-indigo-700'
+                                    ? 'bg-brand-error hover:bg-brand-navy-dark'
+                                    : 'bg-brand-teal hover:bg-brand-teal-light'
                             }`}
                         >
                             {confirmText}

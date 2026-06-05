@@ -20,10 +20,10 @@ export default function TiLayout({
             </Head>
 
             {/* 1. LEFT SIDEBAR */}
-            <div className={`w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-between shrink-0 font-sans transition-transform duration-300 fixed inset-y-0 left-0 z-30 ${isMobileDevOpsSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+            <aside aria-label="Navegación principal" className={`w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-between shrink-0 font-sans transition-transform duration-300 fixed inset-y-0 left-0 z-30 ${isMobileDevOpsSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
                 <div className="space-y-6 text-left">
                     <ApplicationLogo size="small" showSubtext={false} brand="ti" />
-                    <nav className="space-y-1">
+                    <nav aria-label="Menú principal" className="space-y-1">
                         {[
                             { id: 'devops', name: '💻 DevOps & Telemetría', desc: 'Monitoreo e Infraestructura' },
                             { id: 'matrix', name: '⚖️ Matriz Spatie', desc: 'Mapeo Real de Permisos (BD)' },
@@ -39,11 +39,12 @@ export default function TiLayout({
                                     setTiActiveTab(tab.id);
                                     setIsMobileDevOpsSidebarOpen(false);
                                 }}
+                                aria-current={tiActiveTab === tab.id ? 'page' : undefined}
                                 className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group flex flex-col gap-0.5 border ${
-                                    tiActiveTab === tab.id
-                                        ? 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-brand-teal dark:text-white shadow-md'
-                                        : 'border-transparent hover:bg-slate-100/60 dark:hover:bg-slate-800/40 text-slate-500 dark:text-slate-400 hover:text-slate-850 dark:hover:text-slate-205'
-                                    }`}
+                                     tiActiveTab === tab.id
+                                         ? 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-brand-teal dark:text-white shadow-md'
+                                         : 'border-transparent hover:bg-slate-100/60 dark:hover:bg-slate-800/40 text-slate-500 dark:text-slate-400 hover:text-slate-850 dark:hover:text-slate-205'
+                                     }`}
                                 >
                                     <span className={`text-xs font-bold ${tiActiveTab === tab.id ? 'text-brand-teal' : 'text-slate-700 dark:text-slate-300'}`}>
                                     {tab.name}
@@ -64,7 +65,7 @@ export default function TiLayout({
                     </div>
                     <div>RedVecino & MiVecino &bull; 2026</div>
                 </div>
-            </div>
+            </aside>
 
             {/* 2. MAIN WORKSPACE CONTENT */}
             {/* Mobile sidebar overlay backdrop */}
@@ -77,7 +78,7 @@ export default function TiLayout({
 
             <div className="flex-1 flex flex-col md:pl-64 min-h-screen">
                 {/* Fixed Top Navbar */}
-                <header className="h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 md:px-12 fixed top-0 right-0 left-0 md:left-64 z-20 transition-colors duration-300">
+                <header style={{ paddingTop: 'env(safe-area-inset-top)' }} className="h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 md:px-12 fixed top-0 right-0 left-0 md:left-64 z-20 transition-colors duration-300">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setIsMobileDevOpsSidebarOpen(!isMobileDevOpsSidebarOpen)}
@@ -105,7 +106,7 @@ export default function TiLayout({
                         {toggleTheme && (
                             <button
                                 onClick={toggleTheme}
-                                className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-colors duration-200 cursor-pointer mr-0.5"
+                                className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-colors duration-200 cursor-pointer mr-0.5"
                                 aria-label="Toggle Theme"
                                 title="Cambiar tema"
                             >
@@ -132,7 +133,7 @@ export default function TiLayout({
                             href={route('logout')}
                             method="post"
                             as="button"
-                            className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-rose-500 dark:text-rose-400 border border-slate-200 dark:border-slate-700 transition-colors duration-200"
+                            className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-rose-500 dark:text-rose-400 border border-slate-200 dark:border-slate-700 transition-colors duration-200"
                             aria-label="Cerrar sesión"
                             title="Cerrar sesión"
                         >

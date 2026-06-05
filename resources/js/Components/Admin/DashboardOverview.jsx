@@ -110,7 +110,7 @@ export default function DashboardOverview({
                                         setEditingTicket(t);
                                         setAdminActiveTab('tickets');
                                     }}
-                                    className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline text-left font-medium block truncate max-w-[150px]"
+                                    className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline text-left font-medium block truncate max-w-full"
                                 >
                                     {t.title}
                                 </button>,

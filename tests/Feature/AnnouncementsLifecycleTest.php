@@ -81,4 +81,18 @@ class AnnouncementsLifecycleTest extends TestCase
     {
         $this->getJson('/api/announcements')->assertStatus(401);
     }
+
+    public function test_any_authenticated_user_can_list_announcements(): void
+    {
+        $roles = ['Administrador', 'Comité', 'Propietario', 'Residente', 'Colaborador', 'TI'];
+
+        foreach ($roles as $roleName) {
+            $user = $this->getUserByRole($roleName);
+
+            $response = $this->actingAs($user)->getJson('/api/announcements');
+
+            $response->assertStatus(200);
+            $response->assertJsonStructure(['data' => [['id', 'title', 'content']]]);
+        }
+    }
 }

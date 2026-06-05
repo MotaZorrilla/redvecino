@@ -83,7 +83,7 @@ export default function SpatiePermissionMatrix({ setTerminalLogs }) {
         <div className="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-6 md:p-8 space-y-6 text-left max-w-4xl mx-auto shadow-2xl relative overflow-hidden">
             {/* Decorative background gradients */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#00A896]/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-brand-teal/5 rounded-full blur-3xl pointer-events-none" />
 
             <div className="border-b border-slate-800 pb-4 flex items-center justify-between flex-wrap gap-4">
                 <div>
@@ -130,9 +130,10 @@ export default function SpatiePermissionMatrix({ setTerminalLogs }) {
                                                 onClick={() => handleToggle(role, perm)}
                                                 className={`inline-flex h-5 w-5 rounded-lg border ${
                                                     hasPerm
-                                                        ? 'bg-[#00A896]/15 border-[#00A896]/50 text-[#00A896] hover:bg-[#00A896]/30 shadow-md shadow-[#00A896]/5'
+                                                        ? 'bg-brand-teal/15 border-brand-teal/50 text-brand-teal hover:bg-brand-teal/30 shadow-md shadow-brand-teal/5'
                                                         : 'bg-rose-500/5 border-rose-500/10 text-rose-500 hover:bg-rose-500/20'
                                                 } items-center justify-center mx-auto text-[10px] font-black transition-all cursor-pointer transform active:scale-90`}
+                                                aria-label="Toggle permission"
                                                 title={`Alternar '${perm}' para el rol '${role}'`}
                                             >
                                                 {hasPerm ? '✓' : '✗'}

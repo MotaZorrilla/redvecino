@@ -23,7 +23,7 @@ export default function AdminLayout({
             </Head>
 
             {/* 1. LEFT SIDEBAR (Dark Premium Menu, Height complete) */}
-            <div className={`w-64 bg-slate-950 text-white p-6 flex flex-col justify-between shrink-0 font-sans transition-transform duration-300 fixed inset-y-0 left-0 z-30 ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+            <aside aria-label="Navegación principal" className={`w-64 bg-slate-950 text-white p-6 flex flex-col justify-between shrink-0 font-sans transition-transform duration-300 fixed inset-y-0 left-0 z-30 ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
                 <div className="space-y-6 text-left">
                     {/* Logo */}
                     <div className="flex items-center gap-3">
@@ -64,7 +64,7 @@ export default function AdminLayout({
                     </div>
 
                     {/* Vertical Navigation Buttons */}
-                    <nav className="space-y-1">
+                    <nav aria-label="Menú principal" className="space-y-1">
                         {[
                             { id: 'dashboard', label: '📊 Resumen', desc: 'Vista general' },
                             { id: 'properties', label: '🏢 Propiedades', desc: 'Casas y departamentos' },
@@ -80,11 +80,12 @@ export default function AdminLayout({
                                     setAdminActiveTab(tab.id);
                                     setIsMobileSidebarOpen(false);
                                 }}
-                                className={`w-full text-left px-4 py-2 rounded-xl transition-all duration-200 group flex flex-col gap-0.5 border ${
-                                    adminActiveTab === tab.id
-                                        ? 'bg-indigo-600/20 border-indigo-500/50 text-white shadow-md'
-                                        : 'border-transparent hover:bg-slate-900 text-slate-400 hover:text-slate-200'
-                                }`}
+                                aria-current={adminActiveTab === tab.id ? 'page' : undefined}
+                                className={`w-full text-left px-4 py-2.5 rounded-xl transition-all duration-200 group flex flex-col gap-0.5 border ${
+                                     adminActiveTab === tab.id
+                                         ? 'bg-indigo-600/20 border-indigo-500/50 text-white shadow-md'
+                                         : 'border-transparent hover:bg-slate-900 text-slate-400 hover:text-slate-200'
+                                 }`}
                             >
                                 <span className={`text-xs font-bold ${adminActiveTab === tab.id ? 'text-indigo-400' : 'text-slate-300'}`}>
                                     {tab.label}
@@ -121,10 +122,10 @@ export default function AdminLayout({
                     </div>
                     <div className="pt-1.5 border-t border-slate-800/60 flex justify-between items-center text-[9px] text-slate-400 group-hover:text-slate-300 transition-colors">
                         <span>RUT: {adminSettingsForm.rut}</span>
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span aria-live="polite" className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     </div>
                 </button>
-            </div>
+            </aside>
 
             {/* Mobile sidebar overlay backdrop */}
             {isMobileSidebarOpen && (
@@ -137,11 +138,11 @@ export default function AdminLayout({
             {/* 2. RIGHT CONTENT PANEL */}
             <div className="flex-1 flex flex-col md:pl-64 min-h-screen">
                 {/* Fixed Top Navbar */}
-                <header className="h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-150 dark:border-slate-800 flex items-center justify-between px-6 md:px-12 fixed top-0 right-0 left-0 md:left-64 z-20 transition-colors duration-300">
+                <header style={{ paddingTop: 'env(safe-area-inset-top)' }} className="h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-150 dark:border-slate-800 flex items-center justify-between px-6 md:px-12 fixed top-0 right-0 left-0 md:left-64 z-20 transition-colors duration-300">
                     <div className="flex items-center gap-3 text-left">
                         <button
                             onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-                            className="md:hidden p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 transition-colors mr-1"
+                            className="md:hidden p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 transition-colors mr-1"
                             aria-label="Abrir menú"
                         >
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
@@ -175,7 +176,7 @@ export default function AdminLayout({
                         {toggleTheme && (
                             <button
                                 onClick={toggleTheme}
-                                className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 border border-gray-200 dark:border-slate-700 transition-colors duration-200 cursor-pointer"
+                                className="p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 border border-gray-200 dark:border-slate-700 transition-colors duration-200 cursor-pointer"
                                 aria-label="Toggle Theme"
                                 title="Cambiar tema"
                             >
@@ -195,7 +196,7 @@ export default function AdminLayout({
                             href={route('logout')}
                             method="post"
                             as="button"
-                            className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 border border-gray-200 dark:border-slate-700 transition-colors duration-200 cursor-pointer"
+                            className="p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 border border-gray-200 dark:border-slate-700 transition-colors duration-200 cursor-pointer"
                             aria-label="Cerrar sesión"
                             title="Cerrar sesión"
                         >

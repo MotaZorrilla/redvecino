@@ -12,7 +12,7 @@ export default function AnnouncementsList({ setMobileTab }) {
             <div className="flex items-center gap-2">
                 <button 
                     onClick={() => setMobileTab('home')} 
-                    className="text-slate-400 hover:text-slate-650 transition-colors"
+                    className="text-slate-500 hover:text-slate-700 transition-colors"
                     type="button"
                 >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">

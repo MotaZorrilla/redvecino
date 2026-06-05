@@ -119,12 +119,12 @@ export default function ResidenteDashboard({
                             { title: 'Minuta Asamblea Extraordinaria - Mayo', type: 'PDF', size: '820 KB', date: '12/05/2026' },
                             { title: 'Balance Consolidado Gastos Comunes Q1', type: 'XLSX', size: '1.2 MB', date: '10/04/2026' }
                         ].map((doc, i) => (
-                            <div key={i} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl flex items-center justify-between shadow-sm hover:border-[#72B043]/30 transition-all text-left">
+                            <div key={i} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl flex items-center justify-between shadow-sm hover:border-brand-green/30 transition-all text-left">
                                 <div>
                                     <p className="font-black text-slate-800 dark:text-white text-xs">{doc.title}</p>
                                     <span className="text-[9px] text-slate-400 block mt-0.5">{doc.type} &bull; {doc.size} &bull; Subido el {doc.date}</span>
                                 </div>
-                                <button type="button" onClick={() => alert(`Descargando ${doc.title}...`)} className="px-4 py-2 bg-[#72B043]/10 hover:bg-[#72B043]/20 text-[#72B043] font-bold rounded-xl transition-all">
+                                <button type="button" onClick={() => alert(`Descargando ${doc.title}...`)} className="px-4 py-2 bg-brand-green/10 hover:bg-brand-green/20 text-brand-green font-bold rounded-xl transition-all">
                                     Descargar
                                 </button>
                             </div>

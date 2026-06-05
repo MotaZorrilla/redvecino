@@ -24,6 +24,13 @@ export default {
                     orange: '#EC7A08',
                     purple: '#7A5299',
                     gray: '#E2E8F0',
+                    success: '#72B043',
+                    warning: '#EC7A08',
+                    error: '#0F2557',
+                    info: '#00A896',
+                    'navy-dark': '#0A183A',
+                    'teal-light': '#00c2ad',
+                    'green-dark': '#629b37',
                 },
                 slate: {
                     350: '#c8d0db',
@@ -39,6 +46,32 @@ export default {
                 indigo: {
                     650: '#4555b0',
                 },
+            },
+            borderRadius: {
+                'card': '1rem',
+                'modal': '1.5rem',
+                'pill': '9999px',
+                'btn': '0.75rem',
+            },
+            boxShadow: {
+                'brand-sm': '0 1px 3px 0 rgba(15,37,87,0.08)',
+                'brand-md': '0 4px 6px -1px rgba(15,37,87,0.1)',
+                'brand-lg': '0 10px 15px -3px rgba(15,37,87,0.12)',
+                'brand-teal': '0 4px 14px -2px rgba(0,168,150,0.2)',
+                'brand-green': '0 4px 14px -2px rgba(114,176,67,0.2)',
+            },
+            zIndex: {
+                'dropdown': '50',
+                'sticky': '60',
+                'sidebar': '70',
+                'modal-backdrop': '80',
+                'modal': '90',
+                'toast': '100',
+                'tooltip': '110',
+            },
+            backdropBlur: {
+                'xs': '2px',
+                'sm': '4px',
             },
             animation: {
                 'fade-in': 'fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',

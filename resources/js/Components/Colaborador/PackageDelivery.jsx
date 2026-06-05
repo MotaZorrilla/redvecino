@@ -60,14 +60,14 @@ export default function PackageDelivery({
 
                     <div className="space-y-3">
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1 text-left">Destinatario / Residencia</label>
+                            <label htmlFor="colabOcrDeptSelect" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1 text-left">Destinatario / Residencia</label>
                             <select id="colabOcrDeptSelect" className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none cursor-pointer">
                                 <option value="Depto 202">Residente Demo (Depto 202)</option>
                                 <option value="Depto 101">Propietario Demo (Depto 101)</option>
                             </select>
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1 text-left">Empresa de Envío</label>
+                            <label htmlFor="colabOcrCarrierSelect" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1 text-left">Empresa de Envío</label>
                             <select id="colabOcrCarrierSelect" className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none cursor-pointer">
                                 <option value="Starken">Starken (Turbus)</option>
                                 <option value="Chilexpress">Chilexpress</option>
@@ -106,7 +106,7 @@ export default function PackageDelivery({
                                     alert("OCR exitoso: Se registró el paquete " + randTracking + " de " + carrier + " para " + dept + ".");
                                 }, 1500);
                             }}
-                            className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+                            className="w-full py-2.5 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
                         >
                             <span>📷 Simular Escaneo OCR</span>
                         </button>

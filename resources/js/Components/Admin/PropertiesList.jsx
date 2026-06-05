@@ -13,8 +13,11 @@ export default function PropertiesList({
     editingProp,
     setEditingProp
 }) {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const handleFormSubmit = (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
         if (editingProp) {
             setPropertiesList(prev => prev.map(p => p.id === editingProp.id ? {
                 ...p,
@@ -43,6 +46,7 @@ export default function PropertiesList({
         }
         setShowAddPropForm(false);
         setNewPropForm({ condominium_id: adminCondoId, type: 'apartment', number: '', block: 'Torre A', floor: '', area_sqm: '', status: 'vacant' });
+        setIsSubmitting(false);
     };
 
     return (
@@ -60,7 +64,7 @@ export default function PropertiesList({
                         setNewPropForm({ condominium_id: adminCondoId, type: 'apartment', number: '', block: 'Torre A', floor: '', area_sqm: '', status: 'vacant' });
                         setShowAddPropForm(!showAddPropForm);
                     }}
-                    className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all"
+                    className="px-3.5 py-1.5 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow transition-all"
                 >
                     {showAddPropForm ? 'Cerrar Form' : 'Añadir Unidad'}
                 </button>
@@ -71,8 +75,9 @@ export default function PropertiesList({
                     <h5 className="text-xs font-bold text-gray-800 dark:text-slate-200 uppercase">{editingProp ? '✏️ Editar Propiedad' : '🏢 Detalles de la Propiedad'}</h5>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Tipo de Unidad</label>
+                            <label htmlFor="prop-type" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Tipo de Unidad</label>
                             <select
+                                id="prop-type"
                                 value={newPropForm.type}
                                 onChange={(e) => setNewPropForm(prev => ({ ...prev, type: e.target.value }))}
                                 className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
@@ -84,8 +89,9 @@ export default function PropertiesList({
                             </select>
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Número / Identificador</label>
+                            <label htmlFor="prop-number" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Número / Identificador</label>
                             <input
+                                id="prop-number"
                                 type="text"
                                 required
                                 value={newPropForm.number}
@@ -96,8 +102,9 @@ export default function PropertiesList({
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Torre / Bloque</label>
+                            <label htmlFor="prop-block" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Torre / Bloque</label>
                             <input
+                                id="prop-block"
                                 type="text"
                                 value={newPropForm.block}
                                 onChange={(e) => setNewPropForm(prev => ({ ...prev, block: e.target.value }))}
@@ -105,8 +112,9 @@ export default function PropertiesList({
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Piso</label>
+                            <label htmlFor="prop-floor" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Piso</label>
                             <input
+                                id="prop-floor"
                                 type="number"
                                 value={newPropForm.floor}
                                 onChange={(e) => setNewPropForm(prev => ({ ...prev, floor: e.target.value }))}
@@ -114,8 +122,9 @@ export default function PropertiesList({
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Metros Cuadrados (m²)</label>
+                            <label htmlFor="prop-area" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Metros Cuadrados (m²)</label>
                             <input
+                                id="prop-area"
                                 type="number"
                                 value={newPropForm.area_sqm}
                                 onChange={(e) => setNewPropForm(prev => ({ ...prev, area_sqm: e.target.value }))}
@@ -124,8 +133,9 @@ export default function PropertiesList({
                         </div>
                     </div>
                     <div>
-                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado de Ocupación</label>
+                        <label htmlFor="prop-status" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado de Ocupación</label>
                         <select
+                            id="prop-status"
                             value={newPropForm.status}
                             onChange={(e) => setNewPropForm(prev => ({ ...prev, status: e.target.value }))}
                             className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
@@ -136,7 +146,7 @@ export default function PropertiesList({
                         </select>
                     </div>
                     <div className="flex gap-2">
-                        <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow">
+                        <button type="submit" disabled={isSubmitting} className="px-4 py-2 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow disabled:opacity-50 disabled:cursor-not-allowed">
                             {editingProp ? 'Guardar Cambios' : 'Añadir Propiedad'}
                         </button>
                         <button type="button" onClick={() => { setShowAddPropForm(false); setEditingProp(null); }} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl">

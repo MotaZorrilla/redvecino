@@ -110,7 +110,7 @@ export default function TiTicketsGestion({
                     
                     <button
                         onClick={() => setShowAddTicketForm(!showAddTicketForm)}
-                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0"
+                        className="px-4 py-2 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow-lg transition-all shrink-0"
                     >
                         {showAddTicketForm ? 'Cerrar Formulario' : 'Crear Ticket'}
                     </button>
@@ -147,21 +147,23 @@ export default function TiTicketsGestion({
                     <h5 className="text-xs font-bold text-slate-300 uppercase">Detalles del Ticket</h5>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Título</label>
+                            <label htmlFor="ti-ticket-title" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Título</label>
                             <input
+                                id="ti-ticket-title"
                                 type="text"
                                 required
                                 value={newTicketForm.title}
                                 onChange={(e) => setNewTicketForm(prev => ({ ...prev, title: e.target.value }))}
-                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896]"
+                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-brand-teal"
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Prioridad</label>
+                            <label htmlFor="ti-ticket-priority" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Prioridad</label>
                             <select
+                                id="ti-ticket-priority"
                                 value={newTicketForm.priority}
                                 onChange={(e) => setNewTicketForm(prev => ({ ...prev, priority: e.target.value }))}
-                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
+                                className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-brand-teal cursor-pointer"
                             >
                                 <option value="low">Baja</option>
                                 <option value="medium">Media</option>
@@ -171,15 +173,15 @@ export default function TiTicketsGestion({
                         </div>
                     </div>
                     <div>
-                        <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Descripción</label>
+                        <label htmlFor="ti-ticket-desc" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Descripción</label>
                         <textarea
                             required
                             value={newTicketForm.description}
                             onChange={(e) => setNewTicketForm(prev => ({ ...prev, description: e.target.value }))}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-[#00A896] h-20"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl text-xs px-3 py-2 text-white focus:outline-none focus:border-brand-teal h-20"
                         />
                     </div>
-                    <button type="submit" className="px-4 py-2 bg-[#00A896] hover:bg-[#00A896]/80 text-white font-bold text-xs rounded-xl shadow-md">
+                    <button type="submit" className="px-4 py-2 bg-brand-teal text-white font-bold text-xs rounded-xl shadow-md">
                         Guardar Ticket
                     </button>
                 </form>
@@ -217,6 +219,7 @@ export default function TiTicketsGestion({
                                                     setTerminalLogs(prev => [...prev, `[TICKET] Ticket #${t.id} resuelto.`]);
                                                 }}
                                                 className="px-2 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] rounded font-bold hover:bg-emerald-500/20"
+                                                aria-label={`Resolver ticket ${t.title}`}
                                             >
                                                 Resolver
                                             </button>

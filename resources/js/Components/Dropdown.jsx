@@ -40,6 +40,7 @@ const Trigger = ({ children }) => {
                 tabIndex={0}
                 aria-expanded={open}
                 aria-haspopup="true"
+                aria-label="Menú de opciones"
             >
                 {children}
             </div>
@@ -113,7 +114,7 @@ const DropdownLink = ({ className = '', children, ...props }) => {
             {...props}
             role="menuitem"
             className={
-                'block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 dark:text-slate-300 transition duration-150 ease-in-out hover:bg-gray-100 dark:hover:bg-slate-800/80 focus:bg-gray-100 dark:focus:bg-slate-800 focus:outline-none ' +
+                'block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 dark:text-slate-300 transition duration-150 ease-in-out hover:bg-gray-100 dark:hover:bg-slate-800/80 focus:bg-gray-100 dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-teal ' +
                 className
             }
         >

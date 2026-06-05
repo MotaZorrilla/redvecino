@@ -71,11 +71,12 @@ export default function SandboxInspeccion({
             {/* Condominium Selector */}
             <div className="flex flex-wrap items-center gap-4">
                 <div className="flex items-center gap-2">
-                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Condominio:</label>
+                    <label htmlFor="sandbox-condo" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Condominio:</label>
                     <select
+                        id="sandbox-condo"
                         value={sandboxCondoId}
                         onChange={(e) => setSandboxCondoId(e.target.value)}
-                        className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-[#00A896] cursor-pointer"
+                        className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-brand-teal cursor-pointer"
                     >
                         <option value="all" className="bg-white dark:bg-slate-900 text-slate-800 dark:text-white">Todos los Condominios</option>
                         {condosList.map(c => (

@@ -34,8 +34,8 @@ export default function DevOpsTelemetry({
                     <span className="text-xl font-black text-white block mt-1 flex items-center gap-2">
                         {cpuLoad}%
                         <span className="flex h-2 w-2 relative">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00A896] opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00A896]"></span>
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-teal opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-teal"></span>
                         </span>
                     </span>
                 </div>
@@ -45,7 +45,7 @@ export default function DevOpsTelemetry({
                 </div>
                 <div className="bg-slate-900/60 border border-slate-800/80 p-4 rounded-2xl">
                     <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Latencia Red</span>
-                    <span className="text-xl font-black text-[#00A896] block mt-1">{latency}ms</span>
+                    <span className="text-xl font-black text-brand-teal block mt-1">{latency}ms</span>
                 </div>
                 <div className="bg-slate-900/60 border border-slate-800/80 p-4 rounded-2xl">
                     <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Infraestructura</span>
@@ -55,7 +55,7 @@ export default function DevOpsTelemetry({
 
             {/* Syslog console (Expanded height) */}
             <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 font-mono text-xs overflow-hidden shadow-inner flex flex-col justify-between h-[400px]">
-                <div className="space-y-1.5 overflow-y-auto max-h-[330px] text-[#00A896]/95 text-left">
+                <div className="space-y-1.5 overflow-y-auto max-h-[330px] text-brand-teal/95 text-left">
                     {terminalLogs.map((log, idx) => (
                         <div key={idx} className="flex gap-2">
                             <span className="text-slate-600 shrink-0">[{new Date().toLocaleTimeString('es-CL')}]</span>
@@ -93,7 +93,7 @@ export default function DevOpsTelemetry({
                         type="text"
                         name="commandInput"
                         placeholder="Escribe un comando... (ej: /help, db:status, cache:clear, logs:view)"
-                        className="flex-1 bg-transparent border-none outline-none focus:ring-0 text-slate-100 text-xs p-0 placeholder-slate-600"
+                        className="flex-1 bg-transparent border-none focus:ring-2 focus:ring-brand-teal outline-none text-slate-100 text-xs p-0 placeholder-slate-600"
                     />
                     <button type="submit" className="px-3 py-1 bg-slate-900 border border-slate-800 rounded text-[10px] text-slate-400 hover:text-white transition-all">Ejecutar</button>
                 </form>
@@ -127,9 +127,9 @@ export default function DevOpsTelemetry({
                                         setTerminalLogs(prev => [...prev, `[ERROR] Falló: ${errorMsg}`]);
                                     });
                             }}
-                            className="bg-white dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-850 hover:border-[#00A896]/40 p-3 rounded-xl text-left transition-all duration-200 cursor-pointer group flex flex-col justify-between h-[72px] shadow-sm"
+                            className="bg-white dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-850 hover:border-brand-teal/40 p-3 rounded-xl text-left transition-all duration-200 cursor-pointer group flex flex-col justify-between h-[72px] shadow-sm"
                         >
-                            <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-[#00A896] transition-colors">{btn.label}</span>
+                            <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-brand-teal transition-colors">{btn.label}</span>
                             <span className="text-[9px] text-slate-400 dark:text-slate-550 mt-1 leading-normal">{btn.desc}</span>
                         </button>
                     ))}

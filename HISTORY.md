@@ -316,7 +316,120 @@ Failures:    0 failed
 *   **QA Backend:** Ejecución exitosa de `php artisan test` con **146 tests y 597 aserciones al 100%** tras instalar dependencias dev faltantes (`composer install` sin flag `--no-dev`).
 *   **Corrección de Bug:** Se reparó `setAdminActiveTab is not a function` causado por la omisión de los setters de pestañas en `sharedRolePageProps`.
 
-### 3.13 Auditoría Backend Completa — 13 Hallazgos Implementados (Sesión 05/06/2026)
+### 3.14 Auditoría UX/UI Integral (Sesión 05/06/2026 - PM)
+
+Se ejecutó una auditoría UX/UI completa del frontend React + Tailwind, analizando 5 dimensiones sobre ~60 componentes y 9 layouts. Total: **43 hallazgos** (8 críticos, 14 altos, 15 medios, 6 bajos).
+
+#### UI1 — Consistencia Visual y Design Tokens (15 hallazgos)
+
+| ID | Hallazgo | Severidad | Impacto |
+|----|----------|-----------|---------|
+| DT-01 | **PrimaryButton usa `bg-gray-800` en vez de `bg-brand-navy`** | 🔴 Crítico | El botón principal del sistema ignora el color corporativo Azul Marino (#0F2557) |
+| DT-02 | **Focus rings usan `ring-indigo-500` en vez de brand-teal** | 🔴 Crítico | Todos los inputs y botones tienen anillo de foco indigo, no el teal corporativo |
+| DT-03 | **Purple #7A5299 infrautilizado** | 🔴 Crítico | El color morado de marca solo existe en la definición; ApplicationLogo usa `indigo-500` para roles admin |
+| DT-04 | **128+ hardcoded `bg-[...]` con hex de marca** | 🔴 Crítico | Los colores brand existen en tailwind.config.js pero la mayoría de componentes usa `#00A896`, `#72B043`, `#0F2557` como arbitrary values |
+| DT-05 | **Sin tokens semánticos (success/error/warning/info)** | 🔴 Crítico | Toast.jsx usa `rose-600/amber-600/emerald-600`; DangerButton usa `red-600`; sin unificación |
+| DT-06 | **Sin escala de border-radius tokenizada** | 🟠 Alto | `rounded-md`, `lg`, `xl`, `2xl`, `3xl`, `[32px]`, `[42px]` — 7 valores distintos sin estandarizar |
+| DT-07 | **StatCard usa colores Tailwind nativos no-brand** | 🟠 Alto | Las tarjetas de KPIs usan `indigo/emerald/amber/rose/violet/cyan` en vez de la paleta brand |
+| DT-08 | **Focus:ring-0 sin reemplazo visible (DevOpsTelemetry)** | 🟠 Alto | Elimina el anillo de foco sin alternativa, inaccesible por teclado |
+| DT-09 | **Dark mode usa 4 valores distintos para superficie** | 🟠 Alto | `bg-slate-800`, `bg-slate-900`, `bg-[#0B1A3E]`, `bg-[#0A183A]` — inconsistente |
+| DT-10 | **Sin token de z-index** | 🟠 Alto | Modales/toasts usan `z-[9999]` arbitrario |
+| DT-11 | **588 instancias de `text-[...]` con valores hardcodeados** | 🟡 Medio | Incluye colores brand como arbitrary values en vez de clases `text-brand-*` |
+| DT-12 | **Sin boxShadow tokens personalizados** | 🟡 Medio | Solo sombras default de Tailwind, sin sombras brand |
+| DT-13 | **Sin backdrop-blur tokens** | 🟡 Medio | `backdrop-blur-lg/xl/md` sin extensión en config |
+| DT-14 | **ApplicationLogo usa inline `style={{ color }}`** | 🟡 Medio | El logo aplica colores mediante estilos inline en vez de clases Tailwind |
+| DT-15 | **14 gradientes `from-[...]` hardcodeados** | 🟡 Medio | Todos usan hex de marca como arbitrary values |
+
+#### UI2 — Accesibilidad (18 hallazgos)
+
+| ID | Hallazgo | Severidad | Impacto |
+|----|----------|-----------|---------|
+| A11Y-01 | **~100+ labels sin `htmlFor` en todos los dashboards** | 🔴 Crítico | Los lectores de pantalla no pueden asociar labels con inputs. Afecta Admin, TI, Comité, Colaborador, Propietario, Residente |
+| A11Y-02 | **Backdrops de modales sin keyboard handlers** | 🔴 Crítico | Overlays con onClick pero sin onKeyDown, role o tabIndex. Usuarios de teclado no pueden cerrar modales |
+| A11Y-03 | **Welcome.jsx: elementos onClick sin soporte teclado** | 🟠 Alto | Cards de galería, triggers de lightbox y tabs sin handlers de teclado |
+| A11Y-04 | **`outline-none` sin focus visible en varios componentes** | 🟠 Alto | Layouts y dropdowns eliminan outline sin proporcionar indicador de foco alternativo |
+| A11Y-05 | **text-slate-400 sobre bg-gray-50: ratio 3.1:1 (falla WCAG AA)** | 🟠 Alto | Texto de metadatos y subtítulos en 9px con bajo contraste en layouts y componentes |
+| A11Y-06 | **Uso de `<div>` en vez de `<main>` en layouts** | 🟠 Alto | PropietarioLayout y ResidentLayout usan div en lugar de main, perdiendo landmark de navegación |
+| A11Y-07 | **Sin focus trap en modales personalizados** | 🟠 Alto | El foco del teclado puede escapar detrás del overlay en modales de Dashboard.jsx y UsersList.jsx |
+| A11Y-08 | **Sidebars usan `<div>` en vez de `<aside>`** | 🟡 Medio | Todos los layouts pierden el landmark de navegación por sidebar |
+| A11Y-09 | **Botones de navegación sin `aria-current`** | 🟡 Medio | Pestañas activas solo usan estilo visual, no informan al screen reader |
+| A11Y-10 | **Modales usan `<div>` en vez de `<dialog>` nativo** | 🟡 Medio | Pierden gestión nativa de foco, rol dialog y escape key |
+| A11Y-11 | **text-[9px] y text-[10px] extensivos (150+ instancias)** | 🟡 Medio | Tamaños de fuente extremadamente pequeños en todos los layouts |
+| A11Y-12 | **Sidebar `<nav>` sin `aria-label`** | 🟡 Medio | Múltiples landmarks nav sin distinguir |
+| A11Y-13 | **Indicadores de estado (puntos verdes) sin aria-live** | 🟡 Medio | El screen reader no anuncia cambios de estado |
+| A11Y-14 | **Dropdown links sin focus visible** | 🟡 Medio | `focus:outline-none` en dropdown links sin reemplazo |
+| A11Y-15 | **ApplicationLogo alt genérico** | 🟢 Bajo | `alt="RedVecino Logo"` aceptable pero mejorable |
+| A11Y-16 | **Sin región aria-live para notificaciones** | 🟢 Bajo | Toasts y notificaciones no se anuncian automáticamente |
+| A11Y-17 | **Emoji como único identificador en algunos botones** | 🟢 Bajo | Algunos botones en sidebar usan emoji + texto ambiguo para screen readers |
+| A11Y-18 | **Inputs de Login/Register sin font-size mínimo 16px** | 🟢 Bajo | iOS puede hacer auto-zoom en inputs < 16px |
+
+#### UI3 — Estados de Componentes (21 hallazgos)
+
+| ID | Hallazgo | Severidad | Impacto |
+|----|----------|-----------|---------|
+| ST-01 | **0 de 27 componentes manejan errores de API** | 🔴 Crítico | Ningún componente tiene try/catch, error boundary o UI de error. Todos usan estado local síncrono |
+| ST-02 | **17/27 componentes sin estado de carga** | 🟠 Alto | Formularios sin `isSubmitting` — el usuario puede hacer doble clic y duplicar operaciones |
+| ST-03 | **5 formularios sin validación inline** | 🟠 Alto | UsersList, PropertiesList, FinesList, ShoppingList, TicketsReport no muestran errores por campo |
+| ST-04 | **6 formularios sin botón disabled durante submit** | 🟠 Alto | UsersList, PropertiesList, FinesList, ShoppingList, CommunityChat, TicketsReport |
+| ST-05 | **5 componentes sin feedback de éxito** | 🟡 Medio | UsersList, PropertiesList, FinesList, TicketsList, BookingManager — no hay toast después de guardar |
+| ST-06 | **6 componentes sin estado empty** | 🟢 Bajo | CommunityChat, TicketsReport, CommonExpensesQR, BookingManager, PropertyOwnership, ResidentOverview |
+| ST-07 | **14/27 componentes SÍ tienen empty state (bien)** | ✅ Bueno | SimpleTable con `emptyMessage` consistente en Admin, TI, Colaborador, Comité |
+| ST-08 | **4 componentes SÍ tienen loading state (bien)** | ✅ Bueno | FinancesLedger, SettingsPanel, PackageDelivery, CommonExpensesQR |
+| ST-09 | **4 componentes SÍ tienen feedback de éxito (bien)** | ✅ Bueno | SettingsPanel, CommonExpensesQR, AssignedTickets, PersonWizard |
+| ST-10 | **PersonWizard: validación multi-step completa (bien)** | ✅ Bueno | Único wizard con validación por paso, resumen y botón deshabilitado |
+
+#### UI4 — Responsividad y Mobile (15 hallazgos)
+
+| ID | Hallazgo | Severidad | Impacto |
+|----|----------|-----------|---------|
+| RSP-01 | **text-[8px] a text-[11px] en todos los dashboards** | 🔴 Crítico | iOS auto-zoom en inputs con font-size < 16px. 150+ instancias en layouts y componentes |
+| RSP-02 | **Sin soporte iOS safe-area-inset** | 🔴 Crítico | Navbars fijas y bottom tabs pueden quedar ocultos tras el notch/home indicator |
+| RSP-03 | **PropietarioLayout: sin overlay sidebar en mobile** | 🔴 Crítico | No tiene hamburger menu ni backdrop. El layout se rompe en pantallas pequeñas |
+| RSP-04 | **Touch targets < 44px en sidebars y headers** | 🟠 Alto | Botones de navegación usan `py-2` (~32px); botones de header `p-2` (~32px) |
+| RSP-05 | **Sin breakpoints xl/2xl para pantallas grandes** | 🟡 Medio | Pantallas 1920+ reciben mismo layout que lg |
+| RSP-06 | **Fixed heights sin adaptación a viewport** | 🟡 Medio | `h-[420px]`, `h-[520px]`, `max-h-[850px]` en varios componentes |
+| RSP-07 | **Tablas sin vista card en mobile** | 🟡 Medio | Solo horizontal scroll, sin conversión a cards en sm |
+| RSP-08 | **Anchuras fijas arbitrarias (`max-w-[150px]`)** | 🟡 Medio | No escalan en mobile, pueden truncar contenido |
+| RSP-09 | **ResidentLayout con padding horizontal en móvil** | 🟡 Medio | `px-2` en la app móvil simulada, podría necesitar más espacio |
+| RSP-10 | **6/7 layouts con hamburger + sidebar drawer (bien)** | ✅ Bueno | Admin, TI, Comité, Colaborador, SuperUsuario, Guest tienen menú responsive |
+| RSP-11 | **ResidentLayout con bottom tab nav dedicada (bien)** | ✅ Bueno | Navegación inferior fija con 4 tabs para mobile |
+| RSP-12 | **Grid responsivo consistente (bien)** | ✅ Bueno | `grid-cols-1 sm:2 md:3 lg:4` en todos los componentes de datos |
+| RSP-13 | **Welcome page hero con texto responsive (bien)** | ✅ Bueno | `text-4xl sm:5xl md:6xl` y `text-lg` para body |
+| RSP-14 | **Overflow-x-auto en tablas (bien)** | ✅ Bueno | Scroll horizontal consistente en todas las tablas anchas |
+| RSP-15 | **GuestLayout con max-w-md centrado (bien)** | ✅ Bueno | Formularios de login/register bien contenidos en mobile |
+
+#### UI5 — Micro-interacciones y Feedback Visual
+
+| ID | Hallazgo | Severidad |
+|----|----------|-----------|
+| MCR-01 | **401+ transiciones CSS (`transition-all`, `transition-colors`)** | ✅ Bueno |
+| MCR-02 | **172+ patrones `hover:` para feedback visual** | ✅ Bueno |
+| MCR-03 | **`active:scale-95` en botones principales** | ✅ Bueno |
+| MCR-04 | **`hover:scale-105` en tarjetas y elementos clickeables** | ✅ Bueno |
+| MCR-05 | **Dropdown y Modal con animaciones de entrada/salida** | ✅ Bueno |
+| MCR-06 | **`animate-scale-up` en modales del dashboard** | ✅ Bueno |
+| MCR-07 | **Sin skeleton loaders en ningún componente** | 🟡 Medio |
+
+#### Resumen Cuantitativo
+
+| Dimensión | Críticos | Altos | Medios | Bajos | Buenos |
+|-----------|:--------:|:-----:|:------:|:-----:|:------:|
+| Design Tokens | 5 | 5 | 5 | 0 | 0 |
+| Accesibilidad | 2 | 5 | 7 | 4 | 0 |
+| Estados Componentes | 1 | 3 | 1 | 1 | 4 |
+| Responsividad | 3 | 1 | 5 | 0 | 6 |
+| Micro-interacciones | 0 | 0 | 1 | 0 | 6 |
+| **Total** | **11** | **14** | **19** | **5** | **16** |
+
+#### Recomendaciones Prioritarias (Quick Wins)
+
+1. **A11Y-01** · `htmlFor` en labels — tarea mecánica pero de alto impacto: agregar `htmlFor={inputId}` + `id={inputId}` en todos los formularios (~100 instancias)
+2. **DT-01** · PrimaryButton a brand-navy — cambiar `bg-gray-800` por `bg-brand-navy` en `PrimaryButton.jsx`
+3. **DT-02** · Focus rings a brand-teal — reemplazar `focus:ring-indigo-500` por `focus:ring-brand-teal` en todos los inputs y botones
+4. **A11Y-02** · Keyboard handlers en backdrops — agregar `role="button"`, `tabIndex={0}`, `onKeyDown={(e) => e.key === 'Escape' && onClose()}`
+5. **RSP-02** · Safe area — agregar `env(safe-area-inset-*)` en los layouts con posicionamiento fijo
+6. **ST-01** · Error handling — crear un componente `ErrorBoundary` y agregar estados de error en los 27 componentes
+7. **DT-05** · Tokens semánticos — extender tailwind.config.js con `success/info/warning/error` mapeados a brand green (#72B043), teal (#00A896), orange (#EC7A08), navy (#0F2557)
 *   **Contexto — Backend Audit Report:** Se ejecutó una auditoría completa del backend arrojando 15 hallazgos (3 críticos, 5 altos, 7 medios). Se implementaron 13 acciones correctivas en una sola sesión mediante agentes de IA paralelizados.
 *   **C1 - Configuración CORS Explicita (`config/cors.php`):** Se creó el archivo de configuración faltante con origen dinámico vía `CORS_ALLOWED_ORIGINS`, soporte para credenciales SPA y métodos/headers permitidos universalmente.
 *   **C2 - Expiración de Tokens Sanctum (24h):** Se cambió `config/sanctum.php` de `'expiration' => null` a `'expiration' => 1440`, forzando la renovación de tokens de API cada 24 horas.
@@ -334,9 +447,54 @@ Failures:    0 failed
     *   `TiCommandsTest.php` (2 tests) — Seguridad de endpoints TI contra acceso no autorizado
 *   **M5 - Corrección de Locale y Ruta Muerta:** Se cambió `config/app.php` locale de `'en'` a `'es'` con faker `es_CL` para alinearse con seeders y UI chilena. Se eliminó la ruta `/api/dashboard` (dead route) de `routes/api.php`.
 *   **Registro de Middleware CORS:** Se agregó `HandleCors::class` al grupo API en `bootstrap/app.php` como middleware prepend, garantizando headers CORS en todas las respuestas de la API.
-*   **Compilación y Verificación:** `npx vite build` completado con 1058 módulos, 0 errores en 2.71s. Suite de pruebas: **148 tests pasados, 616 aserciones** (7 fallas pre-existentes en `AccountStatementSecurityTest` por ruta `/api/account-statement/{id}` no implementada).
+*   **Compilación y Verificación:** `npx vite build` completado con 1058 módulos, 0 errores en 2.71s.
+
+### 3.16 Auditoría QA Integral (Junio 2026)
+
+Se ejecutó una auditoría completa de calidad de software (QA) sobre la suite de 156 tests existentes, identificando y corrigiendo brechas de cobertura, calidad de aserciones y errores pre-existentes.
+
+#### Hallazgos y Correcciones
+
+| ID | Hallazgo | Tipo | Acción |
+|----|----------|------|--------|
+| QA-01 | **7 tests fallando** en `AccountStatementSecurityTest` por URL incorrecta (`/api/account-statement/{id}` → `/api/users/{id}/account-statement`) | 🔴 Crítico | Corregidas las 7 URLs en el test |
+| QA-02 | **Sin cobertura** de `TiPermissionController` (index + toggle) | 🔴 Crítico | Creado `TiPermissionsTest.php` (6 tests) |
+| QA-03 | **Sin cobertura** de `TicketCategoryController` (index + store) | 🔴 Crítico | Creado `TicketCategoryTest.php` (6 tests) |
+| QA-04 | **Sin cobertura** de `PaymentController::reconcile` | 🔴 Crítico | Creado `PaymentReconciliationTest.php` (5 tests) |
+| QA-05 | **Toggle con rol inexistente** devuelve 500 (RoleDoesNotExistException) en lugar de 404 | 🟠 Alto | Agregado try-catch en `TiPermissionController::toggle()` |
+| QA-06 | **DashboardAccessTest** solo verificaba `assertStatus(200)` para 5/6 roles | 🟡 Medio | Agregadas aserciones Inertia para todos los roles |
+| QA-07 | **FineLifecycleTest** sin test de update/delete | 🟡 Medio | Agregados 4 tests (update + delete, autorizado y no autorizado) |
+| QA-08 | **AnnouncementsLifecycleTest** sin test de listing para usuarios autenticados | 🟡 Medio | Agregado test de listado para todos los roles |
+| QA-09 | **FinanzasLifecycleTest** sin test de Comité creando gasto común | 🟡 Medio | Agregado test de creación por Comité |
+| QA-10 | **ComunidadMensajeriaTest** sin test de remitente marcando como leído | 🟡 Medio | Agregado test: sender cannot mark own message as read |
+
+#### Resultados Finales
+
+| Métrica | Antes | Después |
+|---------|:-----:|:-------:|
+| Tests totales | 156 | **179** |
+| Aserciones | ~616 | **822** |
+| Tests pasados | 148 | **179** |
+| Tests fallidos | 7 | **0** |
+| Archivos de test | 25 | **28** |
+| Cobertura de controladores API | 16/24 (67%) | **22/24 (92%)** |
+| `npx vite build` | ✅ 1058 módulos | ✅ 1058 módulos |
+
+#### Controladores sin test (2/24)
+- `CondoFinanceController` — probado indirectamente vía `CondoFinancesTest` + `CondoFinancesIsolationTest`
+- `MessageController` — probado indirectamente vía `ComunidadMensajeriaTest`
+
+### 3.17 Hotfix — Runtime Errors Frontend (Junio 2026)
+
+Corrección de errores en tiempo de ejecución reportados en la consola del navegador tras el despliegue de la auditoría UX/UI.
+
+| ID | Error | Causa | Fix |
+|----|-------|-------|-----|
+| HF-01 | `ReferenceError: editingTicket is not defined` en `AdminDashboard.jsx:148` | Prop `editingTicket` faltaba en el destructuring de `AdminDashboard.jsx:15` y en `Dashboard.jsx:728` | Agregado `editingTicket` en ambos destructures |
+| HF-02 | `403 Forbidden` en `/api/condo-finances/catalog`, `/summary`, `/incomes`, `/expenses` | Dos `useEffect` en `Dashboard.jsx` (lines 77 y 170) llamaban a endpoints financieros sin verificar permisos del rol | Agregado guard condicional con `user.roles` dentro de cada effect; roles sin `view financial reports` (TI, Colaborador, Propietario, Residente) ya no disparan las peticiones |
+| HF-03 | `ReferenceError: Cannot access 'canViewFinances' before initialization` | Variable `const` en TDZ: declarada después del `useEffect` que la referenciaba en su dependency array | Reemplazada variable externa por chequeo inline dentro del callback del effect |
 
 ---
-**Última actualización:** 5 de Junio de 2026 (Auditoría Backend completa — 13 hallazgos implementados, CORS, Sanctum, Policies, Services, Factories, tests)
-**Versión:** 5.0 (Full Backend Audit Implementation, Security Hardening, Service Layer, Policies & Factories)
+**Última actualización:** 5 de Junio de 2026 (Hotfix runtime errors — editingTicket, 403 financieros, TDZ)
+**Versión:** 6.1 (QA Audit + Runtime Hotfixes)
 **Estado:** Activo y Actualizado
