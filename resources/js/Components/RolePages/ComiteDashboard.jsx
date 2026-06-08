@@ -5,7 +5,7 @@ import ChatAuditLogs from '@/Components/Comite/ChatAuditLogs';
 import MeetingsMinutes from '@/Components/Comite/MeetingsMinutes';
 
 export default function ComiteDashboard({
-    user, condosList, adminCondoId, setAdminCondoId, comiteActiveTab, setComiteActiveTab,
+    user, condosList, adminCondoId, setAdminCondoId, comiteActiveTab, setComiteActiveTab, allCondominiums,
     isMobileSidebarOpen, setIsMobileSidebarOpen, toggleTheme, darkMode,
     adminFilteredProperties, adminFilteredUsers, adminFilteredTickets, adminFilteredPayments,
     adminFilteredFines, setTicketStatusFilter, setTicketPriorityFilter, setEditingTicket,
@@ -95,6 +95,7 @@ export default function ComiteDashboard({
                     handleSaveExpense={handleSaveExpense}
                     handleDeleteExpense={handleDeleteExpense}
                     usersList={usersList}
+                    allCondominiums={allCondominiums}
                 />
             )}
             {comiteActiveTab === 'chats' && (

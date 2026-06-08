@@ -9,7 +9,7 @@ import SettingsPanel from '@/Components/Admin/SettingsPanel';
 import PersonWizard from '@/Components/Admin/PersonWizard';
 
 export default function AdminDashboard({
-    user, condosList, adminCondoId, setAdminCondoId, adminActiveTab, setAdminActiveTab,
+    user, condosList, adminCondoId, setAdminCondoId, adminActiveTab, setAdminActiveTab, allCondominiums,
     isMobileSidebarOpen, setIsMobileSidebarOpen, adminSettingsForm, toggleTheme, darkMode,
     adminFilteredProperties, adminFilteredUsers, adminFilteredTickets, adminFilteredPayments,
     adminFilteredFines, setTicketStatusFilter, setTicketPriorityFilter, editingTicket, setEditingTicket,
@@ -199,6 +199,7 @@ export default function AdminDashboard({
                     handleSaveExpense={handleSaveExpense}
                     handleDeleteExpense={handleDeleteExpense}
                     usersList={usersList}
+                    allCondominiums={allCondominiums}
                     readOnly={false}
                 />
             )}

@@ -133,6 +133,25 @@ Este checklist interactivo registra el avance global y detalla los nuevos requer
   - [ ] **Dashboard Administrador:** Panel integral con Dashboard General, Personas, Unidades, Gastos Comunes, Reservas, Encomiendas, Comunicaciones, Reportes y Configuración.
   - [ ] **Lógica Multi-rol:** Permitir que los usuarios con múltiples perfiles (ej. Residente + Comité) tengan acceso a sus respectivos paneles secundarios desde su panel principal.
 
+### 2.8 Implementación de Reglas Financieras y Remuneraciones (zAux 05/06)
+- [x] **Estructuración de Base de Datos (Migraciones & Modelos):**
+  - [x] Crear migración para agregar `distributable_method` (`prorated`, `equal`, `tower_specific`, `unit_specific`, `exempt`) y `tower_id` a la tabla `condo_expenses` / `condo_incomes`.
+  - [x] Agregar tabla para `afps` (nombre, tasa_comision) y asociar la clave foránea a la ficha del empleado.
+  - [x] Agregar columnas detalladas de haberes imponibles (responsabilidad, horas extras) y no imponibles (vestuario) a la tabla de liquidaciones.
+  - [x] Agregar columnas para descuentos financieros (anticipo, préstamos) a la tabla de liquidaciones.
+- [x] **Desarrollo del Backend (Servicios & Lógica de Negocio):**
+  - [x] Implementar `CommonExpenseCalculator` aplicando la fórmula de base distribuible ($E_{total} - I_{total}$) y el desglose de cargos.
+  - [x] Programar cobro del Fondo de Reserva del $5.0\%$ calculado sobre el Subtotal (Prorrateado + Igualitario) de la unidad.
+  - [x] Implementar la regla de interés moratorio del $1.5\%$ mensual para deudas superiores a 10 días de gracia.
+  - [x] Desarrollar `PayrollCalculator` conforme a las reglas laborales chilenas (Fonasa 7%, AFC 0.6%, AFP dinámica, Haberes y Descuentos).
+- [ ] **Desarrollo del Frontend (React Views & UI):**
+  - [ ] Crear selector de método de distribución en la vista de registro de movimientos de gastos/ingresos del Administrador.
+  - [ ] Diseñar el modal de desglose del cobro del mes para Residentes mostrando el cálculo principal (Prorrateados, Igualitarios, Fondo de Reserva) y cargos posteriores.
+  - [ ] Diseñar la vista de generación y previsualización de Liquidaciones de Sueldo para colaboradores.
+- [x] **Aseguramiento de Calidad (Testing):**
+  - [x] Escribir tests en `Feature/AdvancedFinancesAndPayrollTest.php` para validar la matemática exacta del cálculo de gastos comunes de la Unidad A-302 ($163.250).
+  - [x] Escribir tests en `Feature/AdvancedFinancesAndPayrollTest.php` para validar la liquidación de Juan Carlos Pérez ($826.040).
+
 ---
 
 ## 🚀 3. Registro de Cambios (Walkthrough) y Resultados de Pruebas
@@ -494,7 +513,14 @@ Corrección de errores en tiempo de ejecución reportados en la consola del nave
 | HF-02 | `403 Forbidden` en `/api/condo-finances/catalog`, `/summary`, `/incomes`, `/expenses` | Dos `useEffect` en `Dashboard.jsx` (lines 77 y 170) llamaban a endpoints financieros sin verificar permisos del rol | Agregado guard condicional con `user.roles` dentro de cada effect; roles sin `view financial reports` (TI, Colaborador, Propietario, Residente) ya no disparan las peticiones |
 | HF-03 | `ReferenceError: Cannot access 'canViewFinances' before initialization` | Variable `const` en TDZ: declarada después del `useEffect` que la referenciaba en su dependency array | Reemplazada variable externa por chequeo inline dentro del callback del effect |
 
+### 3.18 Integración y Análisis Contable/Laboral zAux (Junio 2026)
+
+Se realizó una revisión minuciosa y especificación técnica basada en los nuevos archivos financieros provistos en la carpeta [zAux](file:///C:/xampp/htdocs/redvecino/zAux):
+*   **Análisis Contable de Gastos Comunes:** Se incorporó el algoritmo de base distribuible ($E_{total} - I_{total}$), la categorización de movimientos, los 5 métodos de distribución y el prorrateo de Fondo de Reserva sobre el subtotal de la unidad habitacional.
+*   **Análisis Laboral de Remuneraciones:** Se estructuró la jerarquía de haberes (imponibles y no imponibles), cotizaciones previsionales chilenas (salud 7%, pensión dinámica, seguro cesantía 0.6%) y otros descuentos del sueldo líquido.
+*   **Actualización de Documentos:** Se registraron todas las especificaciones y fórmulas matemáticas en la sección 15.13 de [SPEC.md](file:///C:/xampp/htdocs/redvecino/SPEC.md), y se definieron las tareas de desarrollo en la sección 2.8 de este documento.
+
 ---
-**Última actualización:** 5 de Junio de 2026 (Hotfix runtime errors — editingTicket, 403 financieros, TDZ)
-**Versión:** 6.1 (QA Audit + Runtime Hotfixes)
-**Estado:** Activo y Actualizado
+**Última actualización:** 8 de Junio de 2026 (Integración de Reglas Financieras y Remuneracionales Avanzadas - v7.0)
+**Versión:** 7.0 (zAux 05/06 Integration)
+**Estado:** Listo para desarrollo y en proceso de implementación de nuevas reglas contables y laborales.

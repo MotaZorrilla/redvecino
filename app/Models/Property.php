@@ -10,6 +10,7 @@ class Property extends Model
     use HasFactory;
     protected $fillable = [
         'condominium_id',
+        'tower_id',
         'type',
         'number',
         'block',
@@ -18,9 +19,21 @@ class Property extends Model
         'status',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'area_sqm' => 'decimal:2',
+        ];
+    }
+
     public function condominium()
     {
         return $this->belongsTo(Condominium::class);
+    }
+
+    public function tower()
+    {
+        return $this->belongsTo(CondoTower::class, 'tower_id');
     }
 
     public function owners()

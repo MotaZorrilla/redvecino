@@ -57,6 +57,8 @@ class CondoFinanceController extends Controller
             'description' => 'nullable|string',
             'property_id' => 'nullable|exists:properties,id',
             'user_id' => 'nullable|exists:users,id',
+            'distributable_method' => 'nullable|string|in:prorated,equal,tower_specific,unit_specific,exempt',
+            'tower_id' => 'nullable|exists:condo_towers,id',
         ]);
 
         return $this->service->createIncome($data);
@@ -88,6 +90,8 @@ class CondoFinanceController extends Controller
             'description' => 'nullable|string',
             'property_id' => 'nullable|exists:properties,id',
             'user_id' => 'nullable|exists:users,id',
+            'distributable_method' => 'nullable|string|in:prorated,equal,tower_specific,unit_specific,exempt',
+            'tower_id' => 'nullable|exists:condo_towers,id',
         ]);
 
         return $this->service->updateIncome($income, $data);
@@ -133,6 +137,8 @@ class CondoFinanceController extends Controller
             'description' => 'nullable|string',
             'property_id' => 'nullable|exists:properties,id',
             'user_id' => 'nullable|exists:users,id',
+            'distributable_method' => 'nullable|string|in:prorated,equal,tower_specific,unit_specific,exempt',
+            'tower_id' => 'nullable|exists:condo_towers,id',
         ]);
 
         return $this->service->createExpense($data);
@@ -164,6 +170,8 @@ class CondoFinanceController extends Controller
             'description' => 'nullable|string',
             'property_id' => 'nullable|exists:properties,id',
             'user_id' => 'nullable|exists:users,id',
+            'distributable_method' => 'nullable|string|in:prorated,equal,tower_specific,unit_specific,exempt',
+            'tower_id' => 'nullable|exists:condo_towers,id',
         ]);
 
         return $this->service->updateExpense($expense, $data);

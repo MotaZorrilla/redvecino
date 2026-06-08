@@ -18,6 +18,8 @@ class CondoIncome extends Model
         'description',
         'property_id',
         'user_id',
+        'distributable_method',
+        'tower_id',
     ];
 
     protected $casts = [
@@ -28,6 +30,11 @@ class CondoIncome extends Model
     public function condominium()
     {
         return $this->belongsTo(Condominium::class);
+    }
+
+    public function tower()
+    {
+        return $this->belongsTo(CondoTower::class, 'tower_id');
     }
 
     public function property()

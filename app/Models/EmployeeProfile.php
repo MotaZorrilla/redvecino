@@ -17,6 +17,11 @@ class EmployeeProfile extends Model
         'shift',
         'salary',
         'hire_date',
+        'afp_id',
+        'bank_name',
+        'account_type',
+        'account_number',
+        'payment_method',
     ];
 
     protected function casts(): array
@@ -35,5 +40,15 @@ class EmployeeProfile extends Model
     public function supervisor()
     {
         return $this->belongsTo(User::class, 'supervisor_id');
+    }
+
+    public function afp()
+    {
+        return $this->belongsTo(Afp::class, 'afp_id');
+    }
+
+    public function liquidations()
+    {
+        return $this->hasMany(Liquidation::class);
     }
 }

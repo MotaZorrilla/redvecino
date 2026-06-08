@@ -71,8 +71,8 @@ export default function Dashboard() {
         [expensesList, selectedExpenseCategory]
     );
 
-    const [newIncomeForm, setNewIncomeForm] = useState({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '' });
-    const [newExpenseForm, setNewExpenseForm] = useState({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '' });
+    const [newIncomeForm, setNewIncomeForm] = useState({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '', distributable_method: 'prorated', tower_id: '' });
+    const [newExpenseForm, setNewExpenseForm] = useState({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '', distributable_method: 'prorated', tower_id: '' });
 
     useEffect(() => {
         const canView = user?.roles?.some(r => ['admin', 'administrador', 'committee', 'comité'].includes(r.toLowerCase()));
@@ -112,6 +112,8 @@ export default function Dashboard() {
             description: newIncomeForm.description || null,
             property_id: newIncomeForm.property_id ? Number(newIncomeForm.property_id) : null,
             user_id: newIncomeForm.user_id ? Number(newIncomeForm.user_id) : null,
+            distributable_method: newIncomeForm.distributable_method || 'prorated',
+            tower_id: newIncomeForm.tower_id ? Number(newIncomeForm.tower_id) : null,
         };
 
         const req = editingIncome 
@@ -122,7 +124,7 @@ export default function Dashboard() {
             fetchCondoFinances();
             setShowAddIncomeForm(false);
             setEditingIncome(null);
-            setNewIncomeForm({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '' });
+            setNewIncomeForm({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '', distributable_method: 'prorated', tower_id: '' });
         }).catch(err => {
             toast("Error al guardar ingreso: " + (err.response?.data?.message || err.message), 'error');
         });
@@ -146,6 +148,8 @@ export default function Dashboard() {
             description: newExpenseForm.description || null,
             property_id: newExpenseForm.property_id ? Number(newExpenseForm.property_id) : null,
             user_id: newExpenseForm.user_id ? Number(newExpenseForm.user_id) : null,
+            distributable_method: newExpenseForm.distributable_method || 'prorated',
+            tower_id: newExpenseForm.tower_id ? Number(newExpenseForm.tower_id) : null,
         };
 
         const req = editingExpense 
@@ -156,7 +160,7 @@ export default function Dashboard() {
             fetchCondoFinances();
             setShowAddExpenseForm(false);
             setEditingExpense(null);
-            setNewExpenseForm({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '' });
+            setNewExpenseForm({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '', distributable_method: 'prorated', tower_id: '' });
         }).catch(err => {
             toast("Error al guardar egreso: " + (err.response?.data?.message || err.message), 'error');
         });
@@ -451,14 +455,32 @@ export default function Dashboard() {
     const [residentExpenses, setResidentExpenses] = useState({
         id: 421,
         period: 'Mayo 2026',
-        amount: 165000,
+        amount: 163250,
         dueDate: '05 de Junio, 2026',
         status: 'pending',
+        isStructured: true,
+        breakdown: {
+            prorrateado: 70000,
+            igualitario: 20000,
+            subtotal: 90000,
+            fondo_reserva: 4500,
+            total_periodo: 94500,
+            cargos_posteriores: {
+                gastos_torre: 8000,
+                multas: 10000,
+                deuda_anterior: 50000,
+                interes_mora: 750,
+                total: 68750
+            }
+        },
         items: [
-            { name: 'Seguridad & Conserjería', amount: 73260 },
-            { name: 'Limpieza & Ornato', amount: 41250 },
-            { name: 'Mantenciones Técnicas', amount: 32010 },
-            { name: 'Servicios Básicos Comunes', amount: 18480 }
+            { name: 'Gastos Comunes Prorrateados', amount: 70000 },
+            { name: 'Gastos Comunes Igualitarios', amount: 20000 },
+            { name: 'Fondo de Reserva (5%)', amount: 4500 },
+            { name: 'Gastos de Torre A', amount: 8000 },
+            { name: 'Multas por Reglamento', amount: 10000 },
+            { name: 'Deuda Anterior Vencida', amount: 50000 },
+            { name: 'Interés por Mora (1.5%)', amount: 750 }
         ]
     });
 
@@ -725,7 +747,7 @@ export default function Dashboard() {
         forceMobileView, setForceMobileView, isDesktop,
         residentCondo,
         isActuallyAdmin, simulationMode,
-        user, toggleTheme, darkMode, condosList, adminCondoId, setAdminCondoId,
+        user, toggleTheme, darkMode, condosList, adminCondoId, setAdminCondoId, allCondominiums,
         isMobileSidebarOpen, setIsMobileSidebarOpen, adminSettingsForm,
         adminFilteredProperties, adminFilteredUsers, adminFilteredTickets,
         adminFilteredPayments, adminFilteredFines,

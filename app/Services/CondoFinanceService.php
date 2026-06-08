@@ -187,7 +187,7 @@ class CondoFinanceService
 
     public function getIncomes(array $filters)
     {
-        return CondoIncome::with(['property', 'user'])
+        return CondoIncome::with(['property', 'user', 'tower'])
             ->where('condominium_id', $filters['condominium_id'])
             ->orderBy('date', 'desc')
             ->paginate(20);
@@ -195,7 +195,7 @@ class CondoFinanceService
 
     public function getExpenses(array $filters)
     {
-        return CondoExpense::with(['property', 'user', 'commonExpense'])
+        return CondoExpense::with(['property', 'user', 'commonExpense', 'tower'])
             ->where('condominium_id', $filters['condominium_id'])
             ->orderBy('date', 'desc')
             ->paginate(20);

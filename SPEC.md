@@ -1505,7 +1505,82 @@ En `bootstrap/app.php`, el middleware se configura mediante métodos fluidos, no
 
 ---
 
+### 15.13 Especificación de Reglas Financieras y Remuneraciones Avanzadas (zAux 05/06)
+
+Derivado de la incorporación de las directrices e infografías de la sesión del 5 de junio de 2026, se especifican de manera obligatoria las siguientes reglas de negocio y cálculo:
+
+#### 15.13.1 Motor Financiero de Gastos Comunes (GGCC)
+El cálculo mensual para cada unidad habitacional o comercial se estructura en base a las siguientes directrices y fases:
+
+1.  **Parametrización Inicial del Condominio:**
+    *   **Tipos de Unidad ($m^2$):** Catálogo de unidades con coeficiente de prorrateo asociado:
+        *   *Tipo A:* $60\text{ m}^2$ $\rightarrow$ $0.80\%$ de alícuota.
+        *   *Tipo B:* $80\text{ m}^2$ $\rightarrow$ $1.05\%$ de alícuota.
+        *   *Tipo C:* $120\text{ m}^2$ $\rightarrow$ $1.50\%$ de alícuota.
+    *   **Configuración de Medidores por Torre:** Permite mapear consumos independientes por torre (ej. Torre A con medidor de agua y electricidad; Torre B solo con agua; Torre C sin medidores).
+    *   **Reglas Financieras del Período:**
+        *   *Fondo de Reserva ($FR_{pct}$):* $5.0\%$ sobre los gastos comunes del período.
+        *   *Interés Moratorio ($Int_{mora}$):* $1.5\%$ mensual aplicable sobre saldos vencidos.
+        *   *Días de Gracia:* $10$ días tras el vencimiento.
+    *   **Gestión de Espacios Comunes:** Registro de áreas comunes indicando si generan ingresos por arriendo (ej. Sala de eventos, Quinchos y Canchas $\rightarrow$ Sí; Gimnasio y Piscina $\rightarrow$ No).
+
+2.  **Registro de Movimientos con Reglas de Distribución:**
+    Cada ingreso y egreso del período debe registrarse con: Fecha, Descripción, Monto, Documento de Respaldo y un **Método de Distribución**:
+    *   `prorated` (Prorrateado): Distribuido según el $\%$ de alícuota de cada unidad.
+    *   `equal` (Igualitario): Dividido en partes iguales entre todas las unidades.
+    *   `tower_specific` (Torre Específica): Dividido únicamente entre las unidades asociadas a una torre en particular.
+    *   `unit_specific` (Unidad Específica): Cobro directo y exclusivo a una unidad privativa (ej. multas, copias de llaves).
+    *   `exempt` (No participa): Exento de cobro ordinario.
+
+3.  **Algoritmo del Cálculo del Gasto Común por Unidad ($Total_{unidad}$):**
+    *   **Paso 1 (Base Distribuible):**
+        $$Base_{distribuible} = \text{Egresos Totales} - \text{Ingresos Totales}$$
+    *   **Paso 2 (Distribución Principal):**
+        $$Subtotal_{unidad} = \sum (\text{Movimientos Prorrateados} \times P_{unidad}) + \sum \left( \frac{\text{Movimientos Igualitarios}}{N_{total\_unidades}} \right)$$
+    *   **Paso 3 (Fondo de Reserva del Período):**
+        $$FondoReserva_{unidad} = Subtotal_{unidad} \times 0.05$$
+    *   **Paso 4 (Total Gastos Comunes Período):**
+        $$TotalPeriodo_{unidad} = Subtotal_{unidad} + FondoReserva_{unidad}$$
+    *   **Paso 5 (Adición de Cargos Posteriores - Exentos de Fondo de Reserva):**
+        $$CargosPosteriores_{unidad} = GastoTorre_{unidad} + Multa_{unidad} + DeudaAnterior_{unidad} + InteresMora_{unidad}$$
+        Donde:
+        $$InteresMora_{unidad} = DeudaAnterior_{unidad} \times 0.015 \quad (\text{si } \text{días\_mora} > 10)$$
+    *   **Paso 6 (Total Obligación a Pagar):**
+        $$Total_{unidad} = TotalPeriodo_{unidad} + CargosPosteriores_{unidad}$$
+
+#### 15.13.2 Motor de Remuneraciones y Liquidación de Sueldos
+La generación de liquidaciones de sueldo de colaboradores sigue el estándar de la legislación laboral chilena, parametrizando los conceptos bajo la siguiente jerarquía contable:
+
+1.  **Haberes Imponibles:**
+    *   *Sueldo Base:* Pago pactado contractualmente por la jornada de trabajo ordinaria.
+    *   *Asignación de Responsabilidad:* Bono imponible asignado al cargo.
+    *   *Horas Extras:* Recargo por jornada extraordinaria.
+    *   $$\text{Total Imponibles } (H_{imp}) = \text{Sueldo Base} + \text{Asig. Responsabilidad} + \text{Horas Extras}$$
+
+2.  **Haberes No Imponibles:**
+    *   *Asignación de Colación:* Asignación para alimentación diaria.
+    *   *Asignación de Movilización:* Asignación para traslados y locomoción.
+    *   *Asignación de Vestuario:* Asignación para uniforme o ropa de trabajo.
+    *   $$\text{Total No Imponibles } (H_{no\_imp}) = \text{Colación} + \text{Movilización} + \text{Vestuario}$$
+
+3.  **Descuentos Previsionales (Cotizaciones de Salud y Pensión sobre $H_{imp}$):**
+    *   *Salud (Fonasa):* $7.00\%$ de $H_{imp}$.
+    *   *Pensión (AFP):* Comisión porcentual dinámica según la entidad del colaborador (ej. Habitat $10.00\%$ base de capitalización individual; Capital $11.44\%$ total).
+    *   *Seguro de Cesantía (AFC Colaborador):* $0.60\%$ de $H_{imp}$ para contratos indefinidos (en plazo fijo es financiado $100\%$ por el empleador).
+    *   $$\text{Total Previsionales } (D_{prev}) = \text{Salud} + \text{Pensión} + \text{Cesantía}$$
+
+4.  **Otros Descuentos Financieros:**
+    *   *Anticipos:* Adelantos de sueldo entregados durante el mes.
+    *   *Préstamos:* Cuotas de préstamos internos otorgados por la administración.
+    *   *Multas u Atrasos:* Descuentos por ausencias injustificadas u atrasos.
+    *   $$\text{Total Otros Descuentos } (D_{otros}) = \text{Anticipos} + \text{Préstamos} + \text{Multas\_Atrasos}$$
+
+5.  **Cálculo de Sueldo Líquido Final:**
+    $$S_{liquido} = (H_{imp} + H_{no\_imp}) - (D_{prev} + D_{otros})$$
+
+---
+
 **Fecha de creación:** Mayo 2026
-**Última actualización:** 5 de Junio de 2026 (QA Audit + Hotfixes — 179 tests, 0 fallas, 2 errores runtime corregidos)
-**Versión:** 9.0 (Full Frontend UX/UI Audit, Backend Audit, QA Audit, Runtime Hotfixes)
-**Estado:** Listo para desarrollo (Suite completa: 179 tests verdes, 0 errores build, frontend auditado, backend endurecido, QA certificado)
+**Última actualización:** 8 de Junio de 2026 (Integración de Reglas Financieras y Remuneracionales Avanzadas - v10.0)
+**Versión:** 10.0 (zAux 05/06 Integration)
+**Estado:** Listo para desarrollo (Modelado contable consolidado, 179 tests estables en verde, especificaciones actualizadas)

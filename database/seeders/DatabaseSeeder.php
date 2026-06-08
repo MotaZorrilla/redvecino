@@ -21,6 +21,8 @@ use App\Models\Announcement;
 use App\Models\CondoIncome;
 use App\Models\CondoExpense;
 use App\Models\Message;
+use App\Models\Afp;
+use App\Models\CondoTower;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -34,6 +36,13 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->command->info('Roles and permissions seeded.');
+
+        // 1.5. Create standard AFPs
+        $afpHabitat = Afp::create(['name' => 'Habitat', 'commission_rate' => 10.00]);
+        $afpCapital = Afp::create(['name' => 'Capital', 'commission_rate' => 11.44]);
+        $afpModelo = Afp::create(['name' => 'Modelo', 'commission_rate' => 10.58]);
+        
+        $this->command->info('AFPs seeded.');
 
         // 2. Create standard Demo Users (password is 'password')
         $demoUsersData = [
@@ -130,6 +139,11 @@ class DatabaseSeeder extends Seeder
             'shift' => 'mañana-tarde',
             'salary' => 650000.00,
             'hire_date' => '2025-03-15',
+            'afp_id' => $afpHabitat->id,
+            'bank_name' => 'Banco Estado',
+            'account_type' => 'Cuenta Rut',
+            'account_number' => '12345678',
+            'payment_method' => 'Transferencia Electrónica',
         ]);
 
         EmployeeProfile::create([
@@ -140,6 +154,11 @@ class DatabaseSeeder extends Seeder
             'shift' => 'rotativo',
             'salary' => 950000.00,
             'hire_date' => '2024-06-01',
+            'afp_id' => $afpCapital->id,
+            'bank_name' => 'Banco de Chile',
+            'account_type' => 'Cuenta Corriente',
+            'account_number' => '987654321',
+            'payment_method' => 'Transferencia Electrónica',
         ]);
 
         TiProfile::create([
@@ -183,6 +202,31 @@ class DatabaseSeeder extends Seeder
 
         $condos = [$condo1, $condo2, $condo3];
         $this->command->info('3 Condominiums created.');
+
+        // 3.5 Create Towers for each Condo
+        $condoTowers = [];
+        foreach ($condos as $condo) {
+            $towerA = CondoTower::create([
+                'condominium_id' => $condo->id,
+                'name' => 'Torre A',
+                'has_water_meter' => true,
+                'has_electricity_meter' => true,
+            ]);
+            $towerB = CondoTower::create([
+                'condominium_id' => $condo->id,
+                'name' => 'Torre B',
+                'has_water_meter' => true,
+                'has_electricity_meter' => false,
+            ]);
+            $towerC = CondoTower::create([
+                'condominium_id' => $condo->id,
+                'name' => 'Torre C',
+                'has_water_meter' => false,
+                'has_electricity_meter' => false,
+            ]);
+            $condoTowers[$condo->id] = [$towerA, $towerB, $towerC];
+        }
+        $this->command->info('Condo Towers created.');
 
         // 4. Create Ticket Categories
         $categoriesData = [
@@ -235,11 +279,16 @@ class DatabaseSeeder extends Seeder
             for ($i = 1; $i <= 20; $i++) {
                 $aptNumber = 'Apt ' . ($i + 100);
                 
+                $towerList = $condoTowers[$condo->id];
+                $towerIdx = ($i - 1) % 3;
+                $tower = $towerList[$towerIdx];
+
                 $property = Property::create([
                     'condominium_id' => $condo->id,
+                    'tower_id' => $tower->id,
                     'type' => 'apartment',
                     'number' => $aptNumber,
-                    'block' => 'Torre A',
+                    'block' => $tower->name,
                     'floor' => intval(ceil($i / 4)),
                     'area_sqm' => 60.50 + ($i * 2.5),
                     'status' => 'occupied',

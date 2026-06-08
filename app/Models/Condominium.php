@@ -39,4 +39,9 @@ class Condominium extends Model
     {
         return $this->hasManyThrough(Ticket::class, Property::class);
     }
+
+    public function towers()
+    {
+        return $this->hasMany(CondoTower::class);
+    }
 }

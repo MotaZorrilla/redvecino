@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 export default function ContractViewer({ user }) {
     const [activeContractTab, setActiveContractTab] = useState('contract');
+    const [selectedPeriod, setSelectedPeriod] = useState('demo-mayo');
 
     // Mock contract data
     const contractData = {
@@ -19,25 +20,72 @@ export default function ContractViewer({ user }) {
         mealAllowance: 66896,
     };
 
-    // Mock liquidation data (based on ORGANIZACION_SISTEMA.md)
-    const liquidation = {
-        period: 'Mayo 2026',
-        daysWorked: 30,
-        baseSalary: 539000,
-        transportAllowance: 66896,
-        mealAllowance: 66896,
-        totalGross: 672592,
-        healthDeduction: 37730,
-        pensionDeduction: 61662,
-        unemploymentDeduction: 3234,
-        totalDeductions: 102626,
-        netPay: 569966,
+    const liquidations = {
+        'demo-mayo': {
+            period: 'Mayo 2026',
+            employeeName: user?.name || 'Conserje Principal',
+            rut: user?.rut || '55.555.555-5',
+            position: 'Auxiliar de Aseo / Portería',
+            daysWorked: 30,
+            baseSalary: 539000,
+            transportAllowance: 66896,
+            mealAllowance: 66896,
+            responsibilityAllowance: 0,
+            overtime: 0,
+            clothingAllowance: 0,
+            totalGross: 672592,
+            healthDeduction: 37730,
+            pensionDeduction: 61662,
+            pensionRate: '11.44%',
+            pensionName: 'AFP Capital',
+            unemploymentDeduction: 3234,
+            totalDeductions: 102626,
+            anticipo: 0,
+            prestamo: 0,
+            totalOtherDeductions: 0,
+            netPay: 569966,
+            bankName: 'Banco Estado',
+            accountType: 'Cuenta Rut',
+            accountNumber: '12345678',
+            paymentMethod: 'Transferencia Electrónica',
+            observations: 'Pago mensual regular.'
+        },
+        'juan-carlos-abril': {
+            period: 'Abril 2026',
+            employeeName: 'Juan Carlos Pérez González',
+            rut: '12.345.678-9',
+            position: 'Conserje',
+            daysWorked: 30,
+            baseSalary: 850000,
+            transportAllowance: 40000,
+            mealAllowance: 50000,
+            responsibilityAllowance: 80000,
+            overtime: 30000,
+            clothingAllowance: 15000,
+            totalGross: 1065000,
+            healthDeduction: 67200,
+            pensionDeduction: 96000,
+            pensionRate: '10.00%',
+            pensionName: 'AFP Habitat',
+            unemploymentDeduction: 5760,
+            totalDeductions: 168960,
+            anticipo: 50000,
+            prestamo: 20000,
+            totalOtherDeductions: 70000,
+            netPay: 826040,
+            bankName: 'Banco Estado',
+            accountType: 'Cuenta Rut',
+            accountNumber: '12345678',
+            paymentMethod: 'Transferencia Electrónica',
+            observations: 'Nota: El comprobante impreso oficial tiene un error tipográfico de $1.000 CLP en la suma de descuentos previsionales impreso como $169.960. El cálculo correcto real es de $168.960, resultando en un Sueldo Líquido de $826.040 CLP.'
+        }
     };
 
+    const currentLiquidation = liquidations[selectedPeriod] || liquidations['demo-mayo'];
+
     const liquidationHistory = [
-        { period: 'Mayo 2026', netPay: 569966, status: 'paid', date: '31/05/2026' },
-        { period: 'Abril 2026', netPay: 569966, status: 'paid', date: '30/04/2026' },
-        { period: 'Marzo 2026', netPay: 569966, status: 'paid', date: '31/03/2026' },
+        { key: 'demo-mayo', period: 'Mayo 2026', netPay: 569966, status: 'paid', date: '31/05/2026' },
+        { key: 'juan-carlos-abril', period: 'Abril 2026 (Ficha Juan Carlos Pérez)', netPay: 826040, status: 'paid', date: '30/04/2026' },
     ];
 
     const formatCLP = (n) => '$' + n.toLocaleString('es-CL');
@@ -135,78 +183,118 @@ export default function ContractViewer({ user }) {
 
             {/* Liquidation View */}
             {activeContractTab === 'liquidation' && (
-                <div className="space-y-4">
+                <div className="space-y-6">
                     {/* Current Month Liquidation */}
                     <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">
                         <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 p-5 text-white">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <h5 className="text-base font-black">Liquidación de Remuneración</h5>
-                                    <p className="text-xs text-emerald-200 mt-0.5">Período: {liquidation.period} — {liquidation.daysWorked} días trabajados</p>
+                                    <p className="text-xs text-emerald-200 mt-0.5">Período: {currentLiquidation.period} — {currentLiquidation.daysWorked} días trabajados</p>
                                 </div>
-                                <button className="px-3 py-1.5 bg-white/15 hover:bg-white/25 rounded-xl text-[10px] font-bold uppercase transition-all cursor-pointer">
-                                    📥 Descargar PDF
-                                </button>
+                                <span className="px-3 py-1.5 bg-white/15 rounded-xl text-[10px] font-bold uppercase">
+                                    EMPLEADO: {currentLiquidation.employeeName} (RUT {currentLiquidation.rut})
+                                </span>
                             </div>
                         </div>
 
-                        <div className="p-6 space-y-4">
+                        <div className="p-6 space-y-5">
                             {/* Haberes */}
                             <div>
                                 <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider block mb-2">💰 Haberes (Ingresos)</span>
                                 <div className="space-y-1.5">
                                     <div className="flex justify-between items-center px-3 py-2 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg text-xs">
-                                        <span className="text-slate-700 dark:text-slate-300">Sueldo Base Pactado (Imponible)</span>
-                                        <span className="font-bold text-slate-800 dark:text-white">{formatCLP(liquidation.baseSalary)}</span>
+                                        <span className="text-slate-700 dark:text-slate-300 font-medium">Sueldo Base Pactado</span>
+                                        <span className="font-bold text-slate-800 dark:text-white">{formatCLP(currentLiquidation.baseSalary)}</span>
                                     </div>
+                                    {currentLiquidation.responsibilityAllowance > 0 && (
+                                        <div className="flex justify-between items-center px-3 py-2 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg text-xs">
+                                            <span className="text-slate-700 dark:text-slate-300 font-medium">Asignación de Responsabilidad</span>
+                                            <span className="font-bold text-slate-800 dark:text-white">{formatCLP(currentLiquidation.responsibilityAllowance)}</span>
+                                        </div>
+                                    )}
+                                    {currentLiquidation.overtime > 0 && (
+                                        <div className="flex justify-between items-center px-3 py-2 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg text-xs">
+                                            <span className="text-slate-700 dark:text-slate-300 font-medium">Horas Extras</span>
+                                            <span className="font-bold text-slate-800 dark:text-white">{formatCLP(currentLiquidation.overtime)}</span>
+                                        </div>
+                                    )}
                                     <div className="flex justify-between items-center px-3 py-2 bg-slate-50 dark:bg-slate-950/50 rounded-lg text-xs">
                                         <span className="text-slate-600 dark:text-slate-400">Asig. Locomoción (No Imponible)</span>
-                                        <span className="font-bold text-slate-700 dark:text-slate-300">{formatCLP(liquidation.transportAllowance)}</span>
+                                        <span className="font-bold text-slate-700 dark:text-slate-300">{formatCLP(currentLiquidation.transportAllowance)}</span>
                                     </div>
                                     <div className="flex justify-between items-center px-3 py-2 bg-slate-50 dark:bg-slate-950/50 rounded-lg text-xs">
                                         <span className="text-slate-600 dark:text-slate-400">Asig. Colación (No Imponible)</span>
-                                        <span className="font-bold text-slate-700 dark:text-slate-300">{formatCLP(liquidation.mealAllowance)}</span>
+                                        <span className="font-bold text-slate-700 dark:text-slate-300">{formatCLP(currentLiquidation.mealAllowance)}</span>
                                     </div>
-                                    <div className="flex justify-between items-center px-3 py-2 border-t border-emerald-200 dark:border-emerald-900 text-xs font-black">
-                                        <span className="text-emerald-700 dark:text-emerald-400">Total Haberes Bruto</span>
-                                        <span className="text-emerald-700 dark:text-emerald-400">{formatCLP(liquidation.totalGross)}</span>
+                                    {currentLiquidation.clothingAllowance > 0 && (
+                                        <div className="flex justify-between items-center px-3 py-2 bg-slate-50 dark:bg-slate-950/50 rounded-lg text-xs">
+                                            <span className="text-slate-600 dark:text-slate-400">Asig. Vestuario (No Imponible)</span>
+                                            <span className="font-bold text-slate-700 dark:text-slate-300">{formatCLP(currentLiquidation.clothingAllowance)}</span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between items-center px-3 py-2 border-t border-emerald-250 dark:border-emerald-900 text-xs font-black">
+                                        <span className="text-emerald-700 dark:text-emerald-400 uppercase text-[10px]">Total Haberes Bruto</span>
+                                        <span className="text-emerald-700 dark:text-emerald-400">{formatCLP(currentLiquidation.totalGross)}</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Deducciones */}
                             <div>
-                                <span className="text-[10px] text-rose-500 font-bold uppercase tracking-wider block mb-2">📉 Deducciones Previsionales</span>
+                                <span className="text-[10px] text-rose-500 font-bold uppercase tracking-wider block mb-2">📉 Deducciones Previsionales y Descuentos</span>
                                 <div className="space-y-1.5">
                                     <div className="flex justify-between items-center px-3 py-2 bg-rose-50 dark:bg-rose-950/20 rounded-lg text-xs">
-                                        <span className="text-slate-600 dark:text-slate-400">Salud — Fonasa (7%)</span>
-                                        <span className="font-bold text-rose-600 dark:text-rose-400">-{formatCLP(liquidation.healthDeduction)}</span>
+                                        <span className="text-slate-600 dark:text-slate-400">Salud — Fonasa (7.00%)</span>
+                                        <span className="font-bold text-rose-600 dark:text-rose-400">-{formatCLP(currentLiquidation.healthDeduction)}</span>
                                     </div>
-                                    <div className="flex justify-between items-center px-3 py-2 bg-slate-50 dark:bg-slate-950/50 rounded-lg text-xs">
-                                        <span className="text-slate-600 dark:text-slate-400">Pensión — AFP Capital (11.44%)</span>
-                                        <span className="font-bold text-rose-500">-{formatCLP(liquidation.pensionDeduction)}</span>
+                                    <div className="flex justify-between items-center px-3 py-2 bg-rose-50 dark:bg-rose-950/20 rounded-lg text-xs">
+                                        <span className="text-slate-600 dark:text-slate-400">Pensión — {currentLiquidation.pensionName} ({currentLiquidation.pensionRate})</span>
+                                        <span className="font-bold text-rose-600 dark:text-rose-400">-{formatCLP(currentLiquidation.pensionDeduction)}</span>
                                     </div>
-                                    <div className="flex justify-between items-center px-3 py-2 bg-slate-50 dark:bg-slate-950/50 rounded-lg text-xs">
-                                        <span className="text-slate-600 dark:text-slate-400">Seguro Cesantía — AFC (0.60%)</span>
-                                        <span className="font-bold text-rose-500">-{formatCLP(liquidation.unemploymentDeduction)}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center px-3 py-2 border-t border-rose-200 dark:border-rose-900 text-xs font-black">
-                                        <span className="text-rose-600 dark:text-rose-400">Total Descuentos</span>
-                                        <span className="text-rose-600 dark:text-rose-400">-{formatCLP(liquidation.totalDeductions)}</span>
+                                    {currentLiquidation.unemploymentDeduction > 0 && (
+                                        <div className="flex justify-between items-center px-3 py-2 bg-rose-50 dark:bg-rose-950/20 rounded-lg text-xs">
+                                            <span className="text-slate-600 dark:text-slate-400">Seguro Cesantía — AFC (0.60%)</span>
+                                            <span className="font-bold text-rose-600 dark:text-rose-400">-{formatCLP(currentLiquidation.unemploymentDeduction)}</span>
+                                        </div>
+                                    )}
+                                    {currentLiquidation.anticipo > 0 && (
+                                        <div className="flex justify-between items-center px-3 py-2 bg-slate-50 dark:bg-slate-950/50 rounded-lg text-xs">
+                                            <span className="text-slate-600 dark:text-slate-400">Anticipo de Sueldo</span>
+                                            <span className="font-bold text-rose-500">-{formatCLP(currentLiquidation.anticipo)}</span>
+                                        </div>
+                                    )}
+                                    {currentLiquidation.prestamo > 0 && (
+                                        <div className="flex justify-between items-center px-3 py-2 bg-slate-50 dark:bg-slate-950/50 rounded-lg text-xs">
+                                            <span className="text-slate-600 dark:text-slate-400">Préstamo Social</span>
+                                            <span className="font-bold text-rose-500">-{formatCLP(currentLiquidation.prestamo)}</span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between items-center px-3 py-2 border-t border-rose-250 dark:border-rose-900 text-xs font-black">
+                                        <span className="text-rose-600 dark:text-rose-400 uppercase text-[10px]">Total Descuentos</span>
+                                        <span className="text-rose-600 dark:text-rose-400">-{formatCLP(currentLiquidation.totalDeductions + currentLiquidation.totalOtherDeductions)}</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Net Pay */}
-                            <div className="p-4 bg-gradient-to-r from-emerald-50 to-emerald-100 dark:from-emerald-950/40 dark:to-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-2xl">
+                            <div className="p-5 bg-gradient-to-r from-emerald-500/10 to-emerald-500/20 border border-emerald-500/20 rounded-2xl">
                                 <div className="flex justify-between items-center">
                                     <div>
-                                        <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider block">Sueldo Líquido a Transferir</span>
-                                        <span className="text-[9px] text-slate-500 dark:text-slate-400 block mt-0.5">Pago vía transferencia electrónica</span>
+                                        <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider block">Sueldo Líquido Transferido</span>
+                                        <span className="text-[9px] text-slate-500 dark:text-slate-400 block mt-0.5">Vía {currentLiquidation.paymentMethod} &bull; {currentLiquidation.bankName}</span>
                                     </div>
-                                    <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400">{formatCLP(liquidation.netPay)}</span>
+                                    <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400">{formatCLP(currentLiquidation.netPay)}</span>
                                 </div>
                             </div>
+
+                            {/* Reconciliation Alert for Juan Carlos */}
+                            {selectedPeriod === 'juan-carlos-abril' && (
+                                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 p-4 rounded-xl text-[11px] text-amber-800 dark:text-amber-400 font-sans space-y-1">
+                                    <span className="font-extrabold uppercase block">⚠️ Nota de Conciliación Matemática (Infografía)</span>
+                                    <p>La liquidación de Juan Carlos Pérez contiene un error de suma impreso en los descuentos previsionales de la infografía (Fonasa $67.200 + AFP $96.000 + Cesantía $5.760 = $168.960, pero impreso como $169.960). Nuestro sistema realiza la sumatoria matemáticamente exacta de $168.960, resultando en un Sueldo Líquido de $826.040 CLP (en lugar de los $825.040 CLP informados con error).</p>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -217,20 +305,32 @@ export default function ContractViewer({ user }) {
                         </div>
                         <div className="divide-y divide-gray-100 dark:divide-slate-800">
                             {liquidationHistory.map((l, i) => (
-                                <div key={i} className="flex items-center justify-between px-5 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                <div key={i} className={`flex items-center justify-between px-5 py-3 transition-colors ${selectedPeriod === l.key ? 'bg-emerald-500/5 dark:bg-emerald-500/10 border-l-4 border-emerald-500' : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}>
                                     <div className="flex items-center gap-3">
-                                        <div className="h-8 w-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 text-xs font-bold">
-                                            💵
-                                        </div>
+                                        <button 
+                                            onClick={() => setSelectedPeriod(l.key)}
+                                            className="h-8 w-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 text-xs font-bold hover:bg-emerald-500 hover:text-white transition-all cursor-pointer"
+                                            title="Ver liquidación detallada"
+                                        >
+                                            👁️
+                                        </button>
                                         <div>
-                                            <span className="text-xs font-bold text-slate-800 dark:text-white block">{l.period}</span>
+                                            <button 
+                                                onClick={() => setSelectedPeriod(l.key)}
+                                                className="text-xs font-bold text-slate-800 dark:text-white block hover:text-emerald-600 transition-colors text-left"
+                                            >
+                                                {l.period}
+                                            </button>
                                             <span className="text-[10px] text-slate-400 block">Pagado el {l.date}</span>
                                         </div>
                                     </div>
                                     <div className="text-right flex items-center gap-3">
                                         <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">{formatCLP(l.netPay)}</span>
-                                        <button className="px-2 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 text-[10px] font-bold rounded-lg transition-all cursor-pointer">
-                                            📥 PDF
+                                        <button 
+                                            onClick={() => setSelectedPeriod(l.key)}
+                                            className="px-2.5 py-1 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-lg transition-all cursor-pointer"
+                                        >
+                                            🔍 Detalle
                                         </button>
                                     </div>
                                 </div>

@@ -46,9 +46,12 @@ export default function FinancesLedger({
     handleSaveExpense,
     handleDeleteExpense,
     usersList = [],
+    allCondominiums = [],
     readOnly = false
 }) {
     const [selectedAviso, setSelectedAviso] = useState(null);
+    const activeCondo = allCondominiums.find(c => c.id === Number(adminCondoId));
+    const towersList = activeCondo?.towers || [];
     const [modalSubTab, setModalSubTab] = useState('summary');
 
     const formatCategoryLabel = (catKey, label) => {
@@ -454,7 +457,7 @@ export default function FinancesLedger({
                                     <button
                                         onClick={() => {
                                             setEditingIncome(null);
-                                            setNewIncomeForm({ category: '', subcategory: '', amount: '', date: new Date().toISOString().substring(0, 10), description: '', property_id: '', user_id: '' });
+                                            setNewIncomeForm({ category: '', subcategory: '', amount: '', date: new Date().toISOString().substring(0, 10), description: '', property_id: '', user_id: '', distributable_method: 'prorated', tower_id: '' });
                                             setShowAddIncomeForm(!showAddIncomeForm);
                                         }}
                                         className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all"
@@ -574,6 +577,53 @@ export default function FinancesLedger({
                                         </div>
                                     </div>
 
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label htmlFor="income-dist-method" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Método de Distribución</label>
+                                            <select
+                                                id="income-dist-method"
+                                                value={newIncomeForm.distributable_method || 'prorated'}
+                                                onChange={(e) => setNewIncomeForm(prev => ({ 
+                                                    ...prev, 
+                                                    distributable_method: e.target.value,
+                                                    tower_id: e.target.value === 'tower_specific' ? prev.tower_id : '' 
+                                                }))}
+                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                            >
+                                                <option value="prorated">Prorrateado (Alícuota)</option>
+                                                <option value="equal">Partes Iguales</option>
+                                                <option value="tower_specific">Por Torre Específica</option>
+                                                <option value="unit_specific">Unidad Específica</option>
+                                                <option value="exempt">Exento</option>
+                                            </select>
+                                        </div>
+
+                                        {newIncomeForm.distributable_method === 'tower_specific' ? (
+                                            <div>
+                                                <label htmlFor="income-tower" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Torre Específica</label>
+                                                <select
+                                                    id="income-tower"
+                                                    required
+                                                    value={newIncomeForm.tower_id || ''}
+                                                    onChange={(e) => setNewIncomeForm(prev => ({ ...prev, tower_id: e.target.value }))}
+                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                >
+                                                    <option value="">Seleccione Torre...</option>
+                                                    {towersList.map(t => (
+                                                        <option key={t.id} value={t.id}>{t.name}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        ) : (
+                                            <div className="opacity-40 pointer-events-none">
+                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Torre Específica (Inactivo)</label>
+                                                <select className="w-full bg-slate-100 dark:bg-slate-900 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-400 focus:outline-none" disabled>
+                                                    <option>No aplica para este método</option>
+                                                </select>
+                                            </div>
+                                        )}
+                                    </div>
+
                                     <div className="flex gap-2">
                                         <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow">
                                             {editingIncome ? 'Guardar Cambios' : 'Registrar'}
@@ -583,7 +633,7 @@ export default function FinancesLedger({
                                             onClick={() => {
                                                 setShowAddIncomeForm(false);
                                                 setEditingIncome(null);
-                                                setNewIncomeForm({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '' });
+                                                setNewIncomeForm({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '', distributable_method: 'prorated', tower_id: '' });
                                             }}
                                             className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl"
                                         >
@@ -595,7 +645,7 @@ export default function FinancesLedger({
 
                             <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
                                 <SimpleTable
-                                    headers={['Categoría', 'Subcategoría', 'Monto', 'Fecha', 'Detalles', 'Unidad/Vecino', ...(!readOnly ? ['Acciones'] : [])]}
+                                    headers={['Categoría', 'Subcategoría', 'Monto', 'Fecha', 'Detalles', 'Distribución / Torre', 'Unidad/Vecino', ...(!readOnly ? ['Acciones'] : [])]}
                                     rows={filteredIncomes.map(inc => {
                                         const labelVal = financialCatalog.incomes?.[inc.category]?.label || inc.category;
                                         const catName = formatCategoryLabel(inc.category, labelVal);
@@ -611,6 +661,16 @@ export default function FinancesLedger({
                                                 <span className="font-bold text-emerald-600 dark:text-emerald-500" key={`amt-${inc.id}`}>${Number(inc.amount).toLocaleString()}</span>,
                                                 <span key={`date-${inc.id}`}>{new Date(inc.date + 'T12:00:00').toLocaleDateString('es-CL')}</span>,
                                                 <span className="text-xs truncate max-w-xs block text-slate-500 dark:text-slate-400" title={inc.description} key={`desc-${inc.id}`}>{inc.description || '—'}</span>,
+                                                <div key={`dist-${inc.id}`}>
+                                                    <span className="capitalize font-semibold block text-xs">
+                                                        {inc.distributable_method === 'prorated' ? 'Prorrateado' : 
+                                                         inc.distributable_method === 'equal' ? 'Partes Iguales' : 
+                                                         inc.distributable_method === 'tower_specific' ? 'Por Torre' : 
+                                                         inc.distributable_method === 'unit_specific' ? 'Unidad Específica' : 
+                                                         inc.distributable_method === 'exempt' ? 'Exento' : inc.distributable_method || 'Prorrateado'}
+                                                    </span>
+                                                    {inc.tower && <span className="text-[10px] text-indigo-500 font-bold block">{inc.tower.name}</span>}
+                                                </div>,
                                                 <div key={`unit-${inc.id}`}>
                                                     {inc.property && <span className="font-bold block text-xs">Depto #{inc.property.number}</span>}
                                                     {inc.user && <span className="text-[10px] text-slate-400 block">{inc.user.name}</span>}
@@ -630,7 +690,9 @@ export default function FinancesLedger({
                                                                     date: inc.date ? inc.date.substring(0, 10) : '',
                                                                     description: inc.description || '',
                                                                     property_id: inc.property_id ? String(inc.property_id) : '',
-                                                                    user_id: inc.user_id ? String(inc.user_id) : ''
+                                                                    user_id: inc.user_id ? String(inc.user_id) : '',
+                                                                    distributable_method: inc.distributable_method || 'prorated',
+                                                                    tower_id: inc.tower_id ? String(inc.tower_id) : ''
                                                                 });
                                                                 setShowAddIncomeForm(true);
                                                             }}
@@ -675,7 +737,7 @@ export default function FinancesLedger({
                                     <button
                                         onClick={() => {
                                             setEditingExpense(null);
-                                            setNewExpenseForm({ category: '', subcategory: '', amount: '', date: new Date().toISOString().substring(0, 10), description: '', property_id: '', user_id: '' });
+                                            setNewExpenseForm({ category: '', subcategory: '', amount: '', date: new Date().toISOString().substring(0, 10), description: '', property_id: '', user_id: '', distributable_method: 'prorated', tower_id: '' });
                                             setShowAddExpenseForm(!showAddExpenseForm);
                                         }}
                                         className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl shadow transition-all"
@@ -795,6 +857,53 @@ export default function FinancesLedger({
                                         </div>
                                     </div>
 
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label htmlFor="expense-dist-method" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Método de Distribución</label>
+                                            <select
+                                                id="expense-dist-method"
+                                                value={newExpenseForm.distributable_method || 'prorated'}
+                                                onChange={(e) => setNewExpenseForm(prev => ({ 
+                                                    ...prev, 
+                                                    distributable_method: e.target.value,
+                                                    tower_id: e.target.value === 'tower_specific' ? prev.tower_id : '' 
+                                                }))}
+                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                            >
+                                                <option value="prorated">Prorrateado (Alícuota)</option>
+                                                <option value="equal">Partes Iguales</option>
+                                                <option value="tower_specific">Por Torre Específica</option>
+                                                <option value="unit_specific">Unidad Específica</option>
+                                                <option value="exempt">Exento</option>
+                                            </select>
+                                        </div>
+
+                                        {newExpenseForm.distributable_method === 'tower_specific' ? (
+                                            <div>
+                                                <label htmlFor="expense-tower" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Torre Específica</label>
+                                                <select
+                                                    id="expense-tower"
+                                                    required
+                                                    value={newExpenseForm.tower_id || ''}
+                                                    onChange={(e) => setNewExpenseForm(prev => ({ ...prev, tower_id: e.target.value }))}
+                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                                >
+                                                    <option value="">Seleccione Torre...</option>
+                                                    {towersList.map(t => (
+                                                        <option key={t.id} value={t.id}>{t.name}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        ) : (
+                                            <div className="opacity-40 pointer-events-none">
+                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Torre Específica (Inactivo)</label>
+                                                <select className="w-full bg-slate-100 dark:bg-slate-900 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-400 focus:outline-none" disabled>
+                                                    <option>No aplica para este método</option>
+                                                </select>
+                                            </div>
+                                        )}
+                                    </div>
+
                                     <div className="flex gap-2">
                                         <button type="submit" className="px-4 py-2 bg-rose-650 hover:bg-rose-600 text-white font-bold text-xs rounded-xl shadow">
                                             {editingExpense ? 'Guardar Cambios' : 'Registrar'}
@@ -804,7 +913,7 @@ export default function FinancesLedger({
                                             onClick={() => {
                                                 setShowAddExpenseForm(false);
                                                 setEditingExpense(null);
-                                                setNewExpenseForm({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '' });
+                                                setNewExpenseForm({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '', distributable_method: 'prorated', tower_id: '' });
                                             }}
                                             className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl"
                                         >
@@ -816,7 +925,7 @@ export default function FinancesLedger({
 
                             <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
                                 <SimpleTable
-                                    headers={['Categoría', 'Subcategoría', 'Monto', 'Fecha', 'Detalles', 'Unidad/Destinatario', ...(!readOnly ? ['Acciones'] : [])]}
+                                    headers={['Categoría', 'Subcategoría', 'Monto', 'Fecha', 'Detalles', 'Distribución / Torre', 'Unidad/Destinatario', ...(!readOnly ? ['Acciones'] : [])]}
                                     rows={filteredExpenses.map(exp => {
                                         const labelVal = financialCatalog.expenses?.[exp.category]?.label || exp.category;
                                         const catName = formatCategoryLabel(exp.category, labelVal);
@@ -832,6 +941,16 @@ export default function FinancesLedger({
                                                 <span className="font-bold text-rose-600 dark:text-rose-400" key={`amt-${exp.id}`}>${Number(exp.amount).toLocaleString()}</span>,
                                                 <span key={`date-${exp.id}`}>{new Date(exp.date + 'T12:00:00').toLocaleDateString('es-CL')}</span>,
                                                 <span className="text-xs truncate max-w-xs block text-slate-500 dark:text-slate-400" title={exp.description} key={`desc-${exp.id}`}>{exp.description || '—'}</span>,
+                                                <div key={`dist-${exp.id}`}>
+                                                    <span className="capitalize font-semibold block text-xs">
+                                                        {exp.distributable_method === 'prorated' ? 'Prorrateado' : 
+                                                         exp.distributable_method === 'equal' ? 'Partes Iguales' : 
+                                                         exp.distributable_method === 'tower_specific' ? 'Por Torre' : 
+                                                         exp.distributable_method === 'unit_specific' ? 'Unidad Específica' : 
+                                                         exp.distributable_method === 'exempt' ? 'Exento' : exp.distributable_method || 'Prorrateado'}
+                                                    </span>
+                                                    {exp.tower && <span className="text-[10px] text-indigo-500 font-bold block">{exp.tower.name}</span>}
+                                                </div>,
                                                 <div key={`unit-${exp.id}`}>
                                                     {exp.property && <span className="font-bold block text-xs">Depto #{exp.property.number}</span>}
                                                     {exp.user && <span className="text-[10px] text-slate-400 block">{exp.user.name}</span>}
@@ -851,7 +970,9 @@ export default function FinancesLedger({
                                                                     date: exp.date ? exp.date.substring(0, 10) : '',
                                                                     description: exp.description || '',
                                                                     property_id: exp.property_id ? String(exp.property_id) : '',
-                                                                    user_id: exp.user_id ? String(exp.user_id) : ''
+                                                                    user_id: exp.user_id ? String(exp.user_id) : '',
+                                                                    distributable_method: exp.distributable_method || 'prorated',
+                                                                    tower_id: exp.tower_id ? String(exp.tower_id) : ''
                                                                 });
                                                                 setShowAddExpenseForm(true);
                                                             }}

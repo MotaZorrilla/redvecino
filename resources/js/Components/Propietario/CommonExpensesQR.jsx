@@ -14,14 +14,13 @@ export default function CommonExpensesQR({
     showPaymentModal,
     setShowPaymentModal
 }) {
+    const isStructured = residentExpenses.isStructured;
+    const breakdown = residentExpenses.breakdown;
+
     return (
         <div className="space-y-6">
             {/* Main Billing Card */}
-            <div className={`p-6 rounded-3xl border shadow-sm transition-all duration-350 ${
-                simulatedMoroso
-                    ? 'bg-rose-50/10 dark:bg-rose-950/10 border-rose-200 dark:border-rose-900/40 text-rose-900 dark:text-rose-200'
-                    : 'bg-white dark:bg-slate-900 border-gray-150 dark:border-slate-800 text-gray-800 dark:text-slate-100'
-            }`}>
+            <div className={`p-6 rounded-3xl border shadow-sm transition-all duration-350 bg-white dark:bg-slate-900 border-gray-150 dark:border-slate-800 text-gray-800 dark:text-slate-100`}>
                 <div className="flex flex-col md:flex-row md:items-center justify-between border-b pb-4 gap-4 border-gray-150 dark:border-slate-800">
                     <div className="text-left">
                         <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Período Actual de Cobro</span>
@@ -33,18 +32,80 @@ export default function CommonExpensesQR({
                     </div>
                 </div>
 
-                {/* Items Breakdown */}
-                <div className="py-4 space-y-3">
-                    <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500 text-left">Desglose de Conceptos</h4>
-                    <div className="divide-y divide-gray-150 dark:divide-slate-800/60">
-                        {residentExpenses.items.map((item, i) => (
-                            <div key={i} className="flex justify-between items-center py-2 text-sm text-gray-600 dark:text-slate-350">
-                                <span>{item.name}</span>
-                                <span className="font-semibold text-gray-800 dark:text-slate-200 font-mono">${item.amount.toLocaleString('es-CL')}</span>
+                {/* Structured Breakdown or simple items loop */}
+                {isStructured && breakdown ? (
+                    <div className="py-4 space-y-6 text-left">
+                        {/* Seccion A: Gastos Comunes */}
+                        <div className="space-y-3">
+                            <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-blue-500 dark:text-blue-400">
+                                A) Gastos Comunes (Cálculo Principal)
+                            </h4>
+                            <div className="bg-slate-50 dark:bg-slate-950 rounded-2xl p-4 border border-slate-100 dark:border-slate-800/80 space-y-2">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate-600 dark:text-slate-400">Gastos Prorrateados (Alícuota 1.05%)</span>
+                                    <span className="font-mono font-semibold">${breakdown.prorrateado.toLocaleString('es-CL')}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate-600 dark:text-slate-400">Gastos Igualitarios</span>
+                                    <span className="font-mono font-semibold">${breakdown.igualitario.toLocaleString('es-CL')}</span>
+                                </div>
+                                <div className="border-t border-slate-200 dark:border-slate-800 pt-2 flex justify-between text-sm font-semibold">
+                                    <span>Subtotal Gastos Comunes</span>
+                                    <span className="font-mono">${breakdown.subtotal.toLocaleString('es-CL')}</span>
+                                </div>
+                                <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400">
+                                    <span>Fondo de Reserva (5%)</span>
+                                    <span className="font-mono font-semibold">${breakdown.fondo_reserva.toLocaleString('es-CL')}</span>
+                                </div>
+                                <div className="border-t border-slate-200 dark:border-slate-800 pt-2 flex justify-between text-sm font-bold text-gray-900 dark:text-white">
+                                    <span>Total Gastos Comunes del Período</span>
+                                    <span className="font-mono text-brand-green">${breakdown.total_periodo.toLocaleString('es-CL')}</span>
+                                </div>
                             </div>
-                        ))}
+                        </div>
+
+                        {/* Seccion B: Cargos Posteriores */}
+                        <div className="space-y-3">
+                            <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                                B) Cargos Posteriores (Exentos de Fondo de Reserva)
+                            </h4>
+                            <div className="bg-slate-50 dark:bg-slate-950 rounded-2xl p-4 border border-slate-100 dark:border-slate-800/80 space-y-2">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate-600 dark:text-slate-400">Gastos de Torre (Torre A)</span>
+                                    <span className="font-mono font-semibold">${breakdown.cargos_posteriores.gastos_torre.toLocaleString('es-CL')}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate-600 dark:text-slate-400">Multas e Individuales</span>
+                                    <span className="font-mono font-semibold">${breakdown.cargos_posteriores.multas.toLocaleString('es-CL')}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate-600 dark:text-slate-400">Deuda Anterior</span>
+                                    <span className="font-mono font-semibold text-rose-500">${breakdown.cargos_posteriores.deuda_anterior.toLocaleString('es-CL')}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate-600 dark:text-slate-400">Intereses por Mora (1.5%)</span>
+                                    <span className="font-mono font-semibold text-rose-500">${breakdown.cargos_posteriores.interes_mora.toLocaleString('es-CL')}</span>
+                                </div>
+                                <div className="border-t border-slate-200 dark:border-slate-800 pt-2 flex justify-between text-sm font-bold text-gray-900 dark:text-white">
+                                    <span>Total Cargos Posteriores</span>
+                                    <span className="font-mono text-amber-600">${breakdown.cargos_posteriores.total.toLocaleString('es-CL')}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                ) : (
+                    <div className="py-4 space-y-3 text-left">
+                        <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">Desglose de Conceptos</h4>
+                        <div className="divide-y divide-gray-150 dark:divide-slate-800/60">
+                            {residentExpenses.items.map((item, i) => (
+                                <div key={i} className="flex justify-between items-center py-2 text-sm text-gray-600 dark:text-slate-350">
+                                    <span>{item.name}</span>
+                                    <span className="font-semibold text-gray-800 dark:text-slate-200 font-mono">${item.amount.toLocaleString('es-CL')}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* Consolidated Total and Payment Button */}
                 <div className="border-t border-gray-150 dark:border-slate-800 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -66,7 +127,7 @@ export default function CommonExpensesQR({
                             }}
                             className={`w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-white shadow-lg transition-all active:scale-95 ${
                                 simulatedMoroso
-                                    ? 'bg-brand-error hover:bg-brand-navy-dark shadow-rose-600/10'
+                                    ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/10'
                                     : 'bg-brand-green hover:bg-brand-green-dark shadow-[#72B043]/10 hover:shadow-[#72B043]/20'
                             }`}
                         >
@@ -149,7 +210,7 @@ export default function CommonExpensesQR({
                                     <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500 block">Datos de Transferencia Manual</span>
                                     <div className="bg-slate-50 dark:bg-slate-950 p-3 rounded-xl border border-slate-100 dark:border-slate-800 space-y-1 text-[10px] font-mono text-slate-600 dark:text-slate-400">
                                         <div className="flex justify-between"><span>Banco:</span><span className="font-bold text-slate-850 dark:text-slate-200">Banco de la Comunidad</span></div>
-                                        <div className="flex justify-between"><span>Tipo:</span><span className="font-bold text-slate-855 dark:text-slate-200">Cuenta Corriente</span></div>
+                                        <div className="flex justify-between"><span>Tipo:</span><span className="font-bold text-slate-850 dark:text-slate-200">Cuenta Corriente</span></div>
                                         <div className="flex justify-between"><span>N° Cuenta:</span><span className="font-bold text-slate-850 dark:text-slate-200">20260526-99</span></div>
                                         <div className="flex justify-between"><span>RUT:</span><span className="font-bold text-slate-850 dark:text-slate-200">77.777.777-7</span></div>
                                         <div className="flex justify-between text-[#72B043] font-bold"><span>Monto:</span><span>${residentExpenses.amount.toLocaleString('es-CL')} CLP</span></div>
