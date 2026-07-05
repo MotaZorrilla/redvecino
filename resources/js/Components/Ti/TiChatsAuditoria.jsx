@@ -6,7 +6,8 @@ export default function TiChatsAuditoria({
     auditedMessagesState = [],
     setAuditedMessagesState,
     chatAuditReply,
-    setChatAuditReply
+    setChatAuditReply,
+    contacts = []
 }) {
     return (
         <div className="space-y-6 animate-fade-in text-left">
@@ -20,10 +21,10 @@ export default function TiChatsAuditoria({
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[420px] bg-slate-900/40 border border-slate-800/80 rounded-[24px] overflow-hidden animate-fade-in">
                 {/* Inbox list */}
                 <div className="border-r border-slate-800 divide-y divide-slate-800 overflow-y-auto">
-                    {[
+                    {(contacts.length > 0 ? contacts : [
                         { name: 'Residente Demo', lastMsg: 'Hola, llegó mi paquete?', depto: 'Depto 202', count: 1 },
                         { name: 'Propietario Demo', lastMsg: 'Pago conciliado correctamente', depto: 'Depto 101', count: 0 }
-                    ].map((ch) => (
+                    ]).map((ch) => (
                         <button
                             key={ch.name}
                             type="button"

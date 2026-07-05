@@ -16,6 +16,7 @@ class Property extends Model
         'block',
         'floor',
         'area_sqm',
+        'coefficient',
         'status',
     ];
 
@@ -23,6 +24,7 @@ class Property extends Model
     {
         return [
             'area_sqm' => 'decimal:2',
+            'coefficient' => 'float',
         ];
     }
 

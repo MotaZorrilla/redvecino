@@ -1,12 +1,8 @@
 import { useState } from 'react';
 import { SimpleTable } from '@/Components/DashboardShared';
 
-export default function ShiftLogs({ adminCondoId }) {
-    const [shifts, setShifts] = useState([
-        { id: 1, date: '2026-06-02', conserje: 'Felipe Valenzuela', shift: 'Tarde (14:00 - 22:00)', notes: 'Todo tranquilo. Se entregaron 3 paquetes de Starken. Recibido cambio de turno de Carlos.' },
-        { id: 2, date: '2026-06-02', conserje: 'Carlos Mota', shift: 'Mañana (06:00 - 14:00)', notes: 'Se realiza aseo de entrada principal. Se registra mantención de ascensor Torre B (11:00 a 13:00).' },
-        { id: 3, date: '2026-06-01', conserje: 'Andrés Gómez', shift: 'Noche (22:00 - 06:00)', notes: 'Ronda perimetral sin novedades. Portón vehicular funciona correctamente.' }
-    ]);
+export default function ShiftLogs({ adminCondoId, shifts: initialShifts }) {
+    const [shifts, setShifts] = useState(initialShifts || []);
 
     const [showAddForm, setShowAddForm] = useState(false);
     const [newLog, setNewLog] = useState({ conserje: 'Felipe Valenzuela', shift: 'Tarde (14:00 - 22:00)', notes: '' });

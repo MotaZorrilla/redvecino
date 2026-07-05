@@ -35,16 +35,15 @@ class CondominiumFactory extends Factory
             ],
         ];
 
-        // We can pick one from the list based on some state, or just pick a random element
         $condo = fake()->randomElement($condos);
 
         return [
-            'name' => $condo['name'] . ' ' . fake()->unique()->numberBetween(1, 100), // Avoid duplicate names
+            'name' => $condo['name'],
             'address' => $condo['address'] . ' ' . fake()->buildingNumber(),
             'city' => $condo['city'],
             'region' => $condo['region'],
             'postal_code' => $condo['postal_code'],
-            'units_count' => 30,
+            'units_count' => fake()->randomElement([20, 30, 40, 50]),
             'status' => 'active',
         ];
     }

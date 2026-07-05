@@ -28,14 +28,26 @@ use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
+    private int $rutCounter = 0;
+
+    private function uniqueRut(): string
+    {
+        $this->rutCounter++;
+        $base = 10000000 + $this->rutCounter;
+        $rut = number_format($base, 0, ',', '.');
+        $dv = fake()->randomElement(['0','1','2','3','4','5','6','7','8','9','K']);
+        return $rut . '-' . $dv;
+    }
+
     public function run(): void
     {
         // 1. Run Spatie Role and Permission Seeder
         $this->call([
             RolePermissionSeeder::class,
+            FinancialCatalogSeeder::class,
         ]);
 
-        $this->command->info('Roles and permissions seeded.');
+        $this->command->info('Roles, permissions, and financial catalog seeded.');
 
         // 1.5. Create standard AFPs
         $afpHabitat = Afp::create(['name' => 'Habitat', 'commission_rate' => 10.00]);
@@ -322,7 +334,7 @@ class DatabaseSeeder extends Seeder
                 // Create a random owner
                 $ownerName = $ownerNames[($i + $condoIdx) % count($ownerNames)];
                 $ownerEmail = Str::slug($ownerName) . '.' . $condoIdx . '.' . $i . '@email.test';
-                $ownerRut = fake()->numberBetween(10, 25) . '.' . fake()->numberBetween(100, 999) . '.' . fake()->numberBetween(100, 999) . '-' . fake()->randomElement(['0','1','2','3','4','5','6','7','8','9','K']);
+                $ownerRut = $this->uniqueRut();
 
                 $ownerUser = User::create([
                     'name' => $ownerName,
@@ -347,7 +359,7 @@ class DatabaseSeeder extends Seeder
                 if ($hasTenant) {
                     $resName = $residentNames[($i + $condoIdx) % count($residentNames)];
                     $resEmail = Str::slug($resName) . '.' . $condoIdx . '.' . $i . '@email.test';
-                    $resRut = fake()->numberBetween(10, 25) . '.' . fake()->numberBetween(100, 999) . '.' . fake()->numberBetween(100, 999) . '-' . fake()->randomElement(['0','1','2','3','4','5','6','7','8','9','K']);
+                    $resRut = $this->uniqueRut();
 
                     $residentUser = User::create([
                         'name' => $resName,
@@ -1015,6 +1027,23 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->command->info('Internal communication messages seeded.');
+
+        // Seed facilities for condominiums
+        $condominios = Condominium::all();
+        $facilitiesData = [
+            ['name' => 'Quincho', 'type' => 'BBQ', 'capacity' => 20, 'fee' => 15000],
+            ['name' => 'Piscina', 'type' => 'Pool', 'capacity' => 15, 'fee' => 0],
+            ['name' => 'Gimnasio', 'type' => 'Gym', 'capacity' => 10, 'fee' => 0],
+            ['name' => 'Sala de Eventos', 'type' => 'Hall', 'capacity' => 50, 'fee' => 30000],
+        ];
+
+        foreach ($condominios as $condo) {
+            foreach ($facilitiesData as $facility) {
+                \App\Models\Facility::create(array_merge($facility, ['condominium_id' => $condo->id]));
+            }
+        }
+
+        $this->command->info('Facilities seeded for ' . $condominios->count() . ' condominiums.');
         $this->command->info('Database seeding completed with gorgeous hyperrealistic data!');
     }
 }

@@ -1,3 +1,4 @@
+import api from '@/bootstrap';
 import AdminLayout from '@/Layouts/AdminLayout';
 import DashboardOverview from '@/Components/Admin/DashboardOverview';
 import PropertiesList from '@/Components/Admin/PropertiesList';
@@ -95,42 +96,28 @@ export default function AdminDashboard({
                     <PersonWizard
                         isOpen={showPersonWizard}
                         onClose={() => setShowPersonWizard(false)}
-                        onSave={(personData) => {
-                            const mappedRoles = personData.roles && personData.roles.length > 0
-                                ? personData.roles.map(r => r === 'comite' ? 'comité' : r === 'admin' ? 'admin' : r === 'colaborador' ? 'colaborador' : r === 'proveedor' ? 'proveedor' : 'resident')
-                                : ['resident'];
-                            const newU = {
-                                id: usersList.length > 0 ? Math.max(...usersList.map(u => u.id)) + 1 : 1,
-                                name: `${personData.nombres} ${personData.apellidos}`,
-                                rut: personData.rut,
-                                email: personData.email,
-                                phone: personData.telefono,
-                                status: 'active',
-                                roles: mappedRoles,
+                        onSave={async (personData) => {
+                            const payload = {
+                                ...personData,
                                 condominium_id: adminCondoId,
-                                asociada: personData.asociada,
-                                torre: personData.torre,
-                                unidad: personData.unidad,
-                                relations: personData.relations,
-                                cargo: personData.cargo,
-                                area: personData.area,
-                                fechaIngreso: personData.fechaIngreso,
-                                tipoContrato: personData.tipoContrato,
-                                externo: personData.externo,
-                                comiteCargo: personData.comiteCargo,
-                                comitePeriodo: personData.comitePeriodo,
-                                comiteFechaInicio: personData.comiteFechaInicio,
-                                adminTipo: personData.adminTipo,
-                                adminRpa: personData.adminRpa,
-                                adminFechaContrato: personData.adminFechaContrato,
-                                provEmpresa: personData.provEmpresa,
-                                provRut: personData.provRut,
-                                provRubro: personData.provRubro,
-                                hasAccess: personData.hasAccess,
-                                username: personData.username,
-                                password: personData.password
+                                roles: personData.roles && personData.roles.length > 0
+                                    ? personData.roles.map(r => r === 'comite' ? 'comité' : r === 'admin' ? 'admin' : r === 'colaborador' ? 'colaborador' : r === 'proveedor' ? 'proveedor' : 'resident')
+                                    : ['resident'],
                             };
-                            setUsersList(prev => [...prev, newU]);
+                            // Map torre/unidad to property_id if possible
+                            if (personData.asociada && personData.torre && personData.unidad && propertiesList.length > 0) {
+                                const prop = propertiesList.find(p =>
+                                    p.block === personData.torre && p.number === personData.unidad
+                                );
+                                if (prop) payload.property_id = prop.id;
+                            }
+                            try {
+                                const res = await api.post('/api/person-wizard', payload);
+                                const created = res.data.user;
+                                setUsersList(prev => [...prev, created]);
+                            } catch (err) {
+                                console.error('Error creando persona:', err.response?.data || err.message);
+                            }
                             setShowPersonWizard(false);
                         }}
                         condosList={condosList}

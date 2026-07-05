@@ -1,19 +1,13 @@
 import { useState } from 'react';
 import { SimpleTable } from '@/Components/DashboardShared';
 
-export default function AttendanceControl({ user, adminCondoId }) {
+export default function AttendanceControl({ user, adminCondoId, attendance: initialAttendance }) {
     const today = new Date().toISOString().split('T')[0];
     const currentTime = new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
 
     const [isClockedIn, setIsClockedIn] = useState(false);
     const [clockInTime, setClockInTime] = useState(null);
-    const [attendanceHistory, setAttendanceHistory] = useState([
-        { id: 1, date: '2026-06-03', clockIn: '06:02', clockOut: '14:05', hours: '8h 03m', status: 'completed' },
-        { id: 2, date: '2026-06-02', clockIn: '06:00', clockOut: '14:00', hours: '8h 00m', status: 'completed' },
-        { id: 3, date: '2026-06-01', clockIn: '05:58', clockOut: '14:10', hours: '8h 12m', status: 'completed' },
-        { id: 4, date: '2026-05-31', clockIn: '06:05', clockOut: '14:00', hours: '7h 55m', status: 'completed' },
-        { id: 5, date: '2026-05-30', clockIn: '06:00', clockOut: '14:02', hours: '8h 02m', status: 'completed' },
-    ]);
+    const [attendanceHistory, setAttendanceHistory] = useState(initialAttendance || []);
 
     const handleClockIn = () => {
         const time = new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });

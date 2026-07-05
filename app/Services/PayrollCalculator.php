@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\EmployeeProfile;
 use App\Models\Afp;
 
-class PayrollCalculator
+final class PayrollCalculator
 {
     /**
      * Calculates the detailed payroll/liquidation components for an employee.

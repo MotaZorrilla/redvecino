@@ -87,6 +87,17 @@ class TicketController extends Controller
     public function resolve(Request $request, $id)
     {
         $ticket = Ticket::findOrFail($id);
+        
+        // Exigir evidencia fotográfica del trabajo realizado para poder resolver
+        if ($ticket->attachments()->count() === 0 && !$request->has('attachment_path') && !$request->hasFile('photo')) {
+            return response()->json([
+                'message' => 'Se requiere evidencia fotográfica del trabajo realizado para poder resolver la incidencia.',
+                'errors' => [
+                    'evidence' => ['Debe subir una foto del trabajo finalizado.']
+                ]
+            ], 422);
+        }
+
         $data = $request->validate([
             'resolution_notes' => 'required|string',
         ]);

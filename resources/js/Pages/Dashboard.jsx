@@ -255,11 +255,12 @@ export default function Dashboard() {
 
     const userRoles = user?.roles || [];
     const isTiRole = userRoles.some(role => role.toLowerCase() === 'ti');
-    const isSuperUsuarioRole = userRoles.some(role => ['super_usuario', 'súper usuario', 'superusuario'].includes(role.toLowerCase()));
-    const isBusinessAdmin = userRoles.some(role => 
-        ['admin', 'administrador', 'committee', 'comité', 'colaborador', 'employee'].includes(role.toLowerCase())
-    );
-    const isActuallyAdmin = isTiRole || isBusinessAdmin || isSuperUsuarioRole;
+    const isAdminRole = userRoles.some(role => role.toLowerCase() === 'administrador');
+    const isComiteRole = userRoles.some(role => role.toLowerCase() === 'comité');
+    const isColaboradorRole = userRoles.some(role => role.toLowerCase() === 'colaborador');
+    const isPropietarioRole = userRoles.some(role => role.toLowerCase() === 'propietario');
+    const isResidenteRole = userRoles.some(role => role.toLowerCase() === 'residente');
+    const isActuallyAdmin = isTiRole || isAdminRole || isComiteRole || isColaboradorRole;
 
     const [simulationMode, setSimulationMode] = useState(false);
     const [sandboxCondoId, setSandboxCondoId] = useState('all');
@@ -727,16 +728,16 @@ export default function Dashboard() {
     const adminFilteredFines = finesList.filter(f => Number(f.condominium_id) === adminCondoId);
 
     const filteredUsersForSubtab = adminFilteredUsers.filter(u => {
-        const isAd = u.roles?.some(r => ['admin', 'administrador'].includes(r.toLowerCase()));
+        const isAd = u.roles?.some(r => r.toLowerCase() === 'administrador');
         return userSubTab === 'residents' ? !isAd : isAd;
     });
 
-    const isTi = userRoles.some(r => r.toLowerCase() === 'ti');
-    const isSuperUsuario = userRoles.some(r => ['super_usuario', 'súper usuario', 'superusuario'].includes(r.toLowerCase()));
-    const isAdmin = userRoles.some(r => ['admin', 'administrador'].includes(r.toLowerCase()));
-    const isComite = userRoles.some(r => ['committee', 'comité'].includes(r.toLowerCase()));
-    const isColaborador = userRoles.some(r => ['employee', 'colaborador'].includes(r.toLowerCase()));
-    const isPropietario = userRoles.some(r => ['owner', 'propietario'].includes(r.toLowerCase()));
+    const isTi = isTiRole;
+    const isSuperUsuario = false; // removed — not a real role in this system
+    const isAdmin = isAdminRole;
+    const isComite = isComiteRole;
+    const isColaborador = isColaboradorRole;
+    const isPropietario = isPropietarioRole;
 
     const sharedRolePageProps = {
         adminActiveTab, setAdminActiveTab,

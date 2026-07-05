@@ -20,6 +20,7 @@ class CondoFinancesTest extends TestCase
     {
         parent::setUp();
         $this->seed();
+        app(\App\Services\CondoFinanceService::class)->clearCatalogCache();
     }
 
     private function getUserByRole(string $roleName): User

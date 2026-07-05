@@ -1,13 +1,7 @@
 import { useState } from 'react';
 
-export default function FinancialReports() {
-    const [reports] = useState([
-        { title: 'Balance Contable Consolidado - Mayo 2026', type: 'PDF', size: '1.8 MB', date: '02/06/2026', category: 'Finanzas', desc: 'Resumen consolidado de ingresos, egresos y flujo de caja del condominio durante el período.' },
-        { title: 'Rendición de Cuentas Anual 2025', type: 'PDF', size: '4.5 MB', date: '15/01/2026', category: 'Auditoría', desc: 'Documento oficial presentado al comité de administración con el cierre anual del ejercicio contable.' },
-        { title: 'Minuta de Asamblea General Ordinaria - Q1', type: 'PDF', size: '920 KB', date: '20/03/2026', category: 'Actas', desc: 'Acta de asamblea con votaciones de presupuesto común y acuerdos de mantenimiento.' },
-        { title: 'Informe de Auditoría Externa de Cuentas', type: 'PDF', size: '2.1 MB', date: '10/02/2026', category: 'Auditoría', desc: 'Revisión y validación de cuentas bancarias y fondos de reserva por parte de auditor externo.' },
-        { title: 'Presupuesto Operativo Estimado 2026', type: 'XLSX', size: '1.4 MB', date: '15/12/2025', category: 'Presupuesto', desc: 'Hoja de cálculo de proyección de gastos e ingresos operativos por torres y áreas.' }
-    ]);
+export default function FinancialReports({ reports: initialReports }) {
+    const [reports] = useState(initialReports || []);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategory, setFilterCategory] = useState('all');
@@ -19,7 +13,8 @@ export default function FinancialReports() {
     });
 
     const handleDownload = (title) => {
-        alert(`Simulando descarga del documento: ${title}`);
+        const { toast } = require('@/utils/notify');
+        toast(`Descargando: ${title}`, 'success');
     };
 
     return (

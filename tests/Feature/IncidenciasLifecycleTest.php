@@ -140,7 +140,8 @@ class IncidenciasLifecycleTest extends TestCase
         ]);
 
         $response = $this->actingAs($employee)->putJson("/api/tickets/{$ticket->id}/resolve", [
-            'resolution_notes' => 'Tubería ajustada y sellada con silicona.'
+            'resolution_notes' => 'Tubería ajustada y sellada con silicona.',
+            'attachment_path' => 'evidencia.png'
         ]);
 
         $response->assertStatus(200);

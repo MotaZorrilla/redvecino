@@ -12,7 +12,7 @@ class CommitteeProfileFactory extends Factory
 
     public function definition(): array
     {
-        $positions = ['president', 'vice_president', 'secretary', 'treasurer', 'vocal'];
+        $positions = ['presidente', 'vicepresidente', 'secretario', 'tesorero', 'vocal'];
         $periodStart = fake()->dateTimeBetween('-1 year', 'now');
         $periodEnd = clone $periodStart;
         $periodEnd->modify('+2 years');

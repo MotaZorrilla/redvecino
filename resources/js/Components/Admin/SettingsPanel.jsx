@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { toast } from '@/utils/notify';
+import ToastContainer from '@/Components/Toast';
 
 export default function SettingsPanel({
     adminSettingsForm,
@@ -156,7 +158,7 @@ export default function SettingsPanel({
                                         `[AUDIT] Archivo guardado correctamente en backend: 'audit_log_${Date.now()}.json'`
                                     ]);
                                 }
-                                alert("¡Logs de auditoría exportados y guardados en terminalLogs con éxito!");
+                                toast("¡Logs de auditoría exportados y guardados en terminalLogs con éxito!", 'success');
                             }, 1000);
                         }}
                         disabled={exportingLogs}
@@ -173,6 +175,7 @@ export default function SettingsPanel({
                     </button>
                 </div>
             </div>
+            <ToastContainer />
         </div>
     );
 }

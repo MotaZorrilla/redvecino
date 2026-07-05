@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 export default function TiOcupacionMap({
+    user,
     propertiesList = [],
     setPropertiesList,
     showAddPropForm,
@@ -40,8 +41,8 @@ export default function TiOcupacionMap({
                     e.preventDefault();
                     const newP = {
                         id: propertiesList.length + 1,
-                        condominium_id: 1,
-                        condo_name: 'Residencial MiVecino',
+                        condominium_id: user?.condominium_id || 1,
+                        condo_name: user?.condominium_name || 'Residencial MiVecino',
                         type: newPropForm.type,
                         number: newPropForm.number,
                         block: newPropForm.block || 'Torre A',
@@ -54,7 +55,7 @@ export default function TiOcupacionMap({
                     setPropertiesList(prev => [...prev, newP]);
                     setTerminalLogs(prev => [...prev, `[PROPIEDAD] Creada propiedad #${newP.number} en Piso ${newP.floor}`]);
                     setShowAddPropForm(false);
-                    setNewPropForm({ condominium_id: 1, type: 'apartment', number: '', block: 'Torre A', floor: '', area_sqm: '', status: 'vacant' });
+                    setNewPropForm({ condominium_id: user?.condominium_id || 1, type: 'apartment', number: '', block: 'Torre A', floor: '', area_sqm: '', status: 'vacant' });
                 }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl text-left mb-6">
                     <h5 className="text-xs font-bold text-slate-300 uppercase">Detalles de la Unidad</h5>
                     <div className="grid grid-cols-2 gap-4">
@@ -133,8 +134,8 @@ export default function TiOcupacionMap({
                                             id: floor * 100 + num,
                                             number: `${floor}0${num}`,
                                             status: floor === 2 && num === 1 ? 'delinquent' : floor === 3 && num === 3 ? 'vacant' : floor === 4 && num === 2 ? 'maintenance' : 'occupied',
-                                            owners: ['Juan Pérez'],
-                                            residents: ['Carlos Resident']
+                                            owners: property.owners || ['Sin asignar'],
+                                            residents: property.residents || ['Vacante']
                                         };
                                         
                                         const status = property.status;
@@ -178,25 +179,31 @@ export default function TiOcupacionMap({
                             <div className="flex justify-between">
                                 <span className="text-slate-500">Copropietario:</span>
                                 <span className="font-bold text-slate-300">
-                                    {selectedAuditChat === 'Depto 201' ? 'Sofía Valenzuela' : selectedAuditChat === 'Depto 102' || selectedAuditChat === 'Depto 303' ? 'Sin asignar' : 'Carlos Residente'}
+                                    {(() => {
+                                        const prop = propertiesList.find(p => `${p.type || 'Depto'} ${p.number}` === selectedAuditChat);
+                                        return prop?.owners?.[0] || 'Sin asignar';
+                                    })()}
                                 </span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-slate-500">Residente Activo:</span>
                                 <span className="font-bold text-slate-300">
-                                    {selectedAuditChat === 'Depto 201' ? 'Sofía Valenzuela' : selectedAuditChat === 'Depto 102' || selectedAuditChat === 'Depto 303' ? 'Vacante' : 'Carlos Residente'}
+                                    {(() => {
+                                        const prop = propertiesList.find(p => `${p.type || 'Depto'} ${p.number}` === selectedAuditChat);
+                                        return prop?.residents?.[0] || 'Vacante';
+                                    })()}
                                 </span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-slate-500">Estado de Cuenta:</span>
-                                <span className={`font-bold ${selectedAuditChat === 'Depto 201' ? 'text-rose-400' : 'text-emerald-400'}`}>
-                                    {selectedAuditChat === 'Depto 201' ? 'Moroso (3 Meses)' : 'Al Día'}
+                                <span className={`font-bold ${(() => { const p = propertiesList.find(pr => `${pr.type || 'Depto'} ${pr.number}` === selectedAuditChat); return p?.status === 'delinquent' ? 'text-rose-400' : 'text-emerald-400'; })()}`}>
+                                    {(() => { const p = propertiesList.find(pr => `${pr.type || 'Depto'} ${pr.number}` === selectedAuditChat); return p?.status === 'delinquent' ? 'Moroso (3 Meses)' : 'Al Día'; })()}
                                 </span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-slate-500">Saldo Pendiente:</span>
-                                <span className={`font-bold ${selectedAuditChat === 'Depto 201' ? 'text-rose-400' : 'text-slate-300'}`}>
-                                    {selectedAuditChat === 'Depto 201' ? '$231,450' : '$0'}
+                                <span className={`font-bold text-slate-300`}>
+                                    {(() => { const p = propertiesList.find(pr => `${pr.type || 'Depto'} ${pr.number}` === selectedAuditChat); return p?.status === 'delinquent' ? '$231,450' : '$0'; })()}
                                 </span>
                             </div>
                         </div>

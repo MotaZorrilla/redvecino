@@ -7,9 +7,15 @@ use Illuminate\Http\Request;
 
 class AnnouncementController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Announcement::with('creator')->orderBy('published_at', 'desc')->paginate(20);
+        $query = Announcement::with('creator');
+
+        if ($request->has('condominium_id')) {
+            $query->where('condominium_id', $request->condominium_id);
+        }
+
+        return $query->orderBy('published_at', 'desc')->paginate(20);
     }
 
     public function store(Request $request)

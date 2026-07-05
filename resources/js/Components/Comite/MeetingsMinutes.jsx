@@ -1,13 +1,8 @@
 import { useState } from 'react';
 import { SimpleTable, StatusBadge } from '@/Components/DashboardShared';
 
-export default function MeetingsMinutes({ adminCondoId }) {
-    const [minutesList, setMinutesList] = useState([
-        { id: 1, date: '2026-05-15', title: 'Asamblea General Ordinaria de Copropietarios', quorum: '78.4%', status: 'signed', decisions: 'Aprobación de balance anual, presupuesto 2026 y reelección de administración.' },
-        { id: 2, date: '2026-03-22', title: 'Sesión Extraordinaria: Proyecto CCTV', quorum: '62.1%', status: 'signed', decisions: 'Aprobación de cuota extraordinaria de $25.000 para renovación de 16 cámaras.' },
-        { id: 3, date: '2026-02-10', title: 'Reunión Ordinaria de Comité', quorum: '100.0%', status: 'signed', decisions: 'Revisión de bitácoras de conserjería e informe de morosidad.' },
-        { id: 4, date: '2026-06-10', title: 'Próxima Asamblea General Anual', quorum: 'Pendiente', status: 'pending', decisions: 'Discusión de reglamento interno para mascotas y multas por ruidos.' }
-    ]);
+export default function MeetingsMinutes({ adminCondoId, minutes: initialMinutes }) {
+    const [minutesList, setMinutesList] = useState(initialMinutes || []);
 
     const [showAddForm, setShowAddForm] = useState(false);
     const [newMinute, setNewMinute] = useState({ date: '', title: '', quorum: '', status: 'pending', decisions: '' });
@@ -137,7 +132,10 @@ export default function MeetingsMinutes({ adminCondoId }) {
                             </span>,
                             <div className="flex items-center gap-2" key={`act-${m.id}`}>
                                 <button
-                                    onClick={() => alert(`Descargando acta oficial en PDF: ${m.title}`)}
+                                    onClick={() => {
+                                        const { toast } = require('@/utils/notify');
+                                        toast(`Descargando acta oficial en PDF: ${m.title}`, 'success');
+                                    }}
                                     className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-brand-teal/30 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-lg transition-all"
                                 >
                                     📥 PDF

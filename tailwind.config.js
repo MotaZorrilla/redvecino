@@ -15,6 +15,7 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Montserrat', ...defaultTheme.fontFamily.sans],
+                outfit: ['Outfit', ...defaultTheme.fontFamily.sans],
             },
             colors: {
                 brand: {
@@ -31,6 +32,8 @@ export default {
                     'navy-dark': '#0A183A',
                     'teal-light': '#00c2ad',
                     'green-dark': '#629b37',
+                    'bg-primary': '#090d16',
+                    'bg-secondary': '#0f1524',
                 },
                 slate: {
                     350: '#c8d0db',

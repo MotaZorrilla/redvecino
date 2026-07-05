@@ -43,7 +43,7 @@ class TiPermissionsTest extends TestCase
             'permissions',
             'matrix',
         ]);
-        $response->assertJsonCount(6, 'roles');
+        $response->assertJsonCount(11, 'roles');
     }
 
     public function test_non_ti_cannot_view_roles_permissions(): void

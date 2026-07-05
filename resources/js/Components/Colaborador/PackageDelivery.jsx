@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { toast } from '@/utils/notify';
+import ToastContainer from '@/Components/Toast';
 
 export default function PackageDelivery({
     ocrScanning,
@@ -103,7 +105,7 @@ export default function PackageDelivery({
                                     if (setTerminalLogs) {
                                         setTerminalLogs(prev => [...prev, "[OCR] ¡Éxito! Encomienda " + randTracking + " asociada automáticamente a " + dept]);
                                     }
-                                    alert("OCR exitoso: Se registró el paquete " + randTracking + " de " + carrier + " para " + dept + ".");
+                                    toast("OCR exitoso: Se registró el paquete " + randTracking + " de " + carrier + " para " + dept + ".", 'success');
                                 }, 1500);
                             }}
                             className="w-full py-2.5 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
@@ -170,6 +172,7 @@ export default function PackageDelivery({
                     </div>
                 </div>
             </div>
+            <ToastContainer />
         </div>
     );
 }

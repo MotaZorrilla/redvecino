@@ -9,6 +9,8 @@ class TicketCategoryFactory extends Factory
 {
     protected $model = TicketCategory::class;
 
+    private static array $usedCategories = [];
+
     public function definition(): array
     {
         $categories = [
@@ -19,7 +21,15 @@ class TicketCategoryFactory extends Factory
             ['name' => 'Seguridad', 'description' => 'Cámaras, alarmas, accesos, control de visitas y situaciones sospechosas.'],
         ];
 
-        $selected = fake()->unique()->randomElement($categories);
+        $available = array_filter($categories, fn($cat) => !in_array($cat['name'], self::$usedCategories));
+
+        if (empty($available)) {
+            self::$usedCategories = [];
+            $available = $categories;
+        }
+
+        $selected = fake()->randomElement($available);
+        self::$usedCategories[] = $selected['name'];
 
         return [
             'name' => $selected['name'],

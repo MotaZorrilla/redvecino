@@ -1,14 +1,7 @@
 import { useState } from 'react';
 
-export default function ShoppingList({ adminCondoId }) {
-    const [items, setItems] = useState([
-        { id: 1, name: 'Cloro líquido 5L', category: 'Limpieza', quantity: 3, unit: 'bidones', status: 'pending', priority: 'high', requestedBy: 'Carlos Mota', date: '2026-06-02' },
-        { id: 2, name: 'Bolsas de basura 80L (pack 50)', category: 'Limpieza', quantity: 2, unit: 'packs', status: 'purchased', priority: 'medium', requestedBy: 'Felipe Valenzuela', date: '2026-06-01' },
-        { id: 3, name: 'Ampolletas LED E27 10W', category: 'Mantenimiento', quantity: 10, unit: 'unidades', status: 'pending', priority: 'medium', requestedBy: 'Andrés Gómez', date: '2026-06-01' },
-        { id: 4, name: 'Desinfectante multiuso 2L', category: 'Limpieza', quantity: 5, unit: 'botellas', status: 'pending', priority: 'low', requestedBy: 'Carlos Mota', date: '2026-05-30' },
-        { id: 5, name: 'Escoba industrial', category: 'Limpieza', quantity: 2, unit: 'unidades', status: 'purchased', priority: 'low', requestedBy: 'Felipe Valenzuela', date: '2026-05-28' },
-        { id: 6, name: 'Lubricante WD-40 400ml', category: 'Mantenimiento', quantity: 3, unit: 'latas', status: 'pending', priority: 'high', requestedBy: 'Andrés Gómez', date: '2026-06-03' },
-    ]);
+export default function ShoppingList({ adminCondoId, items: initialItems }) {
+    const [items, setItems] = useState(initialItems || []);
 
     const [showAddForm, setShowAddForm] = useState(false);
     const [newItem, setNewItem] = useState({ name: '', category: 'Limpieza', quantity: 1, unit: 'unidades', priority: 'medium' });

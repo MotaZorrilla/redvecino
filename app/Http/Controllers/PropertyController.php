@@ -7,14 +7,26 @@ use Illuminate\Http\Request;
 
 class PropertyController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Property::with('condominium')->paginate(20);
+        $query = Property::with('condominium');
+
+        if ($request->has('condominium_id')) {
+            $query->where('condominium_id', $request->condominium_id);
+        }
+
+        return $query->paginate(20);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        return Property::with(['condominium', 'owners.user', 'residents.user'])->findOrFail($id);
+        $query = Property::with(['condominium', 'owners.user', 'residents.user']);
+
+        if ($request->has('condominium_id')) {
+            $query->where('condominium_id', $request->condominium_id);
+        }
+
+        return $query->findOrFail($id);
     }
 
     public function store(Request $request)

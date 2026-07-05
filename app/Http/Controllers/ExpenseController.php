@@ -7,14 +7,26 @@ use Illuminate\Http\Request;
 
 class ExpenseController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return CommonExpense::with('condominium', 'items')->paginate(20);
+        $query = CommonExpense::with('condominium', 'items');
+
+        if ($request->has('condominium_id')) {
+            $query->where('condominium_id', $request->condominium_id);
+        }
+
+        return $query->paginate(20);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        return CommonExpense::with(['condominium', 'items'])->findOrFail($id);
+        $query = CommonExpense::with(['condominium', 'items']);
+
+        if ($request->has('condominium_id')) {
+            $query->where('condominium_id', $request->condominium_id);
+        }
+
+        return $query->findOrFail($id);
     }
 
     public function store(Request $request)
@@ -44,10 +56,8 @@ class ExpenseController extends Controller
 
     public function update(Request $request, $id)
     {
-        $expense = CommonExpense::findOrFail($id);
-
         $data = $request->validate([
-            'condominium_id' => 'sometimes|exists:condominiums,id',
+            'condominium_id' => 'required|exists:condominiums,id',
             'period' => 'sometimes|string',
             'amount' => 'sometimes|numeric',
             'description' => 'nullable|string',
@@ -59,6 +69,7 @@ class ExpenseController extends Controller
             'items.*.amount' => 'required_with:items|numeric',
         ]);
 
+        $expense = CommonExpense::where('condominium_id', $data['condominium_id'])->findOrFail($id);
         $expense->update($data);
 
         if ($request->items) {
@@ -71,9 +82,10 @@ class ExpenseController extends Controller
         return $expense->load('items');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        $expense = CommonExpense::findOrFail($id);
+        $request->validate(['condominium_id' => 'required|exists:condominiums,id']);
+        $expense = CommonExpense::where('condominium_id', $request->condominium_id)->findOrFail($id);
         $expense->delete();
 
         return response()->json(['message' => 'Gasto común eliminado correctamente.']);

@@ -1,12 +1,8 @@
 import { useState } from 'react';
 import { SimpleTable, StatusBadge } from '@/Components/DashboardShared';
 
-export default function VisitorAccess({ adminCondoId }) {
-    const [visitors, setVisitors] = useState([
-        { id: 1, name: 'Juan Carlos Pérez', rut: '15.654.321-K', dest: 'Depto 202', plate: 'AB-CD-12', entryTime: '17:35', exitTime: '', status: 'active' },
-        { id: 2, name: 'María Ignacia Silva', rut: '18.992.341-3', dest: 'Depto 101', plate: 'Ninguno', entryTime: '14:20', exitTime: '16:05', status: 'completed' },
-        { id: 3, name: 'Repartidor PedidosYa (Felipe)', rut: '24.221.849-0', dest: 'Depto 304', plate: 'Moto 998', entryTime: '18:10', exitTime: '', status: 'active' }
-    ]);
+export default function VisitorAccess({ adminCondoId, visitors: initialVisitors }) {
+    const [visitors, setVisitors] = useState(initialVisitors || []);
 
     const [showAddForm, setShowAddForm] = useState(false);
     const [newVisitor, setNewVisitor] = useState({ name: '', rut: '', dest: 'Depto 202', plate: '', entryTime: '' });

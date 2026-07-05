@@ -1,92 +1,41 @@
 import { useState } from 'react';
 
-export default function ContractViewer({ user }) {
+export default function ContractViewer({ user, contract, liquidations: initialLiquidations }) {
+    const hasData = contract && Object.keys(contract).length > 0;
     const [activeContractTab, setActiveContractTab] = useState('contract');
-    const [selectedPeriod, setSelectedPeriod] = useState('demo-mayo');
+    const firstPeriod = initialLiquidations ? Object.keys(initialLiquidations)[0] : null;
+    const [selectedPeriod, setSelectedPeriod] = useState(firstPeriod);
 
-    // Mock contract data
-    const contractData = {
-        type: 'Plazo Fijo',
-        startDate: '01/04/2026',
-        endDate: '30/06/2026',
-        contractNumber: 2,
-        employer: 'Condominio Aires de Chiguayante II',
-        representative: 'Enrique Tirapegui T.',
-        position: 'Auxiliar de Aseo / Portería',
-        area: 'Seguridad y Limpieza',
-        workSchedule: 'Lunes a Viernes, 06:00 a 14:00',
-        baseSalary: 539000,
-        transportAllowance: 66896,
-        mealAllowance: 66896,
+    const contractData = hasData ? contract : {
+        type: 'Sin contrato',
+        startDate: '—',
+        endDate: '—',
+        contractNumber: 0,
+        employer: '—',
+        representative: '—',
+        position: '—',
+        area: '—',
+        workSchedule: '—',
+        baseSalary: 0,
+        transportAllowance: 0,
+        mealAllowance: 0,
     };
 
-    const liquidations = {
-        'demo-mayo': {
-            period: 'Mayo 2026',
-            employeeName: user?.name || 'Conserje Principal',
-            rut: user?.rut || '55.555.555-5',
-            position: 'Auxiliar de Aseo / Portería',
-            daysWorked: 30,
-            baseSalary: 539000,
-            transportAllowance: 66896,
-            mealAllowance: 66896,
-            responsibilityAllowance: 0,
-            overtime: 0,
-            clothingAllowance: 0,
-            totalGross: 672592,
-            healthDeduction: 37730,
-            pensionDeduction: 61662,
-            pensionRate: '11.44%',
-            pensionName: 'AFP Capital',
-            unemploymentDeduction: 3234,
-            totalDeductions: 102626,
-            anticipo: 0,
-            prestamo: 0,
-            totalOtherDeductions: 0,
-            netPay: 569966,
-            bankName: 'Banco Estado',
-            accountType: 'Cuenta Rut',
-            accountNumber: '12345678',
-            paymentMethod: 'Transferencia Electrónica',
-            observations: 'Pago mensual regular.'
-        },
-        'juan-carlos-abril': {
-            period: 'Abril 2026',
-            employeeName: 'Juan Carlos Pérez González',
-            rut: '12.345.678-9',
-            position: 'Conserje',
-            daysWorked: 30,
-            baseSalary: 850000,
-            transportAllowance: 40000,
-            mealAllowance: 50000,
-            responsibilityAllowance: 80000,
-            overtime: 30000,
-            clothingAllowance: 15000,
-            totalGross: 1065000,
-            healthDeduction: 67200,
-            pensionDeduction: 96000,
-            pensionRate: '10.00%',
-            pensionName: 'AFP Habitat',
-            unemploymentDeduction: 5760,
-            totalDeductions: 168960,
-            anticipo: 50000,
-            prestamo: 20000,
-            totalOtherDeductions: 70000,
-            netPay: 826040,
-            bankName: 'Banco Estado',
-            accountType: 'Cuenta Rut',
-            accountNumber: '12345678',
-            paymentMethod: 'Transferencia Electrónica',
-            observations: 'Nota: El comprobante impreso oficial tiene un error tipográfico de $1.000 CLP en la suma de descuentos previsionales impreso como $169.960. El cálculo correcto real es de $168.960, resultando en un Sueldo Líquido de $826.040 CLP.'
-        }
-    };
+    const liquidations = initialLiquidations || {};
 
-    const currentLiquidation = liquidations[selectedPeriod] || liquidations['demo-mayo'];
+    const currentLiquidation = selectedPeriod && liquidations[selectedPeriod]
+        ? liquidations[selectedPeriod]
+        : Object.values(liquidations)[0] || null;
 
-    const liquidationHistory = [
-        { key: 'demo-mayo', period: 'Mayo 2026', netPay: 569966, status: 'paid', date: '31/05/2026' },
-        { key: 'juan-carlos-abril', period: 'Abril 2026 (Ficha Juan Carlos Pérez)', netPay: 826040, status: 'paid', date: '30/04/2026' },
-    ];
+    const liquidationHistory = liquidations
+        ? Object.entries(liquidations).map(([key, liq]) => ({
+            key,
+            period: liq.period,
+            netPay: liq.netPay,
+            status: liq.status || 'paid',
+            date: liq.date || liq.period,
+          }))
+        : [];
 
     const formatCLP = (n) => '$' + n.toLocaleString('es-CL');
 

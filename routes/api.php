@@ -2,6 +2,10 @@
 
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\CondoFinanceController;
+use App\Http\Controllers\FacilityController;
+use App\Http\Controllers\HRController;
+use App\Http\Controllers\PersonWizardController;
+use App\Http\Controllers\CommonExpenseController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FineController;
 use App\Http\Controllers\MessageController;
@@ -12,7 +16,12 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TiCommandController;
 use App\Http\Controllers\TiPermissionController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoadmapFeaturesController;
+use App\Http\Controllers\CondominiumController;
+use App\Http\Controllers\CondominiumSetupController;
 use Illuminate\Support\Facades\Route;
+
+Route::post('/login-pin', [RoadmapFeaturesController::class, 'loginPin']);
 
 Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
     Route::get('/user', fn(Request $r) => $r->user());
@@ -27,13 +36,42 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::post('/users/{id}/assign-role', [UserController::class, 'assignRole']);
     });
 
-    // 2. Properties Management
+    // Person Wizard
+    Route::middleware('can:manage users')->group(function () {
+        Route::post('/person-wizard', [PersonWizardController::class, 'store']);
+    });
+
+    // Facilities
+    Route::get('/facilities', [FacilityController::class, 'index']);
+    Route::get('/facilities/{facility}', [FacilityController::class, 'show']);
+    Route::middleware('can:manage users')->group(function () {
+        Route::post('/facilities', [FacilityController::class, 'store']);
+        Route::put('/facilities/{facility}', [FacilityController::class, 'update']);
+        Route::delete('/facilities/{facility}', [FacilityController::class, 'destroy']);
+        Route::get('/hr/employees', [HRController::class, 'employees']);
+        Route::get('/hr/employees/{id}', [HRController::class, 'showEmployee']);
+        Route::post('/hr/employees', [HRController::class, 'saveEmployee']);
+        Route::put('/hr/employees/{id}', [HRController::class, 'updateEmployee']);
+        Route::delete('/hr/employees/{id}', [HRController::class, 'deleteEmployee']);
+        Route::get('/hr/liquidations', [HRController::class, 'listLiquidations']);
+        Route::get('/hr/liquidations/{id}', [HRController::class, 'showLiquidation']);
+        Route::post('/hr/liquidations', [HRController::class, 'saveLiquidation']);
+        Route::put('/hr/liquidations/{id}', [HRController::class, 'updateLiquidation']);
+        Route::delete('/hr/liquidations/{id}', [HRController::class, 'deleteLiquidation']);
+    });
     Route::get('/properties', [PropertyController::class, 'index']);
     Route::get('/properties/{id}', [PropertyController::class, 'show']);
     Route::middleware('can:configure system')->group(function () {
         Route::post('/properties', [PropertyController::class, 'store']);
         Route::put('/properties/{id}', [PropertyController::class, 'update']);
         Route::delete('/properties/{id}', [PropertyController::class, 'destroy']);
+        
+        // Setup Condominium
+        Route::post('/setup-condominium', [CondominiumSetupController::class, 'setup']);
+        Route::post('/setup-condominium/copy-tower', [CondominiumSetupController::class, 'copyTowerStructure']);
+        
+        Route::get('/condominiums/{id}', [CondominiumController::class, 'show']);
+        Route::put('/condominiums/{id}', [CondominiumController::class, 'update']);
     });
 
     // 3. Finances
@@ -69,6 +107,9 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::post('/condo-finances/expenses', [CondoFinanceController::class, 'storeExpense']);
         Route::put('/condo-finances/expenses/{id}', [CondoFinanceController::class, 'updateExpense']);
         Route::delete('/condo-finances/expenses/{id}', [CondoFinanceController::class, 'destroyExpense']);
+        
+        Route::post('/common-expenses/generate', [CommonExpenseController::class, 'generatePeriod']);
+        Route::post('/common-expenses/publish', [CommonExpenseController::class, 'publishPeriod']);
     });
 
     Route::middleware('can:pay common expenses')->group(function () {
@@ -114,4 +155,15 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::get('/roles-permissions', [TiPermissionController::class, 'index']);
         Route::post('/roles-permissions/toggle', [TiPermissionController::class, 'toggle']);
     });
+
+    // 8. Roadmap Features
+    Route::get('/bookings', [RoadmapFeaturesController::class, 'listBookings']);
+    Route::post('/bookings', [RoadmapFeaturesController::class, 'storeBooking']);
+    Route::post('/qr-invitations', [RoadmapFeaturesController::class, 'storeQrInvitation']);
+    Route::post('/qr-invitations/verify', [RoadmapFeaturesController::class, 'verifyQrInvitation']);
+    Route::post('/package-custodies', [RoadmapFeaturesController::class, 'storePackageCustody']);
+    Route::put('/package-custodies/{id}/deliver', [RoadmapFeaturesController::class, 'deliverPackageCustody']);
+    Route::post('/quorum-calculation', [RoadmapFeaturesController::class, 'calculateQuorum']);
+    Route::post('/funds/transfer', [RoadmapFeaturesController::class, 'transferFunds']);
 });
+

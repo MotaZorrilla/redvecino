@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { toast } from '@/utils/notify';
+import ToastContainer from '@/Components/Toast';
 
 function LocalBadge({ children, variant = 'default' }) {
     const variants = {
@@ -98,7 +100,7 @@ export default function TiTicketsGestion({
                                     };
                                     setTicketsList(prev => [newT, ...prev]);
                                     setTerminalLogs(prev => [...prev, "[VOICE] Ticket creado automáticamente por IA: 'Filtración en Pasillo Piso 3'"]);
-                                    alert("Reporte de Voz IA: Se ha creado el ticket automáticamente y se clasificó en Plomería.");
+                                    toast("Reporte de Voz IA: Se ha creado el ticket automáticamente y se clasificó en Plomería.", 'success');
                                 }
                             }, 50);
                         }}
@@ -231,6 +233,7 @@ export default function TiTicketsGestion({
                     </table>
                 </div>
             </div>
+            <ToastContainer />
         </div>
     );
 }

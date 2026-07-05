@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, Head } from '@inertiajs/react';
+import { LayoutDashboard, Building2, Users, Wrench, CircleDollarSign, Scale, Settings } from 'lucide-react';
 
 export default function AdminLayout({
     children,
@@ -66,12 +67,12 @@ export default function AdminLayout({
                     {/* Vertical Navigation Buttons */}
                     <nav aria-label="Menú principal" className="space-y-1">
                         {[
-                            { id: 'dashboard', label: '📊 Resumen', desc: 'Vista general' },
-                            { id: 'properties', label: '🏢 Propiedades', desc: 'Casas y departamentos' },
-                            { id: 'users', label: '👥 Usuarios', desc: 'Vecinos y directiva' },
-                            { id: 'tickets', label: '🛠️ Tickets', desc: 'Casos y solicitudes' },
-                            { id: 'payments', label: '💵 Pagos', desc: 'Historial y registros' },
-                            { id: 'fines', label: '⚖️ Multas', desc: 'Infracciones y cargos' }
+                            { id: 'dashboard', icon: LayoutDashboard, label: 'Resumen', desc: 'Vista general' },
+                            { id: 'properties', icon: Building2, label: 'Propiedades', desc: 'Casas y departamentos' },
+                            { id: 'users', icon: Users, label: 'Usuarios', desc: 'Vecinos y directiva' },
+                            { id: 'tickets', icon: Wrench, label: 'Tickets', desc: 'Casos y solicitudes' },
+                            { id: 'payments', icon: CircleDollarSign, label: 'Pagos', desc: 'Historial y registros' },
+                            { id: 'fines', icon: Scale, label: 'Multas', desc: 'Infracciones y cargos' }
                         ].map(tab => (
                             <button
                                 key={tab.id}
@@ -87,10 +88,13 @@ export default function AdminLayout({
                                          : 'border-transparent hover:bg-slate-900 text-slate-400 hover:text-slate-200'
                                  }`}
                             >
-                                <span className={`text-xs font-bold ${adminActiveTab === tab.id ? 'text-indigo-400' : 'text-slate-300'}`}>
-                                    {tab.label}
-                                </span>
-                                <span className="text-[9px] text-slate-500 font-medium">
+                                <div className="flex items-center gap-2">
+                                    <tab.icon className={`w-4 h-4 ${adminActiveTab === tab.id ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-300'}`} />
+                                    <span className={`text-xs font-bold ${adminActiveTab === tab.id ? 'text-indigo-400' : 'text-slate-300 group-hover:text-slate-200'}`}>
+                                        {tab.label}
+                                    </span>
+                                </div>
+                                <span className="text-[9px] text-slate-500 font-medium pl-6 group-hover:text-slate-400">
                                     {tab.desc}
                                 </span>
                             </button>
@@ -150,14 +154,14 @@ export default function AdminLayout({
                             </svg>
                         </button>
                         <h2 className="text-sm font-black text-gray-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                            {adminActiveTab === 'dashboard' && '📊 Panel de Resumen'}
-                            {adminActiveTab === 'properties' && '🏢 Propiedades de la Comunidad'}
-                            {adminActiveTab === 'users' && '👥 Usuarios y Copropietarios'}
-                            {adminActiveTab === 'tickets' && '🛠️ Gestión de Tickets de Soporte'}
-                            {adminActiveTab === 'payments' && '💵 Registro de Pagos e Ingresos'}
-                            {adminActiveTab === 'fines' && '⚖️ Control de Multas y Sanciones'}
-                            {adminActiveTab === 'settings' && '⚙️ Configuración y Ajustes'}
-                            <span className="text-xs px-2.5 py-0.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-full font-bold">
+                            {adminActiveTab === 'dashboard' && <><LayoutDashboard className="w-5 h-5 text-indigo-500" /> Panel de Resumen</>}
+                            {adminActiveTab === 'properties' && <><Building2 className="w-5 h-5 text-indigo-500" /> Propiedades de la Comunidad</>}
+                            {adminActiveTab === 'users' && <><Users className="w-5 h-5 text-indigo-500" /> Usuarios y Copropietarios</>}
+                            {adminActiveTab === 'tickets' && <><Wrench className="w-5 h-5 text-indigo-500" /> Gestión de Tickets de Soporte</>}
+                            {adminActiveTab === 'payments' && <><CircleDollarSign className="w-5 h-5 text-indigo-500" /> Registro de Pagos e Ingresos</>}
+                            {adminActiveTab === 'fines' && <><Scale className="w-5 h-5 text-indigo-500" /> Control de Multas y Sanciones</>}
+                            {adminActiveTab === 'settings' && <><Settings className="w-5 h-5 text-indigo-500" /> Configuración y Ajustes</>}
+                            <span className="text-xs px-2.5 py-0.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-full font-bold ml-2">
                                 {condosList.find(c => c.id === adminCondoId)?.name || 'Condominio'}
                             </span>
                         </h2>

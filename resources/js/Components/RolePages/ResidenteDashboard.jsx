@@ -17,7 +17,8 @@ export default function ResidenteDashboard({
     bookingSlot, setBookingSlot, submitBooking,
     newTicketTitle, setNewTicketTitle, newTicketDesc, setNewTicketDesc,
     newTicketCat, setNewTicketCat, newTicketPri, setNewTicketPri, submitTicket,
-    chatMessages, setChatMessages, chatInput, setChatInput, isTyping, setIsTyping, sendChatMessage
+    chatMessages, setChatMessages, chatInput, setChatInput, isTyping, setIsTyping, sendChatMessage,
+    residentDocuments
 }) {
     return (
         <ResidentLayout
@@ -114,21 +115,24 @@ export default function ResidenteDashboard({
                 <div className="bg-white dark:bg-slate-900 p-6 border border-slate-100 dark:border-slate-800 rounded-3xl space-y-4 shadow-sm animate-scale-up text-xs border-gray-100">
                     <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 block border-b pb-2 dark:border-slate-800">Biblioteca Completa de Documentos</span>
                     <div className="grid md:grid-cols-2 gap-4">
-                        {[
-                            { title: 'Reglamento de Copropiedad Oficial', type: 'PDF', size: '2.4 MB', date: '01/01/2026' },
-                            { title: 'Minuta Asamblea Extraordinaria - Mayo', type: 'PDF', size: '820 KB', date: '12/05/2026' },
-                            { title: 'Balance Consolidado Gastos Comunes Q1', type: 'XLSX', size: '1.2 MB', date: '10/04/2026' }
-                        ].map((doc, i) => (
+                        {(residentDocuments || []).length > 0 ? residentDocuments.map((doc, i) => (
                             <div key={i} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl flex items-center justify-between shadow-sm hover:border-brand-green/30 transition-all text-left">
                                 <div>
                                     <p className="font-black text-slate-800 dark:text-white text-xs">{doc.title}</p>
                                     <span className="text-[9px] text-slate-400 block mt-0.5">{doc.type} &bull; {doc.size} &bull; Subido el {doc.date}</span>
                                 </div>
-                                <button type="button" onClick={() => alert(`Descargando ${doc.title}...`)} className="px-4 py-2 bg-brand-green/10 hover:bg-brand-green/20 text-brand-green font-bold rounded-xl transition-all">
+                                <button type="button" onClick={() => {
+                                    const { toast } = require('@/utils/notify');
+                                    toast(`Descargando ${doc.title}...`, 'success');
+                                }} className="px-4 py-2 bg-brand-green/10 hover:bg-brand-green/20 text-brand-green font-bold rounded-xl transition-all">
                                     Descargar
                                 </button>
                             </div>
-                        ))}
+                        )) : (
+                            <div className="col-span-full text-center py-8 text-slate-400 text-xs">
+                                No hay documentos disponibles.
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

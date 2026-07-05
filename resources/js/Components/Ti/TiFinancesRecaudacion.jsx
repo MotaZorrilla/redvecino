@@ -38,6 +38,7 @@ function LocalStatusBadge({ status, type = 'status' }) {
 }
 
 export default function TiFinancesRecaudacion({
+    user,
     paymentsList = [],
     setPaymentsList,
     showAddPaymentForm,
@@ -65,18 +66,18 @@ export default function TiFinancesRecaudacion({
                     e.preventDefault();
                     const newP = {
                         id: paymentsList.length + 1,
-                        user_id: 1,
+                        user_id: user?.id || 1,
                         property_id: newPaymentForm.property_id || '202',
                         amount: newPaymentForm.amount,
                         payment_method: newPaymentForm.payment_method,
                         status: 'completed',
                         payment_date: new Date().toISOString(),
-                        user: { name: 'Residente Demo' }
+                        user: { name: user?.name || 'Residente' }
                     };
                     setPaymentsList(prev => [newP, ...prev]);
                     setTerminalLogs(prev => [...prev, `[PAGO] Registrado pago #${newP.id} por $${newP.amount}`]);
                     setShowAddPaymentForm(false);
-                    setNewPaymentForm({ user_id: '', property_id: '', common_expense_id: 1, amount: '', payment_method: 'transfer' });
+                    setNewPaymentForm({ user_id: user?.id || '', property_id: '', common_expense_id: 1, amount: '', payment_method: 'transfer' });
                 }} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 space-y-4 max-w-xl">
                     <h5 className="text-xs font-bold text-slate-300 uppercase">Detalles del Pago</h5>
                     <div className="grid grid-cols-2 gap-4">

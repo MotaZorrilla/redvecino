@@ -9,7 +9,11 @@
             <directory>tests/Unit</directory>
         </testsuite>
         <testsuite name="Feature">
-            <directory>tests/Feature</directory>
+            <directory suffix="Test.php">tests/Feature</directory>
+            <directory suffix="Pest.php">tests/Feature</directory>
+        </testsuite>
+        <testsuite name="Arch">
+            <directory suffix="Pest.php">tests/Arch</directory>
         </testsuite>
     </testsuites>
     <source>

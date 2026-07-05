@@ -1,4 +1,5 @@
 const listeners = new Set();
+let nextId = 1;
 
 export function addToastListener(fn) {
     listeners.add(fn);
@@ -6,5 +7,5 @@ export function addToastListener(fn) {
 }
 
 export function toast(message, type = 'success') {
-    listeners.forEach(fn => fn({ message, type, id: Date.now() }));
+    listeners.forEach(fn => fn({ message, type, id: nextId++ }));
 }

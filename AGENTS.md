@@ -54,6 +54,17 @@ En [SecurityRbacMatrixTest.php](file:///C:/xampp/htdocs/redvecino/tests/Feature/
 #### C) Ciclo de Vida de Incidencias e Aislamiento
 En [IncidenciasLifecycleTest.php](file:///C:/xampp/htdocs/redvecino/tests/Feature/IncidenciasLifecycleTest.php), verificamos que los copropietarios e inquilinos no puedan visualizar ni interactuar con incidencias de otros departamentos, validando el aislamiento relacional multi-inquilino.
 
+#### D) Pruebas en Sintaxis Pest v3 (`*Pest.php`)
+Nuevas suites de integración se escriben en Pest v3. Los archivos usan sufijo `*Pest.php` y se declaran en `phpunit.xml` con `<directory suffix="Pest.php">tests/Feature</directory>`.
+
+Archivos existentes:
+*   [FinanzasConsistenciaPest.php](file:///C:/xampp/htdocs/redvecino/tests/Feature/FinanzasConsistenciaPest.php) — 15 tests: montos límite, categorías inválidas, subcategorías, consistencia CRUD.
+*   [QuorumExtremosPest.php](file:///C:/xampp/htdocs/redvecino/tests/Feature/QuorumExtremosPest.php) — 11 tests: 50% exacto, 49.99%, 0 asistentes, duplicados, cross-condo, fallback.
+*   [RBACMatrizCompletaPest.php](file:///C:/xampp/htdocs/redvecino/tests/Feature/RBACMatrizCompletaPest.php) — 12 tests: matriz 6 roles × ~10 endpoints.
+*   [AislamientoMultiCondoPest.php](file:///C:/xampp/htdocs/redvecino/tests/Feature/AislamientoMultiCondoPest.php) — 8 tests: tickets, incomes, expenses, pagos, multas, anuncios, common_expenses.
+*   [CoeficienteFallbackPest.php](file:///C:/xampp/htdocs/redvecino/tests/Feature/CoeficienteFallbackPest.php) — 7 tests: cadena completa de fallback.
+*   [ConcurrenciaFinancieraPest.php](file:///C:/xampp/htdocs/redvecino/tests/Feature/ConcurrenciaFinancieraPest.php) — 8 tests con `->repeat(3)`/`->repeat(5)`: stress CRUD concurrente.
+
 ---
 
 ## 📋 3. Directrices Obligatorias para Futuros Agentes de IA
@@ -68,3 +79,9 @@ Si eres un agente de IA trabajando en este proyecto, **debes seguir estas reglas
     ```
 4.  **Preservación de Seeders:** Si añades o modificas columnas en la base de datos, actualiza de inmediato `DatabaseSeeder.php` y los archivos de factory asociados para que la suite de test siga levantando con datos de alta fidelidad.
 5.  **Mantener la Integridad Histórica:** No borres registros ni destruyas tests existentes para "hacer pasar" un cambio rápido. Adapta la lógica o expande la suite de forma orgánica.
+6.  **Pest v3 para Nuevos Tests:** Toda nueva prueba de integración debe escribirse en sintaxis Pest v3 (`describe()`, `it()`, `dataset()`, `->repeat(N)`) con sufijo `*Pest.php`.
+7.  **`phpunit.xml`:** Debe tener `<directory suffix="Pest.php">tests/Feature</directory>` para descubrir archivos `*Pest.php`.
+8.  **`uses()` Global:** `uses(Tests\TestCase::class)` se declara SOLO en `tests/Pest.php` (global `->in('Feature')`), nunca en archivos individuales.
+9.  **Float vs Int en Pest:** Usar `->toEqual()` (igualdad suelta `==`) para valores decimales y `->toBe()` (identidad estricta `===`) para int/string/bool. `80000.0 !== 80000` en PHP.
+10. **Datasets en Pest:** No usar closures que llamen `app()` o servicios — se evalúan en carga de clase antes del bootstrap. Preferir bucles inline dentro del test.
+11. **Campos Obligatorios:** `payment_method` es requerido en `Payment::create()`. `created_by` es requerido en tickets y announcements.

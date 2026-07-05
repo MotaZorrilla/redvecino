@@ -219,4 +219,144 @@ class AdvancedFinancesAndPayrollTest extends TestCase
         $this->assertEquals(70000, $result['total_otros_descuentos']);
         $this->assertEquals(826040, $result['sueldo_liquido']);
     }
+
+    /**
+     * Test common expenses under extreme numeric boundaries.
+     */
+    public function test_common_expenses_under_extreme_numeric_boundaries(): void
+    {
+        $condo = Condominium::create([
+            'name' => 'Condo Gigante',
+            'address' => 'Av. Gigante 100',
+            'city' => 'Santiago',
+            'region' => 'Metropolitana',
+            'units_count' => 10,
+            'status' => 'active',
+        ]);
+
+        $property = Property::create([
+            'condominium_id' => $condo->id,
+            'type' => 'apartment',
+            'number' => 'A-101',
+            'area_sqm' => 100,
+        ]);
+
+        OwnerProfile::create([
+            'user_id' => User::factory()->create()->id,
+            'property_id' => $property->id,
+            'ownership_percentage' => 10.00, // 10% alícuota
+        ]);
+
+        // Extremely high expense (10 billion)
+        CondoExpense::create([
+            'condominium_id' => $condo->id,
+            'category' => 'servicios_basicos',
+            'amount' => 10000000000.00,
+            'date' => '2026-04-01',
+            'distributable_method' => 'prorated',
+        ]);
+
+        $calculator = new CommonExpenseCalculator();
+        $result = $calculator->calculateForUnit($property, '2026-04', 999999999.00, 30);
+
+        // 10% of 10B = 1B.
+        $this->assertEquals(1000000000, $result['prorrateado']);
+        $this->assertEquals(15000000, $result['interes_mora']); // 1.5% of previous debt
+        $this->assertEquals(999999999, $result['deuda_anterior']);
+        $this->assertEquals(1000000000 + 50000000 + 15000000 + 999999999, $result['total_a_pagar']); // Prorrateado + Fondo (5%) + Mora + Deuda
+    }
+
+    /**
+     * Test common expenses with negative or zero values.
+     */
+    public function test_common_expenses_with_negative_or_zero_values(): void
+    {
+        $condo = Condominium::create([
+            'name' => 'Condo Vacío',
+            'address' => 'Av. Desierta 0',
+            'city' => 'Santiago',
+            'region' => 'Metropolitana',
+            'units_count' => 1,
+            'status' => 'active',
+        ]);
+
+        $property = Property::create([
+            'condominium_id' => $condo->id,
+            'type' => 'apartment',
+            'number' => 'B-101',
+            'area_sqm' => 100,
+        ]);
+
+        // Negative previous debt and negative days overdue should not crash
+        $calculator = new CommonExpenseCalculator();
+        $result = $calculator->calculateForUnit($property, '2026-04', -500.00, -5);
+
+        $this->assertEquals(0, $result['prorrateado']);
+        $this->assertEquals(0, $result['igualitario']);
+        $this->assertEquals(0, $result['interes_mora']);
+        $this->assertEquals(-500.00, $result['deuda_anterior']); // Returns negative debt as passed (treated as credit)
+    }
+
+    /**
+     * Test fallback apportionment coefficient calculations based on property number types.
+     */
+    public function test_apportionment_coefficient_fallbacks(): void
+    {
+        $condo = Condominium::create([
+            'name' => 'Condo Coeficientes',
+            'address' => 'Av. Coeficientes 123',
+            'city' => 'Santiago',
+            'region' => 'Metropolitana',
+            'units_count' => 3,
+            'status' => 'active',
+        ]);
+
+        $propA = Property::create([
+            'condominium_id' => $condo->id,
+            'type' => 'apartment',
+            'number' => 'A-101',
+            'area_sqm' => 50,
+            'coefficient' => 0.008,
+        ]);
+
+        $propB = Property::create([
+            'condominium_id' => $condo->id,
+            'type' => 'apartment',
+            'number' => 'B-102',
+            'area_sqm' => 100,
+            'coefficient' => 0.0105,
+        ]);
+
+        $propC = Property::create([
+            'condominium_id' => $condo->id,
+            'type' => 'apartment',
+            'number' => 'C-103',
+            'area_sqm' => 150,
+        ]);
+
+        // Register a prorated expense of $1,000,000
+        CondoExpense::create([
+            'condominium_id' => $condo->id,
+            'category' => 'personal',
+            'amount' => 1000000.00,
+            'date' => '2026-04-01',
+            'distributable_method' => 'prorated',
+        ]);
+
+        $calculator = new CommonExpenseCalculator();
+
+        // PropA uses explicit coefficient → 0.008 * 1,000,000 = 8,000
+        $resA = $calculator->calculateForUnit($propA, '2026-04');
+        $this->assertEquals(8000, $resA['prorrateado']);
+
+        // PropB uses explicit coefficient → 0.0105 * 1,000,000 = 10,500
+        $resB = $calculator->calculateForUnit($propB, '2026-04');
+        $this->assertEquals(10500, $resB['prorrateado']);
+
+        // PropC has no coefficient, no owner → area fallback: 150/(50+100+150) = 0.5
+        // 0.5 * 1,000,000 = 500,000
+        $resC = $calculator->calculateForUnit($propC, '2026-04');
+        $this->assertEquals(500000, $resC['prorrateado']);
+    }
 }
+

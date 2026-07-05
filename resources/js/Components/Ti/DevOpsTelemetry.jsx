@@ -8,7 +8,8 @@ export default function DevOpsTelemetry({
     ramUsage,
     latency,
     terminalLogs,
-    setTerminalLogs
+    setTerminalLogs,
+    quickCommands = []
 }) {
     return (
         <div className="space-y-6 animate-fade-in">
@@ -103,7 +104,7 @@ export default function DevOpsTelemetry({
             <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-5 space-y-3">
                 <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider block">Acciones Rápidas DevOps (Programáticas VPS)</span>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {[
+                    {(quickCommands.length > 0 ? quickCommands : [
                         { cmd: 'db:status', label: '📊 Estado BD', desc: 'Verifica SQLite' },
                         { cmd: 'cache:clear', label: '⚡ Limpiar Caché', desc: 'Config & App' },
                         { cmd: 'system:info', label: '⚙️ Info Sistema', desc: 'Versión PHP & OS' },
@@ -112,7 +113,7 @@ export default function DevOpsTelemetry({
                         { cmd: 'logs:clear', label: '🗑️ Limpiar Logs', desc: 'Vaciar laravel.log' },
                         { cmd: 'db:migrate', label: '🚀 Migrar BD', desc: 'Artisan migrate' },
                         { cmd: 'db:seed', label: '🌱 Semillar BD', desc: 'Artisan db:seed' }
-                    ].map(btn => (
+                    ]).map(btn => (
                         <button
                             key={btn.cmd}
                             type="button"

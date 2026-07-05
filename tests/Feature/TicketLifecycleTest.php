@@ -230,11 +230,32 @@ class TicketLifecycleTest extends TestCase
         // Then resolve
         $response = $this->actingAs($colaborador)->putJson("/api/tickets/{$ticket->id}/resolve", [
             'resolution_notes' => 'Problema solucionado, se reemplazó la cañería defectuosa.',
+            'attachment_path' => 'evidencia.png'
         ]);
 
         $response->assertStatus(200);
         $this->assertEquals('resolved', $ticket->fresh()->status);
         $this->assertNotNull($ticket->fresh()->resolved_at);
+    }
+
+    public function test_resolving_ticket_requires_photo_evidence(): void
+    {
+        $admin = $this->getUserByRole('Administrador');
+        $colaborador = $this->getUserByRole('Colaborador');
+        $ticket = Ticket::first();
+
+        // First assign
+        $this->actingAs($admin)->putJson("/api/tickets/{$ticket->id}/assign", [
+            'assigned_to' => $colaborador->id,
+        ]);
+
+        // Attempt resolving without attachments or attachment_path or photo
+        $response = $this->actingAs($colaborador)->putJson("/api/tickets/{$ticket->id}/resolve", [
+            'resolution_notes' => 'Problema solucionado sin foto.',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['evidence']);
     }
 
     public function test_admin_can_update_ticket_status(): void
@@ -266,6 +287,7 @@ class TicketLifecycleTest extends TestCase
         $ticket = Ticket::first();
 
         $response = $this->actingAs($admin)->putJson("/api/tickets/{$ticket->id}/resolve", [
+            'attachment_path' => 'evidencia.png'
             // Missing resolution_notes
         ]);
 

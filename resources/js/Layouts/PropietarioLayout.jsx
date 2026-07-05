@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, Head } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import { CircleDollarSign, BarChart3, CalendarDays, Building2 } from 'lucide-react';
 
 export default function PropietarioLayout({
     children,
@@ -28,10 +29,10 @@ export default function PropietarioLayout({
                     {/* Sidebar Tabs */}
                     <nav aria-label="Menú principal" className="space-y-1">
                         {[
-                            { id: 'home', label: '🏠 Resumen Financiero', desc: 'Saldos y gastos comunes' },
-                            { id: 'reports', label: '📊 Rendición Cuentas', desc: 'Balances mensuales de administración' },
-                            { id: 'booking', label: '📅 Reservar Espacios', desc: 'Quinchos, salones, gym' },
-                            { id: 'units', label: '🏢 Unidades y Derechos', desc: 'Mis unidades residenciales' }
+                            { id: 'home', icon: CircleDollarSign, label: 'Resumen Financiero', desc: 'Saldos y gastos comunes' },
+                            { id: 'reports', icon: BarChart3, label: 'Rendición Cuentas', desc: 'Balances mensuales de administración' },
+                            { id: 'booking', icon: CalendarDays, label: 'Reservar Espacios', desc: 'Quinchos, salones, gym' },
+                            { id: 'units', icon: Building2, label: 'Unidades y Derechos', desc: 'Mis unidades residenciales' }
                         ].map(tab => (
                             <button
                                 key={tab.id}
@@ -47,10 +48,13 @@ export default function PropietarioLayout({
                                          : 'border-transparent hover:bg-slate-900 text-slate-400 hover:text-slate-200'
                                  }`}
                             >
-                                <span className={`text-xs font-bold ${propietarioActiveTab === tab.id ? 'text-brand-green' : 'text-slate-300'}`}>
-                                    {tab.label}
-                                </span>
-                                <span className="text-[9px] text-slate-500 font-medium">
+                                <div className="flex items-center gap-2">
+                                    <tab.icon className={`w-4 h-4 ${propietarioActiveTab === tab.id ? 'text-brand-green' : 'text-slate-400 group-hover:text-slate-300'}`} />
+                                    <span className={`text-xs font-bold ${propietarioActiveTab === tab.id ? 'text-brand-green' : 'text-slate-300 group-hover:text-slate-200'}`}>
+                                        {tab.label}
+                                    </span>
+                                </div>
+                                <span className="text-[9px] text-slate-500 font-medium pl-6 group-hover:text-slate-400">
                                     {tab.desc}
                                 </span>
                             </button>
@@ -99,10 +103,10 @@ export default function PropietarioLayout({
                         </button>
                         <div>
                             <h2 className="text-lg font-black text-gray-900 dark:text-slate-100 flex items-center gap-2">
-                                {propietarioActiveTab === 'home' && '💵 Resumen Financiero de Unidades'}
-                                {propietarioActiveTab === 'reports' && '📊 Rendición Contable de Administración'}
-                                {propietarioActiveTab === 'booking' && '📅 Reserva de Áreas de Esparcimiento'}
-                                {propietarioActiveTab === 'units' && '🏢 Mis Propiedades y Unidades'}
+                                {propietarioActiveTab === 'home' && <><CircleDollarSign className="w-5 h-5 text-brand-green" /> Resumen Financiero de Unidades</>}
+                                {propietarioActiveTab === 'reports' && <><BarChart3 className="w-5 h-5 text-brand-green" /> Rendición Contable de Administración</>}
+                                {propietarioActiveTab === 'booking' && <><CalendarDays className="w-5 h-5 text-brand-green" /> Reserva de Áreas de Esparcimiento</>}
+                                {propietarioActiveTab === 'units' && <><Building2 className="w-5 h-5 text-brand-green" /> Mis Propiedades y Unidades</>}
                             </h2>
                             <p className="text-xs text-gray-500 dark:text-slate-400">
                                 {propietarioActiveTab === 'home' && 'Control de gastos comunes, boletas mensuales y generación de QR de pago.'}

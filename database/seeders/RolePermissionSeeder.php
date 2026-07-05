@@ -59,5 +59,12 @@ class RolePermissionSeeder extends Seeder
         $ti->syncPermissions(['view profile', 'edit profile', 'view properties',
             'create tickets', 'view own tickets', 'manage users',
             'configure system', 'view logs', 'manage roles', 'send messages']);
+
+        // Wizard-facing lowercase aliases (PersonWizard & frontend use these)
+        Role::findOrCreate('admin', 'web')->syncPermissions($admin->permissions->pluck('name')->toArray());
+        Role::findOrCreate('colaborador', 'web')->syncPermissions($employee->permissions->pluck('name')->toArray());
+        Role::findOrCreate('comité', 'web')->syncPermissions($committee->permissions->pluck('name')->toArray());
+        Role::findOrCreate('resident', 'web')->syncPermissions($resident->permissions->pluck('name')->toArray());
+        Role::findOrCreate('proveedor', 'web')->syncPermissions($resident->permissions->pluck('name')->toArray());
     }
 }

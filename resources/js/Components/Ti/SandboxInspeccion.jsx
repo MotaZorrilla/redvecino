@@ -123,10 +123,17 @@ export default function SandboxInspeccion({
                             .map(p => {
                                 const ownerName = p.owners?.[0];
                                 const residentName = p.residents?.[0];
-                                const matched = usersList.find(u => 
-                                    (ownerName && u.name.toLowerCase() === ownerName.toLowerCase()) ||
-                                    (residentName && u.name.toLowerCase() === residentName.toLowerCase())
+                                let matched = usersList.find(u => 
+                                    (ownerName && u.name && u.name.toLowerCase().includes(ownerName.toLowerCase())) ||
+                                    (residentName && u.name && u.name.toLowerCase().includes(residentName.toLowerCase()))
                                 );
+
+                                if (!matched && usersList.length > 0) {
+                                    const fallbackUser = usersList.find(u => 
+                                        u.roles?.some(r => r === 'Residente' || r === 'Propietario')
+                                    );
+                                    if (fallbackUser) matched = fallbackUser;
+                                }
 
                                 return (
                                     <div

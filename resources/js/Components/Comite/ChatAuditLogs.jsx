@@ -1,12 +1,14 @@
 import { useState } from 'react';
 
 export default function ChatAuditLogs({
+    user,
     selectedAuditChat,
     setSelectedAuditChat,
     auditedMessagesState = [],
     setAuditedMessagesState,
     chatAuditReply,
-    setChatAuditReply
+    setChatAuditReply,
+    contacts = []
 }) {
     return (
         <div className="space-y-6 animate-fade-in text-left">
@@ -20,10 +22,10 @@ export default function ChatAuditLogs({
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[420px] bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-[24px] overflow-hidden shadow-sm">
                 {/* Inbox list */}
                 <div className="border-r border-gray-200 dark:border-slate-800 divide-y divide-gray-150 dark:divide-slate-800 overflow-y-auto bg-gray-50/50 dark:bg-slate-900/40">
-                    {[
+                    {(contacts.length > 0 ? contacts : [
                         { name: 'Residente Demo', lastMsg: 'Hola, llegó mi paquete?', depto: 'Depto 202', count: 1 },
                         { name: 'Propietario Demo', lastMsg: 'Pago conciliado correctamente', depto: 'Depto 101', count: 0 }
-                    ].map((ch) => (
+                    ]).map((ch) => (
                         <button
                             key={ch.name}
                             type="button"
@@ -74,9 +76,9 @@ export default function ChatAuditLogs({
                         if (!chatAuditReply.trim()) return;
                         const newMsg = {
                             id: auditedMessagesState.length + 1,
-                            sender_id: 1,
-                            sender_name: 'Administración',
-                            receiver_id: 3,
+                            sender_id: user?.id || 1,
+                            sender_name: user?.name || 'Administración',
+                            receiver_id: user?.id === 1 ? 3 : 1,
                             receiver_name: selectedAuditChat,
                             content: chatAuditReply,
                             time: new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' }),
