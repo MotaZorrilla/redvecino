@@ -1,11 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, Head } from '@inertiajs/react';
-import ApplicationLogo from '@/Components/ApplicationLogo';
+import { Smartphone, Monitor } from 'lucide-react';
 
 export default function ResidentLayout({
     children,
     user,
-    isDesktop,
     forceMobileView,
     setForceMobileView,
     mobileTab,
@@ -15,164 +14,136 @@ export default function ResidentLayout({
     setShowMorosidadModal,
     residentCondo = 'Condominio Parque Central',
     toggleTheme,
-    darkMode
+    darkMode,
+    isDesktop: isDesktopProp,
 }) {
+    const [autoDetectedDesktop, setAutoDetectedDesktop] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return window.innerWidth >= 768;
+        }
+        return true;
+    });
+
+    useEffect(() => {
+        const handleResize = () => {
+            setAutoDetectedDesktop(window.innerWidth >= 768);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const isDesktop = forceMobileView !== undefined
+        ? !forceMobileView
+        : isDesktopProp !== undefined
+            ? isDesktopProp
+            : autoDetectedDesktop;
+
+    const toggleView = () => {
+        if (setForceMobileView) {
+            setForceMobileView(!isDesktop);
+        } else {
+            setAutoDetectedDesktop(prev => !prev);
+        }
+    };
+
     return (
-        <div className="py-8 animate-fade-in font-sans selection:bg-brand-green/30 selection:text-white">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-950 font-sans selection:bg-brand-green/30 selection:text-white">
             <Head>
                 <title>Portal MiVecino - Tu Comunidad Conectada</title>
                 <meta name="description" content="Acceso residente a copropiedad, historial de pagos y reglamentos en MiVecino." />
             </Head>
 
-            {isDesktop && !forceMobileView ? (
-                /* GORGEOUS WIDESCREEN DESKTOP PORTAL FOR MIVECINO */
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[32px] overflow-hidden shadow-2xl h-[780px] transition-colors duration-300">
-                        
-                        {/* 1. LEFT SIDEBAR */}
-                        <aside aria-label="Navegación principal" className="w-64 bg-slate-950 text-white p-6 flex flex-col justify-between shrink-0 font-sans">
-                            <div className="space-y-6">
-                                {/* Logo */}
-                                <ApplicationLogo size="small" showSubtext={false} brand="residente" />
-
-                                {/* Resident Profile Card */}
-                                <div className="p-3.5 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-3 text-left">
-                                    <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-brand-green to-brand-orange flex items-center justify-center font-bold text-white text-sm">
-                                        {user?.name?.charAt(0) || 'R'}
-                                    </div>
-                                    <div className="min-w-0 flex-1">
-                                        <p className="text-xs font-black truncate text-white">{user?.name}</p>
-                                        <span className="text-[9px] text-brand-green font-bold block">Residente</span>
-                                    </div>
-                                </div>
-
-                                {/* Nav Links */}
-                                <nav aria-label="Menú principal" className="space-y-1 pt-4">
-                                    {[
-                                        { tab: 'home', label: '🏠 Inicio / Resumen' },
-                                        { tab: 'comunicados', label: '📢 Comunicados' },
-                                        { tab: 'reservas', label: '📅 Reservas' },
-                                        { tab: 'pagos', label: '💵 Pagos / Gastos' },
-                                        { tab: 'incidencias', label: '🛠️ Incidencias' },
-                                        { tab: 'documentos', label: '📄 Documentos' },
-                                        { tab: 'comunidad', label: '👥 Comunidad Chat' },
-                                        { tab: 'configuracion', label: '⚙️ Ajustes / Cuenta' }
-                                    ].map(item => {
-                                        const isReservasLocked = simulatedMoroso && item.tab === 'reservas';
-                                        return (
-                                            <button
-                                                key={item.tab}
-                                                type="button"
-                                                onClick={() => {
-                                                    if (isReservasLocked) {
-                                                        setShowMorosidadModal(true);
-                                                    } else {
-                                                        setMobileTab(item.tab);
-                                                    }
-                                                }}
-                                                aria-current={isReservasLocked ? undefined : (mobileTab === item.tab ? 'page' : undefined)}
-                                                className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
-                                                     isReservasLocked
-                                                         ? 'bg-rose-950/20 text-rose-500 border border-rose-950/20 hover:bg-rose-950/30'
-                                                         : mobileTab === item.tab 
-                                                         ? 'bg-brand-green text-white shadow shadow-brand-green/10' 
-                                                         : 'text-slate-400 hover:bg-slate-900 hover:text-white'
-                                                 }`}
-                                            >
-                                                {isReservasLocked ? '📅 Reservas 🔒' : item.label}
-                                            </button>
-                                        );
-                                    })}
-                                </nav>
+            {isDesktop ? (
+                /* WIDESCREEN DESKTOP PORTAL */
+                <div className="flex flex-col min-h-screen">
+                    {/* Fixed Top Navbar */}
+                    <header style={{ paddingTop: 'env(safe-area-inset-top)' }} className="h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-150 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 lg:px-8 fixed top-0 right-0 left-0 z-20 transition-colors duration-300">
+                        <div className="flex items-center gap-3 text-left">
+                            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                                </svg>
                             </div>
-
-                            {/* Sidebar Footer Controls */}
-                            <div className="space-y-3 pt-4 border-t border-slate-900">
-                                <button
-                                    onClick={() => setForceMobileView(true)}
-                                    type="button"
-                                    className="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-[10px] font-extrabold rounded-xl transition-all flex items-center justify-center gap-1.5 text-slate-300"
-                                >
-                                    <svg className="w-3.5 h-3.5 text-brand-green" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
-                                    </svg>
-                                    Ver Vista Celular
-                                </button>
-                                <div className="flex items-center justify-between text-slate-500 text-[9px] font-mono">
-                                    <span>Modo: Escritorio</span>
-                                    <span>v1.2.0</span>
-                                </div>
-                            </div>
-                        </aside>
-
-                        {/* 2. RIGHT WORKSPACE CONTENT PANELS */}
-                        <div className="flex-1 flex flex-col min-w-0 bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
-                            {/* Top Widescreen Header */}
-                            <div className="px-6 md:px-12 py-5 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between shrink-0">
-                                <div className="text-left">
-                                    <h4 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider">
-                                        {mobileTab === 'home' && 'Panel Resumen Residente'}
-                                        {mobileTab === 'comunicados' && 'Circular de Copropietarios'}
-                                        {mobileTab === 'reservas' && 'Reservación de Instalaciones'}
-                                        {mobileTab === 'pagos' && 'Gastos Comunes y Recaudación'}
-                                        {mobileTab === 'incidencias' && 'Orden de Mantenimiento Vecinal'}
-                                        {mobileTab === 'documentos' && 'Biblioteca Legal y Minutas'}
-                                        {mobileTab === 'comunidad' && 'Mensajería Vecinal Inteligente'}
-                                        {mobileTab === 'configuracion' && 'Ajustes de Perfil y Sistema'}
-                                    </h4>
-                                    <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Gestión operativa en tiempo real del {residentCondo}.</p>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <button 
-                                        onClick={() => {
-                                            setSimulatedMoroso(!simulatedMoroso);
-                                            if (!simulatedMoroso) {
-                                                setMobileTab('home');
-                                            }
-                                        }}
-                                        className={`px-2.5 py-1 text-[10px] font-bold rounded-md uppercase tracking-wider border transition-all duration-300 flex items-center gap-1.5 ${
-                                            simulatedMoroso 
-                                                ? 'bg-rose-500/10 border-rose-500/35 text-rose-500 hover:bg-rose-500/20 shadow-sm shadow-rose-500/5' 
-                                                : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
-                                        }`}
-                                    >
-                                        <span aria-live="polite" className={`h-1.5 w-1.5 rounded-full ${simulatedMoroso ? 'bg-rose-500 animate-pulse' : 'bg-slate-400'}`} />
-                                        {simulatedMoroso ? '🔴 Morosidad Simulada ⚠️' : '⚪ Simular Morosidad'}
-                                    </button>
-                                    <span className="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-bold rounded-md uppercase tracking-wider">
-                                        Depto 202
-                                    </span>
-                                    <button
-                                        onClick={toggleTheme}
-                                        className="p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-350 transition-colors duration-200"
-                                        aria-label="Toggle Theme"
-                                        title="Cambiar tema"
-                                    >
-                                        {darkMode ? (
-                                            <svg className="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m0 13.5V21M4.75 4.75l1.59 1.59m11.32 11.32l1.59 1.59M3 12h2.25m13.5 0H21M4.75 19.25l1.59-1.59m11.32-11.32l1.59-1.59M12 7.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9z" />
-                                            </svg>
-                                        ) : (
-                                            <svg className="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
-                                            </svg>
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Content */}
-                            <main className="flex-1 overflow-y-auto p-6 md:p-12 space-y-6">
-                                {children}
-                            </main>
+                            <h2 className="text-xs sm:text-sm font-black text-gray-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                                <span className="text-emerald-500">MiVecino</span>
+                                <span className="text-[10px] sm:text-xs px-2.5 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full font-bold hidden sm:inline">
+                                    {residentCondo}
+                                </span>
+                            </h2>
                         </div>
-                    </div>
+
+                        <div className="flex items-center gap-2 sm:gap-3">
+                            <button
+                                onClick={toggleView}
+                                type="button"
+                                className="px-2.5 py-1.5 text-[10px] font-bold rounded-lg uppercase tracking-wider border transition-all duration-300 flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
+                                title="Cambiar a vista celular"
+                            >
+                                <Smartphone className="w-3.5 h-3.5" />
+                                <span className="hidden sm:inline">Vista Celular</span>
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    setSimulatedMoroso(!simulatedMoroso);
+                                    if (!simulatedMoroso) setMobileTab('home');
+                                }}
+                                className={`px-2.5 py-1 text-[10px] font-bold rounded-md uppercase tracking-wider border transition-all duration-300 flex items-center gap-1.5 ${
+                                    simulatedMoroso
+                                        ? 'bg-rose-500/10 border-rose-500/35 text-rose-500 hover:bg-rose-500/20 shadow-sm shadow-rose-500/5'
+                                        : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                                }`}
+                            >
+                                <span aria-live="polite" className={`h-1.5 w-1.5 rounded-full ${simulatedMoroso ? 'bg-rose-500 animate-pulse' : 'bg-slate-400'}`} />
+                                <span className="hidden sm:inline">{simulatedMoroso ? 'Morosidad Simulada' : 'Simular Morosidad'}</span>
+                            </button>
+
+                            <div className="flex items-center gap-2 bg-gray-100 dark:bg-slate-950/40 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-slate-800">
+                                <div className="h-6 w-6 rounded bg-emerald-600 flex items-center justify-center font-bold text-white text-[10px]">
+                                    {user?.name?.charAt(0) || 'R'}
+                                </div>
+                                <span className="text-[11px] font-bold text-gray-700 dark:text-slate-350 hidden sm:inline">{user?.name}</span>
+                                <span className="text-[8px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 font-extrabold uppercase px-1.5 py-0.5 rounded hidden sm:inline">RESIDENTE</span>
+                            </div>
+
+                            {toggleTheme && (
+                                <button onClick={toggleTheme} className="p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 border border-gray-200 dark:border-slate-700 transition-colors duration-200 cursor-pointer" aria-label="Toggle Theme" title="Cambiar tema">
+                                    {darkMode ? (
+                                        <svg className="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m0 13.5V21M4.75 4.75l1.59 1.59m11.32 11.32l1.59 1.59M3 12h2.25m13.5 0H21M4.75 19.25l1.59-1.59m11.32-11.32l1.59-1.59M12 7.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9z" /></svg>
+                                    ) : (
+                                        <svg className="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" /></svg>
+                                    )}
+                                </button>
+                            )}
+
+                            <Link href={route('logout')} method="post" as="button" className="p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 border border-gray-200 dark:border-slate-700 transition-colors duration-200 cursor-pointer" aria-label="Cerrar sesión" title="Cerrar sesión">
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
+                            </Link>
+                        </div>
+                    </header>
+
+                    {/* Main Content */}
+                    <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6 lg:py-8 mt-16 overflow-y-auto bg-gray-50 dark:bg-slate-900/10">
+                        {children}
+                    </main>
                 </div>
             ) : (
-                /* SMARTPHONE MOCKUP VIEW OR NATIVE MOBILE PORTAL */
-                <div className="mx-auto max-w-4xl px-4 sm:px-6 space-y-6">
-                    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-3xl md:rounded-[40px] overflow-hidden shadow-xl flex flex-col w-full md:max-w-[390px] md:h-[720px] md:max-h-[calc(100dvh-120px)] mx-auto relative transition-colors duration-300 md:ring-12 md:ring-slate-950/90 shadow-2xl">
-                        
+                /* SMARTPHONE MOCKUP VIEW */
+                <div className="flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 py-6">
+                    {/* Toggle Button */}
+                    <button
+                        onClick={toggleView}
+                        type="button"
+                        className="mb-4 px-3 py-1.5 text-[10px] font-bold rounded-lg uppercase tracking-wider border transition-all duration-300 flex items-center gap-1.5 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer"
+                        title="Cambiar a vista escritorio"
+                    >
+                        <Monitor className="w-3.5 h-3.5" />
+                        Vista PC
+                    </button>
+
+                    {/* Phone Mockup */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-3xl md:rounded-[40px] overflow-hidden shadow-xl w-full max-w-[390px] h-[720px] max-h-[calc(100dvh-80px)] relative transition-colors duration-300 ring-8 ring-slate-950/90 shadow-2xl flex flex-col">
+
                         {/* Inner App Header */}
                         <div className="px-6 py-5 bg-gradient-to-br from-brand-green via-emerald-500 to-emerald-700 text-white flex flex-col gap-3 shrink-0">
                             <div className="flex items-center justify-between">
@@ -187,56 +158,36 @@ export default function ResidentLayout({
                                     </h3>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <button 
+                                    <button
                                         onClick={() => {
                                             setSimulatedMoroso(!simulatedMoroso);
-                                            if (!simulatedMoroso) {
-                                                setMobileTab('home');
-                                            }
+                                            if (!simulatedMoroso) setMobileTab('home');
                                         }}
                                         type="button"
                                         className={`px-2 py-0.5 text-[8px] font-bold rounded border transition-all duration-300 ${
-                                            simulatedMoroso 
-                                                ? 'bg-rose-600 text-white border-rose-500 animate-pulse' 
+                                            simulatedMoroso
+                                                ? 'bg-rose-600 text-white border-rose-500 animate-pulse'
                                                 : 'bg-white/10 border-white/20 text-white hover:bg-white/20'
                                         }`}
                                         title="Simular Estado Moroso"
                                     >
-                                        {simulatedMoroso ? '⚠️ Moroso' : '💸 Simular'}
+                                        {simulatedMoroso ? 'Moroso' : 'Simular'}
                                     </button>
-                                    {isDesktop && (
-                                        <button
-                                            onClick={() => setForceMobileView(false)}
-                                            type="button"
-                                            className="px-2 py-1 bg-white/20 hover:bg-white/30 border border-white/20 rounded-lg text-[9px] font-bold transition-all uppercase tracking-wider"
-                                            title="Cambiar a Vista Widescreen de PC"
-                                        >
-                                            Vista PC
+                                    {toggleTheme && (
+                                        <button onClick={toggleTheme} type="button" className="p-1.5 rounded-lg border bg-white/10 hover:bg-white/20 border-white/20 text-white transition-all shadow-sm" aria-label="Toggle Theme" title="Cambiar tema">
+                                            {darkMode ? (
+                                                <svg className="w-4 h-4 text-amber-300" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m0 13.5V21M4.75 4.75l1.59 1.59m11.32 11.32l1.59 1.59M3 12h2.25m13.5 0H21M4.75 19.25l1.59-1.59m11.32-11.32l1.59-1.59M12 7.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9z" /></svg>
+                                            ) : (
+                                                <svg className="w-4 h-4 text-emerald-100" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" /></svg>
+                                            )}
                                         </button>
                                     )}
-                                    <button
-                                        onClick={toggleTheme}
-                                        type="button"
-                                        className="p-1.5 rounded-lg border bg-white/10 hover:bg-white/20 border-white/20 text-white transition-all shadow-sm"
-                                        aria-label="Toggle Theme"
-                                        title="Cambiar tema"
-                                    >
-                                        {darkMode ? (
-                                            <svg className="w-4 h-4 text-amber-300" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m0 13.5V21M4.75 4.75l1.59 1.59m11.32 11.32l1.59 1.59M3 12h2.25m13.5 0H21M4.75 19.25l1.59-1.59m11.32-11.32l1.59-1.59M12 7.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9z" />
-                                            </svg>
-                                        ) : (
-                                            <svg className="w-4 h-4 text-emerald-100" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
-                                            </svg>
-                                        )}
-                                    </button>
                                     <button
                                         onClick={() => setMobileTab(mobileTab === 'configuracion' ? 'home' : 'configuracion')}
                                         type="button"
                                         className={`p-1.5 rounded-lg border transition-all shadow-sm ${
-                                            mobileTab === 'configuracion' 
-                                                ? 'bg-white text-[#72B043] border-white' 
+                                            mobileTab === 'configuracion'
+                                                ? 'bg-white text-[#72B043] border-white'
                                                 : 'bg-white/10 hover:bg-white/20 border-white/20 text-white'
                                         }`}
                                         title="Configuración"
@@ -264,7 +215,7 @@ export default function ResidentLayout({
                                 <div className="space-y-0.5">
                                     <span className="text-[10px] font-bold text-emerald-100 uppercase tracking-widest block">Vecino Autenticado</span>
                                     <h4 className="text-sm font-extrabold flex items-center gap-1.5">
-                                        ¡Hola, {user?.name}! 
+                                        Hola, {user?.name}!
                                         <span aria-live="polite" className="h-1.5 w-1.5 rounded-full bg-emerald-300 animate-pulse" />
                                     </h4>
                                 </div>
@@ -272,12 +223,12 @@ export default function ResidentLayout({
                             </div>
                         </div>
 
-                        {/* Inner App Content (Tab views) */}
+                        {/* Inner App Content */}
                         <main className="flex-1 overflow-y-auto p-6 pb-20 space-y-6 text-left">
                             {children}
                         </main>
 
-                        {/* Smartphone Bottom Tab Bar Navigation */}
+                        {/* Bottom Tab Bar */}
                         <nav style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} className="h-16 bg-slate-950 dark:bg-slate-950 border-t border-slate-900/60 flex justify-around items-center px-4 shrink-0 z-20 absolute bottom-0 left-0 right-0">
                             {[
                                 { tab: 'home', label: 'Inicio', icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg> },
@@ -299,12 +250,12 @@ export default function ResidentLayout({
                                         type="button"
                                         aria-current={isReservasLocked ? undefined : (mobileTab === item.tab ? 'page' : undefined)}
                                         className={`flex flex-col items-center justify-center w-12 h-full transition-colors ${
-                                             isReservasLocked
-                                                 ? 'text-rose-500'
-                                                 : mobileTab === item.tab 
-                                                 ? 'text-brand-green font-bold' 
-                                                 : 'text-slate-500 hover:text-slate-350'
-                                         }`}
+                                            isReservasLocked
+                                                ? 'text-rose-500'
+                                                : mobileTab === item.tab
+                                                ? 'text-brand-green font-bold'
+                                                : 'text-slate-500 hover:text-slate-350'
+                                        }`}
                                     >
                                         {item.icon}
                                         <span className="text-[9px] mt-0.5 font-bold uppercase tracking-wider">{item.label}</span>

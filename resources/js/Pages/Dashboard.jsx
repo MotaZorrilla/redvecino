@@ -266,10 +266,6 @@ export default function Dashboard() {
     const [sandboxCondoId, setSandboxCondoId] = useState('all');
     const [sandboxModule, setSandboxModule] = useState('map');
 
-    const renderAdminView = isActuallyAdmin && !simulationMode;
-    const renderTiDevOps = isTiRole && !simulationMode;
-    const renderBusinessAdmin = isBusinessAdmin && !simulationMode;
-
     const [forceMobileView, setForceMobileView] = useState(false);
     const [isDesktop, setIsDesktop] = useState(false);
 
