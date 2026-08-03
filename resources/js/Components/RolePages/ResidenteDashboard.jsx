@@ -1,4 +1,4 @@
-import ResidentLayout from '@/Layouts/ResidentLayout';
+import MiVecinoLayout from '@/Layouts/MiVecinoLayout';
 import ResidentOverview from '@/Components/Residente/ResidentOverview';
 import AnnouncementsList from '@/Components/Residente/AnnouncementsList';
 import BookingManager from '@/Components/Propietario/BookingManager';
@@ -21,9 +21,8 @@ export default function ResidenteDashboard({
     residentDocuments
 }) {
     return (
-        <ResidentLayout
+        <MiVecinoLayout
             user={user}
-            isDesktop={isDesktop}
             forceMobileView={forceMobileView}
             setForceMobileView={setForceMobileView}
             mobileTab={mobileTab}
@@ -136,6 +135,6 @@ export default function ResidenteDashboard({
                     </div>
                 </div>
             )}
-        </ResidentLayout>
+        </MiVecinoLayout>
     );
 }

@@ -1,8 +1,8 @@
-﻿# ðŸ›¡ï¸ Plan de Reforzamiento y ExpansiÃ³n de Pruebas (QA Hardening Plan)
+# 🛡️ Plan de Reforzamiento y Expansión de Pruebas (QA Hardening Plan)
 
-Este plan de trabajo detalla la estrategia para robustecer la suite de pruebas existente del proyecto **RedVecino & MiVecino**, intensificando las validaciones en los mÃ³dulos principales, y especificando las nuevas pruebas necesarias para las caracterÃ­sticas pendientes de la hoja de ruta.
+Este plan de trabajo detalla la estrategia para robustecer la suite de pruebas existente del proyecto **RedVecino & MiVecino**, intensificando las validaciones en los módulos principales, y especificando las nuevas pruebas necesarias para las características pendientes de la hoja de ruta.
 
-> **Estado actual (Julio 2026):** Se implementaron 6 nuevas suites en Pest v3 cubriendo gran parte de las Ã¡reas identificadas. Ver secciÃ³n 3.20 de HISTORY.md y archivos `*Pest.php` en `tests/Feature/`. La suite total es de **337 tests, 0 failures**.
+> **Estado actual (Julio 2026 — v8.3):** Se implementaron 6 nuevas suites en Pest v3 cubriendo gran parte de las áreas identificadas. Ver secciones 3.20–3.22 de HISTORY.md y archivos `*Pest.php` en `tests/Feature/`. La suite total es de **376 backend + 29 frontend = 405 tests, 0 failures**. Adicionalmente, se realizó una **auditoría E2E sistemática con Chrome DevTools MCP** validando todos los ítems del Sidebar y Navbar para los 6 roles del sistema en producción real (ver sección 3.22 de `HISTORY.md`).
 
 ---
 

@@ -1,5 +1,5 @@
 import api from '@/bootstrap';
-import AdminLayout from '@/Layouts/AdminLayout';
+import RedVecinoLayout from '@/Layouts/RedVecinoLayout';
 import DashboardOverview from '@/Components/Admin/DashboardOverview';
 import PropertiesList from '@/Components/Admin/PropertiesList';
 import UsersList from '@/Components/Admin/UsersList';
@@ -33,16 +33,16 @@ export default function AdminDashboard({
     ticketStatusFilter, ticketPriorityFilter, adminFilteredUsers: afu
 }) {
     return (
-        <AdminLayout
+        <RedVecinoLayout
             user={user}
+            role="admin"
+            activeTab={adminActiveTab}
+            setActiveTab={setAdminActiveTab}
             condosList={condosList}
             adminCondoId={adminCondoId}
             setAdminCondoId={setAdminCondoId}
-            adminActiveTab={adminActiveTab}
-            setAdminActiveTab={setAdminActiveTab}
             isMobileSidebarOpen={isMobileSidebarOpen}
             setIsMobileSidebarOpen={setIsMobileSidebarOpen}
-            adminSettingsForm={adminSettingsForm}
             toggleTheme={toggleTheme}
             darkMode={darkMode}
         >
@@ -219,6 +219,6 @@ export default function AdminDashboard({
                     paymentsList={paymentsList}
                 />
             )}
-        </AdminLayout>
+        </RedVecinoLayout>
     );
 }

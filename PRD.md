@@ -29,6 +29,13 @@ El producto final debe respetar fielmente las directrices estéticas definidas e
     *   🟣 **Morado/Violeta** (`#7A5299`): Módulos comunitarios y sociales.
     *   ⚪ **Gris Claro** (`#E2E8F0` / `#F8FAFC`): Fondos de tarjetas, separadores y bordes limpios.
 
+### 2.2 Arquitectura de Layouts UI (Estrategia de Dos Llaves)
+
+El sistema de interfaces se articula en torno a **dos layouts unificados** que concentran toda la lógica de navegación, chromática y responsividad:
+
+*   🔑 **`RedVecinoLayout`** — Para los roles de gestión administrativa: TI, Administrador, Comité, Colaborador. Diseñado para pantalla completa de escritorio con Sidebar izquierdo persistente, Navbar superior con selector de condominio y acento cromático dinámico por rol.
+*   🔑 **`MiVecinoLayout`** — Para los roles residenciales: Propietario y Residente. Diseñado Mobile-First con BottomNav fijo en móvil y Sidebar izquierdo en PC. Soporta detección dinámica del rol (Propietario vs Residente) para adaptar las pestañas. Incluye bloqueo de reservas por morosidad integrado a nivel de layout.
+
 ---
 
 ## 👥 3. Perfiles de Usuario y Roles (RBAC)

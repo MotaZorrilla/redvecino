@@ -1,4 +1,4 @@
-import ColaboradorLayout from '@/Layouts/ColaboradorLayout';
+import RedVecinoLayout from '@/Layouts/RedVecinoLayout';
 import AttendanceControl from '@/Components/Colaborador/AttendanceControl';
 import PackageDelivery from '@/Components/Colaborador/PackageDelivery';
 import VisitorAccess from '@/Components/Colaborador/VisitorAccess';
@@ -14,15 +14,16 @@ export default function ColaboradorDashboard({
     ticketsList, setTicketsList
 }) {
     return (
-        <ColaboradorLayout
+        <RedVecinoLayout
+            user={user}
+            role="colaborador"
+            activeTab={colaboradorActiveTab}
+            setActiveTab={setColaboradorActiveTab}
             condosList={condosList}
             adminCondoId={adminCondoId}
             setAdminCondoId={setAdminCondoId}
-            colaboradorActiveTab={colaboradorActiveTab}
-            setColaboradorActiveTab={setColaboradorActiveTab}
             isMobileSidebarOpen={isMobileSidebarOpen}
             setIsMobileSidebarOpen={setIsMobileSidebarOpen}
-            user={user}
             toggleTheme={toggleTheme}
             darkMode={darkMode}
         >
@@ -57,6 +58,6 @@ export default function ColaboradorDashboard({
                     setTicketsList={setTicketsList}
                 />
             )}
-        </ColaboradorLayout>
+        </RedVecinoLayout>
     );
 }

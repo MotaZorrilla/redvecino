@@ -1,4 +1,4 @@
-﻿# BitÃ¡cora de Desarrollo e Historial del Proyecto (RedVecino & MiVecino)
+# BitÃ¡cora de Desarrollo e Historial del Proyecto (RedVecino & MiVecino)
 
 Este documento centraliza toda la planificaciÃ³n, el progreso y la verificaciÃ³n tÃ©cnica del proyecto **condominio-pro**, integrando los planes de trabajo, el checklist de tareas y los resultados de calidad (QA). Se mantiene bajo el principio de conservaciÃ³n de memoria y trazabilidad histÃ³rica.
 
@@ -113,26 +113,35 @@ Este checklist interactivo registra el avance global y detalla los nuevos requer
 - [ ] **Sistema de Tres Canales para Tickets:** Segregar la lÃ³gica del mÃ³dulo de tickets en soporte tÃ©cnico de TI, notificaciones financieras de gastos y tickets vecinales correctivos.
 - [ ] **Correspondencia y Custodia:** Crear la base de datos de paquetes, firma digital del conserje/residente, y la simulaciÃ³n del escaneo OCR de etiquetas en el front-desk.
 - [ ] **Gastos Comunes e Incidencias por Voz (IA Adaptada):** Desarrollar la integraciÃ³n de voz a texto para la creaciÃ³n de tickets rÃ¡pidos de residentes y cargos rÃ¡pidos de administradores.
+### 2.6 Nuevos Hitos de Desarrollo - ReuniÃ³n 27/05/2026 & GuÃ­as de IA
+- [ ] **Branding Unificado:** Modificar logos en el frontend (`ApplicationLogo.jsx`) para cambiar el punto de la letra "i" en RedVecino a color Verde CÃ©sped, sincronizÃ¡ndolo con MiVecino.
+- [x] **CorrecciÃ³n del Control de Roles (Bug Rodrigo #1):** Auditados 15 controladores API. Scoping por `condominium_id` agregado en AnnouncementController, ExpenseController (index/show/update/destroy), PropertyController (index/show), FacilityController (requerido en index). Fix en `RBACMatrizCompletaPest` (61 tests fallaban por falta de `use App\Services\CondoFinanceService`).
+- [N/A] **CorrecciÃ³n de Reportes PDF Duplicados (Bug Rodrigo #2):** No existe cÃ³digo PDF en la nueva app Laravel; solo en `zAux/respaldo5/` (legado). Bug no aplicable al cÃ³digo actual.
+- [ ] **Consola Web de Emergencia para TI:** Implementar la interfaz de consola interactiva en el panel TI con comandos seguros (`database status`, `cache:clear`, `permissions:reset`).
+- [ ] **Mapa de OcupaciÃ³n con Colores de Morosidad:** Desarrollar en el portal del Administrador la grilla de ocupaciÃ³n por pisos y departamentos con colores (Verde, Rojo, Amarillo) y selector de condominio.
+- [ ] **Sistema de Tres Canales para Tickets:** Segregar la lÃ³gica del mÃ³dulo de tickets en soporte tÃ©cnico de TI, notificaciones financieras de gastos y tickets vecinales correctivos.
+- [ ] **Correspondencia y Custodia:** Crear la base de datos de paquetes, firma digital del conserje/residente, y la simulaciÃ³n del escaneo OCR de etiquetas en el front-desk.
+- [ ] **Gastos Comunes e Incidencias por Voz (IA Adaptada):** Desarrollar la integraciÃ³n de voz a texto para la creaciÃ³n de tickets rÃ¡pidos de residentes y cargos rÃ¡pidos de administradores.
 - [ ] **Actas de Asamblea con Validez Legal y QuÃ³rum IA (IA Adaptada):** Implementar la transcripciÃ³n y generaciÃ³n de resÃºmenes, actas y cÃ¡lculo de quÃ³rum doble ponderado en PDF.
 - [ ] **Insights de Morosidad Vecinal Predictiva (IA Adaptada):** Crear la ficha de anÃ¡lisis de comportamiento del copropietario y recomendaciones proactivas.
 - [ ] **VÃ­deo-Comunicados en MiVecino con fal.ai (IA Adaptada):** Crear el generador de avatares en vÃ­deo para los boletines semanales de la administraciÃ³n.
 
 ### 2.7 Nuevos Requerimientos - Mockups Usuarios y Perfiles (04/06/2026)
 - [x] **Asistente de CreaciÃ³n de Personas (PersonWizard):** Frontend completo en React (5 pasos + stepper) + Backend API (`POST /api/person-wizard` via `PersonWizardController`):
-  - [x] **Paso 1 (Datos de la Persona):** Foto, RUT, Nombres, Apellidos, Correo, TelÃ©fono + plantillas de ejemplo.
-  - [x] **Paso 2 (RelaciÃ³n con la Unidad):** Condicional SÃ­/No con selectores dinÃ¡micos de Torre, Unidad y checkboxes de relaciÃ³n mÃºltiple.
-  - [x] **Paso 3 (Funciones y Roles):** Cards de selecciÃ³n Ãºnica con campos condicionales (Colaborador, ComitÃ©, Administrador, Proveedor, Ninguna).
-  - [x] **Paso 4 (Acceso al Sistema):** GeneraciÃ³n automÃ¡tica de usuario/contraseÃ±a temporal con botÃ³n de regenerar y checkbox de envÃ­o por correo.
-  - [x] **Paso 5 (Resumen):** Ficha de vista previa con 4 tarjetas coloreadas, estado, fecha de creaciÃ³n y acciones de guardado.
+  - [x] **Paso 1 (Datos de la Persona):** Foto, RUT, Nombres, Apellidos, Correo, Tel\u00e9fono + plantillas de ejemplo.
+  - [x] **Paso 2 (Relaci\u00f3n con la Unidad):** Condicional S\u00ed/No con selectores din\u00e1micos de Torre, Unidad y checkboxes de relaci\u00f3n m\u00faltiple.
+  - [x] **Paso 3 (Funciones y Roles):** Cards de selecci\u00f3n \u00fanica con campos condicionales (Colaborador, Comit\u00e9, Administrador, Proveedor, Ninguna).
+  - [x] **Paso 4 (Acceso al Sistema):** Generaci\u00f3n autom\u00e1tica de usuario/contrase\u00f1a temporal con bot\u00f3n de regenerar y checkbox de env\u00edo por correo.
+  - [x] **Paso 5 (Resumen):** Ficha de vista previa con 4 tarjetas coloreadas, estado, fecha de creaci\u00f3n y acciones de guardado.
   - [x] **Backend API:** Crea User + roles Spatie + perfiles (Owner, Resident, Employee, Committee, Admin) segÃºn el rol seleccionado.
   - [x] **Frontend conectado:** AdminDashboard.jsx ahora llama a la API real en vez de solo estado local.
   - [x] **8 tests Pest de integraciÃ³n** en `PersonWizardPest.php`.
-- [ ] **Estructura de Dashboards y Perfiles de Acceso:**
-  - [ ] **Dashboard Residente:** Vistas para Gastos Comunes, Pago en LÃ­nea, Notificaciones, Chat, Documentos y Reservas.
-  - [ ] **Dashboard Mantenimiento:** Vistas para Control de Asistencia, Funciones/Horarios, Contratos, Liquidaciones, Lista de Compras, Enlaces de InterÃ©s y Chat.
-  - [ ] **Dashboard ConserjerÃ­a:** Vistas para Control de Asistencia, Turnos/Horarios, Libros (visitas/encomiendas), Chat, Reservas de Ãreas Comunes, Contratos/Liquidaciones y Enlaces de InterÃ©s.
-  - [ ] **Dashboard ComitÃ©:** Vistas para Indicadores, Morosidad, Solicitudes, Actas, Votaciones, Comunicados y Chat.
-  - [ ] **Dashboard Administrador:** Panel integral con Dashboard General, Personas, Unidades, Gastos Comunes, Reservas, Encomiendas, Comunicaciones, Reportes y ConfiguraciÃ³n.
+- [x] **Estructura de Dashboards y Perfiles de Acceso (implementada como layouts unificados — ver secciÃ³n 3.22):**
+  - [x] **Dashboard Residente (MiVecinoLayout):** Inicio, Avisos, Reservas, Pagos, Tickets, MensajerÃ­a, Biblioteca.
+  - [x] **Dashboard Propietario (MiVecinoLayout):** Inicio Financiero, RendiciÃ³n de Cuentas, Reservar Espacios, Unidades y Derechos.
+  - [x] **Dashboard Colaborador/ConserjerÃ­a (RedVecinoLayout):** Asistencia, Encomiendas, Tareas Asignadas.
+  - [x] **Dashboard ComitÃ© (RedVecinoLayout):** Resumen, Finanzas, AuditorÃ­a Chats, Actas de Copropiedad.
+  - [x] **Dashboard Administrador (RedVecinoLayout):** Resumen, Propiedades, Usuarios, Tickets, Pagos, Multas.
   - [ ] **LÃ³gica Multi-rol:** Permitir que los usuarios con mÃºltiples perfiles (ej. Residente + ComitÃ©) tengan acceso a sus respectivos paneles secundarios desde su panel principal.
 
 ### 2.8 ImplementaciÃ³n de Reglas Financieras y Remuneraciones (zAux 05/06)
@@ -618,7 +627,41 @@ Se completaron 4 frentes de trabajo en paralelo: arch() tests, frontend testing,
 #### `covers()` Annotations
 *   Agregadas `covers()` a 8 archivos Pest: FinanzasConsistencia, QuorumExtremos, CoeficienteFallback, AislamientoMultiCondo, ConcurrenciaFinanciera, PersonWizard, FacilityCrud, HrCrud.
 
+### 3.22 Estandarización de Layouts & Auditoría E2E con Chrome DevTools (Sesión 08/07/2026)
+
+Se completó la migración definitiva al modelo de **"dos llaves"**: un layout unificado por cada familia de usuarios, eliminando los 7 layouts individuales anteriores.
+
+#### Diagnóstico y Corrección de Bugs en Caliente
+
+| ID | Archivo | Error | Fix |
+|---|---|---|---|
+| BUG-01 | `Dashboard.jsx` | `ReferenceError: isBusinessAdmin is not defined` → pantalla en blanco en Admin | Eliminada variable huérfana y declaraciones de renderizado obsoletas |
+| BUG-02 | `Dashboard.jsx` | `TypeError: setSimulatedMoroso is not a function` al activar morosidad | Añadida `setSimulatedMoroso` a `sharedRolePageProps` |
+| BUG-03 | `RedVecinoLayout.jsx` | Panel vacío en pestañas del Comité (IDs `payments/users` vs `finances/chats/actas`) | Independizados los mapeos de pestañas para el rol `comite` |
+| BUG-04 | `RedVecinoLayout.jsx` | Panel vacío en Encomiendas del Colaborador (`parcels` vs `packages`) | Corregido el ID a `packages` para sincronizar con `ColaboradorDashboard` |
+| BUG-05 | `Dashboard.jsx` | `TypeError: Cannot read properties of undefined (reading 'length')` al clic en Tickets (Residente) | Inyectados `reportedTickets` y `setReportedTickets` en `sharedRolePageProps` |
+
+#### Nuevos Layouts Unificados
+*   **`RedVecinoLayout.jsx`** — Sidebar izquierdo permanente, navbar superior, acento de color dinámico por rol (`ti`: cian, `admin`: índigo, `comite`: violeta, `colaborador`: naranja). Comparten: TI, Admin, Comité, Colaborador.
+*   **`MiVecinoLayout.jsx`** — Mobile-first (BottomNav en móvil, Sidebar izquierdo en PC), detección dinámica de rol Propietario vs Residente para cargar pestañas correspondientes. Bloqueo de reservas por morosidad integrado. Comparten: Propietario, Residente.
+
+#### Migración a Producción
+*   Los 6 dashboards de rol (`TiDashboard`, `AdminDashboard`, `ComiteDashboard`, `ColaboradorDashboard`, `PropietarioDashboard`, `ResidenteDashboard`) fueron migrados para envolver su contenido en el nuevo layout correspondiente.
+*   Los 7 layouts legacy (`TiLayout`, `AdminLayout`, `ComiteLayout`, `ColaboradorLayout`, `PropietarioLayout`, `ResidentLayout`, `SuperUsuarioLayout`) fueron eliminados del repositorio.
+
+#### Auditoría E2E Sistemática con Chrome DevTools MCP
+Se validó cada ítem del Sidebar y Navbar en producción para los 6 roles, uno a uno, haciendo clic real desde el simulador de impersonación del panel TI. Todos los roles auditados sin errores en consola tras la corrección del BUG-05.
+
+#### Limpieza de Sandbox y Rutas Temporales
+*   Eliminados `TestRedVecino.jsx` y `TestMiVecino.jsx` (vistas de previsualización temporal).
+*   Eliminadas las rutas públicas `/test-redvecino` y `/test-mivecino` de `routes/web.php`.
+*   Compilación limpia de producción: `npm run build` → **2810 módulos transformados, 0 errores**.
+
+#### Actualización de Documentación
+*   `SPEC.md` — Árbol de estructura frontend actualizado para reflejar la nueva arquitectura de layouts.
+*   `HISTORY.md` (este documento) — Checklist de sección 2.7 marcado como completado. Añadida sección 3.22.
+
 ---
-**Última actualización:** 04 de Julio de 2026 (Feature Expansion & Security Hardening - v8.2)
-**Versión:** 8.2 (PersonWizard Backend, Facility CRUD, HR Liquidaciones, Role Leakage Fix, Frontend Testing)
-**Estado:** Estable. Suite completa **376 backend + 29 frontend = 405 tests, 0 failures.** Backend, frontend y seguridad certificados.
+**Última actualización:** 08 de Julio de 2026 (Layout Unification & E2E Audit - v8.3)
+**Versión:** 8.3 (RedVecinoLayout, MiVecinoLayout, Bug Fixes BUG-01→05, E2E Audit todos los roles)
+**Estado:** Estable. Suite completa **376 backend + 29 frontend = 405 tests, 0 failures.** Layouts unificados en producción. Auditoría E2E completada.

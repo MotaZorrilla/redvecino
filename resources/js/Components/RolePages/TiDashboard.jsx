@@ -1,4 +1,4 @@
-import TiLayout from '@/Layouts/TiLayout';
+import RedVecinoLayout from '@/Layouts/RedVecinoLayout';
 import DevOpsTelemetry from '@/Components/Ti/DevOpsTelemetry';
 import SpatiePermissionMatrix from '@/Components/Ti/SpatiePermissionMatrix';
 import SpatieImpersonator from '@/Components/Ti/SpatieImpersonator';
@@ -23,12 +23,13 @@ export default function TiDashboard({
     auditedMessagesState, packages
 }) {
     return (
-        <TiLayout
+        <RedVecinoLayout
             user={user}
-            tiActiveTab={tiActiveTab}
-            setTiActiveTab={setTiActiveTab}
-            isMobileDevOpsSidebarOpen={isMobileDevOpsSidebarOpen}
-            setIsMobileDevOpsSidebarOpen={setIsMobileDevOpsSidebarOpen}
+            role="ti"
+            activeTab={tiActiveTab}
+            setActiveTab={setTiActiveTab}
+            isMobileSidebarOpen={isMobileDevOpsSidebarOpen}
+            setIsMobileSidebarOpen={setIsMobileDevOpsSidebarOpen}
             toggleTheme={toggleTheme}
             darkMode={darkMode}
         >
@@ -113,6 +114,6 @@ export default function TiDashboard({
                     packages={packages}
                 />
             )}
-        </TiLayout>
+        </RedVecinoLayout>
     );
 }

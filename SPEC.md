@@ -1,4 +1,4 @@
-﻿# RedVecino & MiVecino - EspecificaciÃ³n TÃ©cnica del Proyecto (Condominio-PRO)
+# RedVecino & MiVecino - EspecificaciÃ³n TÃ©cnica del Proyecto (Condominio-PRO)
 
 Este proyecto desarrolla una suite tecnolÃ³gica integrada para la gestiÃ³n, administraciÃ³n y vida comunitaria en condominios, estructurada en dos grandes interfaces de usuario alineadas bajo un ecosistema comÃºn:
 1. **RedVecino:** Plataforma web corporativa y panel de administraciÃ³n avanzado para administradores y comitÃ©s de copropiedad. Robustez, analÃ­tica y control total.
@@ -238,13 +238,9 @@ resources/js/
 â”‚   â”œâ”€â”€ Toast.jsx
 â”‚   â””â”€â”€ ConfirmDialog.jsx
 â”œâ”€â”€ Hooks/           # Custom hooks de React
-â”œâ”€â”€ Layouts/         # Layouts de la aplicaciÃ³n por rol
-â”‚   â”œâ”€â”€ TiLayout.jsx
-â”‚   â”œâ”€â”€ AdminLayout.jsx
-â”‚   â”œâ”€â”€ ComiteLayout.jsx
-â”‚   â”œâ”€â”€ ColaboradorLayout.jsx
-â”‚   â”œâ”€â”€ PropietarioLayout.jsx
-â”‚   â”œâ”€â”€ ResidentLayout.jsx
+â”œâ”€â”€ Layouts/         # Layouts estandarizados del ecosistema
+â”‚   â”œâ”€â”€ RedVecinoLayout.jsx  â†  Unificado para gestiÃ³n (TI, Admin, ComitÃ©, Colaborador)
+â”‚   â”œâ”€â”€ MiVecinoLayout.jsx   â†  Unificado para residencial (Propietario, Residente)
 â”‚   â””â”€â”€ SuperUsuarioLayout.jsx
 â”œâ”€â”€ Pages/           # Componentes de pÃ¡gina (Inertia)
 â”‚   â”œâ”€â”€ Auth/

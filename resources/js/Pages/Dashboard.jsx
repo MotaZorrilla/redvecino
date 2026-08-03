@@ -775,12 +775,13 @@ export default function Dashboard() {
         residentExpenses, setResidentExpenses, paymentHistory, setPaymentHistory,
         showPaymentModal, setShowPaymentModal, paymentReceiptName, setPaymentReceiptName,
         isProcessingPayment, setIsProcessingPayment, paymentCompletedSuccess, setPaymentCompletedSuccess,
-        executeQrPayment, simulatedMoroso, setShowMorosidadModal, amenities, setAmenities,
+        executeQrPayment, simulatedMoroso, setSimulatedMoroso, setShowMorosidadModal, amenities, setAmenities,
         myReservations, setMyReservations, bookingAmenity, setBookingAmenity,
         bookingDate, setBookingDate, bookingSlot, setBookingSlot, submitBooking,
         newTicketTitle, setNewTicketTitle, newTicketDesc, setNewTicketDesc,
         newTicketCat, setNewTicketCat, newTicketPri, setNewTicketPri, submitTicket,
-        chatMessages, setChatMessages, chatInput, setChatInput, isTyping, setIsTyping, sendChatMessage
+        chatMessages, setChatMessages, chatInput, setChatInput, isTyping, setIsTyping, sendChatMessage,
+        reportedTickets, setReportedTickets
     };
 
     const sharedTiPageProps = {

@@ -1,4 +1,4 @@
-import PropietarioLayout from '@/Layouts/PropietarioLayout';
+import MiVecinoLayout from '@/Layouts/MiVecinoLayout';
 import CommonExpensesQR from '@/Components/Propietario/CommonExpensesQR';
 import FinancialReports from '@/Components/Propietario/FinancialReports';
 import BookingManager from '@/Components/Propietario/BookingManager';
@@ -10,18 +10,19 @@ export default function PropietarioDashboard({
     paymentHistory, setPaymentHistory, showPaymentModal, setShowPaymentModal,
     paymentReceiptName, setPaymentReceiptName, isProcessingPayment, setIsProcessingPayment,
     paymentCompletedSuccess, setPaymentCompletedSuccess, executeQrPayment,
-    simulatedMoroso, setShowMorosidadModal, amenities, setAmenities,
+    simulatedMoroso, setSimulatedMoroso, setShowMorosidadModal, amenities, setAmenities,
     myReservations, setMyReservations, bookingAmenity, setBookingAmenity,
     bookingDate, setBookingDate, bookingSlot, setBookingSlot, submitBooking,
     propertiesList
 }) {
     return (
-        <PropietarioLayout
+        <MiVecinoLayout
             user={user}
-            propietarioActiveTab={propietarioActiveTab}
-            setPropietarioActiveTab={setPropietarioActiveTab}
-            isMobileSidebarOpen={isMobileSidebarOpen}
-            setIsMobileSidebarOpen={setIsMobileSidebarOpen}
+            mobileTab={propietarioActiveTab}
+            setMobileTab={setPropietarioActiveTab}
+            simulatedMoroso={simulatedMoroso}
+            setSimulatedMoroso={setSimulatedMoroso}
+            setShowMorosidadModal={setShowMorosidadModal}
             toggleTheme={toggleTheme}
             darkMode={darkMode}
         >
@@ -67,6 +68,6 @@ export default function PropietarioDashboard({
             {propietarioActiveTab === 'units' && (
                 <PropertyOwnership user={user} propertiesList={propertiesList} />
             )}
-        </PropietarioLayout>
+        </MiVecinoLayout>
     );
 }

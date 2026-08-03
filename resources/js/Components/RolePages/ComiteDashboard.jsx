@@ -1,4 +1,4 @@
-import ComiteLayout from '@/Layouts/ComiteLayout';
+import RedVecinoLayout from '@/Layouts/RedVecinoLayout';
 import DashboardOverview from '@/Components/Admin/DashboardOverview';
 import FinancialAudit from '@/Components/Comite/FinancialAudit';
 import ChatAuditLogs from '@/Components/Comite/ChatAuditLogs';
@@ -22,15 +22,16 @@ export default function ComiteDashboard({
     chatAuditReply, setChatAuditReply
 }) {
     return (
-        <ComiteLayout
+        <RedVecinoLayout
+            user={user}
+            role="comite"
+            activeTab={comiteActiveTab}
+            setActiveTab={setComiteActiveTab}
             condosList={condosList}
             adminCondoId={adminCondoId}
             setAdminCondoId={setAdminCondoId}
-            comiteActiveTab={comiteActiveTab}
-            setComiteActiveTab={setComiteActiveTab}
             isMobileSidebarOpen={isMobileSidebarOpen}
             setIsMobileSidebarOpen={setIsMobileSidebarOpen}
-            user={user}
             toggleTheme={toggleTheme}
             darkMode={darkMode}
         >
@@ -111,6 +112,6 @@ export default function ComiteDashboard({
             {comiteActiveTab === 'actas' && (
                 <MeetingsMinutes adminCondoId={adminCondoId} />
             )}
-        </ComiteLayout>
+        </RedVecinoLayout>
     );
 }
