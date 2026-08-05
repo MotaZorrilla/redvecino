@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { SimpleTable, StatusBadge } from '@/Components/DashboardShared';
 
 export default function FinancesLedger({
@@ -51,8 +51,202 @@ export default function FinancesLedger({
 }) {
     const [selectedAviso, setSelectedAviso] = useState(null);
     const activeCondo = allCondominiums.find(c => c.id === Number(adminCondoId));
-    const towersList = activeCondo?.towers || [];
     const [modalSubTab, setModalSubTab] = useState('summary');
+    const [expenseStep, setExpenseStep] = useState(1);
+    const [isInstallmentsActive, setIsInstallmentsActive] = useState(false);
+    const [installmentsCount, setInstallmentsCount] = useState(3);
+
+    // Filter states for Recaudación (Payments)
+    const [paymentsSearch, setPaymentsSearch] = useState('');
+    const [paymentsStatusFilter, setPaymentsStatusFilter] = useState('all');
+    const [paymentsStartDate, setPaymentsStartDate] = useState('');
+    const [paymentsEndDate, setPaymentsEndDate] = useState('');
+    const [paymentsSortBy, setPaymentsSortBy] = useState('date_desc');
+
+    // Filter states for Ingresos (Incomes)
+    const [incomeSearch, setIncomeSearch] = useState('');
+    const [incomeStartDate, setIncomeStartDate] = useState('');
+    const [incomeEndDate, setIncomeEndDate] = useState('');
+    const [incomeSortBy, setIncomeSortBy] = useState('date_desc');
+
+    // Filter states for Egresos (Expenses)
+    const [expenseSearch, setExpenseSearch] = useState('');
+    const [expenseStartDate, setExpenseStartDate] = useState('');
+    const [expenseEndDate, setExpenseEndDate] = useState('');
+    const [expenseSortBy, setExpenseSortBy] = useState('date_desc');
+
+    const displayPayments = adminFilteredPayments.length > 0 
+        ? adminFilteredPayments 
+        : (paymentsList.length > 0 
+            ? paymentsList 
+            : incomesList.map(inc => ({
+                id: inc.id,
+                property_id: inc.property_id || inc.property?.number || 101,
+                user: inc.user || { name: inc.description || 'Vecino / Copropietario' },
+                amount: inc.amount,
+                payment_method: 'transfer',
+                payment_date: inc.date || new Date().toISOString(),
+                status: 'completed'
+            }))
+        );
+
+    // Computed filtered list for Recaudación
+    const filteredDisplayPayments = useMemo(() => {
+        let list = [...displayPayments];
+
+        if (paymentsStatusFilter !== 'all') {
+            list = list.filter(p => p.status === paymentsStatusFilter);
+        }
+        if (paymentsSearch.trim()) {
+            const q = paymentsSearch.toLowerCase().trim();
+            list = list.filter(p => 
+                String(p.property_id || p.property?.number || '').toLowerCase().includes(q) ||
+                String(p.user?.name || '').toLowerCase().includes(q) ||
+                String(p.payment_method || '').toLowerCase().includes(q)
+            );
+        }
+        if (paymentsStartDate) {
+            list = list.filter(p => (p.payment_date || '').substring(0, 10) >= paymentsStartDate);
+        }
+        if (paymentsEndDate) {
+            list = list.filter(p => (p.payment_date || '').substring(0, 10) <= paymentsEndDate);
+        }
+
+        return list.sort((a, b) => {
+            if (paymentsSortBy === 'date_desc') return (b.payment_date || '').localeCompare(a.payment_date || '');
+            if (paymentsSortBy === 'date_asc') return (a.payment_date || '').localeCompare(b.payment_date || '');
+            if (paymentsSortBy === 'amount_desc') return Number(b.amount || 0) - Number(a.amount || 0);
+            if (paymentsSortBy === 'amount_asc') return Number(a.amount || 0) - Number(b.amount || 0);
+            return 0;
+        });
+    }, [displayPayments, paymentsStatusFilter, paymentsSearch, paymentsStartDate, paymentsEndDate, paymentsSortBy]);
+
+    // Computed filtered list for Incomes
+    const finalFilteredIncomes = useMemo(() => {
+        let list = [...filteredIncomes];
+
+        if (incomeSearch.trim()) {
+            const q = incomeSearch.toLowerCase().trim();
+            list = list.filter(inc => 
+                String(inc.description || '').toLowerCase().includes(q) ||
+                String(inc.category || '').toLowerCase().includes(q) ||
+                String(inc.subcategory || '').toLowerCase().includes(q) ||
+                String(inc.property_id || inc.property?.number || '').toLowerCase().includes(q)
+            );
+        }
+        if (incomeStartDate) {
+            list = list.filter(inc => (inc.date || '').substring(0, 10) >= incomeStartDate);
+        }
+        if (incomeEndDate) {
+            list = list.filter(inc => (inc.date || '').substring(0, 10) <= incomeEndDate);
+        }
+
+        return list.sort((a, b) => {
+            if (incomeSortBy === 'date_desc') return (b.date || '').localeCompare(a.date || '');
+            if (incomeSortBy === 'date_asc') return (a.date || '').localeCompare(b.date || '');
+            if (incomeSortBy === 'amount_desc') return Number(b.amount || 0) - Number(a.amount || 0);
+            if (incomeSortBy === 'amount_asc') return Number(a.amount || 0) - Number(b.amount || 0);
+            return 0;
+        });
+    }, [filteredIncomes, incomeSearch, incomeStartDate, incomeEndDate, incomeSortBy]);
+
+    // Computed filtered list for Expenses
+    const finalFilteredExpenses = useMemo(() => {
+        let list = [...filteredExpenses];
+
+        if (expenseSearch.trim()) {
+            const q = expenseSearch.toLowerCase().trim();
+            list = list.filter(exp => 
+                String(exp.description || '').toLowerCase().includes(q) ||
+                String(exp.category || '').toLowerCase().includes(q) ||
+                String(exp.subcategory || '').toLowerCase().includes(q) ||
+                String(exp.user?.name || '').toLowerCase().includes(q)
+            );
+        }
+        if (expenseStartDate) {
+            list = list.filter(exp => (exp.date || '').substring(0, 10) >= expenseStartDate);
+        }
+        if (expenseEndDate) {
+            list = list.filter(exp => (exp.date || '').substring(0, 10) <= expenseEndDate);
+        }
+
+        return list.sort((a, b) => {
+            if (expenseSortBy === 'date_desc') return (b.date || '').localeCompare(a.date || '');
+            if (expenseSortBy === 'date_asc') return (a.date || '').localeCompare(b.date || '');
+            if (expenseSortBy === 'amount_desc') return Number(b.amount || 0) - Number(a.amount || 0);
+            if (expenseSortBy === 'amount_asc') return Number(a.amount || 0) - Number(b.amount || 0);
+            return 0;
+        });
+    }, [filteredExpenses, expenseSearch, expenseStartDate, expenseEndDate, expenseSortBy]);
+
+    // KPI Aggregate Metrics
+    const totalCompletedPayments = useMemo(() => 
+        filteredDisplayPayments.filter(p => p.status === 'completed' || p.status === 'approved').reduce((acc, curr) => acc + Number(curr.amount || 0), 0)
+    , [filteredDisplayPayments]);
+
+    const totalPendingPayments = useMemo(() => 
+        filteredDisplayPayments.filter(p => p.status === 'pending').reduce((acc, curr) => acc + Number(curr.amount || 0), 0)
+    , [filteredDisplayPayments]);
+
+    const avgPaymentAmount = useMemo(() => 
+        filteredDisplayPayments.length > 0 ? Math.round(filteredDisplayPayments.reduce((acc, curr) => acc + Number(curr.amount || 0), 0) / filteredDisplayPayments.length) : 0
+    , [filteredDisplayPayments]);
+
+    const totalIncomeAmount = useMemo(() => 
+        finalFilteredIncomes.reduce((acc, curr) => acc + Number(curr.amount || 0), 0)
+    , [finalFilteredIncomes]);
+
+    const totalIncomeGGCC = useMemo(() => 
+        finalFilteredIncomes.filter(i => i.category === 'gastos_comunes').reduce((acc, curr) => acc + Number(curr.amount || 0), 0)
+    , [finalFilteredIncomes]);
+
+    const totalIncomeOther = useMemo(() => 
+        finalFilteredIncomes.filter(i => i.category !== 'gastos_comunes').reduce((acc, curr) => acc + Number(curr.amount || 0), 0)
+    , [finalFilteredIncomes]);
+
+    const totalExpenseAmount = useMemo(() => 
+        finalFilteredExpenses.reduce((acc, curr) => acc + Number(curr.amount || 0), 0)
+    , [finalFilteredExpenses]);
+
+    const totalExpenseOps = useMemo(() => 
+        finalFilteredExpenses.filter(e => ['personal', 'servicios_basicos', 'administracion', 'seguridad', 'limpieza'].includes(e.category)).reduce((acc, curr) => acc + Number(curr.amount || 0), 0)
+    , [finalFilteredExpenses]);
+
+    const totalExpenseMaint = useMemo(() => 
+        finalFilteredExpenses.filter(e => ['mantencion', 'reparacion', 'fondo_reserva'].includes(e.category)).reduce((acc, curr) => acc + Number(curr.amount || 0), 0)
+    , [finalFilteredExpenses]);
+
+    // Computación dinámica del resumen financiero directo desde registros reales filtrados por condominio
+    const computedFinanceSummary = useMemo(() => {
+        const incomesSource = filteredIncomes.length > 0 ? filteredIncomes : incomesList;
+        const expensesSource = filteredExpenses.length > 0 ? filteredExpenses : expensesList;
+
+        const incomesCatMap = {};
+        let totalIncomes = 0;
+        incomesSource.forEach(inc => {
+            const amt = Number(inc.amount || 0);
+            const cat = inc.category || 'otro';
+            incomesCatMap[cat] = (incomesCatMap[cat] || 0) + amt;
+            totalIncomes += amt;
+        });
+
+        const expensesCatMap = {};
+        let totalExpenses = 0;
+        expensesSource.forEach(exp => {
+            const amt = Number(exp.amount || 0);
+            const cat = exp.category || 'otro';
+            expensesCatMap[cat] = (expensesCatMap[cat] || 0) + amt;
+            totalExpenses += amt;
+        });
+
+        return {
+            total_incomes: totalIncomes,
+            total_expenses: totalExpenses,
+            balance: totalIncomes - totalExpenses,
+            incomes_by_category: incomesCatMap,
+            expenses_by_category: expensesCatMap,
+        };
+    }, [filteredIncomes, incomesList, filteredExpenses, expensesList]);
 
     const formatCategoryLabel = (catKey, label) => {
         if (catKey === 'gastos_comunes') {
@@ -98,31 +292,158 @@ export default function FinancesLedger({
 
     return (
         <div className="space-y-6 animate-fade-in text-left">
-            {/* Tabs header selector */}
-            <div className="flex border-b border-gray-150 dark:border-slate-800/80">
+            {/* Tabs header selector - 4 Pestañas Claras */}
+            <div className="flex border-b border-gray-150 dark:border-slate-800/80 overflow-x-auto">
+                <button
+                    onClick={() => setPaymentsTabMode('ledger')}
+                    className={`px-5 py-3 font-bold text-xs uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${paymentsTabMode === 'ledger' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' : 'border-transparent text-gray-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
+                >
+                    ⚖️ Libro Diario Contable
+                </button>
                 <button
                     onClick={() => setPaymentsTabMode('payments')}
-                    className={`px-6 py-3 font-bold text-xs uppercase tracking-wider transition-all border-b-2 ${paymentsTabMode === 'payments' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' : 'border-transparent text-gray-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
+                    className={`px-5 py-3 font-bold text-xs uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${paymentsTabMode === 'payments' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' : 'border-transparent text-gray-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
                 >
                     💵 Recaudación (Copropietarios)
                 </button>
                 <button
-                    onClick={() => setPaymentsTabMode('ledger')}
-                    className={`px-6 py-3 font-bold text-xs uppercase tracking-wider transition-all border-b-2 ${paymentsTabMode === 'ledger' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400' : 'border-transparent text-gray-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
+                    onClick={() => {
+                        setPaymentsTabMode('incomes');
+                        setLedgerSubTab('incomes');
+                    }}
+                    className={`px-5 py-3 font-bold text-xs uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${paymentsTabMode === 'incomes' ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400 dark:border-emerald-400' : 'border-transparent text-gray-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
                 >
-                    ⚖️ Libro Diario Contable
+                    📥 Ingresos Contables
+                </button>
+                <button
+                    onClick={() => {
+                        setPaymentsTabMode('expenses');
+                        setLedgerSubTab('expenses');
+                    }}
+                    className={`px-5 py-3 font-bold text-xs uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${paymentsTabMode === 'expenses' ? 'border-rose-600 text-rose-600 dark:text-rose-400 dark:border-rose-400' : 'border-transparent text-gray-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
+                >
+                    📤 Egresos Contables
                 </button>
             </div>
 
             {paymentsTabMode === 'payments' ? (
                 <div className="space-y-6 animate-fade-in text-left">
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div>
-                            <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">
-                                💵 Registro de Recaudación y Gastos Comunes
-                            </h4>
-                            <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Registra transferencias, pagos con tarjetas y concilia expensas mensuales.</p>
+                    {/* KPI Cards Recaudación */}
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+                            <div className="flex justify-between items-center text-[10px] font-extrabold uppercase text-slate-500 dark:text-slate-400">
+                                <span>Total Recaudado</span>
+                                <span className="text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full font-bold">Conciliados</span>
+                            </div>
+                            <div className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-2">
+                                ${totalCompletedPayments.toLocaleString('es-CL')} <span className="text-xs text-slate-400 font-medium">CLP</span>
+                            </div>
                         </div>
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+                            <div className="flex justify-between items-center text-[10px] font-extrabold uppercase text-slate-500 dark:text-slate-400">
+                                <span>En Conciliación</span>
+                                <span className="text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full font-bold">Pendientes</span>
+                            </div>
+                            <div className="text-xl font-black text-amber-600 dark:text-amber-400 mt-2">
+                                ${totalPendingPayments.toLocaleString('es-CL')} <span className="text-xs text-slate-400 font-medium">CLP</span>
+                            </div>
+                        </div>
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+                            <div className="flex justify-between items-center text-[10px] font-extrabold uppercase text-slate-500 dark:text-slate-400">
+                                <span>Abono Promedio</span>
+                                <span className="text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full font-bold">Promedio</span>
+                            </div>
+                            <div className="text-xl font-black text-slate-900 dark:text-white mt-2">
+                                ${avgPaymentAmount.toLocaleString('es-CL')} <span className="text-xs text-slate-400 font-medium">CLP</span>
+                            </div>
+                        </div>
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+                            <div className="flex justify-between items-center text-[10px] font-extrabold uppercase text-slate-500 dark:text-slate-400">
+                                <span>Total Pagos</span>
+                                <span className="text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full font-bold">Procesados</span>
+                            </div>
+                            <div className="text-xl font-black text-slate-900 dark:text-white mt-2">
+                                {filteredDisplayPayments.length} <span className="text-xs text-slate-400 font-medium">Transacciones</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Toolbar de Filtros Interactivos Recaudación */}
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 text-left">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:flex items-center gap-2 flex-1">
+                            {/* Buscador */}
+                            <div className="relative flex-1 min-w-[180px]">
+                                <input
+                                    type="text"
+                                    value={paymentsSearch}
+                                    onChange={(e) => setPaymentsSearch(e.target.value)}
+                                    placeholder="🔍 Depto #, Vecino, Método..."
+                                    className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl px-3 py-1.5 text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                                />
+                            </div>
+
+                            {/* Estado */}
+                            <select
+                                value={paymentsStatusFilter}
+                                onChange={(e) => setPaymentsStatusFilter(e.target.value)}
+                                className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-white focus:outline-none cursor-pointer"
+                            >
+                                <option value="all">🔍 Todos los Estados</option>
+                                <option value="completed">✅ Conciliados / Completados</option>
+                                <option value="pending">⏳ Pendientes de Revisión</option>
+                                <option value="failed">❌ Rechazados</option>
+                            </select>
+
+                            {/* Fechas */}
+                            <div className="flex items-center gap-1">
+                                <span className="text-[10px] text-slate-400 font-bold uppercase">Desde:</span>
+                                <input
+                                    type="date"
+                                    value={paymentsStartDate}
+                                    onChange={(e) => setPaymentsStartDate(e.target.value)}
+                                    className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl px-2 py-1.5 text-xs font-medium text-slate-800 dark:text-white"
+                                />
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <span className="text-[10px] text-slate-400 font-bold uppercase">Hasta:</span>
+                                <input
+                                    type="date"
+                                    value={paymentsEndDate}
+                                    onChange={(e) => setPaymentsEndDate(e.target.value)}
+                                    className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl px-2 py-1.5 text-xs font-medium text-slate-800 dark:text-white"
+                                />
+                            </div>
+
+                            {/* Orden */}
+                            <select
+                                value={paymentsSortBy}
+                                onChange={(e) => setPaymentsSortBy(e.target.value)}
+                                className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-white focus:outline-none cursor-pointer"
+                            >
+                                <option value="date_desc">📅 Más Recientes</option>
+                                <option value="date_asc">📅 Más Antiguas</option>
+                                <option value="amount_desc">💰 Mayor Monto</option>
+                                <option value="amount_asc">💰 Menor Monto</option>
+                            </select>
+
+                            {/* Limpiar */}
+                            {(paymentsSearch || paymentsStatusFilter !== 'all' || paymentsStartDate || paymentsEndDate || paymentsSortBy !== 'date_desc') && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setPaymentsSearch('');
+                                        setPaymentsStatusFilter('all');
+                                        setPaymentsStartDate('');
+                                        setPaymentsEndDate('');
+                                        setPaymentsSortBy('date_desc');
+                                    }}
+                                    className="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-extrabold rounded-xl border border-rose-500/30 transition-all whitespace-nowrap"
+                                >
+                                    Limpiar Filtros ×
+                                </button>
+                            )}
+                        </div>
+
                         {!readOnly && (
                             <button
                                 onClick={() => {
@@ -130,9 +451,9 @@ export default function FinancesLedger({
                                     setNewPaymentForm({ user_id: '', property_id: '', amount: '', payment_method: 'transfer', status: 'completed' });
                                     setShowAddPaymentForm(!showAddPaymentForm);
                                 }}
-                                className="px-3.5 py-1.5 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow transition-all"
+                                className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all whitespace-nowrap shrink-0"
                             >
-                                {showAddPaymentForm ? 'Cerrar Form' : 'Registrar Pago'}
+                                {showAddPaymentForm ? 'Cerrar Form' : '➕ Registrar Pago'}
                             </button>
                         )}
                     </div>
@@ -225,7 +546,7 @@ export default function FinancesLedger({
                     <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
                         <SimpleTable
                             headers={['Vecino', 'Propiedad', 'Monto', 'Método', 'Fecha', 'Estado', 'Documentos', ...(!readOnly ? ['Acciones'] : [])]}
-                            rows={adminFilteredPayments.map(p => ({
+                            rows={filteredDisplayPayments.map(p => ({
                                 cells: [
                                     <span className="font-bold text-gray-900 dark:text-white" key={`user-${p.id}`}>{p.user?.name || 'Vecino'}</span>,
                                     <span className="font-bold" key={`prop-${p.id}`}>Depto #{p.property_id}</span>,
@@ -243,9 +564,10 @@ export default function FinancesLedger({
                                         📄 Aviso Cobro
                                     </button>,
                                     ...(!readOnly ? [
-                                        <div className="flex items-center gap-2 justify-end" key={`act-${p.id}`}>
+                                        <div className="flex items-center justify-center gap-1.5" key={`act-${p.id}`}>
                                             <button
                                                 type="button"
+                                                title="Editar pago"
                                                 aria-label={`Editar pago de ${p.user?.name || 'vecino'}`}
                                                 onClick={() => {
                                                     setEditingPayment(p);
@@ -258,21 +580,24 @@ export default function FinancesLedger({
                                                     });
                                                     setShowAddPaymentForm(true);
                                                 }}
-                                                className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[10px] font-bold rounded-lg transition-all"
+                                                className="px-2 py-1 sm:px-2.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-xs font-bold rounded-lg transition-all shadow-xs hover:scale-105 active:scale-95 flex items-center gap-1"
                                             >
-                                                ✏️ Editar
+                                                <span>✏️</span>
+                                                <span className="hidden sm:inline">Editar</span>
                                             </button>
                                             <button
                                                 type="button"
-                                                aria-label={`Eliminar pago de ${p.user?.name || 'vecino'}`}
+                                                title="Borrar pago"
+                                                aria-label={`Borrar pago de ${p.user?.name || 'vecino'}`}
                                                 onClick={() => {
                                                     if (confirm('¿Desea eliminar este registro de pago?')) {
                                                         setPaymentsList(prev => prev.filter(item => item.id !== p.id));
                                                     }
                                                 }}
-                                                className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-bold rounded-lg transition-all"
+                                                className="px-2 py-1 sm:px-2.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-xs font-bold rounded-lg transition-all shadow-xs hover:scale-105 active:scale-95 flex items-center gap-1"
                                             >
-                                                🗑️ Eliminar
+                                                <span>🗑️</span>
+                                                <span className="hidden sm:inline">Borrar</span>
                                             </button>
                                         </div>
                                     ] : [])
@@ -282,7 +607,7 @@ export default function FinancesLedger({
                         />
                     </div>
                 </div>
-            ) : (
+            ) : paymentsTabMode === 'ledger' ? (
                 <div className="space-y-6 animate-fade-in">
                     {/* Summary KPIs */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -290,7 +615,7 @@ export default function FinancesLedger({
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Ingresos Contables</p>
-                                    <h3 className="text-xl font-black text-emerald-600 dark:text-emerald-500 mt-1">${Number(financeSummary.total_incomes).toLocaleString()}</h3>
+                                    <h3 className="text-xl font-black text-emerald-600 dark:text-emerald-500 mt-1">${Number(computedFinanceSummary.total_incomes).toLocaleString('es-CL')}</h3>
                                 </div>
                                 <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-500">📥</div>
                             </div>
@@ -299,7 +624,7 @@ export default function FinancesLedger({
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Egresos Contables</p>
-                                    <h3 className="text-xl font-black text-rose-600 dark:text-rose-400 mt-1">${Number(financeSummary.total_expenses).toLocaleString()}</h3>
+                                    <h3 className="text-xl font-black text-rose-600 dark:text-rose-400 mt-1">${Number(computedFinanceSummary.total_expenses).toLocaleString('es-CL')}</h3>
                                 </div>
                                 <div className="p-2 bg-rose-500/10 rounded-xl text-rose-500">📤</div>
                             </div>
@@ -308,26 +633,89 @@ export default function FinancesLedger({
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Balance de Caja</p>
-                                    <h3 className={`text-xl font-black mt-1 ${Number(financeSummary.balance) >= 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-amber-600 dark:text-amber-500'}`}>
-                                        ${Number(financeSummary.balance).toLocaleString()}
+                                    <h3 className={`text-xl font-black mt-1 ${Number(computedFinanceSummary.balance) >= 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-amber-600 dark:text-amber-500'}`}>
+                                        ${Number(computedFinanceSummary.balance).toLocaleString('es-CL')}
                                     </h3>
                                 </div>
-                                <div className={`p-2 rounded-xl ${Number(financeSummary.balance) >= 0 ? 'bg-indigo-500/10 text-indigo-500' : 'bg-amber-500/10 text-amber-500'}`}>⚖️</div>
+                                <div className={`p-2 rounded-xl ${Number(computedFinanceSummary.balance) >= 0 ? 'bg-indigo-500/10 text-indigo-500' : 'bg-amber-500/10 text-amber-500'}`}>⚖️</div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Proportional Balance Bar Chart */}
-                    <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-2.5 text-left">
-                        <div className="flex justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                            <span>📥 Ingresos: ${Number(financeSummary.total_incomes).toLocaleString('es-CL')} ({Math.round(Number(financeSummary.total_incomes) / (Number(financeSummary.total_incomes) + Number(financeSummary.total_expenses) || 1) * 100)}%)</span>
-                            <span>📤 Egresos: ${Number(financeSummary.total_expenses).toLocaleString('es-CL')} ({Math.round(Number(financeSummary.total_expenses) / (Number(financeSummary.total_incomes) + Number(financeSummary.total_expenses) || 1) * 100)}%)</span>
-                        </div>
-                        <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-3.5 flex overflow-hidden">
-                            <div style={{ width: `${Number(financeSummary.total_incomes) / (Number(financeSummary.total_incomes) + Number(financeSummary.total_expenses) || 1) * 100}%` }} className="bg-emerald-500 h-full transition-all duration-500" />
-                            <div style={{ width: `${Number(financeSummary.total_expenses) / (Number(financeSummary.total_incomes) + Number(financeSummary.total_expenses) || 1) * 100}%` }} className="bg-rose-500 h-full transition-all duration-500" />
-                        </div>
-                    </div>
+                    {/* Financial Cashflow Ratio Bar with Centered Break-Even Point (0) */}
+                    {(() => {
+                        const incomes = Number(computedFinanceSummary.total_incomes || 0);
+                        const expenses = Number(computedFinanceSummary.total_expenses || 0);
+                        const netBalance = incomes - expenses;
+                        const isSurplus = netBalance >= 0;
+                        const totalVolume = incomes + expenses;
+                        const netPercentage = totalVolume > 0 ? ((Math.abs(netBalance) / totalVolume) * 100).toFixed(1) : '0.0';
+                        const displacementWidth = Math.min(50, Math.round((Math.abs(netBalance) / (incomes || 1)) * 50));
+
+                        return (
+                            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm space-y-4 text-left">
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                                    <div>
+                                        <h5 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                                            <span>⚖️</span> Equilibrio Financiero & Flujo Neto de Caja
+                                        </h5>
+                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                            El eje central representa el punto de equilibrio 1:1 entre ingresos y egresos.
+                                        </p>
+                                    </div>
+                                    <div className={`px-3 py-1.5 rounded-xl border text-xs font-black flex items-center gap-1.5 shadow-xs ${
+                                        isSurplus 
+                                            ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400' 
+                                            : 'bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400'
+                                    }`}>
+                                        <span>{isSurplus ? '📈' : '📉'}</span>
+                                        <span>{isSurplus ? `Superávit Neto: +$${netBalance.toLocaleString('es-CL')} (+${netPercentage}%)` : `Déficit Neto: -$${Math.abs(netBalance).toLocaleString('es-CL')} (-${netPercentage}%)`}</span>
+                                    </div>
+                                </div>
+
+                                <div className="relative pt-6 pb-2">
+                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                                        <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full border border-slate-300 dark:border-slate-700 shadow-xs z-10">
+                                            Punto 0 (Equilibrio)
+                                        </span>
+                                        <div className="w-0.5 h-10 bg-slate-300 dark:bg-slate-700" />
+                                    </div>
+
+                                    <div className="w-full bg-slate-100 dark:bg-slate-800/80 rounded-full h-5 relative flex overflow-hidden border border-slate-200 dark:border-slate-800">
+                                        <div className="w-1/2 h-full flex justify-end relative">
+                                            {!isSurplus && (
+                                                <div 
+                                                    style={{ width: `${displacementWidth}%` }} 
+                                                    className="bg-gradient-to-l from-rose-500 to-rose-600 h-full rounded-l-md shadow-inner transition-all duration-700 animate-pulse"
+                                                />
+                                            )}
+                                        </div>
+
+                                        <div className="w-1/2 h-full flex justify-start relative">
+                                            {isSurplus && (
+                                                <div 
+                                                    style={{ width: `${displacementWidth}%` }} 
+                                                    className="bg-gradient-to-r from-emerald-500 to-emerald-600 h-full rounded-r-md shadow-inner transition-all duration-700 animate-pulse"
+                                                />
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-between items-center text-[11px] font-bold text-slate-500 dark:text-slate-400 mt-2 px-1">
+                                        <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                            📥 Ingresos: ${incomes.toLocaleString('es-CL')}
+                                        </span>
+                                        <span className="text-slate-400 font-medium">
+                                            {isSurplus ? `Desplazamiento a favor: +${netPercentage}%` : `Desplazamiento en contra: -${netPercentage}%`}
+                                        </span>
+                                        <span className="text-rose-600 dark:text-rose-400 flex items-center gap-1">
+                                            📤 Egresos: ${expenses.toLocaleString('es-CL')}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })()}
 
                     {/* Dynamic Categories breakdown list with horizontal progress bars */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -341,9 +729,9 @@ export default function FinancesLedger({
                             </div>
                             <div className="space-y-3">
                                 {Object.keys(financialCatalog.incomes || {}).map(catKey => {
-                                    const amount = Number(financeSummary.incomes_by_category?.[catKey] || 0);
-                                    const totalIncomes = Number(financeSummary.total_incomes) || 1;
-                                    const percentage = Math.round((amount / totalIncomes) * 100);
+                                    const amount = Number(computedFinanceSummary.incomes_by_category?.[catKey] || 0);
+                                    const totalIncomes = Number(computedFinanceSummary.total_incomes) || 0;
+                                    const percentage = totalIncomes > 0 ? Math.round((amount / totalIncomes) * 100) : 0;
                                     const labelVal = financialCatalog.incomes[catKey]?.label || catKey;
                                     const name = formatCategoryLabel(catKey, labelVal);
                                     const icons = { gastos_comunes: '💵', multas: '⚖️', arriendo_espacios: '🎪', intereses_mora: '📈', cuotas_extraordinarias: '🚨', publicidad_convenio: '📢' };
@@ -356,7 +744,7 @@ export default function FinancesLedger({
                                             onClick={() => {
                                                 setSelectedIncomeCategory(isActive ? 'all' : catKey);
                                                 setLedgerSubTab('incomes');
-                                                setPaymentsTabMode('ledger');
+                                                setPaymentsTabMode('incomes');
                                             }}
                                             className={`w-full text-left space-y-1 p-2 rounded-xl transition-all duration-200 border hover:bg-slate-50 dark:hover:bg-slate-800 ${isActive ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-transparent border-transparent'}`}
                                         >
@@ -383,9 +771,9 @@ export default function FinancesLedger({
                             </div>
                             <div className="space-y-3">
                                 {Object.keys(financialCatalog.expenses || {}).map(catKey => {
-                                    const amount = Number(financeSummary.expenses_by_category?.[catKey] || 0);
-                                    const totalExpenses = Number(financeSummary.total_expenses) || 1;
-                                    const percentage = Math.round((amount / totalExpenses) * 100);
+                                    const amount = Number(computedFinanceSummary.expenses_by_category?.[catKey] || 0);
+                                    const totalExpenses = Number(computedFinanceSummary.total_expenses) || 0;
+                                    const percentage = totalExpenses > 0 ? Math.round((amount / totalExpenses) * 100) : 0;
                                     const labelVal = financialCatalog.expenses[catKey]?.label || catKey;
                                     const name = formatCategoryLabel(catKey, labelVal);
                                     const icons = { personal: '👷', servicios_basicos: '💧', mantencion: '🔧', seguridad: '🛡️', limpieza: '🧹', reparacion: '🔧', seguros: '☂️', administracion: '📁', fondo_reserva: '🏦', otro: '💸' };
@@ -398,7 +786,7 @@ export default function FinancesLedger({
                                             onClick={() => {
                                                 setSelectedExpenseCategory(isActive ? 'all' : catKey);
                                                 setLedgerSubTab('expenses');
-                                                setPaymentsTabMode('ledger');
+                                                setPaymentsTabMode('expenses');
                                             }}
                                             className={`w-full text-left space-y-1 p-2 rounded-xl transition-all duration-200 border hover:bg-slate-50 dark:hover:bg-slate-800 ${isActive ? 'bg-rose-500/10 border-rose-500/30' : 'bg-transparent border-transparent'}`}
                                         >
@@ -415,57 +803,141 @@ export default function FinancesLedger({
                             </div>
                         </div>
                     </div>
-
-                    {/* Sub-tabs switch (Incomes vs Expenses CRUD lists) */}
-                    <div className="flex gap-2.5">
-                        <button
-                            onClick={() => setLedgerSubTab('incomes')}
-                            className={`px-4.5 py-2 rounded-xl text-xs font-extrabold transition-all border ${ledgerSubTab === 'incomes' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 shadow-sm' : 'bg-slate-100 dark:bg-slate-800/60 hover:bg-slate-200 border-transparent text-slate-500 dark:text-slate-400'}`}
-                        >
-                            📥 Libro de Ingresos Contables
-                        </button>
-                        <button
-                            onClick={() => setLedgerSubTab('expenses')}
-                            className={`px-4.5 py-2 rounded-xl text-xs font-extrabold transition-all border ${ledgerSubTab === 'expenses' ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30 shadow-sm' : 'bg-slate-100 dark:bg-slate-800/60 hover:bg-slate-200 border-transparent text-slate-500 dark:text-slate-400'}`}
-                        >
-                            📤 Libro de Egresos Contables
-                        </button>
+                </div>
+            ) : paymentsTabMode === 'incomes' ? (
+                /* ================= INCOME SECTION ================= */
+                <div className="space-y-6 max-w-full overflow-hidden text-left">
+                    {/* KPI Cards Ingresos */}
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+                            <div className="flex justify-between items-center text-[10px] font-extrabold uppercase text-slate-500 dark:text-slate-400">
+                                <span>Total Ingresos Libro</span>
+                                <span className="text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full font-bold">Libro Diario</span>
+                            </div>
+                            <div className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-2">
+                                ${totalIncomeAmount.toLocaleString('es-CL')} <span className="text-xs text-slate-400 font-medium">CLP</span>
+                            </div>
+                        </div>
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+                            <div className="flex justify-between items-center text-[10px] font-extrabold uppercase text-slate-500 dark:text-slate-400">
+                                <span>Gastos Comunes</span>
+                                <span className="text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full font-bold">GGCC</span>
+                            </div>
+                            <div className="text-xl font-black text-indigo-600 dark:text-indigo-400 mt-2">
+                                ${totalIncomeGGCC.toLocaleString('es-CL')} <span className="text-xs text-slate-400 font-medium">CLP</span>
+                            </div>
+                        </div>
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+                            <div className="flex justify-between items-center text-[10px] font-extrabold uppercase text-slate-500 dark:text-slate-400">
+                                <span>Multas & Espacios</span>
+                                <span className="text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full font-bold">Extraordinarios</span>
+                            </div>
+                            <div className="text-xl font-black text-amber-600 dark:text-amber-400 mt-2">
+                                ${totalIncomeOther.toLocaleString('es-CL')} <span className="text-xs text-slate-400 font-medium">CLP</span>
+                            </div>
+                        </div>
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+                            <div className="flex justify-between items-center text-[10px] font-extrabold uppercase text-slate-500 dark:text-slate-400">
+                                <span>Asientos Contables</span>
+                                <span className="text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full font-bold">Registros</span>
+                            </div>
+                            <div className="text-xl font-black text-slate-900 dark:text-white mt-2">
+                                {finalFilteredIncomes.length} <span className="text-xs text-slate-400 font-medium">Items</span>
+                            </div>
+                        </div>
                     </div>
 
-                    {loadingFinances ? (
-                        <div className="flex items-center justify-center py-16 gap-3">
-                            <span className="animate-spin text-xl">⏳</span>
-                            <span className="text-xs font-bold text-slate-400">Actualizando libro contable...</span>
-                        </div>
-                    ) : ledgerSubTab === 'incomes' ? (
-                        /* ================= INCOME SECTION ================= */
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2 text-left">
-                                    <span className="text-xs font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Historial de Ingresos Contables ({filteredIncomes.length} / {incomesList.length})</span>
-                                    {selectedIncomeCategory !== 'all' && (
-                                        <button
-                                            type="button"
-                                            onClick={() => setSelectedIncomeCategory('all')}
-                                            className="px-2 py-0.5 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-600 dark:text-emerald-400 text-[10px] font-black rounded-lg transition-all"
-                                        >
-                                            Limpiar Filtro ×
-                                        </button>
-                                    )}
-                                </div>
-                                {!readOnly && (
-                                    <button
-                                        onClick={() => {
-                                            setEditingIncome(null);
-                                            setNewIncomeForm({ category: '', subcategory: '', amount: '', date: new Date().toISOString().substring(0, 10), description: '', property_id: '', user_id: '', distributable_method: 'prorated', tower_id: '' });
-                                            setShowAddIncomeForm(!showAddIncomeForm);
-                                        }}
-                                        className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all"
-                                    >
-                                        {showAddIncomeForm ? 'Cerrar Formulario' : '➕ Registrar Ingreso'}
-                                    </button>
-                                )}
+                    {/* Toolbar de Filtros Interactivos Ingresos */}
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 text-left">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:flex items-center gap-2 flex-1">
+                            {/* Buscador */}
+                            <div className="relative flex-1 min-w-[180px]">
+                                <input
+                                    type="text"
+                                    value={incomeSearch}
+                                    onChange={(e) => setIncomeSearch(e.target.value)}
+                                    placeholder="🔍 Descripción, subcategoría, Depto..."
+                                    className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl px-3 py-1.5 text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                                />
                             </div>
+
+                            {/* Categoría */}
+                            <select
+                                value={selectedIncomeCategory}
+                                onChange={(e) => setSelectedIncomeCategory(e.target.value)}
+                                className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-white focus:outline-none cursor-pointer"
+                            >
+                                <option value="all">🔍 Todas las Categorías de Ingresos</option>
+                                {Object.entries(financialCatalog.incomes || {}).map(([catKey, catObj]) => (
+                                    <option key={catKey} value={catKey}>
+                                        {formatCategoryLabel(catKey, catObj.label)}
+                                    </option>
+                                ))}
+                            </select>
+
+                            {/* Fechas */}
+                            <div className="flex items-center gap-1">
+                                <span className="text-[10px] text-slate-400 font-bold uppercase">Desde:</span>
+                                <input
+                                    type="date"
+                                    value={incomeStartDate}
+                                    onChange={(e) => setIncomeStartDate(e.target.value)}
+                                    className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl px-2 py-1.5 text-xs font-medium text-slate-800 dark:text-white"
+                                />
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <span className="text-[10px] text-slate-400 font-bold uppercase">Hasta:</span>
+                                <input
+                                    type="date"
+                                    value={incomeEndDate}
+                                    onChange={(e) => setIncomeEndDate(e.target.value)}
+                                    className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl px-2 py-1.5 text-xs font-medium text-slate-800 dark:text-white"
+                                />
+                            </div>
+
+                            {/* Orden */}
+                            <select
+                                value={incomeSortBy}
+                                onChange={(e) => setIncomeSortBy(e.target.value)}
+                                className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-white focus:outline-none cursor-pointer"
+                            >
+                                <option value="date_desc">📅 Más Recientes</option>
+                                <option value="date_asc">📅 Más Antiguas</option>
+                                <option value="amount_desc">💰 Mayor Monto</option>
+                                <option value="amount_asc">💰 Menor Monto</option>
+                            </select>
+
+                            {/* Limpiar */}
+                            {(incomeSearch || selectedIncomeCategory !== 'all' || incomeStartDate || incomeEndDate || incomeSortBy !== 'date_desc') && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setIncomeSearch('');
+                                        setSelectedIncomeCategory('all');
+                                        setIncomeStartDate('');
+                                        setIncomeEndDate('');
+                                        setIncomeSortBy('date_desc');
+                                    }}
+                                    className="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-extrabold rounded-xl border border-rose-500/30 transition-all whitespace-nowrap"
+                                >
+                                    Limpiar Filtros ×
+                                </button>
+                            )}
+                        </div>
+
+                        {!readOnly && (
+                            <button
+                                onClick={() => {
+                                    setEditingIncome(null);
+                                    setNewIncomeForm({ category: '', subcategory: '', amount: '', date: new Date().toISOString().substring(0, 10), description: '', property_id: '', user_id: '', distributable_method: 'prorated', tower_id: '' });
+                                    setShowAddIncomeForm(!showAddIncomeForm);
+                                }}
+                                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all whitespace-nowrap shrink-0"
+                            >
+                                {showAddIncomeForm ? 'Cerrar Form' : '➕ Registrar Ingreso'}
+                            </button>
+                        )}
+                    </div>
 
                             {!readOnly && showAddIncomeForm && (
                                 <form onSubmit={handleSaveIncome} className="bg-slate-50 dark:bg-slate-900/60 p-6 rounded-2xl border border-gray-200 dark:border-slate-800 space-y-4 max-w-2xl text-left">
@@ -643,23 +1115,37 @@ export default function FinancesLedger({
                                 </form>
                             )}
 
-                            <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+                            <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-x-auto max-w-full shadow-sm">
                                 <SimpleTable
-                                    headers={['Categoría', 'Subcategoría', 'Monto', 'Fecha', 'Detalles', 'Distribución / Torre', 'Unidad/Vecino', ...(!readOnly ? ['Acciones'] : [])]}
-                                    rows={filteredIncomes.map(inc => {
+                                    headers={['Categoría / Subrubro', 'Monto', 'Fecha', 'Detalles', 'Distribución / Torre', 'Unidad / Vecino', ...(!readOnly ? ['Acciones'] : [])]}
+                                    rows={finalFilteredIncomes.map(inc => {
                                         const labelVal = financialCatalog.incomes?.[inc.category]?.label || inc.category;
                                         const catName = formatCategoryLabel(inc.category, labelVal);
-                                        const subName = inc.subcategory || 'N/A';
+                                        const subName = inc.subcategory || 'Sin Subrubro';
                                         
                                         const icons = { gastos_comunes: '💵', multas: '⚖️', arriendo_espacios: '🎪', intereses_mora: '📈', cuotas_extraordinarias: '🚨', publicidad_convenios: '📢' };
                                         const icon = icons[inc.category] || '💰';
 
+                                        const parseDateStr = (dStr) => {
+                                            if (!dStr) return '—';
+                                            const cleanStr = String(dStr).substring(0, 10);
+                                            const parts = cleanStr.split('-');
+                                            if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                                            return cleanStr;
+                                        };
+
                                         return {
                                             cells: [
-                                                <span className="font-extrabold text-slate-800 dark:text-white flex items-center gap-1.5" key={`cat-${inc.id}`}>{icon} {catName}</span>,
-                                                <span className="font-semibold text-slate-500 dark:text-slate-400" key={`sub-${inc.id}`}>{subName}</span>,
-                                                <span className="font-bold text-emerald-600 dark:text-emerald-500" key={`amt-${inc.id}`}>${Number(inc.amount).toLocaleString()}</span>,
-                                                <span key={`date-${inc.id}`}>{new Date(inc.date + 'T12:00:00').toLocaleDateString('es-CL')}</span>,
+                                                <div key={`cat-${inc.id}`} className="space-y-0.5 text-left py-0.5">
+                                                    <span className="font-extrabold text-slate-800 dark:text-white text-xs flex items-center gap-1.5 whitespace-nowrap">
+                                                        {icon} {catName}
+                                                    </span>
+                                                    <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-400 block whitespace-nowrap">
+                                                        {subName}
+                                                    </span>
+                                                </div>,
+                                                <span className="font-extrabold text-emerald-600 dark:text-emerald-400 font-mono text-xs" key={`amt-${inc.id}`}>${Number(inc.amount).toLocaleString('es-CL')}</span>,
+                                                <span className="font-mono text-xs text-slate-600 dark:text-slate-300" key={`date-${inc.id}`}>{parseDateStr(inc.date)}</span>,
                                                 <span className="text-xs truncate max-w-xs block text-slate-500 dark:text-slate-400" title={inc.description} key={`desc-${inc.id}`}>{inc.description || '—'}</span>,
                                                 <div key={`dist-${inc.id}`}>
                                                     <span className="capitalize font-semibold block text-xs">
@@ -672,14 +1158,26 @@ export default function FinancesLedger({
                                                     {inc.tower && <span className="text-[10px] text-indigo-500 font-bold block">{inc.tower.name}</span>}
                                                 </div>,
                                                 <div key={`unit-${inc.id}`}>
-                                                    {inc.property && <span className="font-bold block text-xs">Depto #{inc.property.number}</span>}
-                                                    {inc.user && <span className="text-[10px] text-slate-400 block">{inc.user.name}</span>}
-                                                    {!inc.property && !inc.user && <span className="text-slate-400 text-[10px]">—</span>}
+                                                    {inc.property ? (
+                                                        <>
+                                                            <span className="font-bold block text-xs text-slate-900 dark:text-white">Depto #{inc.property.number}</span>
+                                                            {inc.user && <span className="text-[10px] text-slate-400 block">{inc.user.name}</span>}
+                                                        </>
+                                                    ) : inc.tower ? (
+                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-extrabold border border-indigo-500/20">
+                                                            🏢 Gasto General {inc.tower.name}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 text-[10px] font-extrabold border border-slate-200 dark:border-slate-700">
+                                                            🏙️ Gasto General Comunidad
+                                                        </span>
+                                                    )}
                                                 </div>,
                                                 ...(!readOnly ? [
-                                                    <div className="flex items-center gap-2 justify-end" key={`act-${inc.id}`}>
+                                                    <div className="flex items-center justify-center gap-1.5" key={`act-${inc.id}`}>
                                                         <button
                                                             type="button"
+                                                            title="Editar ingreso"
                                                             aria-label={`Editar ingreso ${inc.description || inc.category}`}
                                                             onClick={() => {
                                                                 setEditingIncome(inc);
@@ -696,17 +1194,20 @@ export default function FinancesLedger({
                                                                 });
                                                                 setShowAddIncomeForm(true);
                                                             }}
-                                                            className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-[10px] font-bold rounded-lg transition-all"
+                                                            className="px-2 py-1 sm:px-2.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-xs font-bold rounded-lg transition-all shadow-xs hover:scale-105 active:scale-95 flex items-center gap-1"
                                                         >
-                                                            ✏️ Editar
+                                                            <span>✏️</span>
+                                                            <span className="hidden sm:inline">Editar</span>
                                                         </button>
                                                         <button
                                                             type="button"
-                                                            aria-label={`Eliminar ingreso ${inc.description || inc.category}`}
+                                                            title="Borrar ingreso"
+                                                            aria-label={`Borrar ingreso ${inc.description || inc.category}`}
                                                             onClick={() => handleDeleteIncome(inc.id)}
-                                                            className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-bold rounded-lg transition-all"
+                                                            className="px-2 py-1 sm:px-2.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-xs font-bold rounded-lg transition-all shadow-xs hover:scale-105 active:scale-95 flex items-center gap-1"
                                                         >
-                                                            🗑️ Eliminar
+                                                            <span>🗑️</span>
+                                                            <span className="hidden sm:inline">Borrar</span>
                                                         </button>
                                                     </div>
                                                 ] : [])
@@ -717,229 +1218,493 @@ export default function FinancesLedger({
                                 />
                             </div>
                         </div>
-                    ) : (
-                        /* ================= EXPENSE SECTION ================= */
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2 text-left">
-                                    <span className="text-xs font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Historial de Egresos Contables ({filteredExpenses.length} / {expensesList.length})</span>
-                                    {selectedExpenseCategory !== 'all' && (
-                                        <button
-                                            type="button"
-                                            onClick={() => setSelectedExpenseCategory('all')}
-                                            className="px-2 py-0.5 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-600 dark:text-rose-500 text-[10px] font-black rounded-lg transition-all"
-                                        >
-                                            Limpiar Filtro ×
-                                        </button>
-                                    )}
-                                </div>
-                                {!readOnly && (
-                                    <button
-                                        onClick={() => {
-                                            setEditingExpense(null);
-                                            setNewExpenseForm({ category: '', subcategory: '', amount: '', date: new Date().toISOString().substring(0, 10), description: '', property_id: '', user_id: '', distributable_method: 'prorated', tower_id: '' });
-                                            setShowAddExpenseForm(!showAddExpenseForm);
-                                        }}
-                                        className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl shadow transition-all"
-                                    >
-                                        {showAddExpenseForm ? 'Cerrar Formulario' : '➕ Registrar Egreso'}
-                                    </button>
-                                )}
+            ) : paymentsTabMode === 'expenses' ? (
+                /* ================= EXPENSE SECTION ================= */
+                <div className="space-y-6 max-w-full overflow-hidden text-left">
+                    {/* KPI Cards Egresos */}
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+                            <div className="flex justify-between items-center text-[10px] font-extrabold uppercase text-slate-500 dark:text-slate-400">
+                                <span>Total Egresos Libro</span>
+                                <span className="text-rose-600 dark:text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full font-bold">Operación</span>
+                            </div>
+                            <div className="text-xl font-black text-rose-600 dark:text-rose-500 mt-2">
+                                ${totalExpenseAmount.toLocaleString('es-CL')} <span className="text-xs text-slate-400 font-medium">CLP</span>
+                            </div>
+                        </div>
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+                            <div className="flex justify-between items-center text-[10px] font-extrabold uppercase text-slate-500 dark:text-slate-400">
+                                <span>Servicios & Personal</span>
+                                <span className="text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full font-bold">Fijos</span>
+                            </div>
+                            <div className="text-xl font-black text-indigo-600 dark:text-indigo-400 mt-2">
+                                ${totalExpenseOps.toLocaleString('es-CL')} <span className="text-xs text-slate-400 font-medium">CLP</span>
+                            </div>
+                        </div>
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+                            <div className="flex justify-between items-center text-[10px] font-extrabold uppercase text-slate-500 dark:text-slate-400">
+                                <span>Mantención & Obras</span>
+                                <span className="text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full font-bold">Variables</span>
+                            </div>
+                            <div className="text-xl font-black text-amber-600 dark:text-amber-400 mt-2">
+                                ${totalExpenseMaint.toLocaleString('es-CL')} <span className="text-xs text-slate-400 font-medium">CLP</span>
+                            </div>
+                        </div>
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+                            <div className="flex justify-between items-center text-[10px] font-extrabold uppercase text-slate-500 dark:text-slate-400">
+                                <span>Comprobantes / Facturas</span>
+                                <span className="text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full font-bold">Facturas</span>
+                            </div>
+                            <div className="text-xl font-black text-slate-900 dark:text-white mt-2">
+                                {finalFilteredExpenses.length} <span className="text-xs text-slate-400 font-medium">Documentos</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Toolbar de Filtros Interactivos Egresos */}
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 text-left">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:flex items-center gap-2 flex-1">
+                            {/* Buscador */}
+                            <div className="relative flex-1 min-w-[180px]">
+                                <input
+                                    type="text"
+                                    value={expenseSearch}
+                                    onChange={(e) => setExpenseSearch(e.target.value)}
+                                    placeholder="🔍 Proveedor, N° Factura, detalle..."
+                                    className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl px-3 py-1.5 text-xs font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-rose-500 focus:outline-none"
+                                />
                             </div>
 
+                            {/* Categoría */}
+                            <select
+                                value={selectedExpenseCategory}
+                                onChange={(e) => setSelectedExpenseCategory(e.target.value)}
+                                className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-white focus:outline-none cursor-pointer"
+                            >
+                                <option value="all">🔍 Todas las Categorías de Egresos</option>
+                                {Object.entries(financialCatalog.expenses || {}).map(([catKey, catObj]) => (
+                                    <option key={catKey} value={catKey}>
+                                        {formatCategoryLabel(catKey, catObj.label)}
+                                    </option>
+                                ))}
+                            </select>
+
+                            {/* Fechas */}
+                            <div className="flex items-center gap-1">
+                                <span className="text-[10px] text-slate-400 font-bold uppercase">Desde:</span>
+                                <input
+                                    type="date"
+                                    value={expenseStartDate}
+                                    onChange={(e) => setExpenseStartDate(e.target.value)}
+                                    className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl px-2 py-1.5 text-xs font-medium text-slate-800 dark:text-white"
+                                />
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <span className="text-[10px] text-slate-400 font-bold uppercase">Hasta:</span>
+                                <input
+                                    type="date"
+                                    value={expenseEndDate}
+                                    onChange={(e) => setExpenseEndDate(e.target.value)}
+                                    className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl px-2 py-1.5 text-xs font-medium text-slate-800 dark:text-white"
+                                />
+                            </div>
+
+                            {/* Orden */}
+                            <select
+                                value={expenseSortBy}
+                                onChange={(e) => setExpenseSortBy(e.target.value)}
+                                className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-white focus:outline-none cursor-pointer"
+                            >
+                                <option value="date_desc">📅 Más Recientes</option>
+                                <option value="date_asc">📅 Más Antiguas</option>
+                                <option value="amount_desc">💰 Mayor Monto</option>
+                                <option value="amount_asc">💰 Menor Monto</option>
+                            </select>
+
+                            {/* Limpiar */}
+                            {(expenseSearch || selectedExpenseCategory !== 'all' || expenseStartDate || expenseEndDate || expenseSortBy !== 'date_desc') && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setExpenseSearch('');
+                                        setSelectedExpenseCategory('all');
+                                        setExpenseStartDate('');
+                                        setExpenseEndDate('');
+                                        setExpenseSortBy('date_desc');
+                                    }}
+                                    className="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-extrabold rounded-xl border border-rose-500/30 transition-all whitespace-nowrap"
+                                >
+                                    Limpiar Filtros ×
+                                </button>
+                            )}
+                        </div>
+
+                        {!readOnly && (
+                            <button
+                                onClick={() => {
+                                    setEditingExpense(null);
+                                    setExpenseStep(1);
+                                    setNewExpenseForm({ category: '', subcategory: '', amount: '', date: new Date().toISOString().substring(0, 10), description: '', property_id: '', user_id: '', distributable_method: 'prorated', tower_id: '' });
+                                    setShowAddExpenseForm(!showAddExpenseForm);
+                                }}
+                                className="px-3.5 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl shadow transition-all whitespace-nowrap shrink-0"
+                            >
+                                {showAddExpenseForm ? 'Cerrar Form' : '➕ Registrar Egreso'}
+                            </button>
+                        )}
+                    </div>
+
                             {!readOnly && showAddExpenseForm && (
-                                <form onSubmit={handleSaveExpense} className="bg-slate-50 dark:bg-slate-900/60 p-6 rounded-2xl border border-gray-200 dark:border-slate-800 space-y-4 max-w-2xl text-left">
-                                    <h5 className="text-xs font-bold text-rose-600 dark:text-rose-500 uppercase tracking-wide">{editingExpense ? '✏️ Editar Egreso Contable' : '📤 Registrar Nuevo Egreso Contable'}</h5>
-                                    
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <form onSubmit={handleSaveExpense} className="bg-slate-50 dark:bg-slate-900/90 p-6 rounded-2xl border border-gray-200 dark:border-slate-800 space-y-5 max-w-3xl w-full max-w-full overflow-hidden text-left shadow-xl animate-fade-in relative">
+                                    {/* Header & Stepper estilo v2 */}
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-200 dark:border-slate-800">
                                         <div>
-                                            <label htmlFor="expense-category" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Categoría Financiera</label>
-                                            <select
-                                                id="expense-category"
-                                                required
-                                                value={newExpenseForm.category}
-                                                onChange={(e) => setNewExpenseForm(prev => ({ ...prev, category: e.target.value, subcategory: '' }))}
-                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
-                                            >
-                                                <option value="">Seleccione Categoría...</option>
-                                                {Object.entries(financialCatalog.expenses || {}).map(([key, obj]) => (
-                                                    <option key={key} value={key}>{formatCategoryLabel(key, obj.label)}</option>
-                                                ))}
-                                            </select>
+                                            <h5 className="text-sm font-extrabold text-rose-600 dark:text-rose-500 uppercase tracking-wider flex items-center gap-2">
+                                                <span>📤</span> {editingExpense ? 'Editar Egreso Contable (Wizard v2)' : 'Registrar Nuevo Egreso (Wizard v2)'}
+                                            </h5>
+                                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                                Flujo guiado de 3 pasos idéntico al prototipo oficial de administración
+                                            </p>
                                         </div>
 
-                                        <div>
-                                            <label htmlFor="expense-subcategory" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Subcategoría Específica</label>
-                                            <select
-                                                id="expense-subcategory"
-                                                required
-                                                value={newExpenseForm.subcategory}
-                                                onChange={(e) => setNewExpenseForm(prev => ({ ...prev, subcategory: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
-                                                disabled={!newExpenseForm.category}
-                                            >
-                                                <option value="">Seleccione Subcategoría...</option>
-                                                {Object.entries(financialCatalog.expenses?.[newExpenseForm.category]?.subcategories || {}).map(([subKey, subName]) => (
-                                                    <option key={subKey} value={subName}>{subName}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div>
-                                            <label htmlFor="expense-amount" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto ($ CLP)</label>
-                                            <input
-                                                id="expense-amount"
-                                                type="number"
-                                                required
-                                                value={newExpenseForm.amount}
-                                                onChange={(e) => setNewExpenseForm(prev => ({ ...prev, amount: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
-                                                placeholder="Monto"
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label htmlFor="expense-date" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Fecha Registro</label>
-                                            <input
-                                                id="expense-date"
-                                                type="date"
-                                                required
-                                                value={newExpenseForm.date}
-                                                onChange={(e) => setNewExpenseForm(prev => ({ ...prev, date: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label htmlFor="expense-property" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Unidad (Opcional)</label>
-                                            <select
-                                                id="expense-property"
-                                                value={newExpenseForm.property_id}
-                                                onChange={(e) => setNewExpenseForm(prev => ({ ...prev, property_id: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
-                                            >
-                                                <option value="">Ninguna...</option>
-                                                {adminFilteredProperties.map(p => (
-                                                    <option key={p.id} value={p.id}>Depto #{p.number}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label htmlFor="expense-user" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Personal / Receptor (Opcional)</label>
-                                            <select
-                                                id="expense-user"
-                                                value={newExpenseForm.user_id}
-                                                onChange={(e) => setNewExpenseForm(prev => ({ ...prev, user_id: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
-                                            >
-                                                <option value="">Ninguno...</option>
-                                                {adminFilteredUsers.map(u => (
-                                                    <option key={u.id} value={u.id}>{u.name}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-
-                                        <div>
-                                            <label htmlFor="expense-description" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Descripción / Detalles</label>
-                                            <input
-                                                id="expense-description"
-                                                type="text"
-                                                value={newExpenseForm.description}
-                                                onChange={(e) => setNewExpenseForm(prev => ({ ...prev, description: e.target.value }))}
-                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
-                                                placeholder="Comentarios adicionales o detalle del egreso"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label htmlFor="expense-dist-method" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Método de Distribución</label>
-                                            <select
-                                                id="expense-dist-method"
-                                                value={newExpenseForm.distributable_method || 'prorated'}
-                                                onChange={(e) => setNewExpenseForm(prev => ({ 
-                                                    ...prev, 
-                                                    distributable_method: e.target.value,
-                                                    tower_id: e.target.value === 'tower_specific' ? prev.tower_id : '' 
-                                                }))}
-                                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
-                                            >
-                                                <option value="prorated">Prorrateado (Alícuota)</option>
-                                                <option value="equal">Partes Iguales</option>
-                                                <option value="tower_specific">Por Torre Específica</option>
-                                                <option value="unit_specific">Unidad Específica</option>
-                                                <option value="exempt">Exento</option>
-                                            </select>
-                                        </div>
-
-                                        {newExpenseForm.distributable_method === 'tower_specific' ? (
-                                            <div>
-                                                <label htmlFor="expense-tower" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Torre Específica</label>
-                                                <select
-                                                    id="expense-tower"
-                                                    required
-                                                    value={newExpenseForm.tower_id || ''}
-                                                    onChange={(e) => setNewExpenseForm(prev => ({ ...prev, tower_id: e.target.value }))}
-                                                    className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                        {/* Stepper circular 1 - 2 - 3 */}
+                                        <div className="flex items-center gap-2">
+                                            {[
+                                                { num: 1, label: 'Clasificación' },
+                                                { num: 2, label: 'Referencias' },
+                                                { num: 3, label: 'Prorrateo & Adjunto' }
+                                            ].map((s) => (
+                                                <button
+                                                    key={s.num}
+                                                    type="button"
+                                                    onClick={() => setExpenseStep(s.num)}
+                                                    className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold transition-all ${
+                                                        expenseStep === s.num
+                                                            ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30 scale-105'
+                                                            : expenseStep > s.num
+                                                            ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                                                            : 'bg-gray-200 dark:bg-slate-800 text-gray-500 dark:text-slate-400'
+                                                    }`}
                                                 >
-                                                    <option value="">Seleccione Torre...</option>
-                                                    {towersList.map(t => (
-                                                        <option key={t.id} value={t.id}>{t.name}</option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                        ) : (
-                                            <div className="opacity-40 pointer-events-none">
-                                                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Torre Específica (Inactivo)</label>
-                                                <select className="w-full bg-slate-100 dark:bg-slate-900 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-400 focus:outline-none" disabled>
-                                                    <option>No aplica para este método</option>
-                                                </select>
-                                            </div>
-                                        )}
+                                                    <span className={`w-4 h-4 rounded-full text-[10px] flex items-center justify-center font-black ${
+                                                        expenseStep === s.num ? 'bg-white text-rose-600' : 'bg-slate-300 dark:bg-slate-700'
+                                                    }`}>
+                                                        {expenseStep > s.num ? '✓' : s.num}
+                                                    </span>
+                                                    <span>{s.label}</span>
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
 
-                                    <div className="flex gap-2">
-                                        <button type="submit" className="px-4 py-2 bg-rose-650 hover:bg-rose-600 text-white font-bold text-xs rounded-xl shadow">
-                                            {editingExpense ? 'Guardar Cambios' : 'Registrar'}
-                                        </button>
+                                    {/* PASO 1: CLASIFICACIÓN Y MONTO */}
+                                    {expenseStep === 1 && (
+                                        <div className="space-y-4 animate-fade-in">
+                                            <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-3 text-xs text-rose-600 dark:text-rose-400 font-medium">
+                                                <strong>Paso 1 de 3:</strong> Ingrese la categoría contable, el sub-rubro y el monto en CLP.
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label htmlFor="expense-category" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Categoría Financiera *</label>
+                                                    <select
+                                                        id="expense-category"
+                                                        required
+                                                        value={newExpenseForm.category}
+                                                        onChange={(e) => setNewExpenseForm(prev => ({ ...prev, category: e.target.value, subcategory: '' }))}
+                                                        className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:ring-2 focus:ring-rose-500"
+                                                    >
+                                                        <option value="">Seleccione Categoría...</option>
+                                                        {Object.entries(financialCatalog.expenses || {}).map(([key, obj]) => (
+                                                            <option key={key} value={key}>{formatCategoryLabel(key, obj.label)}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+
+                                                <div>
+                                                    <label htmlFor="expense-subcategory" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Subcategoría Específica *</label>
+                                                    <select
+                                                        id="expense-subcategory"
+                                                        required
+                                                        value={newExpenseForm.subcategory}
+                                                        onChange={(e) => setNewExpenseForm(prev => ({ ...prev, subcategory: e.target.value }))}
+                                                        className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:ring-2 focus:ring-rose-500"
+                                                        disabled={!newExpenseForm.category}
+                                                    >
+                                                        <option value="">Seleccione Subcategoría...</option>
+                                                        {Object.entries(financialCatalog.expenses?.[newExpenseForm.category]?.subcategories || {}).map(([subKey, subName]) => (
+                                                            <option key={subKey} value={subName}>{subName}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label htmlFor="expense-amount" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto Total ($ CLP) *</label>
+                                                    <input
+                                                        id="expense-amount"
+                                                        type="number"
+                                                        required
+                                                        value={newExpenseForm.amount}
+                                                        onChange={(e) => setNewExpenseForm(prev => ({ ...prev, amount: e.target.value }))}
+                                                        className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-sm font-bold px-3 py-2 text-rose-600 dark:text-rose-400 focus:ring-2 focus:ring-rose-500"
+                                                        placeholder="Ej: 150000"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label htmlFor="expense-date" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Fecha Registro *</label>
+                                                    <input
+                                                        id="expense-date"
+                                                        type="date"
+                                                        required
+                                                        value={newExpenseForm.date}
+                                                        onChange={(e) => setNewExpenseForm(prev => ({ ...prev, date: e.target.value }))}
+                                                        className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:ring-2 focus:ring-rose-500"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* PASO 2: REFERENCIAS Y ASIGNACIÓN */}
+                                    {expenseStep === 2 && (
+                                        <div className="space-y-4 animate-fade-in">
+                                            <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-3 text-xs text-indigo-600 dark:text-indigo-400 font-medium">
+                                                <strong>Paso 2 de 3:</strong> Configure la asignación del egreso y detalles de respaldos.
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label htmlFor="expense-dist-method" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Método de Distribución *</label>
+                                                    <select
+                                                        id="expense-dist-method"
+                                                        value={newExpenseForm.distributable_method || 'prorated'}
+                                                        onChange={(e) => setNewExpenseForm(prev => ({ 
+                                                            ...prev, 
+                                                            distributable_method: e.target.value,
+                                                            tower_id: e.target.value === 'tower_specific' ? prev.tower_id : '' 
+                                                        }))}
+                                                        className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500"
+                                                    >
+                                                        <option value="prorated">Global Prorrateado (Por Alícuota)</option>
+                                                        <option value="equal">Partes Iguales entre Todas las Unidades</option>
+                                                        <option value="tower_specific">Torre Específica (Solo esa Torre)</option>
+                                                        <option value="unit_specific">Unidad Específica (Cobro Directo)</option>
+                                                        <option value="exempt">Exento de Cobro</option>
+                                                    </select>
+                                                </div>
+
+                                                {newExpenseForm.distributable_method === 'tower_specific' && (
+                                                    <div>
+                                                        <label htmlFor="expense-tower" className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider block mb-1">Torre Destino *</label>
+                                                        <select
+                                                            id="expense-tower"
+                                                            required
+                                                            value={newExpenseForm.tower_id || ''}
+                                                            onChange={(e) => setNewExpenseForm(prev => ({ ...prev, tower_id: e.target.value }))}
+                                                            className="w-full bg-white dark:bg-slate-950 border border-indigo-500/50 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500"
+                                                        >
+                                                            <option value="">Seleccione Torre...</option>
+                                                            {towersList.map(t => (
+                                                                <option key={t.id} value={t.id}>{t.name}</option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+                                                )}
+
+                                                {newExpenseForm.distributable_method === 'unit_specific' && (
+                                                    <div>
+                                                        <label htmlFor="expense-property" className="text-[10px] text-amber-400 font-bold uppercase tracking-wider block mb-1">Unidad Destino *</label>
+                                                        <select
+                                                            id="expense-property"
+                                                            required
+                                                            value={newExpenseForm.property_id || ''}
+                                                            onChange={(e) => setNewExpenseForm(prev => ({ ...prev, property_id: e.target.value }))}
+                                                            className="w-full bg-white dark:bg-slate-950 border border-amber-500/50 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:ring-2 focus:ring-amber-500"
+                                                        >
+                                                            <option value="">Seleccione Unidad...</option>
+                                                            {adminFilteredProperties.map(p => (
+                                                                <option key={p.id} value={p.id}>Depto #{p.number}</option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label htmlFor="expense-user" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Proveedor / Personal Asignado</label>
+                                                    <select
+                                                        id="expense-user"
+                                                        value={newExpenseForm.user_id}
+                                                        onChange={(e) => setNewExpenseForm(prev => ({ ...prev, user_id: e.target.value }))}
+                                                        className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500"
+                                                    >
+                                                        <option value="">Ninguno / Proveedor Externo...</option>
+                                                        {adminFilteredUsers.map(u => (
+                                                            <option key={u.id} value={u.id}>{u.name}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+
+                                                <div>
+                                                    <label htmlFor="expense-description" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Observaciones / Nº Factura</label>
+                                                    <input
+                                                        id="expense-description"
+                                                        type="text"
+                                                        value={newExpenseForm.description}
+                                                        onChange={(e) => setNewExpenseForm(prev => ({ ...prev, description: e.target.value }))}
+                                                        className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500"
+                                                        placeholder="Nº Factura, proveedor o detalle de compra"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* PASO 3: PRORRATEO EN CUOTAS Y ADJUNTO DE RESPALDO (EXCLUSIVO V2) */}
+                                    {expenseStep === 3 && (
+                                        <div className="space-y-4 animate-fade-in">
+                                            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                                                <strong>Paso 3 de 3:</strong> Prorrateo mensual de cuotas y adjunto del comprobante (Estilo Prototipo v2).
+                                            </div>
+
+                                            {/* Conmutador 1: Dividir en Cuotas */}
+                                            <div className="bg-white dark:bg-slate-950 p-4 rounded-xl border border-gray-200 dark:border-slate-800 flex items-center justify-between">
+                                                <div>
+                                                    <span className="text-xs font-extrabold text-slate-800 dark:text-white block">Dividir en Cuotas Mensuales (Diferir Cobro)</span>
+                                                    <span className="text-[11px] text-slate-400 block">Prorratea este egreso entre N meses de cobro continuo</span>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setIsInstallmentsActive(!isInstallmentsActive)}
+                                                    className={`w-12 h-6 rounded-full p-1 transition-colors ${isInstallmentsActive ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-slate-800'}`}
+                                                >
+                                                    <div className={`w-4 h-4 rounded-full bg-white transition-transform ${isInstallmentsActive ? 'translate-x-6' : 'translate-x-0'}`} />
+                                                </button>
+                                            </div>
+
+                                            {isInstallmentsActive && (
+                                                <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-xl grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                                                    <div>
+                                                        <label htmlFor="installments-count" className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider block mb-1">Número de Cuotas Mensuales</label>
+                                                        <select
+                                                            id="installments-count"
+                                                            value={installmentsCount}
+                                                            onChange={(e) => setInstallmentsCount(Number(e.target.value))}
+                                                            className="w-full bg-white dark:bg-slate-950 border border-emerald-500/50 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white"
+                                                        >
+                                                            <option value={2}>2 Cuotas</option>
+                                                            <option value={3}>3 Cuotas</option>
+                                                            <option value={4}>4 Cuotas</option>
+                                                            <option value={6}>6 Cuotas</option>
+                                                            <option value={12}>12 Cuotas</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div className="text-right">
+                                                        <span className="text-[10px] uppercase tracking-wider text-emerald-600 dark:text-emerald-400 font-bold block">Preview de Cuota Mensual:</span>
+                                                        <span className="text-lg font-black text-emerald-600 dark:text-emerald-400 block">
+                                                            ${Math.round((Number(newExpenseForm.amount) || 0) / installmentsCount).toLocaleString()} / mes
+                                                        </span>
+                                                        <span className="text-[10px] text-slate-400">Total: ${(Number(newExpenseForm.amount) || 0).toLocaleString()} CLP</span>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Resumen Final del Egreso */}
+                                            <div className="bg-slate-100 dark:bg-slate-950 p-4 rounded-xl border border-gray-200 dark:border-slate-800 text-xs space-y-1">
+                                                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">Resumen de Captura:</span>
+                                                <div className="flex justify-between">
+                                                    <span className="text-slate-500">Categoría:</span>
+                                                    <span className="font-bold text-slate-800 dark:text-white">{newExpenseForm.category || 'Sin seleccionar'}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-slate-500">Monto Total:</span>
+                                                    <span className="font-bold text-rose-600 dark:text-rose-400">${Number(newExpenseForm.amount || 0).toLocaleString()} CLP</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-slate-500">Distribución:</span>
+                                                    <span className="font-bold text-indigo-500 capitalize">{newExpenseForm.distributable_method || 'Prorrateado'}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Footer con Navegación del Wizard */}
+                                    <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-slate-800">
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                setShowAddExpenseForm(false);
-                                                setEditingExpense(null);
-                                                setNewExpenseForm({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '', distributable_method: 'prorated', tower_id: '' });
+                                                if (expenseStep > 1) {
+                                                    setExpenseStep(prev => prev - 1);
+                                                } else {
+                                                    setShowAddExpenseForm(false);
+                                                    setEditingExpense(null);
+                                                }
                                             }}
-                                            className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl"
+                                            className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl hover:bg-gray-300 transition-all"
                                         >
-                                            Cancelar
+                                            {expenseStep > 1 ? '← Anterior' : 'Cancelar'}
                                         </button>
+
+                                        <div className="flex gap-2">
+                                            {expenseStep < 3 ? (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setExpenseStep(prev => prev + 1)}
+                                                    className="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1"
+                                                >
+                                                    <span>Siguiente Paso</span>
+                                                    <span>→</span>
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    type="submit"
+                                                    className="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl shadow-md shadow-emerald-600/30 transition-all flex items-center gap-1.5"
+                                                >
+                                                    <span>💾</span>
+                                                    <span>{editingExpense ? 'Guardar Cambios' : 'Confirmar & Guardar Egreso'}</span>
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 </form>
                             )}
 
-                            <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+                            <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-x-auto max-w-full shadow-sm">
                                 <SimpleTable
-                                    headers={['Categoría', 'Subcategoría', 'Monto', 'Fecha', 'Detalles', 'Distribución / Torre', 'Unidad/Destinatario', ...(!readOnly ? ['Acciones'] : [])]}
-                                    rows={filteredExpenses.map(exp => {
+                                    headers={['Categoría / Subrubro', 'Monto', 'Fecha', 'Detalles', 'Distribución / Torre', 'Unidad / Destinatario', ...(!readOnly ? ['Acciones'] : [])]}
+                                    rows={finalFilteredExpenses.map(exp => {
                                         const labelVal = financialCatalog.expenses?.[exp.category]?.label || exp.category;
                                         const catName = formatCategoryLabel(exp.category, labelVal);
-                                        const subName = exp.subcategory || 'N/A';
+                                        const subName = exp.subcategory || 'Sin Subrubro';
                                         
                                         const icons = { personal: '👷', servicios_basicos: '💧', mantencion: '🔧', seguridad: '🛡️', aseo_gasto_comun: '🧹', administracion: '📁', seguros: '☂️', certificaciones: '📜', reemplazos: '🆘' };
                                         const icon = icons[exp.category] || '💸';
 
+                                        const parseDateStr = (dStr) => {
+                                            if (!dStr) return '—';
+                                            const cleanStr = String(dStr).substring(0, 10);
+                                            const parts = cleanStr.split('-');
+                                            if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                                            return cleanStr;
+                                        };
+
                                         return {
                                             cells: [
-                                                <span className="font-extrabold text-slate-800 dark:text-white flex items-center gap-1.5" key={`cat-${exp.id}`}>{icon} {catName}</span>,
-                                                <span className="font-semibold text-slate-500 dark:text-slate-400" key={`sub-${exp.id}`}>{subName}</span>,
-                                                <span className="font-bold text-rose-600 dark:text-rose-400" key={`amt-${exp.id}`}>${Number(exp.amount).toLocaleString()}</span>,
-                                                <span key={`date-${exp.id}`}>{new Date(exp.date + 'T12:00:00').toLocaleDateString('es-CL')}</span>,
+                                                <div key={`cat-${exp.id}`} className="space-y-0.5 text-left py-0.5">
+                                                    <span className="font-extrabold text-slate-800 dark:text-white text-xs flex items-center gap-1.5 whitespace-nowrap">
+                                                        {icon} {catName}
+                                                    </span>
+                                                    <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-400 block whitespace-nowrap">
+                                                        {subName}
+                                                    </span>
+                                                </div>,
+                                                <span className="font-extrabold text-rose-600 dark:text-rose-400 font-mono text-xs" key={`amt-${exp.id}`}>${Number(exp.amount).toLocaleString('es-CL')}</span>,
+                                                <span className="font-mono text-xs text-slate-600 dark:text-slate-300" key={`date-${exp.id}`}>{parseDateStr(exp.date)}</span>,
                                                 <span className="text-xs truncate max-w-xs block text-slate-500 dark:text-slate-400" title={exp.description} key={`desc-${exp.id}`}>{exp.description || '—'}</span>,
                                                 <div key={`dist-${exp.id}`}>
                                                     <span className="capitalize font-semibold block text-xs">
@@ -952,14 +1717,26 @@ export default function FinancesLedger({
                                                     {exp.tower && <span className="text-[10px] text-indigo-500 font-bold block">{exp.tower.name}</span>}
                                                 </div>,
                                                 <div key={`unit-${exp.id}`}>
-                                                    {exp.property && <span className="font-bold block text-xs">Depto #{exp.property.number}</span>}
-                                                    {exp.user && <span className="text-[10px] text-slate-400 block">{exp.user.name}</span>}
-                                                    {!exp.property && !exp.user && <span className="text-slate-400 text-[10px]">—</span>}
+                                                    {exp.property ? (
+                                                        <>
+                                                            <span className="font-bold block text-xs text-slate-900 dark:text-white">Depto #{exp.property.number}</span>
+                                                            {exp.user && <span className="text-[10px] text-slate-400 block">{exp.user.name}</span>}
+                                                        </>
+                                                    ) : exp.tower ? (
+                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-extrabold border border-indigo-500/20">
+                                                            🏢 Gasto General {exp.tower.name}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 text-[10px] font-extrabold border border-slate-200 dark:border-slate-700">
+                                                            🏙️ Gasto General Comunidad
+                                                        </span>
+                                                    )}
                                                 </div>,
                                                 ...(!readOnly ? [
-                                                    <div className="flex items-center gap-2 justify-end" key={`act-${exp.id}`}>
+                                                    <div className="flex items-center justify-center gap-1.5" key={`act-${exp.id}`}>
                                                         <button
                                                             type="button"
+                                                            title="Editar egreso"
                                                             aria-label={`Editar egreso ${exp.description || exp.category}`}
                                                             onClick={() => {
                                                                 setEditingExpense(exp);
@@ -976,17 +1753,20 @@ export default function FinancesLedger({
                                                                 });
                                                                 setShowAddExpenseForm(true);
                                                             }}
-                                                            className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-[10px] font-bold rounded-lg transition-all"
+                                                            className="px-2 py-1 sm:px-2.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-xs font-bold rounded-lg transition-all shadow-xs hover:scale-105 active:scale-95 flex items-center gap-1"
                                                         >
-                                                            ✏️ Editar
+                                                            <span>✏️</span>
+                                                            <span className="hidden sm:inline">Editar</span>
                                                         </button>
                                                         <button
                                                             type="button"
-                                                            aria-label={`Eliminar egreso ${exp.description || exp.category}`}
+                                                            title="Borrar egreso"
+                                                            aria-label={`Borrar egreso ${exp.description || exp.category}`}
                                                             onClick={() => handleDeleteExpense(exp.id)}
-                                                            className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-bold rounded-lg transition-all"
+                                                            className="px-2 py-1 sm:px-2.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-xs font-bold rounded-lg transition-all shadow-xs hover:scale-105 active:scale-95 flex items-center gap-1"
                                                         >
-                                                            🗑️ Eliminar
+                                                            <span>🗑️</span>
+                                                            <span className="hidden sm:inline">Borrar</span>
                                                         </button>
                                                     </div>
                                                 ] : [])
@@ -997,9 +1777,7 @@ export default function FinancesLedger({
                                 />
                             </div>
                         </div>
-                    )}
-                </div>
-            )}
+            ) : null}
 
             {selectedAviso && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm" onClick={() => setSelectedAviso(null)}>

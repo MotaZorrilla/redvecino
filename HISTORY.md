@@ -163,6 +163,9 @@ Este checklist interactivo registra el avance global y detalla los nuevos requer
   - [x] Escribir tests en `Feature/AdvancedFinancesAndPayrollTest.php` para validar la matemÃ¡tica exacta del cÃ¡lculo de gastos comunes de la Unidad A-302 ($163.250).
   - [x] Escribir tests en `Feature/AdvancedFinancesAndPayrollTest.php` para validar la liquidaciÃ³n de Juan Carlos PÃ©rez ($826.040).
 
+  - [x] Escribir tests en `Feature/AdvancedFinancesAndPayrollTest.php` para validar la matem\u00e1tica exacta del c\u00e1lculo de gastos comunes de la Unidad A-302 ($163.250).
+  - [x] Escribir tests en `Feature/AdvancedFinancesAndPayrollTest.php` para validar la liquidaci\u00f3n de Juan Carlos P\u00e9rez ($826.040).
+
 ### 2.9 Integracin de Tareas del Prototipo (zAux/respaldo5)
 - [x] **Fase 1: Modulo de Onboarding y Perfiles (Backend)**
   - [x] Crear CondominiumSetupController para absorber las funciones de onboarding (guardar estructura de torres/pisos, bloqueos de edicion y copiado de estructuras).
@@ -178,6 +181,26 @@ Este checklist interactivo registra el avance global y detalla los nuevos requer
 - [ ] **Fase 4: Adaptacion y Fusion Estetica (Frontend)**
   - [ ] Migrar la estructura en HTML/Vanilla-JS de 
   - [ ] Integrar paleta visual oscura (#090d16) y tipografias base mediante las clases utilitarias de Tailwind CSS.
+
+### 2.10 Plan de Integración y Absorción de Funcionalidades Prototipo v2 (04/08/2026)
+- [x] **Absorción Sprint 1 (Críticos):**
+  - [x] Test Pest v3 `WizardTorresCopyPest.php` para clonación de torres y estructura.
+  - [x] Test Pest v3 `ProrrateoTresNivelesPest.php` para egresos globales, por torre e individuales.
+  - [x] Test Pest v3 `GeneracionPeriodosGCCPest.php` para orquestación de períodos y emisión de boletas.
+- [x] **Absorción Sprint 2 (Altos):**
+  - [x] Test Pest v3 `PedidosInsumosEstadosPest.php` para el flujo de compras de insumos.
+  - [x] Test Pest v3 `ChecklistAreasComPest.php` para entrega/recepción de instalaciones con fotos.
+  - [x] Test Pest v3 `FichasUnidadIntegrantesPest.php` para gestión de integrantes por unidad.
+  - [x] Tests Vitest `ProrrateoPreview.test.js` y `ResidentAutocomplete.test.jsx`.
+- [x] **Absorción Sprint 3 (Medios & UI):**
+  - [x] Test Pest v3 `BoletaImprimiblePest.php` para recibos HTML/PDF.
+  - [x] Test Pest v3 `ConfigMoraVencimientoPest.php` para parámetros de cobranza por condominio.
+  - [x] Test Pest v3 `AmonestacionesColabPest.php` para historial de amonestaciones de personal.
+  - [x] Test Pest v3 `KPIsTendenciaPest.php` para variaciones porcentuales vs mes anterior.
+  - [x] Test Pest v3 `CatalogoDefaultCargaPest.php` para carga idempotente de categorías.
+  - [x] Tests Vitest `BookingCalendar.test.jsx`, `ConflictValidator.test.js`, `ColaboradorModal.test.jsx`.
+- [x] **Seeders de Alta Fidelidad v2:**
+  - [x] `TowerStructureSeeder.php`, `CommonExpensePeriodSeeder.php`, `SupplyOrderSeeder.php`, `ChecklistSeeder.php`, `UnitProfileSeeder.php`, `FineAndMoraSeeder.php`, `AdministratorProfileSeeder.php`.
 
 ---
 
@@ -609,43 +632,9 @@ Se completaron 4 frentes de trabajo en paralelo: arch() tests, frontend testing,
 *   **`POST /api/person-wizard`:** Crea User + roles Spatie + perfiles según rol (OwnerProfile, ResidentProfile, EmployeeProfile, CommitteeProfile, AdminProfile).
 *   **5 roles alias** agregados al `RolePermissionSeeder`: `admin`, `colaborador`, `comité`, `resident`, `proveedor`.
 *   **Frontend conectado:** `AdminDashboard.jsx` ahora envía datos a la API real en vez de solo estado local.
-*   **8 tests Pest** en `PersonWizardPest.php`.
-
-#### Bug #1 — Role Leakage (Fuga de Roles)
-*   Audit completa de 15 controladores API multi-condominio.
-*   Scoping por `condominium_id` agregado en:
-    *   AnnouncementController::index()
-    *   ExpenseController (index, show, update, destroy) — ahora `condominium_id` requerido en mutaciones
-    *   PropertyController (index, show)
-    *   FacilityController::index() — `condominium_id` ahora requerido
-*   Fix crítico: `RBACMatrizCompletaPest.php` tenía 61 tests fallando por falta de `use App\Services\CondoFinanceService`.
-
-#### Bug #2 — window.axios deprecated
-*   `CommonExpenseGenerator.jsx` y `CondominiumSetup.jsx` reemplazan `window.axios` por `import api from '@/bootstrap'`.
-*   Verificación: 0 instancias de `window.axios` en el código.
-
-#### `covers()` Annotations
-*   Agregadas `covers()` a 8 archivos Pest: FinanzasConsistencia, QuorumExtremos, CoeficienteFallback, AislamientoMultiCondo, ConcurrenciaFinanciera, PersonWizard, FacilityCrud, HrCrud.
-
-### 3.22 Estandarización de Layouts & Auditoría E2E con Chrome DevTools (Sesión 08/07/2026)
 
 Se completó la migración definitiva al modelo de **"dos llaves"**: un layout unificado por cada familia de usuarios, eliminando los 7 layouts individuales anteriores.
 
-#### Diagnóstico y Corrección de Bugs en Caliente
-
-| ID | Archivo | Error | Fix |
-|---|---|---|---|
-| BUG-01 | `Dashboard.jsx` | `ReferenceError: isBusinessAdmin is not defined` → pantalla en blanco en Admin | Eliminada variable huérfana y declaraciones de renderizado obsoletas |
-| BUG-02 | `Dashboard.jsx` | `TypeError: setSimulatedMoroso is not a function` al activar morosidad | Añadida `setSimulatedMoroso` a `sharedRolePageProps` |
-| BUG-03 | `RedVecinoLayout.jsx` | Panel vacío en pestañas del Comité (IDs `payments/users` vs `finances/chats/actas`) | Independizados los mapeos de pestañas para el rol `comite` |
-| BUG-04 | `RedVecinoLayout.jsx` | Panel vacío en Encomiendas del Colaborador (`parcels` vs `packages`) | Corregido el ID a `packages` para sincronizar con `ColaboradorDashboard` |
-| BUG-05 | `Dashboard.jsx` | `TypeError: Cannot read properties of undefined (reading 'length')` al clic en Tickets (Residente) | Inyectados `reportedTickets` y `setReportedTickets` en `sharedRolePageProps` |
-
-#### Nuevos Layouts Unificados
-*   **`RedVecinoLayout.jsx`** — Sidebar izquierdo permanente, navbar superior, acento de color dinámico por rol (`ti`: cian, `admin`: índigo, `comite`: violeta, `colaborador`: naranja). Comparten: TI, Admin, Comité, Colaborador.
-*   **`MiVecinoLayout.jsx`** — Mobile-first (BottomNav en móvil, Sidebar izquierdo en PC), detección dinámica de rol Propietario vs Residente para cargar pestañas correspondientes. Bloqueo de reservas por morosidad integrado. Comparten: Propietario, Residente.
-
-#### Migración a Producción
 *   Los 6 dashboards de rol (`TiDashboard`, `AdminDashboard`, `ComiteDashboard`, `ColaboradorDashboard`, `PropietarioDashboard`, `ResidenteDashboard`) fueron migrados para envolver su contenido en el nuevo layout correspondiente.
 *   Los 7 layouts legacy (`TiLayout`, `AdminLayout`, `ComiteLayout`, `ColaboradorLayout`, `PropietarioLayout`, `ResidentLayout`, `SuperUsuarioLayout`) fueron eliminados del repositorio.
 

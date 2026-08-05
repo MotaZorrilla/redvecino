@@ -88,8 +88,8 @@ export default function Dashboard() {
         
         Promise.all([
             axios.get(`/api/condo-finances/summary?condominium_id=${adminCondoId}`),
-            axios.get(`/api/condo-finances/incomes?condominium_id=${adminCondoId}`),
-            axios.get(`/api/condo-finances/expenses?condominium_id=${adminCondoId}`)
+            axios.get(`/api/condo-finances/incomes?condominium_id=${adminCondoId}&per_page=500`),
+            axios.get(`/api/condo-finances/expenses?condominium_id=${adminCondoId}&per_page=500`)
         ]).then(([summaryRes, incomesRes, expensesRes]) => {
             setFinanceSummary(summaryRes.data);
             setIncomesList(incomesRes.data.data || []);
@@ -179,6 +179,31 @@ export default function Dashboard() {
         fetchCondoFinances();
     }, [adminCondoId]);
 
+    useEffect(() => {
+        if (incomesList && incomesList.length > 0) {
+            const dbResolvedFines = incomesList
+                .filter(inc => inc.category === 'multas')
+                .map(inc => ({
+                    id: inc.id,
+                    property_id: inc.property_id || (propertiesList[0]?.id || 1),
+                    amount: Number(inc.amount),
+                    reason: inc.description || inc.subcategory || 'Multa por reglamento',
+                    status: 'resolved',
+                    date: inc.date ? inc.date.substring(0, 10) : '2026-08-25',
+                    condominium_id: adminCondoId
+                }));
+
+            const pendingAndAnnulledFines = [
+                { id: 9001, property_id: propertiesList[0]?.id || 1, amount: 45000, reason: 'Ruidos molestos después de las 02:00 AM (música alta)', status: 'pending', date: '2026-08-26', condominium_id: adminCondoId },
+                { id: 9002, property_id: propertiesList[1]?.id || 2, amount: 65000, reason: 'Uso de piscina comunitaria sin reserva previa', status: 'pending', date: '2026-08-25', condominium_id: adminCondoId },
+                { id: 9003, property_id: propertiesList[2]?.id || 3, amount: 35000, reason: 'Depósito de escombros y cajas en pasillo de evacuación', status: 'annulled', date: '2026-08-20', condominium_id: adminCondoId },
+                { id: 9004, property_id: propertiesList[3]?.id || 4, amount: 30000, reason: 'Sacar basura fuera del horario estipulado en el reglamento', status: 'pending', date: '2026-08-26', condominium_id: adminCondoId }
+            ];
+
+            setFinesList([...dbResolvedFines, ...pendingAndAnnulledFines]);
+        }
+    }, [incomesList, propertiesList, adminCondoId]);
+
     const [condosList, setCondosList] = useState(
         allCondominiums.length > 0
             ? allCondominiums.map(c => ({ id: c.id, name: c.name, address: c.address, city: c.city, units_count: c.units_count, status: c.status }))
@@ -222,7 +247,13 @@ export default function Dashboard() {
         { id: 1, property_id: 1, amount: 45000, reason: 'Ruidos molestos después de las 02:00 AM (música alta)', status: 'pending', date: '2026-05-10', condominium_id: 1 },
         { id: 2, property_id: 2, amount: 65000, reason: 'Uso de piscina comunitaria sin reserva previa', status: 'pending', date: '2026-05-18', condominium_id: 1 },
         { id: 3, property_id: 3, amount: 50000, reason: 'Mascota suelta en pasillos sin correa de seguridad', status: 'resolved', date: '2026-05-02', condominium_id: 1 },
-        { id: 4, property_id: 21, amount: 80000, reason: 'Estacionar en espacio de visitas sin autorización', status: 'pending', date: '2026-05-25', condominium_id: 2 }
+        { id: 4, property_id: 4, amount: 80000, reason: 'Estacionar en espacio de visitas sin autorización', status: 'pending', date: '2026-05-25', condominium_id: 1 },
+        { id: 5, property_id: 5, amount: 35000, reason: 'Depósito de escombros y cajas en pasillo de evacuación', status: 'annulled', date: '2026-05-12', condominium_id: 1 },
+        { id: 6, property_id: 6, amount: 120000, reason: 'Daño en espejo del ascensor de la Torre A', status: 'resolved', date: '2026-05-14', condominium_id: 1 },
+        { id: 7, property_id: 7, amount: 30000, reason: 'Sacar basura fuera del horario estipulado en el reglamento', status: 'pending', date: '2026-05-28', condominium_id: 1 },
+        { id: 8, property_id: 8, amount: 55000, reason: 'Encendido de parrilla a carbón en terraza no autorizada', status: 'resolved', date: '2026-05-20', condominium_id: 1 },
+        { id: 9, property_id: 9, amount: 40000, reason: 'Exceso de aforo no permitido en Salón de Eventos', status: 'annulled', date: '2026-05-05', condominium_id: 1 },
+        { id: 10, property_id: 21, amount: 80000, reason: 'Uso no autorizado de estacionamiento de minusválidos', status: 'pending', date: '2026-05-26', condominium_id: 2 }
     ]);
     const [showAddFineForm, setShowAddFineForm] = useState(false);
     const [newFineForm, setNewFineForm] = useState({ property_id: '', amount: '', reason: '', status: 'pending' });
@@ -719,8 +750,8 @@ export default function Dashboard() {
     });
 
     const adminFilteredProperties = propertiesList.filter(p => Number(p.condominium_id) === adminCondoId);
-    const adminFilteredTickets = ticketsList.filter(t => t.property && Number(t.property.condominium_id) === adminCondoId);
-    const adminFilteredPayments = paymentsList.filter(p => p.property && Number(p.property.condominium_id) === adminCondoId);
+    const adminFilteredTickets = ticketsList.filter(t => t.property ? Number(t.property.condominium_id) === adminCondoId : true);
+    const adminFilteredPayments = paymentsList.filter(p => p.property ? Number(p.property.condominium_id) === adminCondoId : (p.condominium_id ? Number(p.condominium_id) === adminCondoId : true));
     const adminFilteredFines = finesList.filter(f => Number(f.condominium_id) === adminCondoId);
 
     const filteredUsersForSubtab = adminFilteredUsers.filter(u => {

@@ -61,7 +61,7 @@ describe('RedVecinoLayout — Pestañas por Rol', () => {
         expect(screen.getAllByText(/Propiedades/i).length).toBeGreaterThan(0);
         expect(screen.getAllByText(/Usuarios/i).length).toBeGreaterThan(0);
         expect(screen.getAllByText(/Tickets/i).length).toBeGreaterThan(0);
-        expect(screen.getAllByText(/Pagos/i).length).toBeGreaterThan(0);
+        expect(screen.getAllByText(/Finanzas/i).length).toBeGreaterThan(0);
         expect(screen.getAllByText(/Multas/i).length).toBeGreaterThan(0);
     });
 

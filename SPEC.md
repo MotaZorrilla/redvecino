@@ -1609,9 +1609,32 @@ La generaciÃ³n de liquidaciones de sueldo de colaboradores sigue el estÃ¡nda
 5.  **CÃ¡lculo de Sueldo LÃ­quido Final:**
     $$S_{liquido} = (H_{imp} + H_{no\_imp}) - (D_{prev} + D_{otros})$$
 
+#### 15.14 Especificación Técnica del Prototipo v2 (Absorción de Módulos Egresos y Administración)
+
+Se incorporan formalmente al modelo de datos las siguientes entidades y endpoints derivados del análisis del prototipo `zAux/Redvecino idea v2`:
+
+##### 15.14.1 Nuevas Entidades y Tablas de Base de Datos
+*   **`unit_profiles` (Fichas de Unidad):** `id`, `property_id` (unique), `parking_spot` (nullable), `license_plate` (nullable), `observation` (nullable), `timestamps`.
+*   **`unit_members` (Integrantes por Unidad):** `id`, `unit_profile_id`, `first_name`, `last_name`, `rut`, `birth_date`, `is_owner` (bool), `lives_in_unit` (bool), `timestamps`.
+*   **`supply_orders` (Pedidos de Insumos):** `id`, `condominium_id`, `employee_profile_id`, `description`, `quantity`, `unit`, `status` (`pendiente`, `en_compra`, `comprado`, `recibido`), `purchase_document` (nullable), `timestamps`.
+*   **`checklist_records` (Registros de Inspección):** `id`, `condominium_id`, `facility_id`, `booking_id` (nullable), `type` (`entrega`, `recepcion`), `timestamps`.
+*   **`checklist_record_details` (Detalles de Inspección):** `id`, `checklist_record_id`, `item_name`, `status` (`ok`, `dano`), `comment` (nullable), `photo_path` (nullable).
+*   **`employee_warnings` (Amonestaciones de Personal):** `id`, `employee_profile_id`, `reason`, `date`, `type` (`verbal`, `escrita`), `attachment_path` (nullable), `timestamps`.
+
+##### 15.14.2 Cobertura de Endpoints de la API v2
+*   **Torres & Estructura:** `POST /api/setup-condominium/copy-tower` (clonación de estructuras de torre).
+*   **Cobranza & Mora:** `POST /api/condominiums/{id}/finance-config` (día de vencimiento e interés moratorio).
+*   **Recibos:** `GET /api/common-expenses/receipt` (generación HTML/PDF de recibo de cobro con desglose).
+*   **Pedidos de Insumos:** `GET|POST /api/supply-orders`, `PUT /api/supply-orders/{id}/approve`, `PUT /api/supply-orders/{id}/mark-purchased`, `PUT /api/supply-orders/{id}/mark-received`, `POST /api/supply-orders/bulk-approve`.
+*   **Checklist:** `POST /api/checklist-records`, `GET /api/checklist-records`.
+*   **Fichas Integrantes:** `GET|POST /api/unit-profiles/{property_id}`, `GET /api/residents/search`.
+*   **Amonestaciones:** `GET|POST /api/hr/employees/{id}/amonestaciones`, `DELETE /api/hr/amonestaciones/{id}`.
+*   **Analítica:** `GET /api/condo-finances/kpis` (variación porcentual vs mes anterior).
+*   **Catálogo Default:** `POST /api/condo-finances/setup-default-categories` (carga idempotente).
+
 ---
 
 **Fecha de creaciÃ³n:** Mayo 2026
-**Ãšltima actualizaciÃ³n:** 8 de Junio de 2026 (IntegraciÃ³n de Reglas Financieras y Remuneracionales Avanzadas - v10.0)
-**VersiÃ³n:** 10.0 (zAux 05/06 Integration)
-**Estado:** Listo para desarrollo (Modelado contable consolidado, 179 tests estables en verde, especificaciones actualizadas)
+**Ãšltima actualizaciÃ³n:** 04 de Agosto de 2026 (Integración de Especificaciones v2 y Cobertura de Tests - v11.0)
+**VersiÃ³n:** 11.0 (v2 Prototype Specification & Absorbed Endpoints)
+**Estado:** Especificado y Cubierto por Suite de Tests Backend (Pest v3) y Frontend (Vitest).

@@ -63,7 +63,7 @@ class CommonExpenseController extends Controller
             'condominium_id' => 'required|exists:condominiums,id',
             'period' => 'required|string',
             'due_date' => 'required|date',
-            'total_amount' => 'required|numeric'
+            'total_amount' => 'required|numeric|min:0'
         ]);
 
         $expense = CommonExpense::updateOrCreate(

@@ -81,7 +81,7 @@ export default function RedVecinoLayout({
                     { id: 'properties', icon: Building2, label: 'Propiedades', desc: 'Casas y departamentos' },
                     { id: 'users', icon: Users, label: 'Usuarios', desc: 'Vecinos y directiva' },
                     { id: 'tickets', icon: Wrench, label: 'Tickets', desc: 'Casos y solicitudes' },
-                    { id: 'payments', icon: CircleDollarSign, label: 'Pagos', desc: 'Historial y registros' },
+                    { id: 'payments', icon: CircleDollarSign, label: 'Finanzas', desc: 'Libro diario, recaudación y egresos' },
                     { id: 'fines', icon: Scale, label: 'Multas', desc: 'Infracciones y cargos' },
                 ];
             case 'comite':
@@ -111,42 +111,65 @@ export default function RedVecinoLayout({
             </Head>
 
             {/* A. SIDEBAR IZQUIERDO */}
-            <aside aria-label="Navegación principal" className={`${SIDEBAR_W} bg-slate-900 text-white flex flex-col justify-between shrink-0 transition-all duration-300 fixed inset-y-0 left-0 z-30 overflow-hidden ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+            <aside aria-label="Navegación principal" className={`${SIDEBAR_W} bg-white dark:bg-slate-900 text-slate-800 dark:text-white border-r border-slate-200 dark:border-slate-800/80 flex flex-col justify-between shrink-0 transition-all duration-300 fixed inset-y-0 left-0 z-30 overflow-hidden ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
                 <div className="space-y-6 text-left p-4">
-                    {/* Logo + Toggle */}
-                    <div className="flex items-center gap-3">
-                        <div className={`h-9 w-9 rounded-xl bg-gradient-to-br ${themeStyles.gradient} flex items-center justify-center shadow-lg shrink-0`}>
-                            <Building2 className="w-5 h-5 text-white" />
-                        </div>
-                        {!sidebarCollapsed && (
-                            <div className="text-left min-w-0 animate-fade-in">
-                                <h3 className="text-base font-black tracking-tight text-white leading-none">
-                                    Red<span className={`${themeStyles.text} font-extrabold`}>Vecino</span>
-                                </h3>
-                                <p className="text-[9px] text-slate-400 uppercase tracking-widest font-mono mt-1">{themeStyles.panelText}</p>
+                    {/* Logo + Toggle Button */}
+                    <div className="flex flex-col items-center gap-3">
+                        <div className="flex items-center gap-3 w-full justify-between">
+                            <div className="flex items-center gap-3">
+                                {/* RedVecino Official Brand Icon Image Asset */}
+                                <img
+                                    src="/images/icon_redvecino.png"
+                                    alt="RedVecino Icon"
+                                    className="h-9 w-9 object-contain shrink-0 rounded-xl shadow-md"
+                                />
+                                {!sidebarCollapsed && (
+                                    <div className="text-left min-w-0 animate-fade-in">
+                                        <h3 className="text-base font-black tracking-tight text-slate-900 dark:text-white leading-none">
+                                            Red<span className={`${themeStyles.text} font-extrabold`}>Vecino</span>
+                                        </h3>
+                                        <p className="text-[9px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-mono mt-1">{themeStyles.panelText}</p>
+                                    </div>
+                                )}
                             </div>
+                            {!sidebarCollapsed && (
+                                <button
+                                    type="button"
+                                    onClick={() => setSidebarCollapsed(true)}
+                                    className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors hidden md:flex"
+                                    aria-label="Colapsar menú"
+                                    title="Colapsar menú lateral"
+                                >
+                                    <PanelLeftClose className="w-4 h-4" />
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Dedicated Toggle Button underneath Logo when Collapsed */}
+                        {sidebarCollapsed && (
+                            <button
+                                type="button"
+                                onClick={() => setSidebarCollapsed(false)}
+                                className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-white transition-all flex items-center justify-center border border-slate-200 dark:border-slate-700/60 shadow-xs group hidden md:flex"
+                                aria-label="Expandir menú"
+                                title="Expandir menú lateral"
+                            >
+                                <PanelLeft className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                            </button>
                         )}
-                        <button
-                            type="button"
-                            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                            className="ml-auto p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition-colors hidden md:flex"
-                            aria-label={sidebarCollapsed ? 'Expandir menú' : 'Colapsar menú'}
-                        >
-                            {sidebarCollapsed ? <PanelLeft className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
-                        </button>
                     </div>
 
                     {/* Selector de Condominio (Sólo Admin/Comite/Colaborador) */}
                     {!sidebarCollapsed && role !== 'ti' && condosList.length > 0 && (
-                        <div className="bg-slate-800/40 border border-slate-700/60 rounded-xl p-3 space-y-1 text-left animate-fade-in">
-                            <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Condominio Activo</span>
+                        <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 rounded-xl p-3 space-y-1 text-left animate-fade-in">
+                            <span className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider block">Condominio Activo</span>
                             <select
                                 value={adminCondoId}
                                 onChange={(e) => setAdminCondoId && setAdminCondoId(Number(e.target.value))}
-                                className="w-full bg-slate-950 border border-slate-800 rounded-lg py-1.5 px-3 text-xs font-bold text-slate-100 cursor-pointer focus:ring-1 focus:ring-slate-700 pr-8"
+                                className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg py-1.5 px-3 text-xs font-bold text-slate-900 dark:text-slate-100 cursor-pointer focus:ring-1 focus:ring-indigo-500 pr-8"
                             >
                                 {condosList.map(c => (
-                                    <option key={c.id} value={c.id} className="bg-slate-900 text-slate-100">{c.name}</option>
+                                    <option key={c.id} value={c.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">{c.name}</option>
                                 ))}
                             </select>
                         </div>
@@ -166,20 +189,20 @@ export default function RedVecinoLayout({
                                     sidebarCollapsed ? 'p-2.5 flex justify-center' : 'px-4 py-2.5 flex flex-col gap-0.5'
                                 } ${
                                     activeTab === tab.id
-                                        ? `${themeStyles.bg} ${themeStyles.border} text-white shadow-md`
-                                        : 'border-transparent hover:bg-slate-800 text-slate-450 hover:text-slate-200'
+                                        ? `${themeStyles.bg} ${themeStyles.border} text-slate-900 dark:text-white shadow-xs font-bold`
+                                        : 'border-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                                 }`}
                             >
                                 <div className="flex items-center gap-2">
-                                    <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? themeStyles.text : 'text-slate-400 group-hover:text-slate-300'}`} />
+                                    <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? themeStyles.text : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300'}`} />
                                     {!sidebarCollapsed && (
-                                        <span className={`text-xs font-bold ${activeTab === tab.id ? themeStyles.text : 'text-slate-300 group-hover:text-slate-200'}`}>
+                                        <span className={`text-xs font-bold ${activeTab === tab.id ? themeStyles.text : 'text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-slate-100'}`}>
                                             {tab.label}
                                         </span>
                                     )}
                                 </div>
                                 {!sidebarCollapsed && (
-                                    <span className="text-[9px] text-slate-500 font-medium pl-6 group-hover:text-slate-400">
+                                    <span className="text-[9px] text-slate-500 dark:text-slate-500 font-medium pl-6 group-hover:text-slate-600 dark:group-hover:text-slate-400">
                                         {tab.desc}
                                     </span>
                                 )}
@@ -190,14 +213,14 @@ export default function RedVecinoLayout({
 
                 {/* Perfil del Administrador */}
                 <div className="p-4">
-                    <div className={`w-full p-3 rounded-2xl flex items-center gap-2.5 bg-slate-800/60 border border-slate-700/60 ${sidebarCollapsed ? 'justify-center' : ''}`}>
+                    <div className={`w-full p-3 rounded-2xl flex items-center gap-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 ${sidebarCollapsed ? 'justify-center' : ''}`}>
                         <div className={`h-8 w-8 rounded-full bg-gradient-to-br ${themeStyles.gradient} flex items-center justify-center text-xs font-extrabold text-white shrink-0`}>
                             {user?.name?.charAt(0) || 'U'}
                         </div>
                         {!sidebarCollapsed && (
                             <div className="min-w-0 flex-1 text-left">
-                                <span className="text-xs font-bold text-slate-200 block truncate">{user?.name}</span>
-                                <span className="text-[9px] text-slate-400 block truncate font-medium">{role.toUpperCase()}</span>
+                                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block truncate">{user?.name}</span>
+                                <span className="text-[9px] text-slate-500 dark:text-slate-400 block truncate font-medium">{role.toUpperCase()}</span>
                             </div>
                         )}
                     </div>
@@ -207,19 +230,25 @@ export default function RedVecinoLayout({
             {/* B. CONTENIDO DERECHO */}
             <div className={`flex-1 flex flex-col ${CONTENT_PL} min-h-screen transition-all duration-300`}>
                 {/* Header Superior Fijo (h-16) */}
-                <header className={`h-16 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border-b border-slate-200 dark:border-slate-850 flex items-center justify-between px-6 fixed top-0 right-0 left-0 ${CONTENT_PL} z-20 transition-all duration-300`}>
-                    <div className="flex items-center gap-3">
+                <header className={`h-16 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-850 flex items-center justify-between px-6 md:px-10 fixed top-0 right-0 left-0 ${CONTENT_PL} z-20 transition-all duration-300`}>
+                    <div className="flex items-center gap-3 pl-2 md:pl-4">
                         <button
+                            type="button"
                             onClick={() => setIsMobileSidebarOpen && setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-                            className="md:hidden p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-200 transition-colors"
+                            className="md:hidden p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-200 transition-colors border border-slate-200 dark:border-slate-750"
+                            title="Abrir menú móvil"
+                            aria-label="Abrir menú móvil"
                         >
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5-5.25h16.5m-16.5 10.5h16.5" />
                             </svg>
                         </button>
-                        <h4 className="text-xs sm:text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                            {tabs.find(t => t.id === activeTab)?.label || 'Resumen'}
-                        </h4>
+                        <div className="flex items-center gap-2.5">
+                            <span className={`w-2.5 h-2.5 rounded-full ${themeStyles.bg} border ${themeStyles.border} hidden sm:inline-block`} />
+                            <h4 className="text-xs sm:text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-wider">
+                                {tabs.find(t => t.id === activeTab)?.label || 'Resumen'}
+                            </h4>
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-3">

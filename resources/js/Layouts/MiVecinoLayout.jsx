@@ -142,11 +142,14 @@ export default function MiVecinoLayout({
                     {/* A.2 AREA DE CONTENIDO (CON PADDING LEFT PARA EL SIDEBAR EN MD) */}
                     <div className="flex-1 flex flex-col md:pl-64 min-h-screen transition-all duration-300">
                         {/* Header Superior Fijo (h-16) */}
-                        <header className="h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 fixed top-0 right-0 left-0 md:pl-64 z-20 transition-all duration-300">
-                            <div className="flex items-center gap-3">
-                                <h4 className="text-xs sm:text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
-                                    {navItems.find(item => item.tab === mobileTab)?.label || 'Inicio'}
-                                </h4>
+                        <header className="h-16 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 md:px-10 fixed top-0 right-0 left-0 md:pl-64 z-20 transition-all duration-300">
+                            <div className="flex items-center gap-3 pl-2 md:pl-4">
+                                <div className="flex items-center gap-2.5">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/20 border border-emerald-500/50 hidden sm:inline-block" />
+                                    <h4 className="text-xs sm:text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-wider">
+                                        {navItems.find(item => item.tab === mobileTab)?.label || 'Inicio'}
+                                    </h4>
+                                </div>
                             </div>
 
                             {/* Controles del Simulador + Telemetría */}

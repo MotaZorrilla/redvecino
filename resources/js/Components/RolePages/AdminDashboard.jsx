@@ -59,6 +59,7 @@ export default function AdminDashboard({
                     setTicketStatusFilter={setTicketStatusFilter}
                     setTicketPriorityFilter={setTicketPriorityFilter}
                     setEditingTicket={setEditingTicket}
+                    incomesList={incomesList}
                 />
             )}
             {adminActiveTab === 'properties' && (

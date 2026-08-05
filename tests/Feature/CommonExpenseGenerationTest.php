@@ -42,7 +42,7 @@ class CommonExpenseGenerationTest extends TestCase
         CondoExpense::create([
             'condominium_id' => $condo->id,
             'amount' => 500000,
-            'date' => now(),
+            'date' => '2026-09-15',
             'category' => 'Mantenimiento',
             'distributable_method' => 'prorated',
             'description' => 'Test Expense'
@@ -50,7 +50,7 @@ class CommonExpenseGenerationTest extends TestCase
 
         $payload = [
             'condominium_id' => $condo->id,
-            'period' => '2026-07'
+            'period' => '2026-09'
         ];
 
         // Test generation
@@ -58,15 +58,15 @@ class CommonExpenseGenerationTest extends TestCase
         $response->assertStatus(200);
         
         $data = $response->json();
-        $this->assertEquals('2026-07', $data['period']);
+        $this->assertEquals('2026-09', $data['period']);
         $this->assertGreaterThan(0, $data['total_condo_expense']);
         $this->assertNotEmpty($data['bills']);
 
         // Test publish
         $publishPayload = [
             'condominium_id' => $condo->id,
-            'period' => '2026-07',
-            'due_date' => '2026-08-05',
+            'period' => '2026-09',
+            'due_date' => '2026-10-05',
             'total_amount' => $data['total_condo_expense']
         ];
 
@@ -75,7 +75,7 @@ class CommonExpenseGenerationTest extends TestCase
 
         $this->assertDatabaseHas('common_expenses', [
             'condominium_id' => $condo->id,
-            'period' => '2026-07',
+            'period' => '2026-09',
             'status' => 'published'
         ]);
     }

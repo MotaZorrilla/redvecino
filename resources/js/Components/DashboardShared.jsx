@@ -130,34 +130,51 @@ export function SectionCard({ title, link, children, emptyMessage = 'No hay dato
     );
 }
 
-export function SimpleTable({ headers, rows, emptyMessage = 'No hay registros' }) {
+export function SimpleTable({ headers, rows, emptyMessage = "No hay datos disponibles" }) {
     if (!rows || rows.length === 0) {
-        return <p className="text-sm text-gray-400 dark:text-slate-500 text-center py-4">{emptyMessage}</p>;
+        return (
+            <div className="p-8 text-center text-sm text-gray-500 dark:text-slate-400">
+                {emptyMessage}
+            </div>
+        );
     }
 
     return (
-        <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-100 dark:divide-slate-800">
+        <div className="w-full overflow-hidden">
+            <table className="w-full text-left border-collapse">
                 <thead>
-                    <tr>
-                        {headers.map((header, i) => (
-                            <th
-                                key={i}
-                                className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider"
-                            >
-                                {header}
-                            </th>
-                        ))}
+                    <tr className="border-b border-gray-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                        {headers.map((header, i) => {
+                            const isAcciones = typeof header === 'string' && header.toLowerCase().includes('accion');
+                            return (
+                                <th
+                                    key={i}
+                                    className={`px-3 py-3 text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider ${
+                                        isAcciones ? 'text-center w-24 shrink-0' : 'text-left'
+                                    }`}
+                                >
+                                    {header}
+                                </th>
+                            );
+                        })}
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50 dark:divide-slate-900">
                     {rows.map((row, i) => (
                         <tr key={i} className="hover:bg-gray-50 dark:hover:bg-slate-800/40 transition-colors">
-                            {row.cells.map((cell, j) => (
-                                <td key={j} className="px-4 py-3 text-sm text-gray-700 dark:text-slate-300 whitespace-nowrap">
-                                    {cell}
-                                </td>
-                            ))}
+                            {row.cells.map((cell, j) => {
+                                const isAccionesCol = typeof headers[j] === 'string' && headers[j].toLowerCase().includes('accion');
+                                return (
+                                    <td 
+                                        key={j} 
+                                        className={`px-3 py-2.5 text-xs text-gray-700 dark:text-slate-300 ${
+                                            isAccionesCol ? 'text-center w-24 shrink-0' : ''
+                                        }`}
+                                    >
+                                        {cell}
+                                    </td>
+                                );
+                            })}
                         </tr>
                     ))}
                 </tbody>

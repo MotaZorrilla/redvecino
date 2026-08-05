@@ -1044,6 +1044,19 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->command->info('Facilities seeded for ' . $condominios->count() . ' condominiums.');
+
+        // 7. Seeders extendidos según Análisis v2
+        $this->call([
+            TowerStructureSeeder::class,
+            CommonExpensePeriodSeeder::class,
+            SupplyOrderSeeder::class,
+            ChecklistSeeder::class,
+            UnitProfileSeeder::class,
+            FineAndMoraSeeder::class,
+            AdministratorProfileSeeder::class,
+        ]);
+
         $this->command->info('Database seeding completed with gorgeous hyperrealistic data!');
     }
 }
+

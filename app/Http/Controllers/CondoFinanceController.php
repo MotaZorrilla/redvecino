@@ -29,7 +29,7 @@ class CondoFinanceController extends Controller
     {
         $request->validate(['condominium_id' => 'required|exists:condominiums,id']);
 
-        return $this->service->getIncomes($request->only('condominium_id'));
+        return $this->service->getIncomes($request->only('condominium_id', 'category', 'per_page'));
     }
 
     public function storeIncome(Request $request)
@@ -109,7 +109,7 @@ class CondoFinanceController extends Controller
     {
         $request->validate(['condominium_id' => 'required|exists:condominiums,id']);
 
-        return $this->service->getExpenses($request->only('condominium_id'));
+        return $this->service->getExpenses($request->only('condominium_id', 'category', 'per_page'));
     }
 
     public function storeExpense(Request $request)

@@ -68,18 +68,28 @@ final class CondoFinanceService
 
     public function getIncomes(array $filters)
     {
-        return CondoIncome::with(['property', 'user', 'tower'])
-            ->where('condominium_id', $filters['condominium_id'])
-            ->orderBy('date', 'desc')
-            ->paginate(20);
+        $query = CondoIncome::with(['property', 'user', 'tower'])
+            ->where('condominium_id', $filters['condominium_id']);
+
+        if (!empty($filters['category']) && $filters['category'] !== 'all') {
+            $query->where('category', $filters['category']);
+        }
+
+        $perPage = isset($filters['per_page']) ? (int) $filters['per_page'] : 150;
+        return $query->orderBy('date', 'desc')->paginate($perPage);
     }
 
     public function getExpenses(array $filters)
     {
-        return CondoExpense::with(['property', 'user', 'commonExpense', 'tower'])
-            ->where('condominium_id', $filters['condominium_id'])
-            ->orderBy('date', 'desc')
-            ->paginate(20);
+        $query = CondoExpense::with(['property', 'user', 'commonExpense', 'tower'])
+            ->where('condominium_id', $filters['condominium_id']);
+
+        if (!empty($filters['category']) && $filters['category'] !== 'all') {
+            $query->where('category', $filters['category']);
+        }
+
+        $perPage = isset($filters['per_page']) ? (int) $filters['per_page'] : 150;
+        return $query->orderBy('date', 'desc')->paginate($perPage);
     }
 
     public function createIncome(array $data): CondoIncome
