@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SectionCard, SimpleTable, StatusBadge } from '@/Components/DashboardShared';
 
 export default function DashboardOverview({
     condosList = [],
+    allCondominiums = [],
     adminCondoId,
+    setAdminCondoId = () => {},
     adminFilteredProperties = [],
     adminFilteredUsers = [],
     adminFilteredTickets = [],
@@ -15,7 +17,13 @@ export default function DashboardOverview({
     setTicketPriorityFilter,
     setEditingTicket
 }) {
-    const activeCondo = condosList.find(c => c.id === Number(adminCondoId)) || { name: 'Condominio', address: '', city: '' };
+    const listToUse = condosList.length > 0 ? condosList : (allCondominiums.length > 0 ? allCondominiums : [
+        { id: 1, name: 'Condominio Alameda', address: 'Av. Alameda 1234', city: 'Santiago' },
+        { id: 2, name: 'Condominio Los Hidalgos', address: 'Calle Los Hidalgos 567', city: 'Providencia' },
+        { id: 3, name: 'Condominio Mirador del Valle', address: 'Av. El Mirador 890', city: 'Las Condes' }
+    ]);
+
+    const activeCondo = listToUse.find(c => String(c.id) === String(adminCondoId)) || listToUse[0];
 
     // Calculate total collection combining Payments and CondoIncomes
     const totalPaymentsAmount = adminFilteredPayments.reduce((acc, curr) => acc + Number(curr.amount || 0), 0);
@@ -34,22 +42,48 @@ export default function DashboardOverview({
             status: 'approved'
         }));
 
+    const [isBannerDismissed, setIsBannerDismissed] = useState(false);
+
     return (
-        <div className="space-y-6 animate-fade-in text-left">
-            {/* Condo Banner Adaptable Día / Noche */}
-            <div className="bg-gradient-to-r from-indigo-50 via-indigo-100/70 to-white dark:from-indigo-950/80 dark:via-slate-900 dark:to-slate-950 border border-indigo-200/80 dark:border-indigo-900/40 rounded-2xl p-6 relative overflow-hidden shadow-xs dark:shadow-xl transition-all duration-300">
-                <div className="absolute -right-20 -top-20 w-64 h-64 bg-indigo-500/10 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-                <div className="relative z-10 space-y-1">
-                    <span className="text-[10px] bg-indigo-500/10 dark:bg-indigo-500/25 border border-indigo-500/20 dark:border-indigo-500/30 text-indigo-700 dark:text-indigo-300 font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider inline-block">
-                        🏢 Comunidad Activa
-                    </span>
-                    <h4 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{activeCondo.name}</h4>
-                    <p className="text-xs font-medium text-slate-600 dark:text-indigo-200 flex items-center gap-1.5">
-                        <span>📍</span>
-                        <span>{activeCondo.address}, {activeCondo.city}</span>
-                    </p>
+        <div className="space-y-6 animate-fade-in text-left font-outfit">
+            {/* Condo Banner Adaptable Día / Noche Colapsable */}
+            {!isBannerDismissed ? (
+                <div className="bg-gradient-to-r from-indigo-50 via-indigo-100/70 to-white dark:from-indigo-950/80 dark:via-slate-900 dark:to-slate-950 border border-indigo-200/80 dark:border-indigo-900/40 rounded-2xl p-6 relative overflow-hidden shadow-xs dark:shadow-xl transition-all duration-300">
+                    <div className="absolute -right-20 -top-20 w-64 h-64 bg-indigo-500/10 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+                    <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="space-y-1">
+                            <span className="text-[10px] bg-indigo-500/10 dark:bg-indigo-500/25 border border-indigo-500/20 dark:border-indigo-500/30 text-indigo-700 dark:text-indigo-300 font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider inline-block">
+                                🏢 Panel de Gestión Activo
+                            </span>
+                            <h4 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{activeCondo.name}</h4>
+                            <p className="text-xs font-medium text-slate-600 dark:text-indigo-200 flex items-center gap-1.5">
+                                <span>📍</span>
+                                <span>{activeCondo.address || 'Av. Alameda 1234'}, {activeCondo.city || 'Santiago'}</span>
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={() => setIsBannerDismissed(true)}
+                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 shrink-0 self-start sm:self-center"
+                            title="Minimizar cabecera informativa"
+                        >
+                            <span>✕ Minimizar</span>
+                        </button>
+                    </div>
                 </div>
-            </div>
+            ) : (
+                <div className="flex justify-start">
+                    <button
+                        type="button"
+                        onClick={() => setIsBannerDismissed(false)}
+                        className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-800/60"
+                    >
+                        <span>🏢 Mostrar información de {activeCondo.name}</span>
+                        <span>▼</span>
+                    </button>
+                </div>
+            )}
 
             {/* KPI Cards Grid (Prototipo v2 Oficial) */}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

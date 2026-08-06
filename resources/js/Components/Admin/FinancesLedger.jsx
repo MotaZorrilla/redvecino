@@ -1,5 +1,7 @@
 import { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { SimpleTable, StatusBadge } from '@/Components/DashboardShared';
+import UnitDetailModal360 from '@/Components/Admin/UnitDetailModal360';
 
 export default function FinancesLedger({
     adminCondoId,
@@ -47,9 +49,12 @@ export default function FinancesLedger({
     handleDeleteExpense,
     usersList = [],
     allCondominiums = [],
+    finesList = [],
+    ticketsList = [],
     readOnly = false
 }) {
     const [selectedAviso, setSelectedAviso] = useState(null);
+    const [inspectingUnit360, setInspectingUnit360] = useState(null);
     const activeCondo = allCondominiums.find(c => c.id === Number(adminCondoId));
     const [modalSubTab, setModalSubTab] = useState('summary');
     const [expenseStep, setExpenseStep] = useState(1);
@@ -117,6 +122,14 @@ export default function FinancesLedger({
             if (paymentsSortBy === 'date_asc') return (a.payment_date || '').localeCompare(b.payment_date || '');
             if (paymentsSortBy === 'amount_desc') return Number(b.amount || 0) - Number(a.amount || 0);
             if (paymentsSortBy === 'amount_asc') return Number(a.amount || 0) - Number(b.amount || 0);
+            if (paymentsSortBy === 'user_asc') return (a.user?.name || '').localeCompare(b.user?.name || '');
+            if (paymentsSortBy === 'user_desc') return (b.user?.name || '').localeCompare(a.user?.name || '');
+            if (paymentsSortBy === 'prop_asc') return Number(a.property_id || 0) - Number(b.property_id || 0);
+            if (paymentsSortBy === 'prop_desc') return Number(b.property_id || 0) - Number(a.property_id || 0);
+            if (paymentsSortBy === 'method_asc') return (a.payment_method || '').localeCompare(b.payment_method || '');
+            if (paymentsSortBy === 'method_desc') return (b.payment_method || '').localeCompare(a.payment_method || '');
+            if (paymentsSortBy === 'status_asc') return (a.status || '').localeCompare(b.status || '');
+            if (paymentsSortBy === 'status_desc') return (b.status || '').localeCompare(a.status || '');
             return 0;
         });
     }, [displayPayments, paymentsStatusFilter, paymentsSearch, paymentsStartDate, paymentsEndDate, paymentsSortBy]);
@@ -290,8 +303,49 @@ export default function FinancesLedger({
         setNewPaymentForm({ user_id: '', property_id: '', amount: '', payment_method: 'transfer', status: 'completed' });
     };
 
+    const [isBannerDismissed, setIsBannerDismissed] = useState(false);
+
     return (
-        <div className="space-y-6 animate-fade-in text-left">
+        <div className="space-y-6 animate-fade-in text-left font-outfit">
+            {/* Banner de Cabecera Generoso Colapsable del Módulo de Finanzas */}
+            {!isBannerDismissed ? (
+                <div className="bg-gradient-to-r from-indigo-50/80 via-white to-slate-50 dark:from-indigo-950/60 dark:via-slate-900 dark:to-slate-950 border border-indigo-200/80 dark:border-indigo-900/40 rounded-2xl p-6 relative overflow-hidden shadow-xs">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+                        <div className="space-y-1 max-w-3xl">
+                            <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
+                                💰 Motor Contable & Tesorería
+                            </span>
+                            <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                                Finanzas, Libro Diario & Recaudación
+                            </h3>
+                            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                Contabilidad integral y libro diario contable del condominio. Registre la recaudación de Gastos Comunes, concilie egresos operativos de proveedores y mantenimiento, audite el fondo de reserva y verifique el balance contable en tiempo real.
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={() => setIsBannerDismissed(true)}
+                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 shrink-0 self-start md:self-center"
+                            title="Minimizar cabecera informativa"
+                        >
+                            <span>✕ Minimizar</span>
+                        </button>
+                    </div>
+                </div>
+            ) : (
+                <div className="flex justify-start">
+                    <button
+                        type="button"
+                        onClick={() => setIsBannerDismissed(false)}
+                        className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-800/60"
+                    >
+                        <span>ℹ️ Mostrar guía de Finanzas & Tesorería</span>
+                        <span>▼</span>
+                    </button>
+                </div>
+            )}
+
             {/* Tabs header selector - 4 Pestañas Claras */}
             <div className="flex border-b border-gray-150 dark:border-slate-800/80 overflow-x-auto">
                 <button
@@ -545,11 +599,59 @@ export default function FinancesLedger({
 
                     <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
                         <SimpleTable
-                            headers={['Vecino', 'Propiedad', 'Monto', 'Método', 'Fecha', 'Estado', 'Documentos', ...(!readOnly ? ['Acciones'] : [])]}
+                            headers={[
+                                <button key="hdr-user" type="button" onClick={() => setPaymentsSortBy(paymentsSortBy === 'user_asc' ? 'user_desc' : 'user_asc')} className="font-extrabold flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400">
+                                    <span>Vecino</span>
+                                    <span>{paymentsSortBy === 'user_asc' ? '⬆️' : paymentsSortBy === 'user_desc' ? '⬇️' : '↕️'}</span>
+                                </button>,
+                                <button key="hdr-prop" type="button" onClick={() => setPaymentsSortBy(paymentsSortBy === 'prop_asc' ? 'prop_desc' : 'prop_asc')} className="font-extrabold flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400">
+                                    <span>Propiedad</span>
+                                    <span>{paymentsSortBy === 'prop_asc' ? '⬆️' : paymentsSortBy === 'prop_desc' ? '⬇️' : '↕️'}</span>
+                                </button>,
+                                <button key="hdr-amt" type="button" onClick={() => setPaymentsSortBy(paymentsSortBy === 'amount_asc' ? 'amount_desc' : 'amount_asc')} className="font-extrabold flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400">
+                                    <span>Monto</span>
+                                    <span>{paymentsSortBy === 'amount_asc' ? '⬆️' : paymentsSortBy === 'amount_desc' ? '⬇️' : '↕️'}</span>
+                                </button>,
+                                <button key="hdr-method" type="button" onClick={() => setPaymentsSortBy(paymentsSortBy === 'method_asc' ? 'method_desc' : 'method_asc')} className="font-extrabold flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400">
+                                    <span>Método</span>
+                                    <span>{paymentsSortBy === 'method_asc' ? '⬆️' : paymentsSortBy === 'method_desc' ? '⬇️' : '↕️'}</span>
+                                </button>,
+                                <button key="hdr-date" type="button" onClick={() => setPaymentsSortBy(paymentsSortBy === 'date_asc' ? 'date_desc' : 'date_asc')} className="font-extrabold flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400">
+                                    <span>Fecha</span>
+                                    <span>{paymentsSortBy === 'date_asc' ? '⬆️' : paymentsSortBy === 'date_desc' ? '⬇️' : '↕️'}</span>
+                                </button>,
+                                <button key="hdr-status" type="button" onClick={() => setPaymentsSortBy(paymentsSortBy === 'status_asc' ? 'status_desc' : 'status_asc')} className="font-extrabold flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400">
+                                    <span>Estado</span>
+                                    <span>{paymentsSortBy === 'status_asc' ? '⬆️' : paymentsSortBy === 'status_desc' ? '⬇️' : '↕️'}</span>
+                                </button>,
+                                'Documentos',
+                                ...(!readOnly ? ['Acciones'] : [])
+                            ]}
                             rows={filteredDisplayPayments.map(p => ({
                                 cells: [
-                                    <span className="font-bold text-gray-900 dark:text-white" key={`user-${p.id}`}>{p.user?.name || 'Vecino'}</span>,
-                                    <span className="font-bold" key={`prop-${p.id}`}>Depto #{p.property_id}</span>,
+                                    <button
+                                        key={`user-${p.id}`}
+                                        type="button"
+                                        onClick={() => setInspectingUnit360({ 
+                                            number: p.property_id, 
+                                            id: p.property_id, 
+                                            owner: p.user?.name || 'Vecino',
+                                            user: p.user
+                                        })}
+                                        className="font-black text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer text-left"
+                                        title="Ver Ficha Técnica 360° del Vecino"
+                                    >
+                                        <span>👤 {p.user?.name || 'Vecino'}</span>
+                                    </button>,
+                                    <button
+                                        key={`prop-${p.id}`}
+                                        type="button"
+                                        onClick={() => setInspectingUnit360({ number: p.property_id, id: p.property_id })}
+                                        className="font-black text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer"
+                                        title="Ver Ficha Técnica 360°"
+                                    >
+                                        <span>🏢 Depto #{p.property_id}</span>
+                                    </button>,
                                     <span className="font-bold text-emerald-600 dark:text-emerald-500" key={`amt-${p.id}`}>${Number(p.amount).toLocaleString()}</span>,
                                     <span className="capitalize font-mono text-xs" key={`method-${p.id}`}>{p.payment_method === 'transfer' ? 'Transferencia' : p.payment_method === 'card' ? 'Tarjeta' : 'Efectivo'}</span>,
                                     <span key={`date-${p.id}`}>{new Date(p.payment_date).toLocaleDateString('es-CL')}</span>,
@@ -1779,8 +1881,8 @@ export default function FinancesLedger({
                         </div>
             ) : null}
 
-            {selectedAviso && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm" onClick={() => setSelectedAviso(null)}>
+            {selectedAviso && createPortal(
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md" onClick={() => setSelectedAviso(null)}>
                     <div className="relative max-w-4xl w-full bg-white text-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl overflow-y-auto max-h-[90vh] border border-gray-100" onClick={(e) => e.stopPropagation()}>
                         {/* Close Button */}
                         <button 
@@ -1990,8 +2092,21 @@ export default function FinancesLedger({
                             </div>
                         )}
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
+
+            {/* Modal de Ficha Técnica 360° Interconectada */}
+            <UnitDetailModal360
+                inspectingUnit={inspectingUnit360}
+                onClose={() => setInspectingUnit360(null)}
+                allProperties={adminFilteredProperties}
+                allFines={finesList || []}
+                allTickets={ticketsList || []}
+                allUsers={usersList || []}
+                allPayments={paymentsList || []}
+                activeCondoName={activeCondo?.name || 'Condominio Alameda'}
+            />
         </div>
     );
 }

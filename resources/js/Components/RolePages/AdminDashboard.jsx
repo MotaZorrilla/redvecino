@@ -49,7 +49,9 @@ export default function AdminDashboard({
             {adminActiveTab === 'dashboard' && (
                 <DashboardOverview
                     condosList={condosList}
+                    allCondominiums={allCondominiums}
                     adminCondoId={adminCondoId}
+                    setAdminCondoId={setAdminCondoId}
                     adminFilteredProperties={adminFilteredProperties}
                     adminFilteredUsers={adminFilteredUsers}
                     adminFilteredTickets={adminFilteredTickets}
@@ -74,6 +76,8 @@ export default function AdminDashboard({
                     setPropertiesList={setPropertiesList}
                     adminFilteredProperties={adminFilteredProperties}
                     adminCondoId={adminCondoId}
+                    condosList={condosList}
+                    allCondominiums={allCondominiums}
                 />
             )}
             {adminActiveTab === 'users' && (
@@ -188,6 +192,8 @@ export default function AdminDashboard({
                     handleDeleteExpense={handleDeleteExpense}
                     usersList={usersList}
                     allCondominiums={allCondominiums}
+                    finesList={finesList}
+                    ticketsList={ticketsList}
                     readOnly={false}
                 />
             )}

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { SimpleTable, StatusBadge } from '@/Components/DashboardShared';
 import { generatePassword } from '@/utils/helpers';
+import UnitDetailModal360 from '@/Components/Admin/UnitDetailModal360';
 
 export default function UsersList({
     adminCondoId,
@@ -15,25 +16,43 @@ export default function UsersList({
     setEditingUser,
     userSubTab,
     setUserSubTab,
-    onOpenWizard
+    onOpenWizard,
+    activeCondoName = 'Condominio Alameda'
 }) {
     const [selectedWorker, setSelectedWorker] = useState(null);
     const [selectedContract, setSelectedContract] = useState(null);
     const [selectedFiniquito, setSelectedFiniquito] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [userSearchQuery, setUserSearchQuery] = useState('');
+    const [inspectingUnit360, setInspectingUnit360] = useState(null);
 
-    // Filter based on selected sub-tab
+    // Filter based on selected sub-tab & search query
     const filteredUsersForSubtab = adminFilteredUsers.filter(u => {
         const isAd = u.roles?.some(r => ['admin', 'administrador'].includes(r.toLowerCase()));
         const isStaff = u.roles?.some(r => ['colaborador', 'employee'].includes(r.toLowerCase()));
         
+        let matchesTab = false;
         if (userSubTab === 'residents') {
-            return !isAd && !isStaff;
+            matchesTab = !isAd && !isStaff;
         } else if (userSubTab === 'admins') {
-            return isAd;
+            matchesTab = isAd;
         } else {
-            return isStaff;
+            matchesTab = isStaff;
         }
+
+        if (!matchesTab) return false;
+
+        if (userSearchQuery) {
+            const q = userSearchQuery.toLowerCase();
+            const nameMatch = u.name?.toLowerCase().includes(q);
+            const rutMatch = u.rut?.toLowerCase().includes(q);
+            const emailMatch = u.email?.toLowerCase().includes(q);
+            const phoneMatch = u.phone?.toLowerCase().includes(q);
+            const roleMatch = u.roles?.some(r => r.toLowerCase().includes(q));
+            return nameMatch || rutMatch || emailMatch || phoneMatch || roleMatch;
+        }
+
+        return true;
     });
 
     const handleFormSubmit = (e) => {
@@ -68,57 +87,116 @@ export default function UsersList({
         setIsSubmitting(false);
     };
 
+    const [isBannerDismissed, setIsBannerDismissed] = useState(false);
+
     return (
-        <div className="space-y-6 animate-fade-in text-left">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div>
-                    <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">
-                        👥 Gestión de Usuarios del Condominio
-                    </h4>
-                    <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Administra residentes, administradores y personal colaborador con sus respectivas obligaciones y documentos contables.</p>
-                </div>
-                
-                <div className="flex items-center gap-2 flex-wrap">
-                    <div className="flex bg-gray-100 dark:bg-slate-950 p-1 rounded-lg border border-gray-200 dark:border-slate-800/80 mr-2">
+        <div className="space-y-6 animate-fade-in text-left font-outfit">
+            {/* Banner de Cabecera Generoso Colapsable del Módulo de Usuarios */}
+            {!isBannerDismissed ? (
+                <div className="bg-gradient-to-r from-indigo-50/80 via-white to-slate-50 dark:from-indigo-950/60 dark:via-slate-900 dark:to-slate-950 border border-indigo-200/80 dark:border-indigo-900/40 rounded-2xl p-6 relative overflow-hidden shadow-xs">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+                        <div className="space-y-1 max-w-3xl">
+                            <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
+                                👥 Comunidad & Roles
+                            </span>
+                            <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                                Directorio de Usuarios, Residentes & Directiva
+                            </h3>
+                            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                Administración unificada de copropietarios titulares, residentes inquilinos, comité de administración y personal colaborador de {activeCondoName}. Gestione vincularlos con sus departamentos, configure roles y revise la Ficha Técnica 360° de sus unidades.
+                            </p>
+                        </div>
+
                         <button
-                            onClick={() => setUserSubTab('residents')}
-                            className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${userSubTab === 'residents' ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-white shadow' : 'text-slate-500 dark:text-slate-400'}`}
+                            type="button"
+                            onClick={() => setIsBannerDismissed(true)}
+                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 shrink-0 self-start md:self-center"
+                            title="Minimizar cabecera informativa"
                         >
-                            Residentes ({adminFilteredUsers.filter(u => !u.roles?.some(r => ['admin', 'administrador', 'colaborador', 'employee'].includes(r.toLowerCase()))).length})
-                        </button>
-                        <button
-                            onClick={() => setUserSubTab('admins')}
-                            className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${userSubTab === 'admins' ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-white shadow' : 'text-slate-500 dark:text-slate-400'}`}
-                        >
-                            Administradores ({adminFilteredUsers.filter(u => u.roles?.some(r => ['admin', 'administrador'].includes(r.toLowerCase()))).length})
-                        </button>
-                        <button
-                            onClick={() => setUserSubTab('staff')}
-                            className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${userSubTab === 'staff' ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-white shadow' : 'text-slate-500 dark:text-slate-400'}`}
-                        >
-                            Colaboradores ({adminFilteredUsers.filter(u => u.roles?.some(r => ['colaborador', 'employee'].includes(r.toLowerCase()))).length})
+                            <span>✕ Minimizar</span>
                         </button>
                     </div>
+                </div>
+            ) : (
+                <div className="flex justify-start">
+                    <button
+                        type="button"
+                        onClick={() => setIsBannerDismissed(false)}
+                        className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-800/60"
+                    >
+                        <span>ℹ️ Mostrar guía de Gestión de Usuarios</span>
+                        <span>▼</span>
+                    </button>
+                </div>
+            )}
 
+            {/* Sub-pestañas con Subrayado Activo (Estilo Finanzas) */}
+            <div className="flex border-b border-gray-200 dark:border-slate-800/80 w-full overflow-x-auto">
+                <button
+                    onClick={() => setUserSubTab('residents')}
+                    className={`px-5 py-3 font-bold text-xs uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${
+                        userSubTab === 'residents'
+                            ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400 font-extrabold'
+                            : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+                    }`}
+                >
+                    🏠 Residentes & Copropietarios ({adminFilteredUsers.filter(u => !u.roles?.some(r => ['admin', 'administrador', 'colaborador', 'employee'].includes(r.toLowerCase()))).length})
+                </button>
+                <button
+                    onClick={() => setUserSubTab('admins')}
+                    className={`px-5 py-3 font-bold text-xs uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${
+                        userSubTab === 'admins'
+                            ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400 font-extrabold'
+                            : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+                    }`}
+                >
+                    👑 Administradores ({adminFilteredUsers.filter(u => u.roles?.some(r => ['admin', 'administrador'].includes(r.toLowerCase()))).length})
+                </button>
+                <button
+                    onClick={() => setUserSubTab('staff')}
+                    className={`px-5 py-3 font-bold text-xs uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${
+                        userSubTab === 'staff'
+                            ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400 font-extrabold'
+                            : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+                    }`}
+                >
+                    👷 Personal Colaborador ({adminFilteredUsers.filter(u => u.roles?.some(r => ['colaborador', 'employee'].includes(r.toLowerCase()))).length})
+                </button>
+            </div>
+
+            {/* Barra de Búsqueda y Acciones a Ancho Completo */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
+                <div className="relative flex-1 min-w-[240px]">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400 text-xs">🔍</span>
+                    <input
+                        type="text"
+                        placeholder="Buscar por Nombre, RUT, Email..."
+                        value={userSearchQuery}
+                        onChange={(e) => setUserSearchQuery(e.target.value)}
+                        className="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500"
+                    />
+                </div>
+
+                <div className="flex items-center gap-3">
                     <button
                         onClick={() => {
                             setEditingUser(null);
-                            setNewUserForm({ name: '', rut: '', email: '', phone: '', role: userSubTab === 'admins' ? 'admin' : userSubTab === 'staff' ? 'colaborador' : 'resident', status: 'active', password: 'password' });
+                            setNewUserForm({ name: '', rut: '', email: '', phone: '', role: 'resident', status: 'active', password: generatePassword() });
                             setShowAddUserForm(!showAddUserForm);
                         }}
-                        className="px-3.5 py-1.5 bg-brand-teal hover:bg-[#00c2ad] text-white font-bold text-xs rounded-xl shadow transition-all cursor-pointer"
+                        className="px-4 py-2 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
                     >
-                        {showAddUserForm ? 'Cerrar Form' : 'Añadir Rápido'}
+                        <span>{showAddUserForm ? '✖️' : '➕'}</span>
+                        <span>{showAddUserForm ? 'Cerrar Formulario' : 'Nuevo Usuario'}</span>
                     </button>
-                    {onOpenWizard && (
+
+                    {userSubTab === 'staff' && onOpenWizard && (
                         <button
                             onClick={onOpenWizard}
-                            className="px-3.5 py-1.5 bg-gradient-to-r from-brand-teal to-brand-green text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all cursor-pointer flex items-center gap-1.5"
+                            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
                         >
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
-                            </svg>
-                            Asistente de Creación
+                            <span>📑</span>
+                            <span>Asistente Contratos</span>
                         </button>
                     )}
                 </div>
@@ -265,7 +343,20 @@ export default function UsersList({
                                 </button>
                             </div>
                         ] : [
-                            <span className="font-bold text-gray-900 dark:text-white" key={`name-${u.id}`}>{u.name}</span>,
+                            <button
+                                key={`name-${u.id}`}
+                                type="button"
+                                onClick={() => setInspectingUnit360({
+                                    number: u.property_id || u.property?.number || '10',
+                                    id: u.property_id || 10,
+                                    owner: u.name,
+                                    user: u
+                                })}
+                                className="font-extrabold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer text-left"
+                                title="Ver Ficha Técnica 360° del Usuario"
+                            >
+                                <span>👤 {u.name}</span>
+                            </button>,
                             <span className="font-mono text-xs" key={`rut-${u.id}`}>{u.rut}</span>,
                             <span key={`email-${u.id}`}>{u.email}</span>,
                             <div key={`role-${u.id}`} className="flex flex-wrap gap-1">
@@ -508,6 +599,14 @@ export default function UsersList({
                     </div>
                 </div>
             )}
+
+            {/* Modal de Ficha Técnica 360° Interconectada */}
+            <UnitDetailModal360
+                inspectingUnit={inspectingUnit360}
+                onClose={() => setInspectingUnit360(null)}
+                allUsers={usersList}
+                activeCondoName={activeCondoName}
+            />
         </div>
     );
 }

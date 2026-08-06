@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { SimpleTable } from '@/Components/DashboardShared';
+import UnitDetailModal360 from '@/Components/Admin/UnitDetailModal360';
 
 export default function FinesList({
     adminCondoId,
@@ -12,9 +13,12 @@ export default function FinesList({
     showAddFineForm,
     setShowAddFineForm,
     editingFine,
-    setEditingFine
+    setEditingFine,
+    activeCondoName = 'Condominio Alameda'
 }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [inspectingUnit360, setInspectingUnit360] = useState(null);
+    const [isBannerDismissed, setIsBannerDismissed] = useState(false);
 
     // Advanced Filter & Sort States
     const [statusFilter, setStatusFilter] = useState('all');
@@ -39,19 +43,10 @@ export default function FinesList({
         const countPending = baseFines.filter(f => f.status === 'pending').length;
         const countAnnulled = baseFines.filter(f => f.status === 'annulled').length;
 
-        return {
-            totalResolved: resolved,
-            totalPending: pending,
-            totalAnnulled: annulled,
-            totalGross: resolved + pending + annulled,
-            countResolved,
-            countPending,
-            countAnnulled,
-            countTotal: baseFines.length
-        };
+        return { resolved, pending, annulled, countResolved, countPending, countAnnulled };
     }, [baseFines]);
 
-    // Filtered & Sorted List
+    // Filter & Sort Pipeline
     const filteredFines = useMemo(() => {
         let list = [...baseFines];
 
@@ -60,12 +55,12 @@ export default function FinesList({
             list = list.filter(f => f.status === statusFilter);
         }
 
-        // 2. Search Query (property number or reason)
-        if (searchQuery.trim()) {
-            const q = searchQuery.toLowerCase().trim();
+        // 2. Search Query (Motivo o ID de Propiedad)
+        if (searchQuery.trim() !== '') {
+            const q = searchQuery.toLowerCase();
             list = list.filter(f => 
-                String(f.property_id).toLowerCase().includes(q) ||
-                String(f.reason).toLowerCase().includes(q)
+                f.reason.toLowerCase().includes(q) || 
+                String(f.property_id).includes(q)
             );
         }
 
@@ -110,12 +105,12 @@ export default function FinesList({
         } else {
             const newF = {
                 id: finesList.length > 0 ? Math.max(...finesList.map(f => f.id)) + 1 : 1,
+                condominium_id: Number(adminCondoId || 1),
                 property_id: Number(newFineForm.property_id),
                 amount: Number(newFineForm.amount),
                 reason: newFineForm.reason,
                 status: newFineForm.status,
-                date: new Date().toISOString().split('T')[0],
-                condominium_id: adminCondoId
+                date: new Date().toISOString().split('T')[0]
             };
             setFinesList(prev => [newF, ...prev]);
         }
@@ -125,253 +120,235 @@ export default function FinesList({
     };
 
     return (
-        <div className="space-y-6 animate-fade-in text-left max-w-full overflow-hidden">
-            {/* Header Section */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 max-w-full">
-                <div>
-                    <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider flex items-center gap-2">
-                        <span>⚖️</span> Infracciones, Multas y Sanciones
-                    </h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                        Control disciplinario del Reglamento de Copropiedad (ruidos, mascotas, estacionamientos, etc.).
-                    </p>
-                </div>
-                <button
-                    onClick={() => {
-                        setEditingFine(null);
-                        setNewFineForm({ property_id: '', amount: '', reason: '', status: 'pending' });
-                        setShowAddFineForm(!showAddFineForm);
-                    }}
-                    className="px-4 py-2 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
-                >
-                    <span>{showAddFineForm ? '✖️' : '➕'}</span>
-                    <span>{showAddFineForm ? 'Cerrar Formulario' : 'Cursar Nueva Multa'}</span>
-                </button>
-            </div>
+        <div className="space-y-6 animate-fade-in text-left max-w-full overflow-hidden font-outfit">
+            {/* Banner de Cabecera Generoso Colapsable del Módulo de Multas */}
+            {!isBannerDismissed ? (
+                <div className="bg-gradient-to-r from-indigo-50/80 via-white to-slate-50 dark:from-indigo-950/60 dark:via-slate-900 dark:to-slate-950 border border-indigo-200/80 dark:border-indigo-900/40 rounded-2xl p-6 relative overflow-hidden shadow-xs">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+                        <div className="space-y-1 max-w-3xl">
+                            <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
+                                ⚖️ Fiscalización & Reglamento Interno
+                            </span>
+                            <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                                Multas, Infracciones & Control Disciplinario
+                            </h3>
+                            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                Registro y fiscalización del cumplimiento del Reglamento de Copropiedad de {activeCondoName}. Administre sanciones por ruidos molestos, mal uso de áreas comunes o estacionamientos, gestione descargos y sincronice los cobros directamente en la boleta de Gastos Comunes.
+                            </p>
+                        </div>
 
-            {/* Header KPI Summary Badges / Cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-full">
-                {/* Cobrado / Resuelto */}
-                <div className="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-emerald-500/20 shadow-xs space-y-1 min-w-0">
-                    <div className="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-wider gap-1">
-                        <span className="truncate">Cobrado / Resuelto</span>
-                        <span className="text-emerald-500 font-extrabold shrink-0">{stats.countResolved}</span>
+                        <button
+                            type="button"
+                            onClick={() => setIsBannerDismissed(true)}
+                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 shrink-0 self-start md:self-center"
+                            title="Minimizar cabecera informativa"
+                        >
+                            <span>✕ Minimizar</span>
+                        </button>
                     </div>
-                    <p className="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400 truncate">
-                        ${stats.totalResolved.toLocaleString('es-CL')}
-                    </p>
-                    <span className="text-[10px] text-emerald-600/70 font-semibold block truncate">Ingresado a Diario</span>
                 </div>
-
-                {/* Por Cobrar / Pendiente */}
-                <div className="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-rose-500/20 shadow-xs space-y-1 min-w-0">
-                    <div className="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-wider gap-1">
-                        <span className="truncate">Por Cobrar</span>
-                        <span className="text-rose-500 font-extrabold shrink-0">{stats.countPending}</span>
-                    </div>
-                    <p className="text-base sm:text-lg font-black text-rose-600 dark:text-rose-400 truncate">
-                        ${stats.totalPending.toLocaleString('es-CL')}
-                    </p>
-                    <span className="text-[10px] text-rose-600/70 font-semibold block truncate">Cuentas activas</span>
+            ) : (
+                <div className="flex justify-start">
+                    <button
+                        type="button"
+                        onClick={() => setIsBannerDismissed(false)}
+                        className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-800/60"
+                    >
+                        <span>ℹ️ Mostrar guía de Multas & Infracciones</span>
+                        <span>▼</span>
+                    </button>
                 </div>
+            )}
 
-                {/* Anuladas */}
-                <div className="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-1 min-w-0">
-                    <div className="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-wider gap-1">
-                        <span className="truncate">Anuladas</span>
-                        <span className="text-slate-500 font-extrabold shrink-0">{stats.countAnnulled}</span>
-                    </div>
-                    <p className="text-base sm:text-lg font-black text-slate-600 dark:text-slate-400 truncate">
-                        ${stats.totalAnnulled.toLocaleString('es-CL')}
-                    </p>
-                    <span className="text-[10px] text-slate-400 font-semibold block truncate">Sin impacto</span>
-                </div>
-
-                {/* Total Cursado */}
-                <div className="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-indigo-500/20 shadow-xs space-y-1 min-w-0">
-                    <div className="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-wider gap-1">
-                        <span className="truncate">Total Cursado</span>
-                        <span className="text-indigo-500 font-extrabold shrink-0">{stats.countTotal}</span>
-                    </div>
-                    <p className="text-base sm:text-lg font-black text-indigo-600 dark:text-indigo-400 truncate">
-                        ${stats.totalGross.toLocaleString('es-CL')}
-                    </p>
-                    <span className="text-[10px] text-indigo-500/70 font-semibold block truncate">Monto histórico</span>
-                </div>
-            </div>
-
-            {/* Add / Edit Form */}
+            {/* Modal / Formulario de Nueva Multa */}
             {showAddFineForm && (
-                <form onSubmit={handleFormSubmit} className="bg-slate-50 dark:bg-slate-900/60 p-6 rounded-2xl border border-gray-200 dark:border-slate-800 space-y-4 max-w-xl text-left shadow-md">
-                    <h5 className="text-xs font-bold text-gray-800 dark:text-slate-200 uppercase flex items-center gap-2">
+                <form onSubmit={handleFormSubmit} className="bg-white dark:bg-slate-900 border border-brand-teal/30 p-6 rounded-2xl space-y-4 shadow-lg animate-fade-in">
+                    <h5 className="font-extrabold text-sm text-slate-800 dark:text-white flex items-center gap-2">
                         <span>{editingFine ? '✏️' : '⚖️'}</span>
-                        <span>{editingFine ? 'Editar Multa Cursada' : 'Detalles de la Nueva Multa / Sanción'}</span>
+                        <span>{editingFine ? `Editar Multa #${editingFine.id}` : 'Cursar Nueva Infracción'}</span>
                     </h5>
-                    <div className="grid grid-cols-2 gap-4">
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                         <div>
-                            <label htmlFor="fine-property" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Propiedad Infractora</label>
+                            <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Unidad / Departamento</label>
                             <select
-                                id="fine-property"
                                 required
                                 value={newFineForm.property_id}
                                 onChange={(e) => setNewFineForm(prev => ({ ...prev, property_id: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none"
+                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 font-bold text-slate-900 dark:text-white"
                             >
-                                <option value="">Seleccione Unidad...</option>
+                                <option value="">-- Seleccionar Unidad --</option>
                                 {adminFilteredProperties.map(p => (
-                                    <option key={p.id} value={p.id}>Depto #{p.number}</option>
+                                    <option key={p.id} value={p.id}>Depto #{p.number} ({p.block || 'Torre A'})</option>
                                 ))}
                             </select>
                         </div>
+
                         <div>
-                            <label htmlFor="fine-amount" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Monto Sanción ($)</label>
+                            <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Monto ($ CLP)</label>
                             <input
-                                id="fine-amount"
                                 type="number"
                                 required
+                                min="1000"
+                                placeholder="Ej: 50000"
                                 value={newFineForm.amount}
                                 onChange={(e) => setNewFineForm(prev => ({ ...prev, amount: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
+                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 font-bold text-slate-900 dark:text-white"
                             />
                         </div>
+
+                        <div>
+                            <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Estado Infracción</label>
+                            <select
+                                value={newFineForm.status}
+                                onChange={(e) => setNewFineForm(prev => ({ ...prev, status: e.target.value }))}
+                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 font-bold text-slate-900 dark:text-white"
+                            >
+                                <option value="pending">⏳ Pendiente</option>
+                                <option value="resolved">✅ Resuelta / Cobrada</option>
+                                <option value="annulled">🚫 Anulada</option>
+                            </select>
+                        </div>
                     </div>
+
                     <div>
-                        <label htmlFor="fine-reason" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Motivo / Artículo Infringido</label>
-                        <input
-                            id="fine-reason"
-                            type="text"
+                        <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Motivo / Reglamento Infrigido</label>
+                        <textarea
                             required
-                            placeholder="Ej: Ruidos molestos en horario nocturno (Art. 14 del Reglamento)"
+                            rows="2"
+                            placeholder="Ej: Ruidos molestos en horario de descanso (Art. 14 del Reglamento)..."
                             value={newFineForm.reason}
                             onChange={(e) => setNewFineForm(prev => ({ ...prev, reason: e.target.value }))}
-                            className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 font-medium text-slate-900 dark:text-white"
                         />
                     </div>
-                    <div>
-                        <label htmlFor="fine-status" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado de la Sanción</label>
-                        <select
-                            id="fine-status"
-                            value={newFineForm.status}
-                            onChange={(e) => setNewFineForm(prev => ({ ...prev, status: e.target.value }))}
-                            className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-900 dark:text-white focus:outline-none"
-                        >
-                            <option value="pending">⏳ Pendiente de Pago</option>
-                            <option value="resolved">✅ Resuelta / Cobrada (Alimenta Libro Diario)</option>
-                            <option value="annulled">🚫 Anulada tras Descargo</option>
-                        </select>
-                    </div>
-                    <div className="flex gap-2 pt-2">
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="px-4 py-2 bg-brand-teal text-white text-xs font-bold rounded-xl hover:bg-brand-teal-light transition-all"
-                        >
-                            {editingFine ? 'Guardar Cambios' : 'Registrar Sanción'}
-                        </button>
+
+                    <div className="flex justify-end gap-2 pt-2">
                         <button
                             type="button"
                             onClick={() => setShowAddFineForm(false)}
-                            className="px-4 py-2 border border-gray-300 text-gray-500 text-xs font-bold rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition-all"
+                            className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs rounded-xl"
                         >
                             Cancelar
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow"
+                        >
+                            {isSubmitting ? 'Guardando...' : 'Guardar Multa'}
                         </button>
                     </div>
                 </form>
             )}
 
-            {/* Advanced Interactive Control Toolbar (Grid Responsivo sin desbordamiento) */}
-            <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-xs space-y-3 max-w-full overflow-hidden">
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 w-full items-center">
-                    {/* Search Input */}
-                    <div className="relative md:col-span-1 lg:col-span-2 min-w-0">
-                        <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">
-                            🔍
-                        </span>
-                        <input
-                            type="text"
-                            placeholder="Buscar por depto o motivo..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-800 dark:text-white focus:outline-none focus:border-brand-teal"
-                        />
-                    </div>
+            {/* Filter Toolbar & KPIs a Ancho Completo Homologado */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-4 shadow-xs w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <button
+                        type="button"
+                        onClick={() => setStatusFilter(statusFilter === 'pending' ? 'all' : 'pending')}
+                        className={`p-3 rounded-xl border text-left transition-all ${statusFilter === 'pending' ? 'border-amber-500 bg-amber-50 dark:bg-amber-500/10' : 'border-slate-200 dark:border-slate-800'}`}
+                    >
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Multas Pendientes</span>
+                        <div className="text-lg font-black text-amber-600 dark:text-amber-400">
+                            ${stats.pending.toLocaleString('es-CL')} <span className="text-xs text-slate-400">({stats.countPending})</span>
+                        </div>
+                    </button>
 
-                    {/* Status Filter Dropdown */}
-                    <div className="flex items-center gap-1.5 min-w-0">
-                        <label htmlFor="fine-status-filter" className="text-[11px] font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap shrink-0">
-                            Estado:
-                        </label>
-                        <select
-                            id="fine-status-filter"
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            className="w-full min-w-0 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white text-xs px-2.5 py-2 rounded-xl focus:outline-none truncate"
-                        >
-                            <option value="all">Todos ({stats.countTotal})</option>
-                            <option value="pending">⏳ Pendientes ({stats.countPending})</option>
-                            <option value="resolved">✅ Resueltas ({stats.countResolved})</option>
-                            <option value="annulled">🚫 Anuladas ({stats.countAnnulled})</option>
-                        </select>
-                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setStatusFilter(statusFilter === 'resolved' ? 'all' : 'resolved')}
+                        className={`p-3 rounded-xl border text-left transition-all ${statusFilter === 'resolved' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10' : 'border-slate-200 dark:border-slate-800'}`}
+                    >
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Multas Recaudadas</span>
+                        <div className="text-lg font-black text-emerald-600 dark:text-emerald-400">
+                            ${stats.resolved.toLocaleString('es-CL')} <span className="text-xs text-slate-400">({stats.countResolved})</span>
+                        </div>
+                    </button>
 
-                    {/* Sort Dropdown */}
-                    <div className="flex items-center gap-1.5 min-w-0">
-                        <label htmlFor="fine-sort-by" className="text-[11px] font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap shrink-0">
-                            Orden:
-                        </label>
-                        <select
-                            id="fine-sort-by"
-                            value={sortBy}
-                            onChange={(e) => setSortBy(e.target.value)}
-                            className="w-full min-w-0 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white text-xs px-2.5 py-2 rounded-xl focus:outline-none truncate"
-                        >
-                            <option value="date_desc">📅 Recientes</option>
-                            <option value="date_asc">📅 Antiguas</option>
-                            <option value="amount_desc">💰 Mayor monto</option>
-                            <option value="amount_asc">💰 Menor monto</option>
-                        </select>
-                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setStatusFilter(statusFilter === 'annulled' ? 'all' : 'annulled')}
+                        className={`p-3 rounded-xl border text-left transition-all ${statusFilter === 'annulled' ? 'border-slate-500 bg-slate-100 dark:bg-slate-800/40' : 'border-slate-200 dark:border-slate-800'}`}
+                    >
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Multas Anuladas</span>
+                        <div className="text-lg font-black text-slate-500 dark:text-slate-400">
+                            ${stats.annulled.toLocaleString('es-CL')} <span className="text-xs text-slate-400">({stats.countAnnulled})</span>
+                        </div>
+                    </button>
                 </div>
 
-                {/* Secondary Row: Date Range & Clear Filters */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-slate-800/60 max-w-full">
-                    <div className="flex items-center gap-2 text-xs flex-wrap max-w-full">
-                        <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 shrink-0">📅 Fechas:</span>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-slate-800 w-full">
+                    <div className="flex items-center gap-2 flex-wrap flex-1">
+                        <div className="relative flex-1 min-w-[200px]">
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-2.5 text-slate-400 text-xs">🔍</span>
+                            <input
+                                type="text"
+                                placeholder="Buscar motivo, depto..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs pl-8 pr-3 py-2 text-slate-800 dark:text-white"
+                            />
+                        </div>
+
                         <input
                             type="date"
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
-                            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs px-2 py-1 text-slate-800 dark:text-white"
+                            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white"
                         />
-                        <span className="text-slate-400 shrink-0">a</span>
+                        <span className="text-xs text-slate-400">a</span>
                         <input
                             type="date"
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
-                            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs px-2 py-1 text-slate-800 dark:text-white"
+                            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white"
                         />
                     </div>
 
-                    {(statusFilter !== 'all' || searchQuery || startDate || endDate || sortBy !== 'date_desc') && (
+                    <div className="flex items-center gap-2">
+                        {(statusFilter !== 'all' || searchQuery || startDate || endDate || sortBy !== 'date_desc') && (
+                            <button
+                                type="button"
+                                onClick={clearFilters}
+                                className="px-3 py-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 font-bold text-xs rounded-xl transition-all flex items-center gap-1 shrink-0"
+                            >
+                                <span>Limpiar Filtros ×</span>
+                            </button>
+                        )}
+
                         <button
-                            type="button"
-                            onClick={clearFilters}
-                            className="px-3 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 font-bold text-xs rounded-xl transition-all flex items-center gap-1 shrink-0"
+                            onClick={() => {
+                                setEditingFine(null);
+                                setNewFineForm({ property_id: '', amount: '', reason: '', status: 'pending' });
+                                setShowAddFineForm(!showAddFineForm);
+                            }}
+                            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2 cursor-pointer shrink-0"
                         >
-                            <span>Limpiar Filtros ×</span>
+                            <span>{showAddFineForm ? '✖️' : '➕'}</span>
+                            <span>{showAddFineForm ? 'Cerrar Form' : 'Cursar Nueva Multa'}</span>
                         </button>
-                    )}
+                    </div>
                 </div>
             </div>
 
-            {/* Table Results */}
+            {/* Table Results con Unidades Clickeables */}
             <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm max-w-full">
                 <SimpleTable
                     headers={['Fecha', 'Propiedad', 'Infracción / Motivo', 'Monto', 'Estado', 'Acciones']}
                     rows={filteredFines.map(f => ({
                         cells: [
                             <span key={`date-${f.id}`} className="font-mono text-xs">{f.date}</span>,
-                            <span className="font-extrabold text-slate-900 dark:text-white" key={`prop-${f.id}`}>Depto #{f.property_id}</span>,
+                            <button
+                                key={`prop-${f.id}`}
+                                type="button"
+                                onClick={() => setInspectingUnit360({ number: f.property_id, id: f.property_id })}
+                                className="font-black text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer"
+                                title="Ver Ficha Técnica 360°"
+                            >
+                                <span>🏢 Depto #{f.property_id}</span>
+                            </button>,
                             <p className="text-xs text-slate-600 dark:text-slate-400 max-w-[320px] truncate" title={f.reason} key={`reason-${f.id}`}>{f.reason}</p>,
                             <span className="font-extrabold text-rose-600 dark:text-rose-400 font-mono text-xs" key={`amt-${f.id}`}>${Number(f.amount).toLocaleString('es-CL')}</span>,
                             <span key={`status-${f.id}`} className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase flex items-center gap-1 w-fit ${
@@ -386,44 +363,41 @@ export default function FinesList({
                             </span>,
                             <div className="flex items-center justify-center gap-1.5" key={`act-${f.id}`}>
                                 <button
-                                    type="button"
-                                    title="Editar sanción"
-                                    aria-label="Editar sanción"
                                     onClick={() => {
                                         setEditingFine(f);
-                                        setNewFineForm({
-                                            property_id: String(f.property_id),
-                                            amount: String(f.amount),
-                                            reason: f.reason,
-                                            status: f.status
-                                        });
+                                        setNewFineForm({ property_id: String(f.property_id), amount: String(f.amount), reason: f.reason, status: f.status });
                                         setShowAddFineForm(true);
                                     }}
-                                    className="px-2 py-1 sm:px-2.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-xs font-bold rounded-lg transition-all shadow-xs hover:scale-105 active:scale-95 flex items-center gap-1"
+                                    className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-indigo-600 font-bold text-xs"
+                                    title="Editar Multa"
                                 >
-                                    <span>✏️</span>
-                                    <span className="hidden sm:inline">Editar</span>
+                                    ✏️
                                 </button>
-                                <button
-                                    type="button"
-                                    title="Borrar sanción"
-                                    aria-label="Borrar sanción"
-                                    onClick={() => {
-                                        if (confirm('¿Desea anular o eliminar esta sanción?')) {
-                                            setFinesList(prev => prev.filter(item => item.id !== f.id));
-                                        }
-                                    }}
-                                    className="px-2 py-1 sm:px-2.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-xs font-bold rounded-lg transition-all shadow-xs hover:scale-105 active:scale-95 flex items-center gap-1"
-                                >
-                                    <span>🗑️</span>
-                                    <span className="hidden sm:inline">Borrar</span>
-                                </button>
+                                {f.status !== 'resolved' && (
+                                    <button
+                                        onClick={() => {
+                                            setFinesList(prev => prev.map(item => item.id === f.id ? { ...item, status: 'resolved' } : item));
+                                        }}
+                                        className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 font-bold text-xs"
+                                        title="Marcar como Resuelta"
+                                    >
+                                        ✅
+                                    </button>
+                                )}
                             </div>
                         ]
                     }))}
-                    emptyMessage="No hay multas que coincidan con los filtros seleccionados"
                 />
             </div>
+
+            {/* Modal de Ficha Técnica 360° Interconectada */}
+            <UnitDetailModal360
+                inspectingUnit={inspectingUnit360}
+                onClose={() => setInspectingUnit360(null)}
+                allProperties={adminFilteredProperties}
+                allFines={baseFines}
+                activeCondoName={activeCondoName}
+            />
         </div>
     );
 }

@@ -41,7 +41,7 @@ export default function Dashboard() {
     const [adminCondoId, setAdminCondoId] = useState(allCondominiums.length > 0 ? allCondominiums[0].id : 1);
 
     // Condo Finances
-    const [paymentsTabMode, setPaymentsTabMode] = useState('payments');
+    const [paymentsTabMode, setPaymentsTabMode] = useState('ledger');
     const [ledgerSubTab, setLedgerSubTab] = useState('incomes');
     const [incomesList, setIncomesList] = useState([]);
     const [expensesList, setExpensesList] = useState([]);

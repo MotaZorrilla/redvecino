@@ -99,3 +99,37 @@ Para asegurar la entrega oportuna del MVP, quedan excluidas las siguientes funci
 *   Integración directa de pasarelas de pago automatizadas (ej. Webpay, Stripe). El pago se valida manualmente subiendo el comprobante de transferencia.
 *   Aplicaciones móviles nativas publicadas en App Store o Google Play. El acceso móvil se realiza a través de la Web-App responsive de **MiVecino**.
 *   Lectura automatizada de comprobantes bancarios mediante Inteligencia Artificial (OCR). La revisión del comprobante la hace físicamente el administrador.
+
+---
+
+## 🚀 7. Roadmap de Integración v2 (Condominio-PRO v2.0)
+
+Con base en la auditoría comparativa de la propuesta v2 (`zAux/Redvecino idea v2`), se establece el plan maestro para portar los 9 módulos operacionales y contables hacia la arquitectura v1 (Laravel 12 + Inertia v2 + React 18):
+
+### 7.1 Módulos a Portar e Integrar
+1. **Módulo 1 — Constructor Visual de Torres y Jerarquía de Propiedades (Prioridad P0 - Crítico):**
+   * Matriz visual interactiva para la creación y edición de condominios, torres (A/B/C o 1/2/3), pisos y unidades.
+   * Catálogo de tipos de unidades (`tipos_unidades`) y cálculo de alícuota de prorrateo (%) proporcional a los $m^2$.
+2. **Módulo 2 — Motor Contable de Gastos Comunes y Emisión de Boletas por Período (Prioridad P0 - Crítico):**
+   * Emisión masiva mensual de boletas de gastos comunes (`periodos_gasto_comun` y `boletas_gasto_comun`).
+   * Aplicación automática del Fondo de Reserva (5%) y cobro de consumo individual.
+3. **Módulo 3 — Configuración Paramétrica de Mora (Prioridad P1 - Alto):**
+   * Formulario administrativo para ajustar el día límite de vencimiento e interés de mora mensual.
+4. **Módulo 4 — Fichas Detalladas de Residentes por Unidad (Prioridad P1 - Alto):**
+   * Desglose de integrantes por departamento (`ficha_residentes` + `integrantes_ficha`), incluyendo asignación de estacionamientos, patentes de vehículos y tipo de acceso.
+5. **Módulo 5 — Gestión Administrativa de RRHH y Personal (Prioridad P1 - Alto):**
+   * Panel de administración de colaboradores: creación de contratos (3 meses → indefinido), liquidaciones de remuneración (AFP, Fonasa 7%, AFC 0.6%) y registro de amonestaciones.
+6. **Módulo 6 — Pedido de Insumos y Materiales (Prioridad P2 - Medio):**
+   * Flujo de solicitud desde el colaborador hacia el administrador con estados (pendiente, aprobado, comprado).
+7. **Módulo 7 — Checklist de Entrega y Recepción de Áreas Comunes (Prioridad P2 - Medio):**
+   * Control de check-in / check-out para reservas de amenidades (estado OK/dañado y soporte de fotografías).
+8. **Módulo 8 — Landing / Selector Visual de Portales (Prioridad P3 - Bajo):**
+   * Pantalla inicial interactiva para previsualización directa por rol.
+9. **Módulo 9 — Onboarding Guiado de Primera Entrada (Prioridad P3 - Bajo):**
+   * Asistente de configuración inicial del condominio y categorías contables.
+
+### 7.2 Garantía de Calidad y Pruebas Obligatorias por Módulo (Pest v3)
+De acuerdo con las reglas de desarrollo del repositorio (`AGENTS.md`):
+* **Cero código sin pruebas:** Cada nuevo endpoint, controlador o regla de negocio implementada debe contar con su correspondiente suite de pruebas de integración escrita en sintaxis **Pest v3** (`describe()`, `it()`, `dataset()`) con el sufijo `*Pest.php`.
+* **Criterios de Aceptación:** Se deben evaluar Happy Paths, Unhappy Paths (entradas nulas, montos negativos, accesos no autorizados RBAC) y validaciones de bordes (ej. alícuotas que deben sumar exactamente 100.0000%).
+

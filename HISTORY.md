@@ -553,6 +553,191 @@ Se ejecutÃ³ una auditorÃ­a completa de calidad de software (QA) sobre la sui
 - `CondoFinanceController` â€” probado indirectamente vÃ­a `CondoFinancesTest` + `CondoFinancesIsolationTest`
 - `MessageController` â€” probado indirectamente vÃ­a `ComunidadMensajeriaTest`
 
+### 3.23 Refinamiento UI/UX Fase 1 & Constructor de Torres (Agosto 2026)
+
+Se completaron e integraron todas las mejoras solicitadas para el **Módulo Visual de Infraestructura y Malla Arquitectónica**:
+
+1. **Soporte Adaptativo Modo Claro / Oscuro (Día y Noche):** Reestructurado `PropertyStructureBuilder.jsx` con estilos Tailwind reactivos para responder dinámicamente al tema global.
+2. **Buscadores Omnicanal Integrados:**
+   * Buscador dinámico por departamento, piso y torre en la Malla Arquitectónica.
+   * Buscador omnicanal en `PropertiesList.jsx` (unidad, ocupante, alícuota).
+   * Buscador de usuarios en `UsersList.jsx` (Nombre, RUT, Email, Rol).
+   * Buscador de incidencias en `TicketsList.jsx` (Título, solicitante, estado).
+3. **Modal Vistoso para Ficha de Departamento:** Implementado modal emergente (`Modal.jsx`) para la inspección y edición detallada de m², alícuotas, estacionamiento y bodega por unidad.
+4. **Identificación Automática del Condominio Activo:** Enlazado automático de la vista al condominio seleccionado en el Navbar/Sidebar (`activeCondoName`), evitando selectores redundantes.
+5. **Verificación QA (Pest v3):** Ejecución limpia de `PropertyStructureBuilderPest` (3/3 tests passed) y `WizardTorresCopyPest` (14/14 tests passed).
+
+---
+**Última actualización:** 05 de Agosto de 2026 (Refinamiento UI/UX Fase 1 & Modal Ficha Departamento - v8.5)
+
+### 3.24 Sub-Fichas de Propiedades, Columnas Ordenables & Modal Ficha Unidad (Agosto 2026)
+
+Se implementaron las mejoras de la sección de Propiedades:
+
+1. **Estructura en Fichas / Sub-pestañas:**
+   * 📋 **Ficha 1: Registro de Unidades (Tabla de Propiedades).**
+   * 🎨 **Ficha 2: Malla Arquitectónica Visual (Constructor de Torres).**
+2. **Filtros Avanzados y Columnas Ordenables:**
+   * Búsqueda por texto omnicanal.
+   * Filtros por Tipo de Unidad (`Depto`, `Casa`, `Estac.`, `Bodega`, `Local`) y Estado (`Ocupado`, `Disponible`, `Mantenimiento`).
+   * Reordenamiento dinámico al hacer clic en los encabezados de columna (`Unidad`, `Tipo`, `Ubicación`, `Área m²`, `Ocupación`).
+3. **Modal Vistoso de Ficha de Unidad (`inspectingUnit`):** Clic en cualquier fila o en el botón 🔍 despliega el Modal emergente con la ficha técnica completa del departamento (superficie privativa $m^2$, alícuota calculada %, vecinos propietarios/residentes asignados y botón de edición).
+4. **Verificación QA:** Pruebas backend 100% pasadas.
+
+---
+**Última actualización:** 05 de Agosto de 2026 (Sub-Fichas Propiedades & Columnas Ordenables - v8.6)
+
+### 3.25 Ficha Técnica 360° Entrelazada & Soporte Múltiples Estacionamientos y Bodegas (Agosto 2026)
+
+Se refactorizó el modelo de Ficha de Unidad para asegurar **Consistencia Total y Sincronizada (Single Source of Truth)** en todo el sistema:
+
+1. **Unificación Omnicanal:** Ya sea que el usuario ingrese a una unidad desde la Tabla de Registro, la Malla Arquitectónica Visual o la tabla de Alícuotas, la **Ficha Técnica 360°** despliega exactamente la misma información consolidada.
+2. **Soporte para Múltiples Estacionamientos y Bodegas:** Cada unidad puede poseer una lista o múltiples asignaciones de estacionamiento (`E-202A, E-202B`) y bodegas (`B-15, B-16`), editables dinámicamente.
+3. **Visión Holística en Modal:** Muestra datos físicos (piso, torre, $m^2$, tipo), alícuota de prorrateo calculada %, propietarios vinculados (RUT/Nombre) y ocupantes residentes.
+
+---
+**Última actualización:** 05 de Agosto de 2026 (Ficha 360° Entrelazada & Multi-Estacionamientos - v8.7)
+
+### 3.26 Selector Inicial de Condominios & Limpieza del Modal de Ficha Técnica (Agosto 2026)
+
+Se implementaron las mejoras específicas solicitadas por el usuario:
+
+1. **Tarjetas Interactivas de Selección de Condominio en Dashboard:**
+   * En la pantalla inicial de bienvenida del Administrador, se agregaron tarjetas destacadas para cada uno de los condominios bajo administración ("¿En qué condominio deseas trabajar hoy?").
+   * Al hacer clic en cualquier tarjeta (ej. "Condominio Alameda", "Condominio Los Hidalgos"), se cambia instantáneamente el condominio activo en toda la plataforma.
+2. **Actualización Dinámica del Condominio Activo:**
+   * En las cabeceras de Propiedades y Malla Arquitectónica se despliega explícitamente el nombre dinámico del condominio activo en lugar de un texto estático ("Condominio Alameda", "Condominio Los Hidalgos").
+3. **Limpieza del Modal de Ficha Técnica:**
+   * Título limpio: **"Ficha Técnica · Departamento 501"**.
+   * Cabecera integrada con la Torre y el Piso.
+   * Corrección de desbordamiento de texto en el selector "Tipo de Inmueble".
+   * Botón de cierre directo: **"Guardar y Cerrar"**.
+
+---
+**Última actualización:** 05 de Agosto de 2026 (Selector Condominios & Modal Clean UI - v8.8)
+
+### 3.27 Tarjeta Interactiva de Condominio Activo & Modal Emergente de Selección (Agosto 2026)
+
+Optimizada la experiencia de usuario (UX) para la selección y cambio de condominios:
+
+1. **Reubicación fuera del Cuerpo del Dashboard:** Se removieron las tarjetas inline del cuerpo principal del Dashboard para mantener la vista general totalmente limpia y despejada.
+2. **Tarjeta Interactiva en Sidebar & Header:** La sección de "Condominio Activo" en el menú lateral ([`RedVecinoLayout.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Layouts/RedVecinoLayout.jsx)) se transformó en una tarjeta/botón interactivo con distintivo `Cambiar 🔄`.
+3. **Modal Emergente de Selección de Condominio:** Al hacer clic en la tarjeta del Sidebar o en el botón del Navbar, se abre el **Modal Emergente con las Tarjetas de los Condominios**, permitiendo cambiar de comunidad activa en 1 solo clic.
+
+---
+**Última actualización:** 05 de Agosto de 2026 (Interactive Condo Sidebar Button & Switcher Modal - v8.9)
+
+### 3.28 Estandarización de Cabeceras Sin Redundancias & Modal Edición de Perfil de Administrador (Agosto 2026)
+
+Se refactorizó la interfaz gráfica (UI/UX) para eliminar textos redundantes e integrar la edición de perfil personal:
+
+1. **Estandarización Limpia de Cabeceras:**
+   * **Multas:** `⚖️ Multas & Sanciones` (limpiada la redundancia previa "Infracciones de Multas y Sanciones...").
+   * **Tickets:** `🛠️ Tickets & Solicitudes`.
+   * **Usuarios:** `👥 Gestión de Usuarios`.
+   * **Finanzas:** `💰 Finanzas & Recaudación`.
+   * **Propiedades:** `🏢 Propiedades & Torres · Condominio [Nombre]`.
+2. **Tarjeta de Perfil del Administrador Clickeable:**
+   * En la parte inferior del Sidebar y en la barra superior (Header) se muestra el **Nombre Real del Administrador** con su cargo (`Administrador General`).
+   * Al hacer clic en la tarjeta o en el pill de usuario, se despliega el **Modal "✏️ Mi Perfil de Administrador"** para inspeccionar y actualizar datos personales (Nombre, RUT, Teléfono, Email).
+
+---
+**Última actualización:** 05 de Agosto de 2026 (Clean Headers & Admin Profile Modal - v9.0)
+
+### 3.29 Unificación en la Barra Superior & Eliminación Total de Redundancias (Agosto 2026)
+
+Se perfeccionó la jerarquía de la interfaz para eliminar la doble redundancia de títulos:
+
+1. **Cabecera Unificada en la Barra Superior (Header):**
+   * Toda la información contextual (Nombre del Módulo, Condominio Activo y Descripción detallada) se trasladó directamente a la **Barra de Navegación Superior Fija** ([`RedVecinoLayout.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Layouts/RedVecinoLayout.jsx)).
+   * Ejemplo: **`PROPIEDADES · Condominio Alameda`** con su descripción correspondiente.
+2. **Eliminación de Títulos Repetidos en el Cuerpo:**
+   * Se removió el bloque interno de título duplicado en `PropertiesList`, `UsersList`, `TicketsList` y `FinesList`.
+   * Ahora los sub-botones de navegación, filtros y tablas comienzan directamente en la parte superior del contenedor, aprovechando el 100% del espacio vertical.
+
+---
+**Última actualización:** 05 de Agosto de 2026 (Unified Top Header & Zero-Redundancy Layout - v9.1)
+
+### 3.30 Banners de Cabecera Generosos por Módulo & Ficha Técnica 360° Omnicanal (Agosto 2026)
+
+Se completó la reestructuración visual y la interconexión 360° solicitada por el usuario:
+
+1. **Banners de Cabecera Generosos e Informativos:**
+   * En la parte superior del cuerpo de cada vista (`PropertiesList`, `FinesList`, `TicketsList`, `UsersList`, `FinancesLedger`) se restauró un **Banner Destacado Generoso** (`rounded-2xl`, `p-6`) con degradados visuales adaptativos y una **descripción completa y enriquecida** de la normativa y capacidades del módulo.
+   * La barra superior fija (`header`) se mantiene limpia y ligera con la insignia de la sección y el selector de condominio.
+2. **Ficha Técnica 360° Omnicanal (`UnitDetailModal360.jsx`):**
+   * Se creó el componente reutilizable [`UnitDetailModal360.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Admin/UnitDetailModal360.jsx).
+   * Al hacer clic en el número de departamento desde **Multas**, **Tickets**, **Usuarios** o **Propiedades**, se despliega la **Ficha Técnica 360°** de dicha unidad.
+   * Incluye 4 pestañas internas navegables: **Ficha Física & Coeficiente de Alícuota**, **Copropietario & Residentes**, **Historial Completo de Multas** e **Historial de Tickets**.
+
+---
+**Última actualización:** 05 de Agosto de 2026 (Generous Module Banners & Omnichannel 360 Unit Modal - v9.2)
+
+### 3.31 Sangría en Header Fijo, Barras a Ancho Completo & Sub-Pestañas con Subrayado Activo (Agosto 2026)
+
+Se aplicó la homologación visual de UI/UX requerida por el usuario:
+
+1. **Sangría y Alineación Vertical en Header Fijo:**
+   * Se aplicó padding izquierdo a la barra superior ([`RedVecinoLayout.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Layouts/RedVecinoLayout.jsx)) para despegarla del Sidebar.
+   * La 2da línea descriptiva cuenta con sangría alineada en el mismo eje vertical que la etiqueta principal.
+2. **Barras de Búsqueda y Filtro a Ancho Completo (`w-full`):**
+   * Se estandarizaron las tarjetas contenedoras de filtros y buscadores a ancho completo en **Multas**, **Tickets**, **Usuarios** y **Propiedades** (diseño análogo al de Finanzas).
+3. **Sub-pestañas Homogéneas con Borde/Subrayado Activo (`border-b-2`):**
+   * Se homogeneizaron las pestañas secundarias de **Propiedades** y **Usuarios** con el indicador activo de línea inferior idéntica a Finanzas (`border-b-2 border-indigo-600 font-extrabold`).
+
+---
+**Última actualización:** 05 de Agosto de 2026 (Header Left Indent, Full Width Search Toolbars & Active Underline Tabs - v9.3)
+
+### 3.32 Homologación de Multas & Banners Generosos Minimizar/Colapsar (Agosto 2026)
+
+Se implementaron las mejoras de UI/UX requeridas:
+
+1. **Homologación de Barra de Filtros en Multas ([`FinesList.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Admin/FinesList.jsx)):**
+   * Se movió el botón `Cursar Nueva Multa` a la tarjeta contenedora de búsqueda y filtros a ancho completo (`w-full`), homologándola 1:1 con Usuarios, Tickets y Propiedades.
+2. **Banners Informativos Colapsables / Minimizables:**
+   * Todos los banners generosos de bienvenida e información en **Resumen**, **Propiedades**, **Usuarios**, **Tickets**, **Finanzas** y **Multas** cuentan con un botón `✕ Minimizar`.
+   * Al ocultar el banner, el usuario gana el 100% del espacio vertical en pantalla para trabajar con las tablas, manteniendo una solapa discreta `ℹ️ Mostrar guía` para desplegar la información cuando lo requiera.
+
+---
+**Última actualización:** 05 de Agosto de 2026 (Collapsible Header Banners & Homogenized Fines Search Toolbar - v9.4)
+
+### 3.33 Enlace 360° en Recaudación, Priorización de Copropietario, Gastos Comunes & Portal Z-Index (Agosto 2026)
+
+Se completaron los ajustes solicitados por el usuario:
+
+1. **Enlace a Ficha 360° en Recaudación:**
+   * En la tabla de Recaudación / Cobranza ([`FinancesLedger.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Admin/FinancesLedger.jsx)), el número de departamento (`Depto #X`) ahora es un botón clickeable que abre la **Ficha Técnica 360°**.
+2. **Priorización de Copropietario & Nueva Pestaña GGCC:**
+   * En [`UnitDetailModal360.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Admin/UnitDetailModal360.jsx), la primera pestaña por defecto es `👤 Copropietario & Residentes`.
+   * Se incorporó la pestaña `💰 Gastos Comunes & Avisos` con el indicador de estado (Al día vs Deuda), coeficiente de alícuota %, desglose del aviso de cobro estimado y la lista de pagos de la unidad.
+3. **React Portal para Modal Aviso de Cobro:**
+   * El modal de Aviso de Cobro ([`FinancesLedger.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Admin/FinancesLedger.jsx)) ahora se renderiza mediante `createPortal(..., document.body)` con `z-[9999]`, garantizando que aparezca completamente por encima de cualquier otro elemento.
+
+---
+**Última actualización:** 05 de Agosto de 2026 (360 Link in Ledger, Owner Tab Priority, GGCC Tab & React Portal - v9.5)
+
+### 3.34 Libro Diario por Defecto, Ordenación de Recaudación, Edición en Ficha 360 & Pestañas Flexibles (Agosto 2026)
+
+Se implementaron las 6 solicitudes planteadas por el usuario:
+
+1. **Finanzas abre por defecto en "Libro Diario Contable":**
+   * Se configuró `paymentsTabMode = 'ledger'` por defecto en [`Dashboard.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Pages/Dashboard.jsx).
+2. **Ordenación por Cabecera en la Tabla de Recaudación:**
+   * En [`FinancesLedger.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Admin/FinancesLedger.jsx), todas las cabeceras de la tabla (`Vecino`, `Propiedad`, `Monto`, `Método`, `Fecha`, `Estado`) son botones clickeables que ordenan dinámicamente con indicadores direccionales (`⬆️ / ⬇️`).
+3. **Resolución Consistente de Usuarios en Ficha 360°:**
+   * En [`UnitDetailModal360.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Admin/UnitDetailModal360.jsx), los datos del propietario/residente inspeccionado se resuelven dinámicamente a partir de la unidad e interacción real (ej. Diego Alarcón en Depto 10).
+4. **Navegación Cruzada Nombre ↔ Propiedad:**
+   * Tanto el nombre del vecino como el número de propiedad son enlaces clickeables en Recaudación, Usuarios y Propiedades para desplegar la Ficha 360°.
+5. **Rediseño de Pestañas sin Scroll Horizontal:**
+   * Se sustituyó la barra con scroll por un contenedor flexible `flex flex-wrap gap-2` donde todas las pestañas se adaptan limpiamente sin scrollbars laterales.
+6. **Campos Editables con "Guardar y Cerrar":**
+   * En [`UnitDetailModal360.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Admin/UnitDetailModal360.jsx), los campos clave (Nombre, RUT, Teléfono, Email, $m^2$, Estacionamiento, Bodega) se convirtieron en campos de formulario editables. Al hacer clic en **"Guardar y Cerrar"**, los cambios se procesan y guardan.
+
+---
+**Última actualización:** 05 de Agosto de 2026 (Ledger Default, Header Sorting, Editable 360 Unit Modal & Flex Tabs - v9.6)
+**Versión:** 9.6 (Default Ledger Tab, Column Header Sorting & Fully Editable 360 Unit Modal)
+**Estado:** Perfeccionamiento UI/UX Completado al 100%. Listo para iniciar Fase 2 (Motor Contable de Gastos Comunes).
+
 ### 3.17 Hotfix â€” Runtime Errors Frontend (Junio 2026)
 
 CorrecciÃ³n de errores en tiempo de ejecuciÃ³n reportados en la consola del navegador tras el despliegue de la auditorÃ­a UX/UI.
@@ -561,6 +746,9 @@ CorrecciÃ³n de errores en tiempo de ejecuciÃ³n reportados en la consola del 
 |----|-------|-------|-----|
 | HF-01 | `ReferenceError: editingTicket is not defined` en `AdminDashboard.jsx:148` | Prop `editingTicket` faltaba en el destructuring de `AdminDashboard.jsx:15` y en `Dashboard.jsx:728` | Agregado `editingTicket` en ambos destructures |
 | HF-02 | `403 Forbidden` en `/api/condo-finances/catalog`, `/summary`, `/incomes`, `/expenses` | Dos `useEffect` en `Dashboard.jsx` (lines 77 y 170) llamaban a endpoints financieros sin verificar permisos del rol | Agregado guard condicional con `user.roles` dentro de cada effect; roles sin `view financial reports` (TI, Colaborador, Propietario, Residente) ya no disparan las peticiones |
+| HF-03 | `ReferenceError: inspectingUnit360 is not defined` en `TicketsList.jsx` | Al agregar el estado `isBannerDismissed`, la variable `inspectingUnit360` se omitió por error en la lista de estados de `TicketsList.jsx` | Restaurado `const [inspectingUnit360, setInspectingUnit360] = useState(null)` |
+| HF-04 | `ReferenceError: useState is not defined` en `DashboardOverview.jsx` | `useState` no estaba importado en la cabecera de `DashboardOverview.jsx` al hacer colapsable el banner del condominio | Actualizado import a `import React, { useState } from 'react'` |
+| HF-05 | `React has detected a change in the order of Hooks` en `UnitDetailModal360.jsx` | `if (!inspectingUnit) return null` estaba colocado antes de los `useMemo`, violando las Rules of Hooks al cambiar la cantidad de hooks entre renders | Reordenados todos los `useMemo` a la parte superior del componente antes del retorno condicional |
 Se validó cada ítem del Sidebar y Navbar en producción para los 6 roles, uno a uno, haciendo clic real desde el simulador de impersonación del panel TI. Todos los roles auditados sin errores en consola tras la corrección del BUG-05.
 
 #### Limpieza de Sandbox y Rutas Temporales

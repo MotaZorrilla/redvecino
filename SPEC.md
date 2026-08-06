@@ -1634,7 +1634,32 @@ Se incorporan formalmente al modelo de datos las siguientes entidades y endpoint
 
 ---
 
-**Fecha de creaciÃ³n:** Mayo 2026
-**Ãšltima actualizaciÃ³n:** 04 de Agosto de 2026 (Integración de Especificaciones v2 y Cobertura de Tests - v11.0)
-**VersiÃ³n:** 11.0 (v2 Prototype Specification & Absorbed Endpoints)
-**Estado:** Especificado y Cubierto por Suite de Tests Backend (Pest v3) y Frontend (Vitest).
+##### 15.15 Especificación Técnica: Constructor Visual de Infraestructura (Torres, Pisos, Unidades & Alícuotas)
+
+Se especifica el componente visual y la lógica backend para la carga dinámica "punto por punto" de estructuras de condominio en RedVecino v1:
+
+###### 15.15.1 Estructura Jerárquica de Propiedades (`parent_id`)
+* **Jerarquía:** `Condominio (Root)` ➔ `Torre / Bloque (tipo: torre)` ➔ `Departamento / Local (tipo: apartment/commercial, parent_id = torre_id)` ➔ `Estacionamiento / Bodega (parent_id = apartment_id)`.
+* **Atributos de Alícuota y Prorrateo:**
+  * `area_sqm`: Superficie utilizable en metros cuadrados ($m^2$).
+  * `alicuota_pct`: Coeficiente porcentual de prorrateo ($0.0000\% - 100.0000\%$).
+  * `tower_label`: Identificador (ej. Torre A, Torre B, Torre 1).
+  * `floor_number`: Número de piso (ej. Piso 1 a N, Subterráneo -1).
+
+###### 15.15.2 Interfaz React (`PropertyStructureBuilder.jsx`)
+* **Generador Masivo:** Parámetros para creación inicial (número de torres, pisos por torre, unidades por piso y patrón de numeración).
+* **Grid de Malla Arquitectónica:** Matriz interactiva de pisos $\times$ departamentos por torre. Cada celda es clickeable para abrir la edición punto por punto.
+* **Validador de Alícuotas:** Indicador reactivo en tiempo real que asegura que la suma de alícuotas alcance el **100.0000%**. Botón de ajuste automático por redondeo de decimales.
+
+###### 15.15.3 Protocolo Obligatorio de Pruebas (Pest v3)
+Todas las adiciones deben ser auditadas mediante suites de tests escritas en sintaxis Pest v3 (`*Pest.php` en `tests/Feature`):
+1. **Validación de Límites (`Boundary Testing`):** Pruebas para alícuotas negativas, alícuotas mayores al 100%, o sumas inconsistentes.
+2. **Pruebas de Aislamiento Multi-Condominio:** Garantizar que las torres y unidades pertenecientes al Condominio A no puedan ser leídas o manipuladas por administradores del Condominio B.
+3. **Validación RBAC:** Proteger los endpoints del builder exigiendo el permiso `manage properties` de Spatie.
+
+---
+
+**Fecha de creación:** Mayo 2026
+**Última actualización:** 05 de Agosto de 2026 (Constructor Visual de Torres & Protocolo Pest v3 - v11.1)
+**Versión:** 11.1 (Visual Infrastructure Builder & Mandatory Pest v3 Coverage)
+**Estado:** Especificación Activa. Se iniciará la implementación de la Fase 1 con su respectiva suite de tests.
