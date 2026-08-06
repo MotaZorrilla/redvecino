@@ -90,8 +90,8 @@ final class CommonExpenseCalculator
         $montoIndividual = max(0, $egresosIndividuales - $ingresosIndividuales);
 
         $montoInteresMora = 0.0;
-        if ($previousDebt > 0 && $daysOverdue > 10) {
-            $montoInteresMora = round($previousDebt * 0.015);
+        if ($previousDebt > 0 && $daysOverdue > $this->moraDaysOverdueThreshold($condoId)) {
+            $montoInteresMora = round($previousDebt * $this->moraRate($condoId));
         }
 
         $totalCargosPosteriores = $montoGastoTorre + $montoIndividual + $previousDebt + $montoInteresMora;
@@ -118,6 +118,22 @@ final class CommonExpenseCalculator
                 'total_ingresos_igualitarios' => $ingresosIgualitarios,
             ]
         ];
+    }
+
+    private function moraRate(int $condoId): float
+    {
+        $rate = Condominium::where('id', $condoId)->value('late_interest_rate');
+        if ($rate !== null) {
+            // stored as percentage (2.00 = 2%); convertir a fracción.
+            return (float) $rate / 100.0;
+        }
+        return 0.015; // legado 1.5%
+    }
+
+    private function moraDaysOverdueThreshold(int $condoId): int
+    {
+        $dueDay = Condominium::where('id', $condoId)->value('due_day');
+        return $dueDay !== null ? (int) $dueDay : 10;
     }
 
     private function getApportionmentCoefficient(Property $property): float

@@ -288,6 +288,12 @@ class DatabaseSeeder extends Seeder
             // Parking: 1.0% each (total 5%)
             // Storage: 1.0% each (total 5%)
 
+            // ALÍCUOTAS POR MODELO (fuente única de coefficient, suma = 100%):
+            //   apt  → 4.5%  = 0.045 (20 uds = 90%)
+            //   park → 1.0%  = 0.010 ( 5 uds =  5%)
+            //   bodega → 1.0% = 0.010 ( 5 uds =  5%)
+            // Estos valores alimentan el motor Fase 2 (boletas que suman al total).
+
             for ($i = 1; $i <= 20; $i++) {
                 $aptNumber = 'Apt ' . ($i + 100);
                 
@@ -303,6 +309,7 @@ class DatabaseSeeder extends Seeder
                     'block' => $tower->name,
                     'floor' => intval(ceil($i / 4)),
                     'area_sqm' => 60.50 + ($i * 2.5),
+                    'coefficient' => 0.045,
                     'status' => 'occupied',
                 ]);
 
@@ -402,6 +409,7 @@ class DatabaseSeeder extends Seeder
                     'block' => 'Subterráneo -1',
                     'floor' => null,
                     'area_sqm' => 12.50,
+                    'coefficient' => 0.010,
                     'status' => 'occupied',
                 ]);
 
@@ -429,6 +437,7 @@ class DatabaseSeeder extends Seeder
                     'block' => 'Subterráneo -1',
                     'floor' => null,
                     'area_sqm' => 6.00,
+                    'coefficient' => 0.010,
                     'status' => 'occupied',
                 ]);
 
@@ -1047,13 +1056,15 @@ class DatabaseSeeder extends Seeder
 
         // 7. Seeders extendidos según Análisis v2
         $this->call([
-            TowerStructureSeeder::class,
             CommonExpensePeriodSeeder::class,
             SupplyOrderSeeder::class,
             ChecklistSeeder::class,
             UnitProfileSeeder::class,
             FineAndMoraSeeder::class,
             AdministratorProfileSeeder::class,
+            PayrollBookingsSeeder::class,
+            CommonExpensePeriodReceiptSeeder::class,
+            DemoTicketsSeeder::class,
         ]);
 
         $this->command->info('Database seeding completed with gorgeous hyperrealistic data!');

@@ -64,6 +64,9 @@ Archivos existentes:
 *   [AislamientoMultiCondoPest.php](file:///C:/xampp/htdocs/redvecino/tests/Feature/AislamientoMultiCondoPest.php) — 8 tests: tickets, incomes, expenses, pagos, multas, anuncios, common_expenses.
 *   [CoeficienteFallbackPest.php](file:///C:/xampp/htdocs/redvecino/tests/Feature/CoeficienteFallbackPest.php) — 7 tests: cadena completa de fallback.
 *   [ConcurrenciaFinancieraPest.php](file:///C:/xampp/htdocs/redvecino/tests/Feature/ConcurrenciaFinancieraPest.php) — 8 tests con `->repeat(3)`/`->repeat(5)`: stress CRUD concurrente.
+*   [ConfigMoraMotorPest.php](file:///C:/xampp/htdocs/redvecino/tests/Feature/ConfigMoraMotorPest.php) — 3 tests (`toEqual`): tasa de mora configurada (2.0%→2000), fallback 1.5% (null→1500) y umbral de días de atraso (`due_day`).
+
+Seeders del demo (deterministas e idempotentes, registrados en `DatabaseSeeder::run()` §7): `PayrollBookingsSeeder` (nómina + liquidaciones + bookings), `CommonExpensePeriodReceiptSeeder` (boletas Fase 2 con mora) y `DemoTicketsSeeder` (tickets de residentes demo).
 
 ---
 

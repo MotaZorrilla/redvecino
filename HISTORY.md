@@ -816,3 +816,47 @@ Corrección de errores en tiempo de ejecución reportados en la consola del nave
 **Última actualización:** 08 de Julio de 2026 (Layout Unification & E2E Audit - v8.3)
 **Versión:** 8.3 (RedVecinoLayout, MiVecinoLayout, Bug Fixes BUG-01→05, E2E Audit todos los roles)
 **Estado:** Estable. Suite completa **376 backend + 29 frontend = 405 tests, 0 failures.** Layouts unificados en producción. Auditoría E2E completada.
+
+---
+
+## 4.1 Refactor Backend F0→F6: Semilla Completa, Backend Faltante y Motor Contable Fase 2 (Agosto 2026)
+
+Refactorización integral para que `php artisan migrate:fresh --seed` levante toda la plataforma demo con datos reales (los que muestran las UIs), integrando el Motor Contable de la Fase 2. **GATE final: 448 tests, 0 fallos (1594 assertions).**
+
+### Fase 1 — Backend faltante + ArchPest (445 tests)
+- Migraciones nuevas: `unit_profiles` + `unit_members` (campo `lives_in_unit`), `supply_orders` (enum `pendiente/en_compra/comprado/recibido`), `condominiums.due_day` (default 10) + `late_interest_rate` (nullable).
+- Modelos/controllers/rutas nuevos: `UnitProfile`, `UnitMember`, `SupplyOrder`; `UnitProfileController`, `SupplyOrderController`, `CondominiumController::financeConfig`; rutas `/unit-profiles`, `/supply-orders`, `/condominiums/{id}/finance`.
+- Store de insumos restringido a Adm/Colab (403 a residente). Whitelist `Api\CommonExpensePeriodController` en ArchPest.
+- Tests endurecidos (dejan `[200,404]`): `ConfigMoraVencimientoPest`, `FichasUnidadIntegrantesPest`, `PedidosInsumosEstadosPest`.
+
+### Fase 2 — Mora parametrizable + Coeficiente en motores (448 tests)
+- `late_interest_rate` nullable sin default: motores usan la tasa del condominio, con fallback al 1.5% heredado. `due_day` es umbral de días de atraso.
+- `CommonExpenseCalculator` con `moraRate()` y `moraDaysOverdueThreshold()`; el controller de períodos usa la tasa configurada (2.0%).
+- Alícuota con prioridad única a `properties.coefficient` (fallback por superficie).
+- Test nuevo `ConfigMoraMotorPest` (3 tests, `toEqual` para floats): 2.0%→2000, null→1500, umbral 20 días→0/2000.
+
+### Fase 3 — Estructura de alícuotas (448 tests)
+- `DatabaseSeeder` asigna coeficiente por modelo: apt `0.045` (90%), estacionamiento `0.010` (5%), bodega `0.010` (5%); suma = 1.000000 en los 3 condominios.
+- `TowerStructureSeeder` → no-op `@deprecated`, removido de `DatabaseSeeder::run()`.
+
+### Fase 4 — Nómina real + Liquidaciones + Bookings (448 tests)
+- Nuevo `PayrollBookingsSeeder`: José Andrade y Mario Carrasco (Recepcionistas, 44 h/sem, líquido $720.000) y María Rojas Muñoz (Auxiliar limpieza 38 h/sem, líquido $685.000); AFP Habitat; 6 liquidaciones (2026-06 y 2026-07).
+- 2 bookings demo: Sala de Eventos (Realizado) y Piscina (Pendiente) en el depto demo.
+- `HrCrudPest`: listado de liquidaciones ajustado a `>= 2` (el seed aporta 6).
+
+### Fase 5 — Motor Contable Fase 2 con boletas (10 tests CommonExpense)
+- Nuevo `CommonExpensePeriodReceiptSeeder`: 6 períodos (2026-07 `closed` + 2026-08 `issued`) × 3 condominios → 180 boletas que suman al total + 5% fondo reserva.
+- 2 morosos por condominio arrastran Saldo Anterior + Interés de mora (1.5%; ej. saldo 472.500 → interés 7.087,5).
+
+### Fase 6 — Transaccionales reales (448 tests)
+- Nuevo `DemoTicketsSeeder`: 2 sugerencias de Miguel (Comité) + reclamo de convivencia de René (Residente) en Torre A – Apt 101, asignado al conserje.
+- Datos demo finales: 16 tickets, 12 amenities, 2 bookings, 4 supply orders, 5 empleados, 6 liquidaciones, 6 períodos, 180 boletas.
+
+### Verificación
+- `php artisan migrate:fresh --seed` OK (todos los seeders idempotentes).
+- `php artisan test` → **448 passed (1594 assertions), 0 failures.**
+
+---
+**Última actualización:** 06 de Agosto de 2026 (Refactor Backend F0→F6 + Motor Contable Fase 2 con boletas reales)
+**Versión:** 10.7 (Backend Unit Profiles, Supply Orders, Mora Parametrizable, Coeficiente por Alícuota, Nómina+Liquidaciones, Bookings, Boletas 2026-07/08, Tickets Demo)
+**Estado:** Sistema demo completo y determinista. Suite integración **448 tests, 0 fallos.**

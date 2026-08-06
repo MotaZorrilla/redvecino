@@ -70,7 +70,7 @@ class CommonExpensePeriodController extends Controller
             ], 422);
         }
 
-        // Superficie total del condominio para el coeficiente de prorrateo ($m^2$)
+        // Superficie total del condominio (fallback para el coeficiente de prorrateo)
         $totalAreaSqm = $properties->sum(function ($p) {
             return floatval($p->area_sqm) ?: 70;
         });
@@ -78,6 +78,11 @@ class CommonExpensePeriodController extends Controller
         if ($totalAreaSqm <= 0) {
             $totalAreaSqm = 1000.00;
         }
+
+        // Tasa de interés de mora: configurada en el condominio o 1.5% heredado
+        $moraRate = $condominium->late_interest_rate !== null
+            ? floatval($condominium->late_interest_rate) / 100.0
+            : 0.015;
 
         DB::beginTransaction();
         try {
@@ -100,7 +105,11 @@ class CommonExpensePeriodController extends Controller
 
             foreach ($properties as $property) {
                 $areaSqm = floatval($property->area_sqm) ?: 70.0;
-                $alicuotaPct = $areaSqm / $totalAreaSqm;
+
+                // Alícuota: prioriza el coeficiente declarado (alícuota por modelo); fallback por superficie.
+                $alicuotaPct = $property->coefficient !== null
+                    ? floatval($property->coefficient)
+                    : $areaSqm / $totalAreaSqm;
 
                 // Fórmulas de prorrateo contables
                 $baseAmount = round($totalExpenses * $alicuotaPct, 2);
@@ -118,7 +127,7 @@ class CommonExpensePeriodController extends Controller
                     ->first();
 
                 $previousBalance = $previousReceipt ? floatval($previousReceipt->total_amount) : 0.00;
-                $interestAmount = $previousBalance > 0 ? round($previousBalance * 0.015, 2) : 0.00; // 1.5% mora mensual
+                $interestAmount = $previousBalance > 0 ? round($previousBalance * $moraRate, 2) : 0.00; // mora del condominio
 
                 $totalAmount = $baseAmount + $reserveFundAmount + $individualConsumption + $previousBalance + $interestAmount;
 

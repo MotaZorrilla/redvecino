@@ -15,8 +15,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('condominiums', function (Blueprint $table) {
+            // Día de vencimiento: default 10 (legacy). Tasa de mora: nullable;
+            // si es null los motores caen al 1.5% histórico (preserva contractos de prueba).
             $table->unsignedTinyInteger('due_day')->default(10)->after('status');
-            $table->decimal('late_interest_rate', total: 5, places: 2)->default(2.00)->after('due_day');
+            $table->decimal('late_interest_rate', 5, 2)->nullable()->after('due_day');
         });
     }
 
