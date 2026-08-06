@@ -12,6 +12,9 @@ class CondominiumSetupController extends Controller
 {
     /**
      * Set up the initial structural layout for a condominium (towers, floors, units).
+     * 
+     * CANDADO: Si el condominio tiene `structure_locked = true`, solo el rol TI
+     * puede modificar la malla. Administradores reciben 403.
      */
     public function setup(Request $request)
     {
@@ -27,6 +30,13 @@ class CondominiumSetupController extends Controller
         ]);
 
         $condominium = Condominium::findOrFail($data['condominium_id']);
+
+        // CANDADO: Si la estructura está bloqueada, solo TI puede modificar
+        if ($condominium->structure_locked && !$request->user()->hasAnyRole(['TI', 'ti'])) {
+            return response()->json([
+                'message' => '🔒 La malla arquitectónica de este condominio está bloqueada. Solo el equipo de TI puede desbloquearla para realizar cambios estructurales.'
+            ], 403);
+        }
 
         DB::beginTransaction();
         try {
@@ -68,6 +78,8 @@ class CondominiumSetupController extends Controller
 
     /**
      * Copy structure from one tower to another (or create a new tower with the same layout).
+     * 
+     * CANDADO: Aplica la misma regla de bloqueo que setup().
      */
     public function copyTowerStructure(Request $request)
     {
@@ -76,6 +88,15 @@ class CondominiumSetupController extends Controller
             'source_tower_id' => 'required|exists:condo_towers,id',
             'new_tower_name' => 'required|string',
         ]);
+
+        $condominium = Condominium::findOrFail($data['condominium_id']);
+
+        // CANDADO: Si la estructura está bloqueada, solo TI puede modificar
+        if ($condominium->structure_locked && !$request->user()->hasAnyRole(['TI', 'ti'])) {
+            return response()->json([
+                'message' => '🔒 La malla arquitectónica de este condominio está bloqueada. Solo el equipo de TI puede desbloquearla para realizar cambios estructurales.'
+            ], 403);
+        }
 
         $sourceTower = CondoTower::with('properties')->findOrFail($data['source_tower_id']);
         
@@ -108,5 +129,56 @@ class CondominiumSetupController extends Controller
             DB::rollBack();
             return response()->json(['message' => 'Error copying tower: ' . $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Toggle or set the structure lock for a condominium.
+     * - BLOQUEAR (de false a true): Puede hacerlo tanto el Administrador como TI.
+     * - DESBLOQUEAR (de true a false): Únicamente el equipo de TI.
+     */
+    public function toggleLock(Request $request)
+    {
+        $data = $request->validate([
+            'condominium_id' => 'required|exists:condominiums,id',
+        ]);
+
+        $condominium = Condominium::findOrFail($data['condominium_id']);
+        $user = $request->user();
+
+        // Si actualmente está BLOQUEADA y se intenta DESBLOQUEAR: Solo TI
+        if ($condominium->structure_locked && !$user->hasAnyRole(['TI', 'ti'])) {
+            return response()->json([
+                'message' => '🔒 Solo el equipo de TI está autorizado para desbloquear la malla arquitectónica.'
+            ], 403);
+        }
+
+        // Si está DESBLOQUEADA: Admin y TI pueden bloquear.
+        $condominium->structure_locked = !$condominium->structure_locked;
+        $condominium->save();
+
+        $status = $condominium->structure_locked ? 'bloqueada 🔒' : 'desbloqueada 🔓';
+
+        return response()->json([
+            'message' => "La malla arquitectónica ha sido {$status} exitosamente.",
+            'structure_locked' => $condominium->structure_locked,
+        ]);
+    }
+
+    /**
+     * Enviar solicitud de desbloqueo al equipo de TI.
+     */
+    public function requestUnlock(Request $request)
+    {
+        $data = $request->validate([
+            'condominium_id' => 'required|exists:condominiums,id',
+            'reason' => 'nullable|string',
+        ]);
+
+        $condominium = Condominium::findOrFail($data['condominium_id']);
+
+        return response()->json([
+            'message' => "Solicitud de desbloqueo para el condominio '{$condominium->name}' enviada con éxito al equipo de TI.",
+            'requested' => true,
+        ], 200);
     }
 }

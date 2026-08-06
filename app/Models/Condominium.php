@@ -18,7 +18,21 @@ class Condominium extends Model
         'postal_code',
         'units_count',
         'status',
+        'structure_locked',
+        'due_day',
+        'late_interest_rate',
     ];
+
+    protected $casts = [
+        'structure_locked' => 'boolean',
+        'due_day' => 'integer',
+        'late_interest_rate' => 'float',
+    ];
+
+    public function supplyOrders()
+    {
+        return $this->hasMany(SupplyOrder::class);
+    }
 
     public function properties()
     {

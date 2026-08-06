@@ -8,6 +8,8 @@ import FinancesLedger from '@/Components/Admin/FinancesLedger';
 import FinesList from '@/Components/Admin/FinesList';
 import SettingsPanel from '@/Components/Admin/SettingsPanel';
 import PersonWizard from '@/Components/Admin/PersonWizard';
+import CondoProfilePanel from '@/Components/Admin/CondoProfilePanel';
+import EmployeesList from '@/Components/Admin/EmployeesList';
 
 export default function AdminDashboard({
     user, condosList, adminCondoId, setAdminCondoId, adminActiveTab, setAdminActiveTab, allCondominiums,
@@ -210,6 +212,16 @@ export default function AdminDashboard({
                     adminFilteredFines={adminFilteredFines}
                     adminFilteredProperties={adminFilteredProperties}
                     adminCondoId={adminCondoId}
+                />
+            )}
+            {adminActiveTab === 'employees' && (
+                <EmployeesList adminCondoId={adminCondoId} />
+            )}
+            {adminActiveTab === 'condo_profile' && (
+                <CondoProfilePanel
+                    adminCondoId={adminCondoId}
+                    condosList={condosList}
+                    allCondominiums={allCondominiums}
                 />
             )}
             {adminActiveTab === 'settings' && (

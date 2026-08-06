@@ -40,4 +40,24 @@ class CondominiumController extends Controller
 
         return response()->json(['message' => 'Condominium updated successfully.', 'condominium' => $condo]);
     }
+
+    public function financeConfig(Request $request, $id)
+    {
+        $condo = Condominium::findOrFail($id);
+
+        $data = $request->validate([
+            'due_day' => 'required|integer|min:1|max:31',
+            'late_interest_rate' => 'required|numeric|min:0|max:100',
+        ]);
+
+        $condo->update([
+            'due_day' => (int) $data['due_day'],
+            'late_interest_rate' => (float) $data['late_interest_rate'],
+        ]);
+
+        return response()->json([
+            'message' => 'Configuración de mora y vencimiento actualizada.',
+            'condominium' => $condo->only(['id', 'name', 'due_day', 'late_interest_rate']),
+        ]);
+    }
 }

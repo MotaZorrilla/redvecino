@@ -37,7 +37,8 @@ arch('Controllers avoid DB facade except for transactions')
     ->not->toUse(['Illuminate\Support\Facades\DB', 'DB'])
     ->ignoring('App\Http\Controllers\CondominiumSetupController')
     ->ignoring('App\Http\Controllers\RoadmapFeaturesController')
-    ->ignoring('App\Http\Controllers\CommonExpenseController');
+    ->ignoring('App\Http\Controllers\CommonExpenseController')
+    ->ignoring('App\Http\Controllers\Api\CommonExpensePeriodController');
 
 arch('Controllers avoid raw SQL queries')
     ->expect('App\Http\Controllers')

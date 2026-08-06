@@ -50,9 +50,9 @@ class PropertyManagementTest extends TestCase
     }
 
     /**
-     * Administrador does NOT have 'configure system' → cannot create properties.
+     * Administrador now HAS 'configure system' → CAN create properties.
      */
-    public function test_admin_cannot_create_property(): void
+    public function test_admin_can_create_property(): void
     {
         $admin = $this->getUserByRole('Administrador');
         $condo = Condominium::first();
@@ -65,7 +65,7 @@ class PropertyManagementTest extends TestCase
             'status'         => 'vacant',
         ]);
 
-        $response->assertStatus(403);
+        $response->assertStatus(201);
     }
 
     /**
@@ -86,16 +86,16 @@ class PropertyManagementTest extends TestCase
     }
 
     /**
-     * Administrador cannot DELETE properties (lacks 'configure system').
+     * Administrador CAN delete properties (now has 'configure system').
      */
-    public function test_admin_cannot_delete_property(): void
+    public function test_admin_can_delete_property(): void
     {
         $admin = $this->getUserByRole('Administrador');
         $property = Property::first();
 
         $response = $this->actingAs($admin)->deleteJson("/api/properties/{$property->id}");
 
-        $response->assertStatus(403);
+        $response->assertSuccessful();
     }
 
     /**

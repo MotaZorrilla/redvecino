@@ -16,7 +16,7 @@ describe('Fichas de Unidad e Integrantes', function () {
         $property = Property::firstOrFail();
 
         $response = $this->actingAs($admin)->getJson("/api/unit-profiles/{$property->id}");
-        expect($response->status())->toBeIn([200, 404]);
+        expect($response->status())->toBe(200);
     });
 
     test('admin puede guardar o actualizar la ficha de unidad con estacionamiento y patente', function () {
@@ -47,7 +47,7 @@ describe('Fichas de Unidad e Integrantes', function () {
             ],
         ]);
 
-        expect($response->status())->toBeIn([200, 404]);
+        expect($response->status())->toBe(201);
     });
 
     test('busqueda global de residentes devuelve coincidencias por nombre', function () {

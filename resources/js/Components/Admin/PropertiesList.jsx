@@ -28,6 +28,9 @@ export default function PropertiesList({
         return found ? found.name : 'Condominio Alameda';
     }, [condosList, allCondominiums, adminCondoId]);
 
+    // Modo de Visualización del Registro de Unidades ('grid' = Vista Malla por Torres | 'table' = Vista Tabla Contable)
+    const [unitsViewMode, setUnitsViewMode] = useState('grid');
+
     // Filtros avanzados
     const [propSearchQuery, setPropSearchQuery] = useState('');
     const [selectedTypeFilter, setSelectedTypeFilter] = useState('all');
@@ -127,6 +130,27 @@ export default function PropertiesList({
             });
     }, [adminFilteredProperties, selectedTypeFilter, selectedStatusFilter, propSearchQuery, sortField, sortDirection]);
 
+    // Agrupamiento por Torre/Bloque y Piso para la Vista Malla de Unidades
+    const propertiesByBlock = useMemo(() => {
+        const map = {};
+        processedProperties.forEach(p => {
+            const blockName = p.block || 'Torre A';
+            if (!map[blockName]) map[blockName] = [];
+            map[blockName].push(p);
+        });
+        return map;
+    }, [processedProperties]);
+
+    // KPIs de Ocupación y Superficie Total
+    const statsSummary = useMemo(() => {
+        const total = processedProperties.length;
+        const occupied = processedProperties.filter(p => p.status === 'occupied').length;
+        const vacant = processedProperties.filter(p => p.status === 'vacant').length;
+        const rate = total > 0 ? Math.round((occupied / total) * 100) : 0;
+        const totalSqm = processedProperties.reduce((acc, p) => acc + (Number(p.area_sqm) || 0), 0);
+        return { total, occupied, vacant, rate, totalSqm };
+    }, [processedProperties]);
+
     const [isBannerDismissed, setIsBannerDismissed] = useState(false);
 
     return (
@@ -202,59 +226,111 @@ export default function PropertiesList({
                 <PropertyStructureBuilder activeCondoId={adminCondoId} condosList={condosList} allCondominiums={allCondominiums} />
             )}
 
-            {/* VISTA FICHA 1: REGISTRO DE UNIDADES (TABLA CON BÚSQUEDA Y ORDENACIÓN) */}
+            {/* VISTA FICHA 1: REGISTRO DE UNIDADES (MALLA VISUAL POR TORRES O TABLA CONTABLE) */}
             {subTab === 'units_table' && (
                 <div className="space-y-6">
-                    {/* Barra de Filtros Avanzada (Estilo Módulo de Finanzas) */}
-                    <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        {/* Buscador Omnicanal */}
-                        <div className="relative flex-1 min-w-[240px]">
-                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400 text-xs">🔍</span>
-                            <input
-                                type="text"
-                                placeholder="Buscar por número de depto, torre, residente, propietario..."
-                                value={propSearchQuery}
-                                onChange={(e) => setPropSearchQuery(e.target.value)}
-                                className="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500"
-                            />
+                    {/* Tarjetas de Resumen KPI (Estandarizado) */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-xs">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Total Unidades</span>
+                            <div className="text-xl font-black text-slate-900 dark:text-white mt-1">{statsSummary.total}</div>
+                            <span className="text-[10px] text-slate-500">{Object.keys(propertiesByBlock).length} Torres/Sectores</span>
                         </div>
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-xs">
+                            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-wider block">Unidades Ocupadas</span>
+                            <div className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{statsSummary.occupied}</div>
+                            <span className="text-[10px] text-emerald-500 font-bold">{statsSummary.rate}% Tasa Ocupación</span>
+                        </div>
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-xs">
+                            <span className="text-[10px] font-black text-amber-500 uppercase tracking-wider block">Disponibles / Vacantes</span>
+                            <div className="text-xl font-black text-amber-600 dark:text-amber-400 mt-1">{statsSummary.vacant}</div>
+                            <span className="text-[10px] text-amber-500 font-bold">Listas para asignación</span>
+                        </div>
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-xs">
+                            <span className="text-[10px] font-black text-indigo-500 uppercase tracking-wider block">Superficie Total</span>
+                            <div className="text-xl font-black text-indigo-600 dark:text-indigo-400 mt-1">{statsSummary.totalSqm.toLocaleString()} m²</div>
+                            <span className="text-[10px] text-indigo-500 font-bold">Prorrateo alícuotas</span>
+                        </div>
+                    </div>
 
-                        {/* Filtros por Select */}
-                        <div className="flex items-center gap-3 flex-wrap">
-                            <select
-                                value={selectedTypeFilter}
-                                onChange={(e) => setSelectedTypeFilter(e.target.value)}
-                                className="px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500"
-                            >
-                                <option value="all">Todos los Tipos</option>
-                                <option value="apartment">Departamento</option>
-                                <option value="house">Casa</option>
-                                <option value="parking">Estacionamiento</option>
-                                <option value="storage">Bodega</option>
-                                <option value="commercial">Local Comercial</option>
-                            </select>
+                    {/* Barra de Filtros Avanzada Estandarizada */}
+                    <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm space-y-3">
+                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            {/* Selector de Modo de Vista (Malla Visual vs Tabla) */}
+                            <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-950 p-1 rounded-xl shrink-0">
+                                <button
+                                    onClick={() => setUnitsViewMode('grid')}
+                                    className={`px-3.5 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
+                                        unitsViewMode === 'grid'
+                                            ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm font-extrabold'
+                                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
+                                    }`}
+                                >
+                                    <span>🏢</span>
+                                    <span>Vista Malla por Torres</span>
+                                </button>
+                                <button
+                                    onClick={() => setUnitsViewMode('table')}
+                                    className={`px-3.5 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 ${
+                                        unitsViewMode === 'table'
+                                            ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm font-extrabold'
+                                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
+                                    }`}
+                                >
+                                    <span>📊</span>
+                                    <span>Vista Tabla Contable</span>
+                                </button>
+                            </div>
 
-                            <select
-                                value={selectedStatusFilter}
-                                onChange={(e) => setSelectedStatusFilter(e.target.value)}
-                                className="px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500"
-                            >
-                                <option value="all">Todos los Estados</option>
-                                <option value="occupied">Ocupado</option>
-                                <option value="vacant">Desocupado / Disponible</option>
-                                <option value="maintenance">En Mantenimiento</option>
-                            </select>
+                            {/* Buscador Omnicanal */}
+                            <div className="relative flex-1 min-w-[240px]">
+                                <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400 text-xs">🔍</span>
+                                <input
+                                    type="text"
+                                    placeholder="Buscar por número de depto, torre, residente, propietario..."
+                                    value={propSearchQuery}
+                                    onChange={(e) => setPropSearchQuery(e.target.value)}
+                                    className="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500"
+                                />
+                            </div>
 
-                            <button
-                                onClick={() => {
-                                    setEditingProp(null);
-                                    setNewPropForm({ condominium_id: adminCondoId, type: 'apartment', number: '', block: 'Torre A', floor: '', area_sqm: '', status: 'vacant' });
-                                    setShowAddPropForm(!showAddPropForm);
-                                }}
-                                className="px-4 py-2 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5"
-                            >
-                                <span>{showAddPropForm ? '✕ Cerrar' : '➕ Añadir Unidad'}</span>
-                            </button>
+                            {/* Filtros por Select */}
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <select
+                                    value={selectedTypeFilter}
+                                    onChange={(e) => setSelectedTypeFilter(e.target.value)}
+                                    className="px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500"
+                                >
+                                    <option value="all">Todos los Tipos</option>
+                                    <option value="apartment">Departamento</option>
+                                    <option value="house">Casa</option>
+                                    <option value="parking">Estacionamiento</option>
+                                    <option value="storage">Bodega</option>
+                                    <option value="commercial">Local Comercial</option>
+                                </select>
+
+                                <select
+                                    value={selectedStatusFilter}
+                                    onChange={(e) => setSelectedStatusFilter(e.target.value)}
+                                    className="px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500"
+                                >
+                                    <option value="all">Todos los Estados</option>
+                                    <option value="occupied">Ocupado</option>
+                                    <option value="vacant">Desocupado / Disponible</option>
+                                    <option value="maintenance">En Mantenimiento</option>
+                                </select>
+
+                                <button
+                                    onClick={() => {
+                                        setEditingProp(null);
+                                        setNewPropForm({ condominium_id: adminCondoId, type: 'apartment', number: '', block: 'Torre A', floor: '', area_sqm: '', status: 'vacant' });
+                                        setShowAddPropForm(!showAddPropForm);
+                                    }}
+                                    className="px-4 py-2 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5"
+                                >
+                                    <span>{showAddPropForm ? '✕ Cerrar' : '➕ Añadir Unidad'}</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -346,8 +422,101 @@ export default function PropertiesList({
                         </form>
                     )}
 
-                    {/* Tabla de Registro con Encabezados Ordenables */}
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+                    {/* VISTA A: MALLA VISUAL DE UNIDADES POR TORRE Y PISO */}
+                    {unitsViewMode === 'grid' && (
+                        <div className="space-y-6">
+                            {Object.keys(propertiesByBlock).length === 0 ? (
+                                <div className="p-12 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 text-slate-400">
+                                    <span className="text-4xl block mb-2">🔍</span>
+                                    <p className="text-sm font-bold">No se encontraron propiedades que coincidan con la búsqueda.</p>
+                                </div>
+                            ) : (
+                                Object.entries(propertiesByBlock).map(([blockName, propsList]) => {
+                                    // Agrupar propiedades de esta torre por número de piso
+                                    const floorsMap = {};
+                                    propsList.forEach(p => {
+                                        const fNum = p.floor || 1;
+                                        if (!floorsMap[fNum]) floorsMap[fNum] = [];
+                                        floorsMap[fNum].push(p);
+                                    });
+                                    const floorNumbers = Object.keys(floorsMap).map(Number).sort((a, b) => b - a); // Pisos superiores arriba
+
+                                    return (
+                                        <div key={blockName} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
+                                            {/* Cabecera de Torre / Bloque */}
+                                            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+                                                <div className="flex items-center gap-3">
+                                                    <span className="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center font-black text-sm">
+                                                        🏢
+                                                    </span>
+                                                    <div>
+                                                        <h3 className="text-base font-black text-slate-900 dark:text-white">{blockName}</h3>
+                                                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                            {propsList.length} Unidades · {propsList.filter(p => p.status === 'occupied').length} Ocupadas · {propsList.reduce((acc, p) => acc + (Number(p.area_sqm) || 0), 0)} m² Totales
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                                                    {floorNumbers.length} Pisos
+                                                </span>
+                                            </div>
+
+                                            {/* Grilla de Pisos y Celdas de Departamentos */}
+                                            <div className="space-y-3">
+                                                {floorNumbers.map(floorNum => (
+                                                    <div key={floorNum} className="flex flex-col md:flex-row items-stretch md:items-center gap-2 bg-slate-50 dark:bg-slate-950/60 p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80">
+                                                        <div className="w-20 shrink-0 text-[11px] font-black text-slate-400 uppercase tracking-wider text-center md:text-left">
+                                                            Piso {floorNum}
+                                                        </div>
+
+                                                        <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                                                            {floorsMap[floorNum].map(p => {
+                                                                const isOccupied = p.status === 'occupied';
+                                                                const isVacant = p.status === 'vacant';
+                                                                const ownerText = p.owners?.length ? p.owners[0] : 'Sin Propietario';
+
+                                                                return (
+                                                                    <button
+                                                                        key={p.id}
+                                                                        onClick={() => setInspectingUnit(p)}
+                                                                        className={`p-2.5 rounded-xl border text-left transition-all hover:scale-[1.02] shadow-xs flex flex-col justify-between space-y-1.5 ${
+                                                                            isOccupied
+                                                                                ? 'bg-emerald-500/10 border-emerald-500/30 hover:border-emerald-500 text-emerald-950 dark:text-emerald-100'
+                                                                                : isVacant
+                                                                                ? 'bg-amber-500/10 border-amber-500/30 hover:border-amber-500 text-amber-950 dark:text-amber-100'
+                                                                                : 'bg-slate-500/10 border-slate-500/30 hover:border-slate-500 text-slate-900 dark:text-slate-100'
+                                                                        }`}
+                                                                    >
+                                                                        <div className="flex items-center justify-between gap-1">
+                                                                            <span className="font-black text-xs">#{p.number}</span>
+                                                                            <span className={`w-2 h-2 rounded-full ${isOccupied ? 'bg-emerald-500' : isVacant ? 'bg-amber-500' : 'bg-slate-400'}`}></span>
+                                                                        </div>
+
+                                                                        <div className="text-[10px] font-medium opacity-85 truncate">
+                                                                            {p.type === 'apartment' ? '🏢 Depto' : p.type === 'parking' ? '🚗 Estac.' : p.type === 'storage' ? '📦 Bodega' : p.type} · {p.area_sqm || 70}m²
+                                                                        </div>
+
+                                                                        <div className="text-[9px] font-bold truncate opacity-75">
+                                                                            👤 {ownerText}
+                                                                        </div>
+                                                                    </button>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
+                    )}
+
+                    {/* VISTA B: TABLA DE REGISTRO CONTABLE CON ENCABEZADOS ORDENABLES */}
+                    {unitsViewMode === 'table' && (
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
                         <SimpleTable
                             headers={[
                                 <button key="h-num" onClick={() => handleSort('number')} className="flex items-center gap-1 font-bold">
@@ -450,8 +619,9 @@ export default function PropertiesList({
                             })}
                         />
                     </div>
-                </div>
-            )}
+                )}
+            </div>
+        )}
 
             {/* MODAL FICHA TÉCNICA 360° UNIFICADA */}
             <UnitDetailModal360

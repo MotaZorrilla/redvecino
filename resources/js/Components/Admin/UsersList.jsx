@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { SimpleTable, StatusBadge } from '@/Components/DashboardShared';
 import { generatePassword } from '@/utils/helpers';
 import UnitDetailModal360 from '@/Components/Admin/UnitDetailModal360';
+import Modal from '@/Components/Modal';
 
 export default function UsersList({
     adminCondoId,
@@ -25,6 +26,50 @@ export default function UsersList({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [userSearchQuery, setUserSearchQuery] = useState('');
     const [inspectingUnit360, setInspectingUnit360] = useState(null);
+
+    // Estado Ficha de Residentes / Nueva Asignación de Unidad
+    const [showResidentForm, setShowResidentForm] = useState(false);
+    const [selectedUnit, setSelectedUnit] = useState('');
+    const [parkingNumber, setParkingNumber] = useState('');
+    const [vehiclePlate, setVehiclePlate] = useState('');
+    const [residentNotes, setResidentNotes] = useState('');
+
+    // Listado de Integrantes de la Unidad
+    const [members, setMembers] = useState([
+        {
+            id: 1,
+            firstName: 'Pedro',
+            lastName: 'Pérez Cardozo',
+            rut: '19.345.678-K',
+            dob: '1995-05-12',
+            age: 31,
+            phone: '+56 9 8765 4321',
+            email: 'pedro.perez@gmail.com',
+            isOwner: true,
+            livesHere: true,
+            hasPlatformAccess: true
+        }
+    ]);
+
+    const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+    const [editingMember, setEditingMember] = useState(null);
+    const [memberForm, setMemberForm] = useState({
+        firstName: '', lastName: '', rut: '', dob: '', phone: '', email: '',
+        isOwner: false, livesHere: true, hasPlatformAccess: true
+    });
+
+    // Calcular edad en base a fecha de nacimiento
+    const calculateAge = (dobString) => {
+        if (!dobString) return '-';
+        const birthDate = new Date(dobString);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age > 0 ? age : 0;
+    };
 
     // Filter based on selected sub-tab & search query
     const filteredUsersForSubtab = adminFilteredUsers.filter(u => {
@@ -87,50 +132,261 @@ export default function UsersList({
         setIsSubmitting(false);
     };
 
+    // Agregar / Editar Integrante de la Ficha
+    const handleOpenMemberModal = (member = null) => {
+        if (member) {
+            setEditingMember(member);
+            setMemberForm({ ...member });
+        } else {
+            setEditingMember(null);
+            setMemberForm({
+                firstName: '', lastName: '', rut: '', dob: '', phone: '', email: '',
+                isOwner: false, livesHere: true, hasPlatformAccess: true
+            });
+        }
+        setShowAddMemberModal(true);
+    };
+
+    const handleSaveMember = (e) => {
+        e.preventDefault();
+        if (!memberForm.firstName || !memberForm.lastName || !memberForm.rut) return;
+
+        const age = calculateAge(memberForm.dob);
+
+        if (editingMember) {
+            setMembers(members.map(m => m.id === editingMember.id ? { ...memberForm, age } : m));
+        } else {
+            setMembers([...members, { id: Date.now(), ...memberForm, age }]);
+        }
+
+        // Si se otorga acceso a plataforma o es residente nuevo, registrarlo en la lista global de usuarios
+        if (memberForm.hasPlatformAccess) {
+            const fullName = `${memberForm.firstName} ${memberForm.lastName}`.trim();
+            const exists = usersList.some(u => u.rut === memberForm.rut);
+            if (!exists) {
+                setUsersList(prev => [...prev, {
+                    id: Date.now(),
+                    name: fullName,
+                    rut: memberForm.rut,
+                    email: memberForm.email || `${memberForm.rut}@redvecino.cl`,
+                    phone: memberForm.phone || '+56 9 0000 0000',
+                    status: 'active',
+                    roles: [memberForm.isOwner ? 'owner' : 'resident'],
+                    condominium_id: adminCondoId
+                }]);
+            }
+        }
+
+        setShowAddMemberModal(false);
+    };
+
+    const handleDeleteMember = (id) => {
+        setMembers(members.filter(m => m.id !== id));
+    };
+
     const [isBannerDismissed, setIsBannerDismissed] = useState(false);
 
     return (
-        <div className="space-y-6 animate-fade-in text-left font-outfit">
-            {/* Banner de Cabecera Generoso Colapsable del Módulo de Usuarios */}
-            {!isBannerDismissed ? (
-                <div className="bg-gradient-to-r from-indigo-50/80 via-white to-slate-50 dark:from-indigo-950/60 dark:via-slate-900 dark:to-slate-950 border border-indigo-200/80 dark:border-indigo-900/40 rounded-2xl p-6 relative overflow-hidden shadow-xs">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-                        <div className="space-y-1 max-w-3xl">
-                            <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
-                                👥 Comunidad & Roles
-                            </span>
-                            <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
-                                Directorio de Usuarios, Residentes & Directiva
+        <div className="space-y-6 animate-fade-in text-left font-outfit w-full">
+            {/* Header Ficha de Residentes */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <span className="text-[10px] font-black uppercase bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30 px-3 py-1 rounded-full tracking-wider">
+                        🏘️ Gestión de Habitantes y Vehículos
+                    </span>
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white mt-2">
+                        Ficha de Residentes
+                    </h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        Administra los habitantes, estacionamientos e información de vehículos de cada unidad.
+                    </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2.5">
+                    <button
+                        onClick={() => setShowResidentForm(!showResidentForm)}
+                        className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2"
+                    >
+                        <span>{showResidentForm ? '✖️' : '➕'}</span>
+                        <span>{showResidentForm ? 'Cerrar Ficha' : 'Nueva Asignación'}</span>
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            setUserSubTab('residents');
+                            setUserSearchQuery('propietario');
+                        }}
+                        className="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 font-extrabold text-xs rounded-xl border border-slate-200 dark:border-slate-700 transition-all flex items-center gap-2"
+                    >
+                        <span>📋</span>
+                        <span>Listado de Propietarios</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* FORMULARIO DE NUEVA ASIGNACIÓN DE FICHA DE RESIDENTES */}
+            {showResidentForm && (
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-xs space-y-6 animate-fade-in">
+                    {/* SECCIÓN 1: DATOS DE LA UNIDAD, ESTACIONAMIENTO Y VEHÍCULO */}
+                    <div className="space-y-4">
+                        <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider border-b border-slate-200 dark:border-slate-800 pb-3 flex items-center gap-2">
+                            <span className="p-1.5 bg-indigo-500/10 text-indigo-500 rounded-lg">🚗</span>
+                            <span>Datos de la Unidad, Estacionamiento y Vehículo</span>
+                        </h3>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                            <div>
+                                <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1">Seleccionar Unidad *</label>
+                                <select
+                                    value={selectedUnit}
+                                    onChange={(e) => setSelectedUnit(e.target.value)}
+                                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                                >
+                                    <option value="">Seleccione una unidad...</option>
+                                    <option value="101-A">Depto 101 (Torre A)</option>
+                                    <option value="102-A">Depto 102 (Torre A)</option>
+                                    <option value="201-A">Depto 201 (Torre A)</option>
+                                    <option value="202-A">Depto 202 (Torre A)</option>
+                                    <option value="PH-01">Penthouse 01 (Torre A)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1">Número de Estacionamiento</label>
+                                <input
+                                    type="text"
+                                    placeholder="Ej: Estac. 15, Subt 2 o N/A"
+                                    value={parkingNumber}
+                                    onChange={(e) => setParkingNumber(e.target.value)}
+                                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1">Patente / Placa del Vehículo</label>
+                                <input
+                                    type="text"
+                                    placeholder="Ej: AB-CD-12"
+                                    value={vehiclePlate}
+                                    onChange={(e) => setVehiclePlate(e.target.value)}
+                                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 font-mono font-black uppercase text-indigo-600 dark:text-indigo-400 focus:ring-2 focus:ring-indigo-500 text-sm"
+                                />
+                            </div>
+
+                            <div className="md:col-span-3">
+                                <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1">Referencias u Observaciones</label>
+                                <textarea
+                                    rows="2"
+                                    placeholder="Ej: Mascotas permitidas, arrendatarios, etc. (Máximo 3 líneas)"
+                                    value={residentNotes}
+                                    onChange={(e) => setResidentNotes(e.target.value)}
+                                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 font-medium text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 text-xs"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* SECCIÓN 2: INTEGRANTES Y RESIDENTES DE LA UNIDAD */}
+                    <div className="space-y-4 pt-2">
+                        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                            <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                                <span className="p-1.5 bg-emerald-500/10 text-emerald-500 rounded-lg">👨‍👩‍👧‍👦</span>
+                                <span>Integrantes y Residentes de la Unidad</span>
                             </h3>
-                            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                                Administración unificada de copropietarios titulares, residentes inquilinos, comité de administración y personal colaborador de {activeCondoName}. Gestione vincularlos con sus departamentos, configure roles y revise la Ficha Técnica 360° de sus unidades.
-                            </p>
+
+                            <button
+                                type="button"
+                                onClick={() => handleOpenMemberModal()}
+                                className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5"
+                            >
+                                <span>➕</span>
+                                <span>Agregar Integrante</span>
+                            </button>
                         </div>
 
-                        <button
-                            type="button"
-                            onClick={() => setIsBannerDismissed(true)}
-                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 shrink-0 self-start md:self-center"
-                            title="Minimizar cabecera informativa"
-                        >
-                            <span>✕ Minimizar</span>
-                        </button>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse min-w-[950px]">
+                                <thead>
+                                    <tr className="border-b border-slate-200 dark:border-slate-800 text-[10px] font-black uppercase text-slate-400">
+                                        <th className="py-2.5 px-3">Nombres y Apellidos *</th>
+                                        <th className="py-2.5 px-3">RUT *</th>
+                                        <th className="py-2.5 px-3">F. Nacimiento</th>
+                                        <th className="py-2.5 px-3">Edad</th>
+                                        <th className="py-2.5 px-3">Contacto</th>
+                                        <th className="py-2.5 px-3 text-center">Dueño / Prop.</th>
+                                        <th className="py-2.5 px-3 text-center">¿Vive aquí?</th>
+                                        <th className="py-2.5 px-3 text-center">Acceso Plat.</th>
+                                        <th className="py-2.5 px-3 text-right">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
+                                    {members.map(m => (
+                                        <tr key={m.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all">
+                                            <td className="py-2.5 px-3 font-black text-slate-900 dark:text-white">
+                                                {m.firstName} {m.lastName}
+                                            </td>
+                                            <td className="py-2.5 px-3 font-mono font-bold text-slate-600 dark:text-slate-300">{m.rut}</td>
+                                            <td className="py-2.5 px-3 font-mono text-slate-500">{m.dob || 'dd/mm/aaaa'}</td>
+                                            <td className="py-2.5 px-3 font-bold text-indigo-600 dark:text-indigo-400">{m.age !== '-' ? `${m.age} años` : '-'}</td>
+                                            <td className="py-2.5 px-3 space-y-0.5">
+                                                <div className="font-mono text-[11px] text-slate-700 dark:text-slate-300">{m.phone || 's/n'}</div>
+                                                <div className="text-[10px] text-slate-400">{m.email || 's/n'}</div>
+                                            </td>
+                                            <td className="py-2.5 px-3 text-center">
+                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                                                    m.isOwner
+                                                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+                                                }`}>
+                                                    {m.isOwner ? 'Sí' : 'No'}
+                                                </span>
+                                            </td>
+                                            <td className="py-2.5 px-3 text-center">
+                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                                                    m.livesHere
+                                                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+                                                }`}>
+                                                    {m.livesHere ? 'Sí' : 'No'}
+                                                </span>
+                                            </td>
+                                            <td className="py-2.5 px-3 text-center">
+                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                                                    m.hasPlatformAccess
+                                                        ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20'
+                                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+                                                }`}>
+                                                    {m.hasPlatformAccess ? 'Concedido' : 'Sin Acceso'}
+                                                </span>
+                                            </td>
+                                            <td className="py-2.5 px-3 text-right">
+                                                <div className="flex items-center justify-end gap-1">
+                                                    <button
+                                                        onClick={() => handleOpenMemberModal(m)}
+                                                        className="p-1 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-lg"
+                                                        title="Editar integrante"
+                                                    >
+                                                        ✏️
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteMember(m.id)}
+                                                        className="p-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold rounded-lg"
+                                                        title="Eliminar integrante"
+                                                    >
+                                                        🗑️
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-            ) : (
-                <div className="flex justify-start">
-                    <button
-                        type="button"
-                        onClick={() => setIsBannerDismissed(false)}
-                        className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-800/60"
-                    >
-                        <span>ℹ️ Mostrar guía de Gestión de Usuarios</span>
-                        <span>▼</span>
-                    </button>
                 </div>
             )}
 
-            {/* Sub-pestañas con Subrayado Activo (Estilo Finanzas) */}
+            {/* Sub-pestañas con Subrayado Activo */}
             <div className="flex border-b border-gray-200 dark:border-slate-800/80 w-full overflow-x-auto">
                 <button
                     onClick={() => setUserSubTab('residents')}
@@ -170,7 +426,7 @@ export default function UsersList({
                     <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400 text-xs">🔍</span>
                     <input
                         type="text"
-                        placeholder="Buscar por Nombre, RUT, Email..."
+                        placeholder="Buscar residente por nombre, RUT, email..."
                         value={userSearchQuery}
                         onChange={(e) => setUserSearchQuery(e.target.value)}
                         className="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500"
@@ -184,116 +440,16 @@ export default function UsersList({
                             setNewUserForm({ name: '', rut: '', email: '', phone: '', role: 'resident', status: 'active', password: generatePassword() });
                             setShowAddUserForm(!showAddUserForm);
                         }}
-                        className="px-4 py-2 bg-brand-teal hover:bg-brand-teal-light text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
                     >
                         <span>{showAddUserForm ? '✖️' : '➕'}</span>
                         <span>{showAddUserForm ? 'Cerrar Formulario' : 'Nuevo Usuario'}</span>
                     </button>
-
-                    {userSubTab === 'staff' && onOpenWizard && (
-                        <button
-                            onClick={onOpenWizard}
-                            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
-                        >
-                            <span>📑</span>
-                            <span>Asistente Contratos</span>
-                        </button>
-                    )}
                 </div>
             </div>
 
-            {showAddUserForm && (
-                <form onSubmit={handleFormSubmit} className="bg-slate-50 dark:bg-slate-900/60 p-6 rounded-2xl border border-gray-200 dark:border-slate-800 space-y-4 max-w-xl text-left shadow-sm">
-                    <h5 className="text-xs font-bold text-gray-800 dark:text-slate-200 uppercase">{editingUser ? '✏️ Editar Usuario' : '👥 Detalles del Usuario'}</h5>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label htmlFor="user-name" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Nombre completo</label>
-                            <input
-                                id="user-name"
-                                type="text"
-                                required
-                                value={newUserForm.name}
-                                onChange={(e) => setNewUserForm(prev => ({ ...prev, name: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="user-rut" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">RUT / Identificación</label>
-                            <input
-                                id="user-rut"
-                                type="text"
-                                required
-                                value={newUserForm.rut}
-                                onChange={(e) => setNewUserForm(prev => ({ ...prev, rut: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
-                            />
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label htmlFor="user-email" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Correo Electrónico</label>
-                            <input
-                                id="user-email"
-                                type="email"
-                                required
-                                value={newUserForm.email}
-                                onChange={(e) => setNewUserForm(prev => ({ ...prev, email: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="user-phone" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Teléfono</label>
-                            <input
-                                id="user-phone"
-                                type="text"
-                                value={newUserForm.phone}
-                                onChange={(e) => setNewUserForm(prev => ({ ...prev, phone: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
-                            />
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label htmlFor="user-role" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Rol</label>
-                            <select
-                                id="user-role"
-                                value={newUserForm.role}
-                                onChange={(e) => setNewUserForm(prev => ({ ...prev, role: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
-                            >
-                                <option value="resident">Residente</option>
-                                <option value="owner">Propietario</option>
-                                <option value="comite">Comité</option>
-                                <option value="colaborador">Colaborador</option>
-                                <option value="admin">Administrador</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label htmlFor="user-status" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">Estado</label>
-                            <select
-                                id="user-status"
-                                value={newUserForm.status}
-                                onChange={(e) => setNewUserForm(prev => ({ ...prev, status: e.target.value }))}
-                                className="w-full bg-white dark:bg-slate-950 border border-gray-300 dark:border-slate-800/80 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
-                            >
-                                <option value="active">Activo</option>
-                                <option value="inactive">Inactivo</option>
-                                <option value="suspended">Suspendido</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div className="flex gap-2">
-                        <button type="submit" disabled={isSubmitting} className="px-4 py-2 bg-brand-teal hover:bg-[#00c2ad] text-white font-bold text-xs rounded-xl shadow cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-                            {editingUser ? 'Guardar Cambios' : 'Añadir Usuario'}
-                        </button>
-                        <button type="button" onClick={() => { setShowAddUserForm(false); setEditingUser(null); }} className="px-4 py-2 bg-gray-200 dark:bg-slate-800 dark:text-white text-gray-700 font-bold text-xs rounded-xl cursor-pointer">
-                            Cancelar
-                        </button>
-                    </div>
-                </form>
-            )}
-
-            <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+            {/* TABLA PRINCIPAL DE USUARIOS */}
+            <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs">
                 <SimpleTable
                     headers={
                         userSubTab === 'staff' 
@@ -309,37 +465,18 @@ export default function UsersList({
                                 <span className="font-bold text-indigo-600 dark:text-indigo-400">
                                     {u.cargo || 'Auxiliar de Aseo / Portería'}
                                 </span>
-                                {u.area && (
-                                    <span className="text-[10px] text-gray-500 dark:text-slate-400">
-                                        Área: {u.area}
-                                    </span>
-                                )}
                             </div>,
                             <div className="space-y-0.5 text-[10px]" key={`contrato-${u.id}`}>
                                 <div><span className="font-bold text-indigo-500">1º Fijo (3m):</span> Vencido</div>
-                                <div><span className="font-bold text-indigo-500">2º Fijo (3m):</span> {u.tipoContrato ? `${u.tipoContrato} (Ingreso: ${u.fechaIngreso || '01/01/2026'})` : 'Vigente (Cierre: 30/06/2026)'}</div>
+                                <div><span className="font-bold text-indigo-500">2º Fijo (3m):</span> Vigente</div>
                             </div>,
                             <div className="flex items-center gap-2 justify-end" key={`act-${u.id}`}>
                                 <button
                                     type="button"
-                                    onClick={() => setSelectedContract(u)}
-                                    className="px-2.5 py-1 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/25 text-indigo-600 dark:text-indigo-450 text-[10px] font-bold rounded-lg transition-all cursor-pointer"
-                                >
-                                    📝 Contrato
-                                </button>
-                                <button
-                                    type="button"
                                     onClick={() => setSelectedWorker(u)}
-                                    className="px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/25 text-emerald-600 dark:text-emerald-450 text-[10px] font-bold rounded-lg transition-all cursor-pointer"
+                                    className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-500/25 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-lg"
                                 >
-                                    💵 Liquidación
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setSelectedFiniquito(u)}
-                                    className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/25 text-rose-500 text-[10px] font-bold rounded-lg transition-all cursor-pointer"
-                                >
-                                    ❌ Finiquitar
+                                    📄 Ficha
                                 </button>
                             </div>
                         ] : [
@@ -347,30 +484,22 @@ export default function UsersList({
                                 key={`name-${u.id}`}
                                 type="button"
                                 onClick={() => setInspectingUnit360({
-                                    number: u.property_id || u.property?.number || '10',
-                                    id: u.property_id || 10,
-                                    owner: u.name,
-                                    user: u
+                                    number: u.property_id || u.property?.number || '101',
+                                    type: 'apartment',
+                                    block: 'Torre A',
+                                    floor: 1
                                 })}
-                                className="font-extrabold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer text-left"
-                                title="Ver Ficha Técnica 360° del Usuario"
+                                className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline text-left cursor-pointer"
                             >
-                                <span>👤 {u.name}</span>
+                                {u.name}
                             </button>,
-                            <span className="font-mono text-xs" key={`rut-${u.id}`}>{u.rut}</span>,
+                            <span className="font-mono text-xs font-bold text-slate-600 dark:text-slate-300" key={`rut-${u.id}`}>{u.rut}</span>,
                             <span key={`email-${u.id}`}>{u.email}</span>,
-                            <div key={`role-${u.id}`} className="flex flex-wrap gap-1">
-                                {(u.roles || ['Residente']).map(r => (
-                                    <span key={r} className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 dark:text-indigo-400">
-                                        {r}
-                                    </span>
-                                ))}
-                            </div>,
-                            <span key={`status-${u.id}`} className={`inline-flex items-center gap-1.5 text-xs ${u.status === 'active' ? 'text-emerald-500' : 'text-slate-500'}`}>
-                                <span className={`h-1.5 w-1.5 rounded-full ${u.status === 'active' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-                                <span className="capitalize">{u.status || 'Active'}</span>
+                            <span className="capitalize font-bold text-indigo-600 dark:text-indigo-400" key={`role-${u.id}`}>
+                                {u.roles?.[0] || 'Residente'}
                             </span>,
-                            <div className="flex items-center gap-2 justify-end" key={`act-${u.id}`}>
+                            <StatusBadge key={`status-${u.id}`} status={u.status || 'active'} />,
+                            <div className="flex items-center gap-1.5 justify-end" key={`actions-${u.id}`}>
                                 <button
                                     type="button"
                                     onClick={() => {
@@ -380,233 +509,159 @@ export default function UsersList({
                                             rut: u.rut,
                                             email: u.email,
                                             phone: u.phone || '',
-                                            role: u.roles[0] || 'resident',
+                                            role: u.roles?.[0] || 'resident',
                                             status: u.status || 'active',
                                             password: ''
                                         });
                                         setShowAddUserForm(true);
                                     }}
-                                    className="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-[10px] font-bold rounded-lg transition-all cursor-pointer"
+                                    className="p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 text-slate-600 dark:text-slate-300 hover:text-indigo-600 text-xs font-bold rounded-lg transition-colors"
+                                    title="Editar usuario"
                                 >
-                                    ✏️ Editar
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        if (confirm(`¿Estás seguro de eliminar a ${u.name}?`)) {
-                                            setUsersList(prev => prev.filter(item => item.id !== u.id));
-                                        }
-                                    }}
-                                    className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-500 text-[10px] font-bold rounded-lg transition-all cursor-pointer"
-                                >
-                                    🗑️ Eliminar
+                                    ✏️
                                 </button>
                             </div>
                         ]
                     }))}
-                    emptyMessage="No hay usuarios en este segmento"
                 />
             </div>
 
-            {/* 📝 CONTRACT MODAL (dos contratos fijos de 3 meses, luego indefinido) */}
-            {selectedContract && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm" onClick={() => setSelectedContract(null)}>
-                    <div className="relative max-w-3xl w-full bg-white text-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl overflow-y-auto max-h-[85vh] border border-gray-100 text-left" onClick={(e) => e.stopPropagation()}>
-                        <button onClick={() => setSelectedContract(null)} className="absolute top-4 right-4 p-2 rounded-xl bg-gray-100 text-gray-500 cursor-pointer">✕</button>
-                        <div className="space-y-4 font-serif text-sm">
-                            <h3 className="text-center font-bold text-lg border-b pb-3 uppercase tracking-wider font-sans">Contrato Individual de Trabajo</h3>
-                            <p className="text-xs text-right font-sans font-semibold text-gray-500">Periodo de Relación: Plazo Fijo Dual</p>
-                            
-                            <p className="text-justify leading-relaxed">
-                                En la comuna de Concepción, a 01 de abril de 2025, entre <strong>CONDOMINIO AIRES DE CHIGUAYANTE II</strong>, 
-                                representado por su administrador Sr. <strong>Enrique Tirapegui T.</strong>, en adelante "el empleador", 
-                                y don <strong>{selectedContract.name}</strong>, RUT <strong>{selectedContract.rut}</strong>, en adelante "el trabajador", 
-                                se ha convenido el siguiente contrato de trabajo:
-                            </p>
+            {/* MODAL AGREGAR / EDITAR INTEGRANTE DE LA UNIDAD */}
+            {showAddMemberModal && (
+                <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+                    <form onSubmit={handleSaveMember} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl max-w-lg w-full text-left space-y-4 shadow-2xl">
+                        <h3 className="text-base font-black text-slate-900 dark:text-white">
+                            {editingMember ? '✏️ Editar Integrante de la Unidad' : '➕ Agregar Integrante a la Unidad'}
+                        </h3>
 
-                            <p className="font-bold uppercase text-xs tracking-wider font-sans text-slate-700">CLÁUSULA PRIMERA: Funciones y Cargo</p>
-                            <p className="text-justify leading-relaxed">
-                                El trabajador se compromete a desempeñar sus funciones como <strong>Auxiliar de Aseo Full Time y Portería</strong>, 
-                                ejecutando las labores de limpieza de áreas comunes, control peatonal, correspondencia y rondas perimetrales según el reglamento interno.
-                            </p>
-
-                            <p className="font-bold uppercase text-xs tracking-wider font-sans text-slate-700">CLÁUSULA SEGUNDA: Duración y Regla de Plazo Fijo Dual (zAux)</p>
-                            <p className="text-justify leading-relaxed border-l-4 border-indigo-500 pl-4 bg-slate-50 py-2.5 rounded-r-xl font-sans text-xs">
-                                De acuerdo con las políticas corporativas del Condominio, la relación laboral se regirá bajo la modalidad de 
-                                <strong> dos contratos iniciales de plazo fijo de 3 meses cada uno</strong>. El primer periodo comprende desde el 01/04/2025 al 30/06/2025 (vencido). 
-                                El segundo periodo comprende desde el 01/07/2025 al 30/09/2025. Transcurridos exitosamente estos 6 meses totales de prueba dual, 
-                                el contrato pasará automáticamente a tener la condición jurídica de <strong>plazo indefinido</strong>.
-                            </p>
-
-                            <p className="font-bold uppercase text-xs tracking-wider font-sans text-slate-700">CLÁUSULA TERCERA: Jornada y Remuneración</p>
-                            <p className="text-justify leading-relaxed">
-                                La jornada de trabajo será de 44 horas semanales. El empleador pagará al trabajador un sueldo base bruto mensual imponible de 
-                                <strong> $539.000</strong>, además de asignaciones no imponibles de colación y locomoción.
-                            </p>
-
-                            <div className="pt-10 flex justify-around text-center font-sans text-xs">
+                        <div className="space-y-3 text-xs">
+                            <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <div className="w-48 border-t border-slate-400 pt-2">Firma Empleador</div>
-                                    <p className="text-[10px] text-gray-400">RUT: 65.219.801-5</p>
+                                    <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1">Nombres *</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        placeholder="Nombres"
+                                        value={memberForm.firstName}
+                                        onChange={(e) => setMemberForm({ ...memberForm, firstName: e.target.value })}
+                                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 font-bold text-slate-900 dark:text-white"
+                                    />
                                 </div>
                                 <div>
-                                    <div className="w-48 border-t border-slate-400 pt-2">Firma Trabajador</div>
-                                    <p className="text-[10px] text-gray-400">RUT: {selectedContract.rut}</p>
+                                    <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1">Apellidos *</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        placeholder="Apellidos"
+                                        value={memberForm.lastName}
+                                        onChange={(e) => setMemberForm({ ...memberForm, lastName: e.target.value })}
+                                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 font-bold text-slate-900 dark:text-white"
+                                    />
                                 </div>
                             </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1">RUT *</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        placeholder="Ej: 19.345.678-K"
+                                        value={memberForm.rut}
+                                        onChange={(e) => setMemberForm({ ...memberForm, rut: e.target.value })}
+                                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 font-mono font-bold text-slate-900 dark:text-white"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1">Fecha Nacimiento *</label>
+                                    <input
+                                        type="date"
+                                        required
+                                        value={memberForm.dob}
+                                        onChange={(e) => setMemberForm({ ...memberForm, dob: e.target.value })}
+                                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 font-bold text-slate-900 dark:text-white"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1">Teléfono (Opcional)</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Ej: +56 9 8765 4321"
+                                        value={memberForm.phone}
+                                        onChange={(e) => setMemberForm({ ...memberForm, phone: e.target.value })}
+                                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 font-bold text-slate-900 dark:text-white"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1">Email (Opcional)</label>
+                                    <input
+                                        type="email"
+                                        placeholder="Ej: user@mail.com"
+                                        value={memberForm.email}
+                                        onChange={(e) => setMemberForm({ ...memberForm, email: e.target.value })}
+                                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 font-bold text-slate-900 dark:text-white"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Opciones Checkbox de Rol y Estado de Habitante */}
+                            <div className="bg-slate-50 dark:bg-slate-950 p-3 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2 pt-2">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={memberForm.isOwner}
+                                        onChange={(e) => setMemberForm({ ...memberForm, isOwner: e.target.checked })}
+                                        className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                                    />
+                                    <span className="font-bold text-slate-800 dark:text-slate-200">Dueño / Copropietario Titular</span>
+                                </label>
+
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={memberForm.livesHere}
+                                        onChange={(e) => setMemberForm({ ...memberForm, livesHere: e.target.checked })}
+                                        className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                    />
+                                    <span className="font-bold text-slate-800 dark:text-slate-200">¿Vive actualmente en la unidad?</span>
+                                </label>
+
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={memberForm.hasPlatformAccess}
+                                        onChange={(e) => setMemberForm({ ...memberForm, hasPlatformAccess: e.target.checked })}
+                                        className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                                    />
+                                    <span className="font-bold text-slate-800 dark:text-slate-200">Conceder Acceso a la Plataforma RedVecino</span>
+                                </label>
+                            </div>
                         </div>
-                    </div>
+
+                        <div className="flex justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
+                            <button type="button" onClick={() => setShowAddMemberModal(false)} className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-xs font-bold rounded-xl">Cancelar</button>
+                            <button type="submit" className="px-5 py-2 bg-indigo-600 text-white font-black text-xs rounded-xl shadow-lg">Guardar Integrante</button>
+                        </div>
+                    </form>
                 </div>
             )}
 
-            {/* 💵 PAYROLL DEDUCTION MODAL (Liquidación René Ambiado) */}
-            {selectedWorker && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm" onClick={() => setSelectedWorker(null)}>
-                    <div className="relative max-w-2xl w-full bg-white text-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl overflow-y-auto max-h-[90vh] border border-gray-100 text-left font-sans" onClick={(e) => e.stopPropagation()}>
-                        <button onClick={() => setSelectedWorker(null)} className="absolute top-4 right-4 p-2 rounded-xl bg-gray-100 text-gray-500 cursor-pointer">✕</button>
-                        
-                        <div className="space-y-6">
-                            {/* Header */}
-                            <div className="flex justify-between items-start border-b pb-4">
-                                <div className="text-xs space-y-0.5">
-                                    <span className="text-[9px] text-indigo-600 font-extrabold uppercase block tracking-wider">Detalle del Empleador</span>
-                                    <p className="font-bold">CONDOMINIO AIRES DE CHIGUAYANTE II</p>
-                                    <p className="text-gray-400">Representante: Enrique Tirapegui T. &bull; Esperanza 775</p>
-                                    <p className="text-gray-400 font-mono">RUT: 65.247.879-4</p>
-                                </div>
-                                <div className="text-right">
-                                    <h3 className="text-base font-black uppercase text-slate-900 tracking-tight">Liquidación de Remuneraciones</h3>
-                                    <span className="inline-block px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded text-[9px] font-black uppercase mt-1">Mes: MARZO / 2026</span>
-                                </div>
-                            </div>
-
-                            {/* Worker details */}
-                            <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-gray-150 text-xs">
-                                <div className="space-y-1">
-                                    <div><span className="text-gray-400 font-bold uppercase text-[9px]">Trabajador:</span> <strong className="text-gray-900">{selectedWorker.name}</strong></div>
-                                    <div><span className="text-gray-400 font-bold uppercase text-[9px]">RUT:</span> <strong className="text-gray-900 font-mono">{selectedWorker.rut}</strong></div>
-                                    <div><span className="text-gray-400 font-bold uppercase text-[9px]">Fecha Último Contrato:</span> <strong className="text-gray-900">01/04/2025</strong></div>
-                                </div>
-                                <div className="space-y-1 border-l pl-4 border-gray-200">
-                                    <div><span className="text-gray-400 font-bold uppercase text-[9px]">Cargo:</span> <strong className="text-gray-900">Auxiliar de aseo Full Time</strong></div>
-                                    <div><span className="text-gray-400 font-bold uppercase text-[9px]">Tipo de Contrato:</span> <strong className="text-gray-900">Indefinido</strong></div>
-                                    <div><span className="text-gray-400 font-bold uppercase text-[9px]">Días Trabajados:</span> <strong className="text-gray-900">30 días</strong></div>
-                                </div>
-                            </div>
-
-                            {/* Calculations Table */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start text-xs">
-                                {/* Haberes */}
-                                <div className="border border-gray-150 rounded-2xl overflow-hidden shadow-sm bg-white">
-                                    <table className="min-w-full divide-y divide-gray-100">
-                                        <thead>
-                                            <tr className="bg-slate-50 font-black text-slate-700"><th className="px-4 py-2 text-left text-[9px] uppercase font-bold tracking-wider" colSpan={2}>Haberes del Trabajador</th></tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-100 font-medium">
-                                            <tr><td className="px-4 py-2.5 text-left">Sueldo Base (Pactado $539.000)</td><td className="px-4 py-2.5 text-right font-mono font-bold">$539.000</td></tr>
-                                            <tr className="bg-slate-50/20"><td className="px-4 py-2 text-left text-[9px] uppercase font-bold text-gray-400" colSpan={2}>Total Haberes Imponibles: $539.000</td></tr>
-                                            <tr><td className="px-4 py-2.5 text-left">Asignación de Locomoción</td><td className="px-4 py-2.5 text-right font-mono font-bold">$66.896</td></tr>
-                                            <tr><td className="px-4 py-2.5 text-left">Asignación de Colación</td><td className="px-4 py-2.5 text-right font-mono font-bold">$66.896</td></tr>
-                                            <tr className="bg-slate-50/20"><td className="px-4 py-2 text-left text-[9px] uppercase font-bold text-gray-400" colSpan={2}>Total Haberes No Imponibles: $133.592</td></tr>
-                                            <tr className="bg-slate-100/50 font-black text-slate-900">
-                                                <td className="px-4 py-2.5 text-left text-[10px] uppercase">TOTAL DE HABERES BRUTOS</td>
-                                                <td className="px-4 py-2.5 text-right font-mono text-xs">$672.592</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                {/* Deducciones */}
-                                <div className="border border-gray-150 rounded-2xl overflow-hidden shadow-sm bg-white">
-                                    <table className="min-w-full divide-y divide-gray-100">
-                                        <thead>
-                                            <tr className="bg-slate-50 font-black text-slate-700"><th className="px-4 py-2 text-left text-[9px] uppercase font-bold tracking-wider" colSpan={2}>Descuentos y Deducciones</th></tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-100 font-medium">
-                                            <tr><td className="px-4 py-2.5 text-left">Cotización Salud (Fonasa 7.00%)</td><td className="px-4 py-2.5 text-right font-mono font-bold text-rose-600">$37.730</td></tr>
-                                            <tr><td className="px-4 py-2.5 text-left">Fondo Pensión (AFP Capital 11.44%)</td><td className="px-4 py-2.5 text-right font-mono font-bold text-rose-600">$61.662</td></tr>
-                                            <tr><td className="px-4 py-2.5 text-left">Seguro de Cesantía (AFC 0.60%)</td><td className="px-4 py-2.5 text-right font-mono font-bold text-rose-600">$3.234</td></tr>
-                                            <tr className="bg-slate-50/20"><td className="px-4 py-2 text-left text-[9px] uppercase font-bold text-gray-400" colSpan={2}>Total Descuentos Previsionales: $102.626</td></tr>
-                                            <tr><td className="px-4 py-2.5 text-left">Otros descuentos adicionales</td><td className="px-4 py-2.5 text-right font-mono font-bold text-rose-600">$0</td></tr>
-                                            <tr className="bg-slate-100/50 font-black text-rose-700">
-                                                <td className="px-4 py-2.5 text-left text-[10px] uppercase">TOTAL DEDUCCIONES</td>
-                                                <td className="px-4 py-2.5 text-right font-mono text-xs">$102.626</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            {/* Net Liquido */}
-                            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex justify-between items-center text-xs font-black">
-                                <span className="text-emerald-800 text-[11px] uppercase tracking-wider">SUELDO LÍQUIDO A PAGAR / TRANSFERENCIA</span>
-                                <span className="text-emerald-700 font-mono text-sm font-black">$569.966</span>
-                            </div>
-
-                            <p className="text-[10px] italic text-gray-400 leading-snug text-center pt-2">
-                                "Certifico que he recibido de mi Empleador Enrique Tirapegui T., a mi total y entera satisfacción el saldo líquido indicado en la presente liquidación, sin tener cargo ni cobro posterior alguno que hacer."
-                            </p>
-                        </div>
-                    </div>
-                </div>
+            {/* Modal Ficha Técnica 360° */}
+            {inspectingUnit360 && (
+                <UnitDetailModal360
+                    inspectingUnit={inspectingUnit360}
+                    onClose={() => setInspectingUnit360(null)}
+                    allProperties={[]}
+                    allFines={[]}
+                    allTickets={[]}
+                    allUsers={usersList}
+                    allPayments={[]}
+                    activeCondoName={activeCondoName}
+                />
             )}
-
-            {/* ❌ FINIQUITO MODAL */}
-            {selectedFiniquito && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm" onClick={() => setSelectedFiniquito(null)}>
-                    <div className="relative max-w-3xl w-full bg-white text-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl overflow-y-auto max-h-[85vh] border border-gray-100 text-left" onClick={(e) => e.stopPropagation()}>
-                        <button onClick={() => setSelectedFiniquito(null)} className="absolute top-4 right-4 p-2 rounded-xl bg-gray-100 text-gray-500 cursor-pointer">✕</button>
-                        <div className="space-y-4 font-serif text-sm">
-                            <h3 className="text-center font-bold text-lg border-b pb-3 uppercase tracking-wider font-sans">Acta de Finiquito de Contrato</h3>
-                            <p className="text-xs text-right font-sans font-semibold text-rose-500">Estado: Término de Relación Laboral</p>
-                            
-                            <p className="text-justify leading-relaxed">
-                                En la comuna de Concepción, a 31 de marzo de 2026, las partes comparecientes, a saber, 
-                                <strong> CONDOMINIO AIRES DE CHIGUAYANTE II</strong>, como empleador, y don <strong>{selectedFiniquito.name}</strong>, 
-                                como trabajador, acuerdan de mutuo acuerdo poner término a la relación laboral y firmar el presente finiquito:
-                            </p>
-
-                            <p className="font-bold uppercase text-xs tracking-wider font-sans text-slate-700">CÁLCULO DE HABERES PENDIENTES Y LIQUIDACIÓN</p>
-                            <div className="border rounded-2xl overflow-hidden font-sans text-xs">
-                                <table className="min-w-full divide-y divide-gray-100">
-                                    <tbody className="divide-y divide-gray-100">
-                                        <tr><td className="px-4 py-2 text-left font-medium">Feriado Proporcional Pendiente (Vacaciones no tomadas)</td><td className="px-4 py-2 text-right font-mono font-bold">$124.300</td></tr>
-                                        <tr><td className="px-4 py-2 text-left font-medium">Aguinaldo Fiestas Patrias Proporcional</td><td className="px-4 py-2 text-right font-mono font-bold">$45.000</td></tr>
-                                        <tr><td className="px-4 py-2 text-left font-medium">Indemnización por Años de Servicio</td><td className="px-4 py-2 text-right font-mono font-bold">$0 (Relación inferior a 1 año)</td></tr>
-                                        <tr className="bg-slate-50 font-bold text-indigo-650">
-                                            <td className="px-4 py-2 text-left">TOTAL DE HABERES DE LIQUIDACIÓN DE FINIQUITO</td>
-                                            <td className="px-4 py-2 text-right font-mono">$169.300</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <p className="text-justify leading-relaxed">
-                                El trabajador manifiesta expresamente que durante el tiempo que prestó servicios al empleador, 
-                                este le pagó íntegra y oportunamente todas sus remuneraciones, cotizaciones previsionales, feriados y demás beneficios legales, 
-                                no teniendo ninguna reclamación posterior que formular.
-                            </p>
-
-                            <div className="pt-10 flex justify-around text-center font-sans text-xs">
-                                <div>
-                                    <div className="w-48 border-t border-slate-400 pt-2">Firma Empleador</div>
-                                </div>
-                                <div>
-                                    <div className="w-48 border-t border-slate-400 pt-2">Firma Trabajador</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Modal de Ficha Técnica 360° Interconectada */}
-            <UnitDetailModal360
-                inspectingUnit={inspectingUnit360}
-                onClose={() => setInspectingUnit360(null)}
-                allUsers={usersList}
-                activeCondoName={activeCondoName}
-            />
         </div>
     );
 }

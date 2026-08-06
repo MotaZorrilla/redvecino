@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\Property;
+use App\Models\Condominium;
 use App\Models\CommonExpense;
 use App\Models\Payment;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -52,7 +53,7 @@ class SecurityRbacMatrixTest extends TestCase
         $responseAnnounce = $this->actingAs($admin)->postJson('/api/announcements', []);
         $this->assertNotEquals(403, $responseAnnounce->getStatusCode());
 
-        // CANNOT: Configure system (Create properties should yield 403 for Admin since only TI has configure system)
+        // CAN: Configure system (Admin now has 'configure system' — can create properties)
         $responseProperty = $this->actingAs($admin)->postJson('/api/properties', [
             'condominium_id' => 1,
             'type' => 'apartment',
@@ -60,7 +61,23 @@ class SecurityRbacMatrixTest extends TestCase
             'block' => 'Torre B',
             'status' => 'vacant'
         ]);
-        $responseProperty->assertStatus(403);
+        $this->assertNotEquals(403, $responseProperty->getStatusCode());
+
+        // CAN: Lock structure (Admin can lock an unlocked mesh: 200 OK)
+        $condo = Condominium::first();
+        $condo->structure_locked = false;
+        $condo->save();
+
+        $responseLock = $this->actingAs($admin)->postJson('/api/setup-condominium/toggle-lock', [
+            'condominium_id' => $condo->id,
+        ]);
+        $responseLock->assertStatus(200);
+
+        // CANNOT: Unlock structure (Once locked, Admin CANNOT unlock: 403 Forbidden, only TI can unlock)
+        $responseUnlock = $this->actingAs($admin)->postJson('/api/setup-condominium/toggle-lock', [
+            'condominium_id' => $condo->id,
+        ]);
+        $responseUnlock->assertStatus(403);
     }
 
     public function test_ti_rbac_rules(): void

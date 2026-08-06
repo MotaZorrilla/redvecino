@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { SimpleTable, StatusBadge } from '@/Components/DashboardShared';
 import UnitDetailModal360 from '@/Components/Admin/UnitDetailModal360';
+import CommonExpenseGenerator from '@/Components/Admin/CommonExpenseGenerator';
+import AmenitiesBookingPanel from '@/Components/Admin/AmenitiesBookingPanel';
 
 export default function FinancesLedger({
     adminCondoId,
@@ -378,7 +380,27 @@ export default function FinancesLedger({
                 >
                     📤 Egresos Contables
                 </button>
+                <button
+                    onClick={() => setPaymentsTabMode('ggcc_generator')}
+                    className={`px-5 py-3 font-bold text-xs uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${paymentsTabMode === 'ggcc_generator' ? 'border-amber-500 text-amber-600 dark:text-amber-400 dark:border-amber-400 font-extrabold' : 'border-transparent text-gray-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
+                >
+                    ⚡ Emisión de GGCC (Boletas)
+                </button>
+                <button
+                    onClick={() => setPaymentsTabMode('amenities_bookings')}
+                    className={`px-5 py-3 font-bold text-xs uppercase tracking-wider transition-all border-b-2 whitespace-nowrap ${paymentsTabMode === 'amenities_bookings' ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400 dark:border-emerald-400 font-extrabold' : 'border-transparent text-gray-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
+                >
+                    📅 Ingresos por Arriendo (Amenidades)
+                </button>
             </div>
+
+            {paymentsTabMode === 'ggcc_generator' && (
+                <CommonExpenseGenerator adminCondoId={adminCondoId} activeCondoName={activeCondo?.name || 'Condominio Alameda'} />
+            )}
+
+            {paymentsTabMode === 'amenities_bookings' && (
+                <AmenitiesBookingPanel adminCondoId={adminCondoId} />
+            )}
 
             {paymentsTabMode === 'payments' ? (
                 <div className="space-y-6 animate-fade-in text-left">

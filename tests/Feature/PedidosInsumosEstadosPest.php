@@ -21,14 +21,14 @@ describe('Flujo de Estados de Pedidos de Insumos', function () {
             'unit' => 'unidad',
         ]);
 
-        expect($response->status())->toBeIn([201, 404]);
+        expect($response->status())->toBe(201);
     });
 
     test('admin puede aprobar un pedido pendiente (pendiente -> en_compra)', function () {
         $admin = User::whereHas('roles', fn($q) => $q->where('name', 'Administrador'))->firstOrFail();
 
         $response = $this->actingAs($admin)->putJson('/api/supply-orders/1/approve');
-        expect($response->status())->toBeIn([200, 404]);
+        expect($response->status())->toBe(200);
     });
 
     test('admin puede marcar pedido como comprado (en_compra -> comprado)', function () {
@@ -37,14 +37,14 @@ describe('Flujo de Estados de Pedidos de Insumos', function () {
         $response = $this->actingAs($admin)->putJson('/api/supply-orders/1/mark-purchased', [
             'purchase_document' => 'FAC-001',
         ]);
-        expect($response->status())->toBeIn([200, 404]);
+        expect($response->status())->toBe(200);
     });
 
     test('admin puede marcar pedido como recibido (comprado -> recibido)', function () {
         $admin = User::whereHas('roles', fn($q) => $q->where('name', 'Administrador'))->firstOrFail();
 
         $response = $this->actingAs($admin)->putJson('/api/supply-orders/1/mark-received');
-        expect($response->status())->toBeIn([200, 404]);
+        expect($response->status())->toBe(200);
     });
 
     test('residente no puede crear pedidos de insumos', function () {
@@ -57,6 +57,6 @@ describe('Flujo de Estados de Pedidos de Insumos', function () {
             'quantity' => 5,
         ]);
 
-        expect($response->status())->toBeIn([403, 404]);
+        expect($response->status())->toBe(403);
     });
 });

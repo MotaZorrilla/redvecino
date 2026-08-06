@@ -118,7 +118,7 @@ test('listar usuarios: solo admin', function (string $role, int $expected) {
 // ─── PROPERTY MANAGEMENT ───────────────────────────────────────
 
 dataset('roles_manage_properties', [
-    'Administrador' => ['role' => 'Administrador', 'expected' => 403],
+    'Administrador' => ['role' => 'Administrador', 'expected' => 201],
     'Comité' => ['role' => 'Comité', 'expected' => 403],
     'Propietario' => ['role' => 'Propietario', 'expected' => 403],
     'Residente' => ['role' => 'Residente', 'expected' => 403],
@@ -126,7 +126,7 @@ dataset('roles_manage_properties', [
     'TI' => ['role' => 'TI', 'expected' => 201],
 ]);
 
-test('crear propiedad: solo TI', function (string $role, int $expected) {
+test('crear propiedad: solo Administrador y TI', function (string $role, int $expected) {
     $user = getUserByRole($role);
     $this->actingAs($user)->postJson('/api/properties', [
         'condominium_id' => $this->condo->id,

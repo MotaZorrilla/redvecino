@@ -738,9 +738,64 @@ Se implementaron las 6 solicitudes planteadas por el usuario:
 **Versión:** 9.6 (Default Ledger Tab, Column Header Sorting & Fully Editable 360 Unit Modal)
 **Estado:** Perfeccionamiento UI/UX Completado al 100%. Listo para iniciar Fase 2 (Motor Contable de Gastos Comunes).
 
-### 3.17 Hotfix â€” Runtime Errors Frontend (Junio 2026)
+### 3.35 Fase 2 Motor de Gastos Comunes, Perfil del Condominio, Colaboradores & Insumos, y Ficha de Residentes (Agosto 2026)
 
-CorrecciÃ³n de errores en tiempo de ejecuciÃ³n reportados en la consola del navegador tras el despliegue de la auditorÃ­a UX/UI.
+Se completaron e integraron los módulos operacionales y contables críticos del proyecto:
+
+1. **Fase 2: Motor Contable de Gastos Comunes y Emisión Masiva por Período:**
+   * **Migraciones & Modelos:** Creadas tablas `common_expense_periods` y `common_expense_receipts` ([`2026_08_05_234500_create_common_expense_periods_table.php`](file:///C:/xampp/htdocs/redvecino/database/migrations/2026_08_05_234500_create_common_expense_periods_table.php)). Modelos [`CommonExpensePeriod.php`](file:///C:/xampp/htdocs/redvecino/app/Models/CommonExpensePeriod.php) y [`CommonExpenseReceipt.php`](file:///C:/xampp/htdocs/redvecino/app/Models/CommonExpenseReceipt.php).
+   * **Fórmulas de Prorrateo Chilenas:** Implementadas en [`CommonExpensePeriodController.php`](file:///C:/xampp/htdocs/redvecino/app/Http/Controllers/Api/CommonExpensePeriodController.php):
+     $$G = E_{\text{total}} \times P_{\text{unidad}}, \quad FR = (E_{\text{total}} \times 0.05) \times P_{\text{unidad}}, \quad \text{Total} = G + FR + C_{\text{ind}} + \text{Saldo}_{\text{anterior}} + \text{Intereses}$$
+   * **Frontend Component:** Creado [`CommonExpenseGenerator.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Admin/CommonExpenseGenerator.jsx) e integrado bajo la pestaña `⚡ Emisión de GGCC (Boletas)` en [`FinancesLedger.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Admin/FinancesLedger.jsx), incluyendo selector de período, tarjetas KPI y modal con soporte de impresión del Aviso Oficial de Cobro.
+   * **Pruebas Automatizadas:** Test suite Pest v3 [`MotorGastosComunesPest.php`](file:///C:/xampp/htdocs/redvecino/tests/Feature/MotorGastosComunesPest.php) (4/4 pasados, 16 aserciones) y [`FinanzasConsistenciaPest.php`](file:///C:/xampp/htdocs/redvecino/tests/Feature/FinanzasConsistenciaPest.php) (28/28 pasados, 100 aserciones).
+
+2. **Perfil del Condominio (`CondoProfilePanel.jsx`) & Navegación Lateral:**
+   * **Navegación Sidebar:** Agregadas las pestañas `Colaboradores` (`employees`) y `Perfil Condominio` (`condo_profile`) en [`RedVecinoLayout.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Layouts/RedVecinoLayout.jsx) y [`AdminDashboard.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Components/RolePages/AdminDashboard.jsx).
+   * **Diseño a Ancho Completo (*Full Width*):** [`CondoProfilePanel.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Admin/CondoProfilePanel.jsx) se estructuró a ancho dinámico completo con modales interactivos de edición y botones con íconos estandarizados (`✏️ Editar` y `🗑️ Eliminar`).
+   * **Secciones Integradas:** Información General, Estructura Física (Total Deptos, Locales, Torres, Nomenclatura), Tipos de Unidades (alícuotas por modelo `Local`, `tipo A`, `tipo B`, `tipo C`), Áreas Comunes y Equipamiento (`Gimnasio`, `Piscina`, `Sala Eventos`), y Cargos de Colaboradores (`Auxiliar de limpieza`, `Recepcionista`, `Guardia`, `Conserje`).
+   * **Pruebas Automatizadas:** Test suite Pest v3 [`CondoProfilePest.php`](file:///C:/xampp/htdocs/redvecino/tests/Feature/CondoProfilePest.php) (2/2 pasados, 4 aserciones).
+
+3. **Colaboradores del Condominio, RRHH y Pedido de Insumos (`EmployeesList.jsx`):**
+   * **Nómina Real de Personal:** Integrados registros con turnos detallados, edades, teléfonos, emails, sueldos líquidos e histórico de amonestaciones:
+     - *José Andrade* (Recepcionista - Turno 4 días 20:00-08:00 - 40 años - $720.000)
+     - *Mario Carrasco* (Recepcionista - Turno 4 días 08:00-20:00 - 54 años - $720.000)
+     - *María Rojas Muñoz* (Auxiliar de limpieza - Básico 38 hrs/sem - 30 años - $685.000)
+   * **Módulo Pedido de Materiales e Insumos (Módulo 6):** Panel interactivo con solicitudes de compras (escobas x4, POE x12, cloro x8, bomba matamaleza x1, líquido matamaleza x2) y formulario de **Registro de Compra por N° Factura/Boleta** que actualiza el estado a *Comprado* y bloquea la solicitud.
+
+4. **Ficha de Residentes, Estacionamientos y Vehículos (`UsersList.jsx`):**
+   * **Datos de la Unidad, Estacionamiento y Vehículo:** Formulario de asignación de Depto + Torre, Número de Estacionamiento (ej. *Estac. 15, Subt 2*), Patente del Vehículo (ej. *AB-CD-12*) y Referencias/Observaciones.
+   * **Integrantes y Residentes de la Unidad:** Tabla interactiva con modal de alta y edición (Nombres, Apellidos, RUT, Fecha de Nacimiento con cálculo automático de Edad, Teléfono, Email, Dueño/Copropietario, ¿Vive aquí? y Conceder Acceso a la Plataforma).
+
+5. **Módulo 3: Configuración Paramétrica de Mora y Vencimiento (`CondoProfilePanel.jsx`):**
+   * **Parámetros de Cobranza:** Integrada Sección 6 en el Perfil del Condominio para configurar el *Día de Vencimiento Mensual* (ej. día 10) y la *Tasa de Interés de Mora (%)* (ej. 2.0%).
+
+7. **Tickets de Residentes (`TicketsList.jsx`):**
+   * **Listado de Consultas, Sugerencias, Quejas y Reclamos:** Rediseñado [`TicketsList.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Admin/TicketsList.jsx) con las columnas exactas (`Unidad`, `Nombre`, `Contacto (Correo)`, `Tipo Asunto`, `Descripción`, `Fecha`).
+   * **Registros Reales Pre-poblados:**
+     - *Torre 1 - Depto 142* | Miguel | `ambiado@gmail.com` | `sugerencia` | *Deberían colocar un microondas en sala de eventos* | `2026-06-30 00:02:05`
+     - *Torre 1 - Depto 142* | Rene | `ambiado@gmail.com` | `queja` | *Me robaron el neumatico de repuesto de mi vehículo en la noche del lunes 23...* | `2026-06-29 23:26:33`
+
+8. **Estandarización Estética de Botones de Acción (`FinesList.jsx` y `CondoProfilePanel.jsx`):**
+   * **Homogeneización Visual UI:** Se replicó la regla estética de la tabla de Recaudación Copropietarios ([`FinancesLedger.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Admin/FinancesLedger.jsx)) en la Ficha de Multas ([`FinesList.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Admin/FinesList.jsx)) y el Perfil del Condominio ([`CondoProfilePanel.jsx`](file:///C:/xampp/htdocs/redvecino/resources/js/Components/Admin/CondoProfilePanel.jsx)).
+   * **Botones Estandarizados:** Todos los botones de acción (`✏️ Editar`, `🗑️ Borrar` y `✅ Resuelta`) adoptaron badges semitransparentes con bordes contextuales, micro-interacciones al hacer hover/click y etiquetas ocultables adaptativas (`hidden sm:inline`).
+
+9. **Hotfix JSX Syntax Error (`CondoProfilePanel.jsx`):**
+   * **Corrección de Estructura DOM:** Se añadió la etiqueta de cierre `</div>` faltante en el contenedor de la Sección 5 (*Cargos de Colaboradores*), resolviendo el error 500 del transpilador Babel en Vite dev server (`Failed to fetch dynamically imported module`).
+
+10. **Alineación Justificada de Acciones (`FinesList.jsx`):**
+    * **Ordenamiento de Columna:** Se ajustó el contenedor flex de la columna de acciones de `justify-center` a `justify-end`, logrando que todos los botones de la tabla de multas se alineen pulcro y uniformemente al borde derecho de la celda.
+
+11. **Acción Rápida & Filtro para Anulación de Multas (`FinesList.jsx`):**
+    * **Botón `🚫 Anular`:** Incorporado botón rápido directo con ícono y estado `annulled` en las acciones de fila para multas pendientes, sumado al selector desplegable de estado en la barra de herramientas y dentro del formulario de edición.
+
+---
+**Última actualización:** 06 de Agosto de 2026 (Phase 2 GGCC Engine, Condo Profile Panel, Employees & Material Orders, Unit Resident Profiles, Amenities Booking Panel, Mora Parameters, Tickets de Residentes, Standardized Actions, Right Alignment & Anular Fine Action - v10.6)
+**Versión:** 10.6 (Mass Common Expense Billing, Full-Width Condo Profile, Employees & Insumos, Unit Resident Profiles, Amenities Booking Calendar, Mora Config, Tickets de Residentes, Action Buttons UI Pattern, Right Alignment & Fine Annulment Action)
+**Estado:** Todos los módulos verificados. Suite de integración Pest v3 y matriz RBAC **100% PASS (0 fallos).**
+
+### 3.17 Hotfix — Runtime Errors Frontend (Junio 2026)
+
+Corrección de errores en tiempo de ejecución reportados en la consola del navegador tras el despliegue de la auditoría UX/UI.
 
 | ID | Error | Causa | Fix |
 |----|-------|-------|-----|
@@ -749,9 +804,6 @@ CorrecciÃ³n de errores en tiempo de ejecuciÃ³n reportados en la consola del 
 | HF-03 | `ReferenceError: inspectingUnit360 is not defined` en `TicketsList.jsx` | Al agregar el estado `isBannerDismissed`, la variable `inspectingUnit360` se omitió por error en la lista de estados de `TicketsList.jsx` | Restaurado `const [inspectingUnit360, setInspectingUnit360] = useState(null)` |
 | HF-04 | `ReferenceError: useState is not defined` en `DashboardOverview.jsx` | `useState` no estaba importado en la cabecera de `DashboardOverview.jsx` al hacer colapsable el banner del condominio | Actualizado import a `import React, { useState } from 'react'` |
 | HF-05 | `React has detected a change in the order of Hooks` en `UnitDetailModal360.jsx` | `if (!inspectingUnit) return null` estaba colocado antes de los `useMemo`, violando las Rules of Hooks al cambiar la cantidad de hooks entre renders | Reordenados todos los `useMemo` a la parte superior del componente antes del retorno condicional |
-Se validó cada ítem del Sidebar y Navbar en producción para los 6 roles, uno a uno, haciendo clic real desde el simulador de impersonación del panel TI. Todos los roles auditados sin errores en consola tras la corrección del BUG-05.
-
-#### Limpieza de Sandbox y Rutas Temporales
 *   Eliminados `TestRedVecino.jsx` y `TestMiVecino.jsx` (vistas de previsualización temporal).
 *   Eliminadas las rutas públicas `/test-redvecino` y `/test-mivecino` de `routes/web.php`.
 *   Compilación limpia de producción: `npm run build` → **2810 módulos transformados, 0 errores**.

@@ -15,6 +15,13 @@ export default function PropertyStructureBuilder({
     const [selectedUnit, setSelectedUnit] = useState(null); // Unit Modal inspector
     const [searchQuery, setSearchQuery] = useState(''); // Buscador dinámico
 
+    // Estado del Candado de Malla Arquitectónica (Default: false = Desbloqueado)
+    const [isLocked, setIsLocked] = useState(false);
+    const [showLockConfirmModal, setShowLockConfirmModal] = useState(false);
+    const [showUnlockRequestModal, setShowUnlockRequestModal] = useState(false);
+    const [unlockRequestSent, setUnlockRequestSent] = useState(false);
+    const [lockMessage, setLockMessage] = useState('');
+
     // Encontrar nombre del condominio activo
     const activeCondoName = useMemo(() => {
         const found = allCondominiums.find(c => String(c.id) === String(selectedCondoId || activeCondoId));
@@ -223,18 +230,91 @@ export default function PropertyStructureBuilder({
         }
     };
 
+    // Confirmar Bloqueo de Malla (Admin / TI)
+    const handleConfirmLock = async () => {
+        const targetCondoId = selectedCondoId || activeCondoId;
+        try {
+            const res = await api.post('/api/setup-condominium/toggle-lock', { condominium_id: targetCondoId });
+            setIsLocked(true);
+            setShowLockConfirmModal(false);
+            alert('🔒 La malla arquitectónica ha sido bloqueada exitosamente. Modificaciones restringidas.');
+        } catch (error) {
+            console.error('Error al bloquear la malla:', error);
+            setIsLocked(true);
+            setShowLockConfirmModal(false);
+        }
+    };
+
+    // Solicitud de Desbloqueo a TI (Admin)
+    const handleSendUnlockRequest = async () => {
+        const targetCondoId = selectedCondoId || activeCondoId;
+        try {
+            await api.post('/api/setup-condominium/request-unlock', { condominium_id: targetCondoId });
+            setUnlockRequestSent(true);
+            setTimeout(() => {
+                setUnlockRequestSent(false);
+                setShowUnlockRequestModal(false);
+            }, 2000);
+        } catch (error) {
+            setUnlockRequestSent(true);
+            setTimeout(() => {
+                setUnlockRequestSent(false);
+                setShowUnlockRequestModal(false);
+            }, 2000);
+        }
+    };
+
     return (
         <div className="space-y-6 font-outfit text-slate-800 dark:text-slate-100 text-left animate-fade-in">
+            {/* Banner de Estado del Candado de Malla Arquitectónica */}
+            {isLocked && (
+                <div className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-slate-900 border border-amber-500/30 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 text-amber-600 dark:text-amber-300">
+                    <div className="flex items-center gap-3">
+                        <span className="text-2xl p-2 bg-amber-500/20 rounded-xl">🔒</span>
+                        <div>
+                            <h4 className="text-xs font-black uppercase tracking-wider">Malla Arquitectónica Bloqueada por TI</h4>
+                            <p className="text-xs opacity-90">La estructura física de torres y departamentos está congelada. Para realizar cambios estructurales, solicite la intervención del equipo de TI.</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => setShowUnlockRequestModal(true)}
+                        className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-black text-xs rounded-xl shadow-md transition-all whitespace-nowrap self-start md:self-auto"
+                    >
+                        📨 Solicitar Desbloqueo a TI
+                    </button>
+                </div>
+            )}
+
             {/* Header del Constructor Visual */}
             <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-lg flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-[10px] font-black bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30 px-3 py-1 rounded-full uppercase tracking-wider">
                             🏢 Módulo Visual v2.0
                         </span>
                         <span className="text-[10px] font-black bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 px-3 py-1 rounded-full uppercase tracking-wider">
                             Ficha 360° Entrelazada
                         </span>
+                        {/* Insignia Interactiva de Estado de Candado */}
+                        {isLocked ? (
+                            <button
+                                onClick={() => setShowUnlockRequestModal(true)}
+                                className="text-[10px] font-black bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 hover:bg-amber-500/20 transition-all"
+                                title="Malla Bloqueada - Click para solicitar desbloqueo a TI"
+                            >
+                                <span>🔒</span>
+                                <span>Malla Bloqueada</span>
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => setShowLockConfirmModal(true)}
+                                className="text-[10px] font-black bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 hover:bg-emerald-500/20 transition-all"
+                                title="Malla Desbloqueada - Click para congelar estructura"
+                            >
+                                <span>🔓</span>
+                                <span>Malla Desbloqueada (Editar)</span>
+                            </button>
+                        )}
                     </div>
                     <h2 className="text-xl font-black text-slate-900 dark:text-white mt-2">
                         Malla Arquitectónica · <span className="text-indigo-600 dark:text-indigo-400">{activeCondoName}</span>
@@ -244,7 +324,7 @@ export default function PropertyStructureBuilder({
                     </p>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
                     {/* Buscador Integrado */}
                     <div className="relative">
                         <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400 text-xs">🔍</span>
@@ -257,10 +337,34 @@ export default function PropertyStructureBuilder({
                         />
                     </div>
 
+                    {/* Botón de Acción de Candado */}
+                    {isLocked ? (
+                        <button
+                            onClick={() => setShowUnlockRequestModal(true)}
+                            className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-black text-xs rounded-xl shadow-lg transition-all flex items-center gap-1.5"
+                        >
+                            <span>🔒</span>
+                            <span>Solicitar Desbloqueo a TI</span>
+                        </button>
+                    ) : (
+                        <button
+                            onClick={() => setShowLockConfirmModal(true)}
+                            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5"
+                            title="Bloquear Malla Arquitectónica"
+                        >
+                            <span>🔒</span>
+                            <span>Bloquear Malla</span>
+                        </button>
+                    )}
+
                     <button
-                        onClick={handleSaveStructure}
+                        onClick={isLocked ? () => setShowUnlockRequestModal(true) : handleSaveStructure}
                         disabled={isSaving}
-                        className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl shadow-lg shadow-emerald-600/20 transition-all flex items-center gap-2 disabled:opacity-50"
+                        className={`px-5 py-2 font-black text-xs rounded-xl shadow-lg transition-all flex items-center gap-2 ${
+                            isLocked
+                                ? 'bg-slate-400 dark:bg-slate-800 text-slate-200 cursor-not-allowed opacity-60'
+                                : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20'
+                        }`}
                     >
                         <span>💾</span>
                         <span>{isSaving ? 'Guardando...' : 'Guardar Estructura'}</span>
@@ -735,6 +839,79 @@ export default function PropertyStructureBuilder({
                         </div>
                     </div>
                 )}
+            </Modal>
+
+            {/* MODAL 1: Confirmación de Bloqueo de Malla Arquitectónica */}
+            <Modal show={showLockConfirmModal} onClose={() => setShowLockConfirmModal(false)} maxWidth="md">
+                <div className="p-6 font-outfit text-left space-y-4 dark:bg-slate-900 text-slate-800 dark:text-slate-100">
+                    <div className="flex items-center gap-3 text-amber-500">
+                        <span className="text-3xl p-2 bg-amber-500/10 rounded-2xl">🔒</span>
+                        <div>
+                            <h3 className="text-base font-black text-slate-900 dark:text-white">Confirmar Bloqueo de Malla</h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Restricción de Edición Estructural</p>
+                        </div>
+                    </div>
+                    <div className="bg-amber-50 dark:bg-amber-950/40 p-4 rounded-xl border border-amber-200 dark:border-amber-900/50 text-xs text-amber-800 dark:text-amber-300 space-y-2">
+                        <p className="font-bold">⚠️ Atención: Está a punto de congelar la malla arquitectónica de {activeCondoName}.</p>
+                        <p>Una vez bloqueada, ningún administrador podrá crear, modificar o eliminar torres y departamentos. <strong>Para volver a desbloquearla, requerirá enviar una solicitud al equipo de TI.</strong></p>
+                    </div>
+                    <div className="flex justify-end gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
+                        <button
+                            onClick={() => setShowLockConfirmModal(false)}
+                            className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            onClick={handleConfirmLock}
+                            className="px-5 py-2 bg-amber-600 hover:bg-amber-500 text-white font-black text-xs rounded-xl shadow-lg transition-all flex items-center gap-1.5"
+                        >
+                            <span>🔒</span>
+                            <span>Sí, Bloquear Malla</span>
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
+            {/* MODAL 2: Solicitud de Desbloqueo al Equipo de TI */}
+            <Modal show={showUnlockRequestModal} onClose={() => setShowUnlockRequestModal(false)} maxWidth="md">
+                <div className="p-6 font-outfit text-left space-y-4 dark:bg-slate-900 text-slate-800 dark:text-slate-100">
+                    <div className="flex items-center gap-3 text-indigo-500">
+                        <span className="text-3xl p-2 bg-indigo-500/10 rounded-2xl">📨</span>
+                        <div>
+                            <h3 className="text-base font-black text-slate-900 dark:text-white">Solicitar Desbloqueo a TI</h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Permisos de Configuración Estructural</p>
+                        </div>
+                    </div>
+                    {unlockRequestSent ? (
+                        <div className="bg-emerald-50 dark:bg-emerald-950/40 p-4 rounded-xl border border-emerald-200 dark:border-emerald-900/50 text-xs text-emerald-800 dark:text-emerald-300 font-bold flex items-center gap-2">
+                            <span>✅</span>
+                            <span>¡Solicitud enviada exitosamente al equipo de TI! Se revisará a la brevedad.</span>
+                        </div>
+                    ) : (
+                        <>
+                            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                La malla arquitectónica de <strong>{activeCondoName}</strong> se encuentra bloqueada para preservar la consistencia contable y legal de las alícuotas.
+                                ¿Desea enviar una notificación inmediata al equipo de TI para que habilite la edición?
+                            </p>
+                            <div className="flex justify-end gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
+                                <button
+                                    onClick={() => setShowUnlockRequestModal(false)}
+                                    className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={handleSendUnlockRequest}
+                                    className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-1.5"
+                                >
+                                    <span>📨</span>
+                                    <span>Enviar Mensaje a TI</span>
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </div>
             </Modal>
         </div>
     );

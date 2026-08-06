@@ -292,6 +292,17 @@ export default function FinesList({
                             />
                         </div>
 
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs px-3 py-2 text-slate-800 dark:text-white font-bold cursor-pointer"
+                        >
+                            <option value="all">🔍 Todos los Estados</option>
+                            <option value="pending">⏳ Pendientes</option>
+                            <option value="resolved">✅ Resueltas</option>
+                            <option value="annulled">🚫 Anuladas</option>
+                        </select>
+
                         <input
                             type="date"
                             value={startDate}
@@ -361,29 +372,61 @@ export default function FinesList({
                                 <span>{f.status === 'resolved' ? '✅' : f.status === 'annulled' ? '🚫' : '⏳'}</span>
                                 <span>{f.status === 'pending' ? 'pendiente' : f.status === 'resolved' ? 'resuelta' : 'anulada'}</span>
                             </span>,
-                            <div className="flex items-center justify-center gap-1.5" key={`act-${f.id}`}>
+                            <div className="flex items-center justify-end gap-1.5" key={`act-${f.id}`}>
                                 <button
+                                    type="button"
                                     onClick={() => {
                                         setEditingFine(f);
                                         setNewFineForm({ property_id: String(f.property_id), amount: String(f.amount), reason: f.reason, status: f.status });
                                         setShowAddFineForm(true);
                                     }}
-                                    className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-indigo-600 font-bold text-xs"
+                                    className="px-2 py-1 sm:px-2.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-bold rounded-lg transition-all shadow-xs hover:scale-105 active:scale-95 flex items-center gap-1 cursor-pointer"
                                     title="Editar Multa"
                                 >
-                                    ✏️
+                                    <span>✏️</span>
+                                    <span className="hidden sm:inline">Editar</span>
                                 </button>
-                                {f.status !== 'resolved' && (
-                                    <button
-                                        onClick={() => {
-                                            setFinesList(prev => prev.map(item => item.id === f.id ? { ...item, status: 'resolved' } : item));
-                                        }}
-                                        className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 font-bold text-xs"
-                                        title="Marcar como Resuelta"
-                                    >
-                                        ✅
-                                    </button>
+                                {f.status === 'pending' && (
+                                    <>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setFinesList(prev => prev.map(item => item.id === f.id ? { ...item, status: 'resolved' } : item));
+                                            }}
+                                            className="px-2 py-1 sm:px-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold rounded-lg transition-all shadow-xs hover:scale-105 active:scale-95 flex items-center gap-1 cursor-pointer"
+                                            title="Marcar como Resuelta"
+                                        >
+                                            <span>✅</span>
+                                            <span className="hidden sm:inline">Resuelta</span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (confirm('¿Desea anular esta infracción / multa?')) {
+                                                    setFinesList(prev => prev.map(item => item.id === f.id ? { ...item, status: 'annulled' } : item));
+                                                }
+                                            }}
+                                            className="px-2 py-1 sm:px-2.5 bg-slate-500/10 hover:bg-slate-500/20 border border-slate-500/30 text-slate-600 dark:text-slate-400 text-xs font-bold rounded-lg transition-all shadow-xs hover:scale-105 active:scale-95 flex items-center gap-1 cursor-pointer"
+                                            title="Anular Infracción"
+                                        >
+                                            <span>🚫</span>
+                                            <span className="hidden sm:inline">Anular</span>
+                                        </button>
+                                    </>
                                 )}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if (confirm('¿Desea eliminar definitivamente este registro de multa?')) {
+                                            setFinesList(prev => prev.filter(item => item.id !== f.id));
+                                        }
+                                    }}
+                                    className="px-2 py-1 sm:px-2.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs font-bold rounded-lg transition-all shadow-xs hover:scale-105 active:scale-95 flex items-center gap-1 cursor-pointer"
+                                    title="Borrar Registro"
+                                >
+                                    <span>🗑️</span>
+                                    <span className="hidden sm:inline">Borrar</span>
+                                </button>
                             </div>
                         ]
                     }))}

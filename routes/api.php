@@ -19,6 +19,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoadmapFeaturesController;
 use App\Http\Controllers\CondominiumController;
 use App\Http\Controllers\CondominiumSetupController;
+use App\Http\Controllers\Api\CommonExpensePeriodController;
+use App\Http\Controllers\UnitProfileController;
+use App\Http\Controllers\SupplyOrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login-pin', [RoadmapFeaturesController::class, 'loginPin']);
@@ -69,9 +72,27 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         // Setup Condominium
         Route::post('/setup-condominium', [CondominiumSetupController::class, 'setup']);
         Route::post('/setup-condominium/copy-tower', [CondominiumSetupController::class, 'copyTowerStructure']);
+        Route::post('/setup-condominium/toggle-lock', [CondominiumSetupController::class, 'toggleLock']);
+        Route::post('/setup-condominium/request-unlock', [CondominiumSetupController::class, 'requestUnlock']);
         
         Route::get('/condominiums/{id}', [CondominiumController::class, 'show']);
         Route::put('/condominiums/{id}', [CondominiumController::class, 'update']);
+        Route::post('/condominiums/{id}/finance-config', [CondominiumController::class, 'financeConfig']);
+    });
+
+    // Ficha de Unidad e Integrantes (Ficha de Residentes)
+    Route::middleware('can:manage users')->group(function () {
+        Route::get('/unit-profiles/{propertyId}', [UnitProfileController::class, 'show']);
+        Route::post('/unit-profiles/{propertyId}', [UnitProfileController::class, 'upsert']);
+    });
+
+    // Pedidos de Materiales e Insumos
+    Route::get('/supply-orders', [SupplyOrderController::class, 'index']);
+    Route::post('/supply-orders', [SupplyOrderController::class, 'store']);
+    Route::middleware('can:approve expenses')->group(function () {
+        Route::put('/supply-orders/{id}/approve', [SupplyOrderController::class, 'approve']);
+        Route::put('/supply-orders/{id}/mark-purchased', [SupplyOrderController::class, 'markPurchased']);
+        Route::put('/supply-orders/{id}/mark-received', [SupplyOrderController::class, 'markReceived']);
     });
 
     // 3. Finances
@@ -84,6 +105,13 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::get('/fines/{id}', [FineController::class, 'show']);
         Route::put('/fines/{id}', [FineController::class, 'update']);
         Route::delete('/fines/{id}', [FineController::class, 'destroy']);
+
+        // Períodos Contables & Boletas de Gastos Comunes (Fase 2)
+        Route::get('/common-expense-periods', [CommonExpensePeriodController::class, 'indexPeriods']);
+        Route::post('/common-expense-periods/generate', [CommonExpensePeriodController::class, 'generateMassBilling']);
+        Route::get('/common-expense-periods/{id}/receipts', [CommonExpensePeriodController::class, 'getReceipts']);
+        Route::post('/common-expense-periods/{id}/close', [CommonExpensePeriodController::class, 'closePeriod']);
+        Route::get('/common-expenses/receipt/{id}', [CommonExpensePeriodController::class, 'showReceipt']);
     });
 
     Route::middleware('can:approve expenses')->group(function () {

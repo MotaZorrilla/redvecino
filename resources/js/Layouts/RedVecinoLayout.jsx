@@ -110,8 +110,10 @@ export default function RedVecinoLayout({
                     { id: 'properties', icon: Building2, label: 'Propiedades', desc: 'Casas y departamentos' },
                     { id: 'users', icon: Users, label: 'Usuarios', desc: 'Vecinos y directiva' },
                     { id: 'tickets', icon: Wrench, label: 'Tickets', desc: 'Casos y solicitudes' },
+                    { id: 'employees', icon: Users, label: 'Colaboradores', desc: 'Personal y RRHH' },
                     { id: 'payments', icon: CircleDollarSign, label: 'Finanzas', desc: 'Libro diario, recaudación y egresos' },
                     { id: 'fines', icon: Scale, label: 'Multas', desc: 'Infracciones y cargos' },
+                    { id: 'condo_profile', icon: Building2, label: 'Perfil Condominio', desc: 'Datos, alícuotas y amenidades' },
                 ];
             case 'comite':
                 return [

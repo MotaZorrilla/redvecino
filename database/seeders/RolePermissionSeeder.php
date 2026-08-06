@@ -53,6 +53,7 @@ class RolePermissionSeeder extends Seeder
             'pay common expenses', 'view account statements', 'create tickets',
             'view own tickets', 'assign tickets', 'resolve tickets',
             'view financial reports', 'approve expenses', 'manage users',
+            'configure system',
             'publish announcements', 'send messages']);
 
         $ti = Role::findOrCreate('TI', 'web');
