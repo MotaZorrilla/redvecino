@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '@/bootstrap';
+import { STEPS, validateStep } from '@/hooks/condoProfileWizard';
 
 export default function CondoProfilePanel({ adminCondoId = 1, condosList = [], allCondominiums = [] }) {
     const activeCondo = (condosList.length > 0 ? condosList : allCondominiums).find(c => String(c.id) === String(adminCondoId)) || {
@@ -69,6 +70,15 @@ export default function CondoProfilePanel({ adminCondoId = 1, condosList = [], a
     // Feedback de Guardado
     const [isSaving, setIsSaving] = useState(false);
     const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
+
+    // Wizard multi-paso
+    const [activeStep, setActiveStep] = useState(STEPS[0].key);
+    const activeIndex = STEPS.findIndex(s => s.key === activeStep);
+    const currentValid = validateStep(activeStep, formData, { unitTypes });
+    const goTo = (idx) => {
+        if (idx < 0 || idx >= STEPS.length) return;
+        setActiveStep(STEPS[idx].key);
+    };
 
     useEffect(() => {
         if (activeCondo) {
@@ -231,8 +241,33 @@ export default function CondoProfilePanel({ adminCondoId = 1, condosList = [], a
             )}
 
             <form onSubmit={handleSubmitProfile} className="space-y-6">
+                {/* Barra de pasos del Wizard */}
+                <div className="flex items-center gap-2 flex-wrap border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl">
+                    {STEPS.map((s, i) => {
+                        const isActive = s.key === activeStep;
+                        const done = i < activeIndex;
+                        return (
+                            <button
+                                type="button"
+                                key={s.key}
+                                onClick={() => goTo(i)}
+                                className={`px-2.5 py-1.5 rounded-xl text-[10px] font-black flex items-center gap-1 transition-all ${
+                                    isActive
+                                        ? 'bg-indigo-600 text-white shadow-lg'
+                                        : done
+                                            ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400'
+                                            : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                                }`}
+                            >
+                                <span>{done ? '✓' : i + 1}</span>
+                                <span className="hidden sm:inline">{s.title}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+
                 {/* SECCIÓN 1: INFORMACIÓN GENERAL */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-xs space-y-4">
+                <div className={`${activeStep === 'general' ? '' : 'hidden'} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-xs space-y-4`}>
                     <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider border-b border-slate-200 dark:border-slate-800 pb-3 flex items-center gap-2">
                         <span className="p-1.5 bg-indigo-500/10 text-indigo-500 rounded-lg">ℹ️</span>
                         <span>Información General</span>
@@ -331,7 +366,7 @@ export default function CondoProfilePanel({ adminCondoId = 1, condosList = [], a
                 </div>
 
                 {/* SECCIÓN 2: ESTRUCTURA FÍSICA */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-xs space-y-4">
+                <div className={`${activeStep === 'estructura' ? '' : 'hidden'} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-xs space-y-4`}>
                     <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider border-b border-slate-200 dark:border-slate-800 pb-3 flex items-center gap-2">
                         <span className="p-1.5 bg-amber-500/10 text-amber-500 rounded-lg">🏢</span>
                         <span>Estructura Física</span>
@@ -383,7 +418,7 @@ export default function CondoProfilePanel({ adminCondoId = 1, condosList = [], a
                 </div>
 
                 {/* SECCIÓN 3: TIPOS DE UNIDADES (ALÍCUOTAS POR MODELO) */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-xs space-y-4">
+                <div className={`${activeStep === 'tipos' ? '' : 'hidden'} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-xs space-y-4`}>
                     <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                         <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
                             <span className="p-1.5 bg-emerald-500/10 text-emerald-500 rounded-lg">📐</span>
@@ -445,7 +480,7 @@ export default function CondoProfilePanel({ adminCondoId = 1, condosList = [], a
                 </div>
 
                 {/* SECCIÓN 4: ÁREAS COMUNES Y EQUIPAMIENTO */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-xs space-y-4">
+                <div className={`${activeStep === 'areas' ? '' : 'hidden'} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-xs space-y-4`}>
                     <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                         <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
                             <span className="p-1.5 bg-cyan-500/10 text-cyan-500 rounded-lg">🏊</span>
@@ -515,7 +550,7 @@ export default function CondoProfilePanel({ adminCondoId = 1, condosList = [], a
                 </div>
 
                 {/* SECCIÓN 5: CARGOS DE COLABORADORES */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-xs space-y-4">
+                <div className={`${activeStep === 'cargos' ? '' : 'hidden'} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-xs space-y-4`}>
                     <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                         <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
                             <span className="p-1.5 bg-purple-500/10 text-purple-500 rounded-lg">👷</span>
@@ -573,7 +608,7 @@ export default function CondoProfilePanel({ adminCondoId = 1, condosList = [], a
                 </div>
 
                 {/* SECCIÓN 6: PARÁMETROS DE GASTOS COMUNES & CONFIGURACIÓN DE MORA */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-xs space-y-4">
+                <div className={`${activeStep === 'parametros' ? '' : 'hidden'} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-xs space-y-4`}>
                     <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider border-b border-slate-200 dark:border-slate-800 pb-3 flex items-center gap-2">
                         <span className="p-1.5 bg-rose-500/10 text-rose-500 rounded-lg">⚙️</span>
                         <span>Parámetros de Gastos Comunes & Configuración de Mora</span>
@@ -619,16 +654,37 @@ export default function CondoProfilePanel({ adminCondoId = 1, condosList = [], a
                     </div>
                 </div>
 
-                {/* BOTÓN FINAL DE GUARDAR */}
-                <div className="flex justify-end pt-4">
+                {/* NAVECACIÓN WIZARD + BOTÓN FINAL */}
+                <div className="flex items-center justify-between gap-3 pt-2">
                     <button
-                        type="submit"
-                        disabled={isSaving}
-                        className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm rounded-xl shadow-xl shadow-indigo-600/30 transition-all flex items-center gap-2 disabled:opacity-50"
+                        type="button"
+                        onClick={() => goTo(activeIndex - 1)}
+                        disabled={activeIndex === 0}
+                        className="px-6 py-3 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-black text-sm rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                        <span>💾</span>
-                        <span>{isSaving ? 'Guardando Perfil...' : 'Guardar Cambios del Perfil'}</span>
+                        ← Anterior
                     </button>
+
+                    {STEPS[activeIndex].isLast ? (
+                        <button
+                            type="submit"
+                            disabled={isSaving}
+                            className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm rounded-xl shadow-xl shadow-indigo-600/30 transition-all flex items-center gap-2 disabled:opacity-50"
+                        >
+                            <span>💾</span>
+                            <span>{isSaving ? 'Guardando Perfil...' : 'Guardar Cambios del Perfil'}</span>
+                        </button>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={() => goTo(activeIndex + 1)}
+                            disabled={!currentValid}
+                            className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm rounded-xl shadow-xl shadow-indigo-600/30 transition-all flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                            <span>Siguiente →</span>
+                            {!currentValid && <span className="text-[9px] opacity-80">(completa los campos *)</span>}
+                        </button>
+                    )}
                 </div>
             </form>
 

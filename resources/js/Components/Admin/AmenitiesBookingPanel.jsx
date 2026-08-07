@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from '@/Components/Modal';
+import { useBookings, mapBookingToPanel } from '@/hooks/useBookings';
 
 export default function AmenitiesBookingPanel({ adminCondoId = 1 }) {
+    const { data: realBookings = [] } = useBookings(true);
     const [bookings, setBookings] = useState([
         {
             id: 1,
@@ -27,6 +29,19 @@ export default function AmenitiesBookingPanel({ adminCondoId = 1 }) {
 
     const [selectedAmenityFilter, setSelectedAmenityFilter] = useState('all');
     const [showNewBookingModal, setShowNewBookingModal] = useState(false);
+
+    // Merge reservas reales desde /api/bookings (fuente de verdad cuando existen).
+    useEffect(() => {
+        if (realBookings.length > 0) {
+            setBookings(prev => {
+                const knownIds = new Set(prev.map(b => b.id));
+                const fresh = realBookings
+                    .filter(b => !knownIds.has(b.id))
+                    .map(mapBookingToPanel);
+                return [...fresh, ...prev];
+            });
+        }
+    }, [realBookings]);
     const [newBooking, setNewBooking] = useState({
         amenity_name: 'Sala Eventos',
         unit_name: 'Torre 1 - Depto 142',
