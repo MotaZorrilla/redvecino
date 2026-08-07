@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Condominium;
 use App\Models\CommonExpense;
+use App\Models\CommonExpensePeriod;
 use App\Models\Property;
 use App\Services\CommonExpenseCalculator;
 use Illuminate\Http\Request;
@@ -76,6 +77,20 @@ class CommonExpenseController extends Controller
                 'due_date' => $data['due_date'],
                 'description' => 'Gasto Comun del periodo ' . $data['period'],
                 'status' => 'published'
+            ]
+        );
+
+        // Unificación: materializar el mismo periodo en el modelo unificado.
+        CommonExpensePeriod::updateOrCreate(
+            [
+                'condominium_id' => $data['condominium_id'],
+                'period' => $data['period']
+            ],
+            [
+                'status' => 'issued',
+                'total_expenses' => $data['total_amount'],
+                'due_date' => $data['due_date'],
+                'created_by' => auth()->id(),
             ]
         );
 
