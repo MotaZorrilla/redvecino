@@ -31,20 +31,22 @@ class CommonExpenseController extends Controller
         ]);
 
         $condominium = Condominium::findOrFail($data['condominium_id']);
-        $properties = Property::where('condominium_id', $condominium->id)->get();
+        $properties = Property::where('condominium_id', $condominium->id)->with('tower')->get();
 
         $generatedBills = [];
         $totalCondoExpense = 0;
 
         foreach ($properties as $property) {
             $bill = $this->calculator->calculateForUnit($property, $data['period']);
+            $totalToPay = $bill['total_a_pagar'] ?? 0;
+
             $generatedBills[] = [
                 'property_id' => $property->id,
                 'property_number' => $property->number,
                 'details' => $bill,
-                'total_to_pay' => $bill['total_a_pagar'] ?? 0
+                'total_to_pay' => $totalToPay
             ];
-            $totalCondoExpense += ($bill['total_a_pagar'] ?? 0);
+            $totalCondoExpense += $totalToPay;
         }
 
         return response()->json([
