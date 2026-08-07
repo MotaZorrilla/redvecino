@@ -17,10 +17,8 @@ use App\Models\Payment;
 use App\Models\Fine;
 use App\Models\TicketCategory;
 use App\Models\Ticket;
-use App\Models\Announcement;
 use App\Models\CondoIncome;
 use App\Models\CondoExpense;
-use App\Models\Message;
 use App\Models\Afp;
 use App\Models\CondoTower;
 use Illuminate\Database\Seeder;
@@ -964,103 +962,14 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('Support tickets seeded.');
+$this->command->info('Support tickets seeded.');
 
-        // 9. Generate Announcements
-        $announcementsData = [
-            [
-                'title' => 'Mantención Semestral de Calderas y Corte de Agua Caliente',
-                'content' => 'Estimados vecinos, les informamos que el día miércoles 27 de mayo se realizará la mantención semestral reglamentaria a la caldera central del edificio. Debido a esto, el servicio de agua caliente se suspenderá entre las 08:30 y las 14:00 horas. Agradecemos su comprensión.',
-                'priority' => 'high',
-            ],
-            [
-                'title' => 'Campaña de Vacunación contra la Influenza en Sala Multiuso',
-                'content' => 'Nos complace informar que, gracias a gestiones con el CESFAM comunal, se realizará un operativo de vacunación escolar y de adultos mayores contra la influenza el próximo sábado 30 de mayo de 09:00 a 13:00 en la sala multiuso. Vacunas gratuitas e ilimitadas para copropietarios.',
-                'priority' => 'normal',
-            ],
-            [
-                'title' => 'Modificación del Reglamento Interno sobre Mudanzas y Ruidos',
-                'content' => 'El Comité de Administración recuerda a todos los residentes que las mudanzas solo están permitidas de lunes a viernes de 09:00 a 18:00 y sábados de 09:00 a 14:00. Cualquier mudanza fuera de este horario o que no cuente con las lonas de protección de ascensor instaladas será sancionada.',
-                'priority' => 'normal',
-            ],
-            [
-                'title' => 'Pintura y Reparación de Fachada del Acceso Peatonal',
-                'content' => 'Durante toda esta semana se realizarán trabajos de hidrolavado y pintura en el portal de acceso principal del condominio. Rogamos transitar con precaución y respetar las señales de advertencia de pintura fresca colocadas por el personal de obras.',
-                'priority' => 'low',
-            ],
-        ];
-
-        foreach ($condos as $condo) {
-            foreach ($announcementsData as $ann) {
-                Announcement::create([
-                    'condominium_id' => $condo->id,
-                    'created_by' => $demoUsers['Administrador']->id,
-                    'title' => $ann['title'],
-                    'content' => $ann['content'],
-                    'priority' => $ann['priority'],
-                    'published_at' => now()->subDays(fake()->numberBetween(1, 10)),
-                    'expires_at' => now()->addDays(15),
-                ]);
-            }
-        }
-
-        $this->command->info('Community announcements seeded.');
-
-        // 10. Generate Internal Messages
-        $messageSubjectContent = [
-            ['subject' => 'Consulta sobre cobro de Gasto Común de Mayo', 'content' => 'Estimado Administrador, le escribo para consultar sobre un recargo por concepto de mantención extraordinaria reflejado en mi última liquidación. ¿Podría facilitarme el detalle de dicha factura? Atentamente.'],
-            ['subject' => 'Reserva de Quincho aprobada', 'content' => 'Hola, le informamos que su solicitud para la reserva del Quincho N°2 para el próximo viernes en la tarde ha sido aprobada con éxito. Recuerde respetar el aforo máximo de 15 personas y entregar limpio el sector a medianoche.'],
-            ['subject' => 'Aviso de reparación de ascensor', 'content' => 'Estimado Presidente del Comité, le escribo para avisar que el técnico de Otis ya resolvió el problema del sensor de puerta en el ascensor 1 y quedó funcionando al 100% en fase de pruebas.'],
-            ['subject' => 'Reporte de ruido molesto / Vecino Depto 402', 'content' => 'Hola conserjería, quería reportar que en el departamento 402 tienen música en volumen muy alto y ruidos de taconeo molestos. Es día de semana y ya son pasadas las 12:30 AM. ¿Podrían llamarlos? Gracias.'],
-        ];
-
-        // Seed some random messages
-        $allUsers = User::all();
-        for ($i = 0; $i < 8; $i++) {
-            $sender = $allUsers->random();
-            $receiver = $allUsers->where('id', '!=', $sender->id)->random();
-            if (!$sender || !$receiver) continue;
-
-            $template = $messageSubjectContent[$i % count($messageSubjectContent)];
-
-            Message::create([
-                'sender_id' => $sender->id,
-                'receiver_id' => $receiver->id,
-                'subject' => $template['subject'],
-                'content' => $template['content'],
-                'is_read' => fake()->boolean(60),
-                'read_at' => fake()->dateTimeBetween('-10 days', 'now'),
-            ]);
-        }
-
-        // Add 1 unread message specifically for our Demo Propietario from the Admin
-        Message::create([
-            'sender_id' => $demoUsers['Administrador']->id,
-            'receiver_id' => $demoUsers['Propietario']->id,
-            'subject' => 'Notificación de Regularización de Pago Pendiente',
-            'content' => 'Estimado propietario, le saludamos cordialmente. Le escribimos para recordarle amablemente que mantiene un saldo pendiente por concepto de multas de convivencia del mes anterior. Le solicitamos regularizar su situación en el portal de pagos en línea.',
-            'is_read' => false,
-            'read_at' => null,
-        ]);
-
-        $this->command->info('Internal communication messages seeded.');
+        // 9/10. Generate Announcements & Internal Messages
+        $this->call(AnnouncementsSeeder::class);
+        $this->call(MessagesSeeder::class);
 
         // Seed facilities for condominiums
-        $condominios = Condominium::all();
-        $facilitiesData = [
-            ['name' => 'Quincho', 'type' => 'BBQ', 'capacity' => 20, 'fee' => 15000],
-            ['name' => 'Piscina', 'type' => 'Pool', 'capacity' => 15, 'fee' => 0],
-            ['name' => 'Gimnasio', 'type' => 'Gym', 'capacity' => 10, 'fee' => 0],
-            ['name' => 'Sala de Eventos', 'type' => 'Hall', 'capacity' => 50, 'fee' => 30000],
-        ];
-
-        foreach ($condominios as $condo) {
-            foreach ($facilitiesData as $facility) {
-                \App\Models\Facility::create(array_merge($facility, ['condominium_id' => $condo->id]));
-            }
-        }
-
-        $this->command->info('Facilities seeded for ' . $condominios->count() . ' condominiums.');
+        $this->call(FacilitiesSeeder::class);
 
         // 7. Seeders extendidos según Análisis v2
         $this->call([
