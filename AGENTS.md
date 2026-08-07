@@ -65,8 +65,16 @@ Archivos existentes:
 *   [CoeficienteFallbackPest.php](file:///C:/xampp/htdocs/redvecino/tests/Feature/CoeficienteFallbackPest.php) — 7 tests: cadena completa de fallback.
 *   [ConcurrenciaFinancieraPest.php](file:///C:/xampp/htdocs/redvecino/tests/Feature/ConcurrenciaFinancieraPest.php) — 8 tests con `->repeat(3)`/`->repeat(5)`: stress CRUD concurrente.
 *   [ConfigMoraMotorPest.php](file:///C:/xampp/htdocs/redvecino/tests/Feature/ConfigMoraMotorPest.php) — 3 tests (`toEqual`): tasa de mora configurada (2.0%→2000), fallback 1.5% (null→1500) y umbral de días de atraso (`due_day`).
+*   [CommonExpenseLegacyCharPest.php](file:///C:/xampp/htdocs/redvecino/tests/Feature/CommonExpenseLegacyCharPest.php) — Tests de caracterización para el motor de gastos comunes y unificación aditiva.
 
-Seeders del demo (deterministas e idempotentes, registrados en `DatabaseSeeder::run()` §7): `PayrollBookingsSeeder` (nómina + liquidaciones + bookings), `CommonExpensePeriodReceiptSeeder` (boletas Fase 2 con mora) y `DemoTicketsSeeder` (tickets de residentes demo).
+Seeders del demo (deterministas e idempotentes, registrados en `DatabaseSeeder::run()`): `FacilitiesSeeder`, `AnnouncementsSeeder`, `MessagesSeeder` (desacoplados), `PayrollBookingsSeeder` (nómina + liquidaciones + bookings), `CommonExpensePeriodReceiptSeeder` (boletas Fase 2 con mora) y `DemoTicketsSeeder` (tickets de residentes demo).
+
+---
+
+## 📊 Estado Actual de la Suite de Pruebas (Verificado en Verde)
+- **Backend (PHP / Laravel / Pest v3):** 486 passed (2534 assertions) con `php artisan test`.
+- **Frontend (React / Vitest):** 174 passed con `npm run test:frontend`.
+- **Verificación obligatoria:** Todo cambio debe mantener la suite 100% en verde antes de cada commit.
 
 ---
 

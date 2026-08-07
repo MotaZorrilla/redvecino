@@ -87,7 +87,7 @@ El sistema implementa un control de acceso basado en roles (RBAC) gestionado a t
 ### 5.2 Filosofía de Calidad y Pruebas (Agente QA)
 *   **Prioridad de Integración:** Se exige el desarrollo de Feature/Integration Tests (usando Pest PHP) para validar las reglas de negocio (ej. importes de cobros numéricos mayores a cero, consistencia en subcategorías contables y aislamiento multi-tenant).
 *   **No Mocks Innecesarios:** Probar contra bases de datos en memoria hidratadas con datos realistas mediante seeders deterministas.
-*   **Suite total:** **376 tests backend** (Pest v3 + PHPUnit) + **29 tests frontend** (Vitest + React Testing Library) = **405 tests, 0 failures.**
+*   **Suite total:** **486 tests backend** (Pest v3 + PHPUnit) + **174 tests frontend** (Vitest + React Testing Library) = **660 tests, 0 failures (100% Verde).**
 *   **arch() tests:** 9 tests estructurales (naming, herencia, Services final, prohibición de debug calls).
 *   **Cobertura de controladores API:** 24/24 controladores cubiertos con tests de integración.
 

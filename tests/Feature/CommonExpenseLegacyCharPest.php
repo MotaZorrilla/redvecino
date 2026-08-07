@@ -103,4 +103,7 @@ it('publish también materializa el periodo en el modelo unificado CommonExpense
 
     expect($period)->not->toBeNull()
         ->and((float) $period->total_expenses)->toBe(123456.0);
+
+    $receiptsCount = \App\Models\CommonExpenseReceipt::where('period_id', $period->id)->count();
+    expect($receiptsCount)->toBeGreaterThan(0);
 });

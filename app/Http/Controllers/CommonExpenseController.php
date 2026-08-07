@@ -80,8 +80,8 @@ class CommonExpenseController extends Controller
             ]
         );
 
-        // Unificación: materializar el mismo periodo en el modelo unificado.
-        CommonExpensePeriod::updateOrCreate(
+        // Unificación: materializar el mismo periodo en el modelo unificado y generar boletas.
+        $periodRecord = CommonExpensePeriod::updateOrCreate(
             [
                 'condominium_id' => $data['condominium_id'],
                 'period' => $data['period']
@@ -93,6 +93,38 @@ class CommonExpenseController extends Controller
                 'created_by' => auth()->id(),
             ]
         );
+
+        $properties = Property::where('condominium_id', $data['condominium_id'])->get();
+        $totalAreaSqm = floatval($properties->sum('area_sqm')) ?: 1.0;
+
+        foreach ($properties as $property) {
+            $areaSqm = floatval($property->area_sqm) ?: 70.0;
+            $alicuotaPct = $property->coefficient !== null
+                ? floatval($property->coefficient)
+                : $areaSqm / $totalAreaSqm;
+
+            $baseAmount = round($data['total_amount'] * $alicuotaPct, 2);
+
+            \App\Models\CommonExpenseReceipt::updateOrCreate(
+                [
+                    'condominium_id' => $data['condominium_id'],
+                    'period_id' => $periodRecord->id,
+                    'property_id' => $property->id,
+                ],
+                [
+                    'alicuota_pct' => $alicuotaPct,
+                    'base_amount' => $baseAmount,
+                    'reserve_fund_amount' => 0,
+                    'individual_consumption' => 0,
+                    'previous_balance' => 0,
+                    'interest_amount' => 0,
+                    'total_amount' => $baseAmount,
+                    'status' => 'pending',
+                    'issue_date' => now()->toDateString(),
+                    'due_date' => $data['due_date'],
+                ]
+            );
+        }
 
         return response()->json(['message' => 'Period published successfully.', 'common_expense' => $expense]);
     }
