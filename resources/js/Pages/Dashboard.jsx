@@ -17,6 +17,7 @@ import ResidenteDashboard from '@/Components/RolePages/ResidenteDashboard';
 
 import { RoleTransitionLoader } from '@/Components/DashboardShared';
 import { useCondoFinances } from '@/hooks/useCondoFinances';
+import { useFinancialCatalog } from '@/hooks/useFinancialCatalog';
 
 export default function Dashboard() {
     const { 
@@ -44,7 +45,6 @@ export default function Dashboard() {
     // Condo Finances
     const [paymentsTabMode, setPaymentsTabMode] = useState('ledger');
     const [ledgerSubTab, setLedgerSubTab] = useState('incomes');
-    const [financialCatalog, setFinancialCatalog] = useState({ incomes: {}, expenses: {} });
     const [showAddIncomeForm, setShowAddIncomeForm] = useState(false);
     const [showAddExpenseForm, setShowAddExpenseForm] = useState(false);
     const [editingIncome, setEditingIncome] = useState(null);
@@ -55,6 +55,9 @@ export default function Dashboard() {
     const [isMobileDevOpsSidebarOpen, setIsMobileDevOpsSidebarOpen] = useState(false);
 
     const canViewFinances = user?.roles?.some(r => ['admin', 'administrador', 'committee', 'comité'].includes(r.toLowerCase()));
+
+    const { data: catalogData } = useFinancialCatalog(canViewFinances);
+    const financialCatalog = catalogData || { incomes: {}, expenses: {} };
 
     const {
         data: financesData,
