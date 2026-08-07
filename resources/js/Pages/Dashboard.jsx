@@ -16,6 +16,7 @@ import PropietarioDashboard from '@/Components/RolePages/PropietarioDashboard';
 import ResidenteDashboard from '@/Components/RolePages/ResidenteDashboard';
 
 import { RoleTransitionLoader } from '@/Components/DashboardShared';
+import { useCondoFinances } from '@/hooks/useCondoFinances';
 
 export default function Dashboard() {
     const { 
@@ -43,19 +44,27 @@ export default function Dashboard() {
     // Condo Finances
     const [paymentsTabMode, setPaymentsTabMode] = useState('ledger');
     const [ledgerSubTab, setLedgerSubTab] = useState('incomes');
-    const [incomesList, setIncomesList] = useState([]);
-    const [expensesList, setExpensesList] = useState([]);
-    const [financeSummary, setFinanceSummary] = useState({ total_incomes: 0, total_expenses: 0, balance: 0, incomes_by_category: {}, expenses_by_category: {} });
     const [financialCatalog, setFinancialCatalog] = useState({ incomes: {}, expenses: {} });
     const [showAddIncomeForm, setShowAddIncomeForm] = useState(false);
     const [showAddExpenseForm, setShowAddExpenseForm] = useState(false);
     const [editingIncome, setEditingIncome] = useState(null);
     const [editingExpense, setEditingExpense] = useState(null);
-    const [loadingFinances, setLoadingFinances] = useState(false);
     const [selectedIncomeCategory, setSelectedIncomeCategory] = useState('all');
     const [selectedExpenseCategory, setSelectedExpenseCategory] = useState('all');
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
     const [isMobileDevOpsSidebarOpen, setIsMobileDevOpsSidebarOpen] = useState(false);
+
+    const canViewFinances = user?.roles?.some(r => ['admin', 'administrador', 'committee', 'comité'].includes(r.toLowerCase()));
+
+    const {
+        data: financesData,
+        isFetching: loadingFinances,
+        refetch: fetchCondoFinances,
+    } = useCondoFinances(canViewFinances ? adminCondoId : null);
+
+    const incomesList = financesData?.incomes || [];
+    const expensesList = financesData?.expenses || [];
+    const financeSummary = financesData?.summary || { total_incomes: 0, total_expenses: 0, balance: 0, incomes_by_category: {}, expenses_by_category: {} };
 
     const filteredIncomes = useMemo(() =>
         selectedIncomeCategory === 'all'
@@ -81,25 +90,6 @@ export default function Dashboard() {
             .then(res => setFinancialCatalog(res.data))
             .catch(err => console.error("Error cargando catálogo financiero:", err));
     }, []);
-
-    const fetchCondoFinances = () => {
-        if (!adminCondoId) return;
-        setLoadingFinances(true);
-        
-        Promise.all([
-            axios.get(`/api/condo-finances/summary?condominium_id=${adminCondoId}`),
-            axios.get(`/api/condo-finances/incomes?condominium_id=${adminCondoId}&per_page=500`),
-            axios.get(`/api/condo-finances/expenses?condominium_id=${adminCondoId}&per_page=500`)
-        ]).then(([summaryRes, incomesRes, expensesRes]) => {
-            setFinanceSummary(summaryRes.data);
-            setIncomesList(incomesRes.data.data || []);
-            setExpensesList(expensesRes.data.data || []);
-            setLoadingFinances(false);
-        }).catch(err => {
-            console.error("Error al cargar finanzas de condominio:", err);
-            setLoadingFinances(false);
-        });
-    };
 
     const handleSaveIncome = (e) => {
         e.preventDefault();
@@ -172,12 +162,6 @@ export default function Dashboard() {
             .then(() => fetchCondoFinances())
             .catch(err => toast("Error al eliminar egreso: " + err.message, 'error'));
     };
-
-    useEffect(() => {
-        const canView = user?.roles?.some(r => ['admin', 'administrador', 'committee', 'comité'].includes(r.toLowerCase()));
-        if (!canView) return;
-        fetchCondoFinances();
-    }, [adminCondoId]);
 
     useEffect(() => {
         if (incomesList && incomesList.length > 0) {
