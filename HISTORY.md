@@ -1,4 +1,4 @@
-﻿# BitÃƒÂ¡cora de Desarrollo e Historial del Proyecto (RedVecino & MiVecino)
+# BitÃƒÂ¡cora de Desarrollo e Historial del Proyecto (RedVecino & MiVecino)
 
 Este documento centraliza toda la planificaciÃƒÂ³n, el progreso y la verificaciÃƒÂ³n tÃƒÂ©cnica del proyecto **condominio-pro**, integrando los planes de trabajo, el checklist de tareas y los resultados de calidad (QA). Se mantiene bajo el principio de conservaciÃƒÂ³n de memoria y trazabilidad histÃƒÂ³rica.
 
@@ -890,9 +890,10 @@ Ejecucion del plan TDD derivado de las auditorias (UX/UI, Arquitectura, Backend,
 - useBookings (2 tests): consume la API real GET /api/bookings (RoadmapFeaturesController); mapeo area_name->amenity_name, booking_date->date. AmenitiesBookingPanel lo fusiona como fuente de verdad.
 - Wizard CondoProfilePanel: ayudante puro condoProfileWizard.js (6 pasos + validacion de avance: info general obligatoria, torres/unidades>0, >=1 modelo, due_day+mora) - 6 tests. Barra de pasos, seccion unica activa, navegacion Anterior/Siguiente gated, Guardar solo al final.
 
-### 4.6 Fase 2 - Split del Seeder y Unificacion de CommonExpenses
+### 4.6 Fase 2 - Split del Seeder y Unificación de CommonExpenses
 - Split seguro del tail de DatabaseSeeder (1082 -> ~950 lineas): nuevos FacilitiesSeeder, AnnouncementsSeeder, MessagesSeeder (resuelven dependencias por query determinista). Suite 482 verde tras cada extraccion.
-- Caracterizacion legacy + Unificacion aditiva: CommonExpenseLegacyCharPest (4 tests) fija el contrato (validacion negativa -> 422, idempotencia de publish, contrato de generate). CommonExpenseController::publishPeriod ahora TAMBIEN materializa CommonExpensePeriod (status issued, total_expenses, due_date, created_by) - escritura dual del modelo unificado sin quitar el legacy (backward compatible).
+- Caracterizacion legacy + Unificacion aditiva: CommonExpenseLegacyCharPest (4 tests) fija el contrato (validacion negativa -> 422, idempotencia de publish, contrato de generate). CommonExpenseController::publishPeriod ahora TAMBIEN materializa CommonExpensePeriod (status issued, total_expenses, due_date, created_by) y **materializa las boletas individuales CommonExpenseReceipt por unidad** calculando alícuota/prorrateo - escritura dual completa del modelo unificado sin quitar el legacy (backward compatible).
+- Optimizacion de CommonExpenseController::generatePeriod: pre-carga eager de relaciones de torre (`with('tower')`) en previsualización contable.
 
 ### 4.7 Verificacion final
 - Backend: php artisan test -> 486 passed (2.534 assertions), 0 failures.
