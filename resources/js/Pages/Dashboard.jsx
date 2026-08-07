@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { generatePassword, formatCurrency } from '@/utils/helpers';
 import { toast } from '@/utils/notify';
@@ -18,6 +17,7 @@ import ResidenteDashboard from '@/Components/RolePages/ResidenteDashboard';
 import { RoleTransitionLoader } from '@/Components/DashboardShared';
 import { useCondoFinances } from '@/hooks/useCondoFinances';
 import { useFinancialCatalog } from '@/hooks/useFinancialCatalog';
+import { useFinanceMutations } from '@/hooks/useFinanceMutations';
 
 export default function Dashboard() {
     const { 
@@ -62,8 +62,9 @@ export default function Dashboard() {
     const {
         data: financesData,
         isFetching: loadingFinances,
-        refetch: fetchCondoFinances,
     } = useCondoFinances(canViewFinances ? adminCondoId : null);
+
+    const { saveIncome, deleteIncome, saveExpense, deleteExpense } = useFinanceMutations(adminCondoId);
 
     const incomesList = financesData?.incomes || [];
     const expensesList = financesData?.expenses || [];
@@ -86,14 +87,6 @@ export default function Dashboard() {
     const [newIncomeForm, setNewIncomeForm] = useState({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '', distributable_method: 'prorated', tower_id: '' });
     const [newExpenseForm, setNewExpenseForm] = useState({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '', distributable_method: 'prorated', tower_id: '' });
 
-    useEffect(() => {
-        const canView = user?.roles?.some(r => ['admin', 'administrador', 'committee', 'comité'].includes(r.toLowerCase()));
-        if (!canView) return;
-        axios.get('/api/condo-finances/catalog')
-            .then(res => setFinancialCatalog(res.data))
-            .catch(err => console.error("Error cargando catálogo financiero:", err));
-    }, []);
-
     const handleSaveIncome = (e) => {
         e.preventDefault();
         const data = {
@@ -109,25 +102,22 @@ export default function Dashboard() {
             tower_id: newIncomeForm.tower_id ? Number(newIncomeForm.tower_id) : null,
         };
 
-        const req = editingIncome 
-            ? axios.put(`/api/condo-finances/incomes/${editingIncome.id}`, data)
-            : axios.post('/api/condo-finances/incomes', data);
+        const payload = editingIncome ? { ...data, id: editingIncome.id } : data;
 
-        req.then(() => {
-            fetchCondoFinances();
-            setShowAddIncomeForm(false);
-            setEditingIncome(null);
-            setNewIncomeForm({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '', distributable_method: 'prorated', tower_id: '' });
-        }).catch(err => {
-            toast("Error al guardar ingreso: " + (err.response?.data?.message || err.message), 'error');
-        });
+        saveIncome.mutateAsync(payload)
+            .then(() => {
+                setShowAddIncomeForm(false);
+                setEditingIncome(null);
+                setNewIncomeForm({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '', distributable_method: 'prorated', tower_id: '' });
+            })
+            .catch(err => {
+                toast("Error al guardar ingreso: " + (err.response?.data?.message || err.message), 'error');
+            });
     };
 
     const handleDeleteIncome = (id) => {
         if (!confirm("¿Seguro que deseas eliminar este ingreso contable?")) return;
-        axios.delete(`/api/condo-finances/incomes/${id}`)
-            .then(() => fetchCondoFinances())
-            .catch(err => toast("Error al eliminar ingreso: " + err.message, 'error'));
+        deleteIncome.mutateAsync(id).catch(err => toast("Error al eliminar ingreso: " + err.message, 'error'));
     };
 
     const handleSaveExpense = (e) => {
@@ -145,25 +135,22 @@ export default function Dashboard() {
             tower_id: newExpenseForm.tower_id ? Number(newExpenseForm.tower_id) : null,
         };
 
-        const req = editingExpense 
-            ? axios.put(`/api/condo-finances/expenses/${editingExpense.id}`, data)
-            : axios.post('/api/condo-finances/expenses', data);
+        const payload = editingExpense ? { ...data, id: editingExpense.id } : data;
 
-        req.then(() => {
-            fetchCondoFinances();
-            setShowAddExpenseForm(false);
-            setEditingExpense(null);
-            setNewExpenseForm({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '', distributable_method: 'prorated', tower_id: '' });
-        }).catch(err => {
-            toast("Error al guardar egreso: " + (err.response?.data?.message || err.message), 'error');
-        });
+        saveExpense.mutateAsync(payload)
+            .then(() => {
+                setShowAddExpenseForm(false);
+                setEditingExpense(null);
+                setNewExpenseForm({ category: '', subcategory: '', amount: '', date: '', description: '', property_id: '', user_id: '', distributable_method: 'prorated', tower_id: '' });
+            })
+            .catch(err => {
+                toast("Error al guardar egreso: " + (err.response?.data?.message || err.message), 'error');
+            });
     };
 
     const handleDeleteExpense = (id) => {
         if (!confirm("¿Seguro que deseas eliminar este egreso contable?")) return;
-        axios.delete(`/api/condo-finances/expenses/${id}`)
-            .then(() => fetchCondoFinances())
-            .catch(err => toast("Error al eliminar egreso: " + err.message, 'error'));
+        deleteExpense.mutateAsync(id).catch(err => toast("Error al eliminar egreso: " + err.message, 'error'));
     };
 
     useEffect(() => {
