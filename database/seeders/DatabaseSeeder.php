@@ -34,9 +34,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->rutCounter++;
         $base = 10000000 + $this->rutCounter;
-        $rut = number_format($base, 0, ',', '.');
-        $dv = fake()->randomElement(['0','1','2','3','4','5','6','7','8','9','K']);
-        return $rut . '-' . $dv;
+        return \App\Support\Rut::generate($base);
     }
 
     public function run(): void
@@ -459,8 +457,13 @@ class DatabaseSeeder extends Seeder
 
         $this->command->info('Properties, Owners, and Residents seeded.');
 
-        // 6. Generate Financial Records (Common Expenses, Expense Items, Payments)
-        $periods = ['2026-03', '2026-04', '2026-05'];
+// 6. Generate Financial Records (Common Expenses, Expense Items, Payments)
+        $anchorYear = config('demo.anchor_year');
+        $periods = [
+            ['period' => ($anchorYear - 1) . '-03', 'due_day' => 5, 'status' => 'paid'],
+            ['period' => ($anchorYear - 1) . '-04', 'due_day' => 5, 'status' => 'paid'],
+            ['period' => ($anchorYear - 1) . '-05', 'due_day' => 5, 'status' => 'pending'],
+        ];
         $expenseCategories = [
             ['category' => 'Seguridad', 'description' => 'Servicios de conserjería y vigilancia 24/7 de empresa contratada.'],
             ['category' => 'Aseo y Áreas Comunes', 'description' => 'Insumos de limpieza y personal de aseo diario.'],
@@ -470,15 +473,12 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($condos as $condo) {
-            foreach ($periods as $periodIdx => $period) {
-                // March & April are paid. May is pending.
-                $isCurrent = ($period === '2026-05');
-                $status = $isCurrent ? 'pending' : 'paid';
-                $dueDate = match ($period) {
-                    '2026-03' => '2026-04-05',
-                    '2026-04' => '2026-05-05',
-                    '2026-05' => '2026-06-05',
-                };
+            foreach ($periods as $periodIdx => $periodData) {
+                $period = $periodData['period'];
+                $dueDay = $periodData['due_day'];
+                $status = $periodData['status'];
+                $isCurrent = ($periodData['status'] === 'pending');
+                $dueDate = date('Y-m-d', strtotime("{$period}-{$dueDay}"));
 
                 // Base global amount
                 $baseAmount = match ($condo->name) {
@@ -486,7 +486,7 @@ class DatabaseSeeder extends Seeder
                     'Condominio Parque del Inca' => 3500000.00,
                     'Condominio Providencia Plaza' => 2800000.00,
                 };
-                
+
                 // Add minor variation per month
                 $variation = ($periodIdx * 54320.00) - 20000.00;
                 $totalAmount = $baseAmount + $variation;
@@ -565,7 +565,9 @@ class DatabaseSeeder extends Seeder
 
                         if ($isPaid) {
                             $paymentStatus = 'approved';
-                            $paymentDate = fake()->dateTimeBetween('2026-05-15', 'now')->format('Y-m-d');
+                            $currentPeriodStart = ($anchorYear - 1) . '-05-01';
+                            $currentPeriodEnd = ($anchorYear - 1) . '-05-31';
+                            $paymentDate = fake()->dateTimeBetween($currentPeriodStart, $currentPeriodEnd)->format('Y-m-d');
                             $method = fake()->randomElement(['transferencia', 'tarjeta_debito']);
                             $ref = 'TXN-' . fake()->numberBetween(100000, 999999);
                         } else {
@@ -573,15 +575,19 @@ class DatabaseSeeder extends Seeder
                         }
                     }
 
+                    $payDate = $paymentDate ?? now()->format('Y-m-d');
+
                     Payment::create([
                         'user_id' => $ownerProfile->user_id,
                         'property_id' => $property->id,
                         'common_expense_id' => $commonExpense->id,
                         'amount' => $aliquot,
-                        'payment_date' => $paymentDate ?? now()->format('Y-m-d'),
+                        'payment_date' => $payDate,
                         'payment_method' => $method,
                         'reference' => $ref,
                         'status' => $paymentStatus,
+                        'created_at' => \Illuminate\Support\Carbon::parse($payDate),
+                        'updated_at' => \Illuminate\Support\Carbon::parse($payDate),
                     ]);
                 }
             }
@@ -600,12 +606,14 @@ class DatabaseSeeder extends Seeder
 
         // Seed 6 realistic fines
         $apartments = Property::where('type', 'apartment')->get();
+        $fineStartDate = ($anchorYear - 1) . '-01-01';
+        $fineEndDate = ($anchorYear - 1) . '-12-31';
         for ($i = 1; $i <= 6; $i++) {
             $property = $apartments->random();
             $ownerProfile = OwnerProfile::where('property_id', $property->id)->first();
             if (!$ownerProfile) continue;
 
-            $issued = fake()->dateTimeBetween('-2 months', 'now');
+            $issued = fake()->dateTimeBetween($fineStartDate, $fineEndDate);
             $due = clone $issued;
             $due->modify('+15 days');
 
@@ -627,14 +635,14 @@ class DatabaseSeeder extends Seeder
                 'property_id' => $demoProperty->id,
                 'reason' => 'Ruidos molestos y ruidos de construcción fuera del horario autorizado de mudanzas (Sábado por la tarde).',
                 'amount' => 45000.00,
-                'issued_date' => '2026-05-10',
+                'issued_date' => ($anchorYear - 1) . '-05-10',
                 'due_date' => '2026-05-25',
                 'status' => 'pending',
             ]);
         }
 
         // ─── SEED CONDO INCOMES FROM PAYMENTS & FINES ──────────────────────
-        foreach (Payment::where('status', 'approved')->get() as $payment) {
+        foreach (Payment::where('status', 'approved')->with(['property', 'commonExpense', 'user'])->get() as $payment) {
             $property = $payment->property;
             if (!$property) continue;
 
@@ -650,7 +658,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        foreach (Fine::where('status', 'paid')->get() as $fine) {
+        foreach (Fine::where('status', 'paid')->with('property')->get() as $fine) {
             $property = $fine->property;
             if (!$property) continue;
 
@@ -669,7 +677,7 @@ class DatabaseSeeder extends Seeder
         $this->command->info('Condo incomes seeded from payments and fines.');
 
         // ─── SEED CONDO EXPENSES FROM EXPENSE ITEMS ─────────────────────
-        foreach (ExpenseItem::all() as $item) {
+        foreach (ExpenseItem::with('commonExpense')->get() as $item) {
             $commonExpense = $item->commonExpense;
             if (!$commonExpense) continue;
 
@@ -1056,6 +1064,7 @@ class DatabaseSeeder extends Seeder
 
         // 7. Seeders extendidos según Análisis v2
         $this->call([
+            BudgetSeeder::class,
             CommonExpensePeriodSeeder::class,
             SupplyOrderSeeder::class,
             ChecklistSeeder::class,

@@ -41,15 +41,26 @@ class CondominiumSetupController extends Controller
         DB::beginTransaction();
         try {
             foreach ($data['towers'] as $towerData) {
-                $tower = CondoTower::create([
-                    'condominium_id' => $condominium->id,
-                    'name' => $towerData['name'],
-                    'has_water_meter' => $towerData['has_water_meter'] ?? false,
-                    'has_electricity_meter' => $towerData['has_electricity_meter'] ?? false,
-                ]);
+                // Idempotencia: no duplicar torres ya existentes con mismo nombre
+                $tower = CondoTower::firstOrCreate(
+                    ['condominium_id' => $condominium->id, 'name' => $towerData['name']],
+                    [
+                        'has_water_meter' => $towerData['has_water_meter'] ?? false,
+                        'has_electricity_meter' => $towerData['has_electricity_meter'] ?? false,
+                    ]
+                );
 
                 $floors = $towerData['floors'];
                 $unitsPerFloor = $towerData['units_per_floor'];
+
+                $existingUnits = Property::where('condominium_id', $condominium->id)
+                    ->where('tower_id', $tower->id)
+                    ->count();
+
+                // Solo generar unidades si la torre aún no tiene ninguna (evita duplicados)
+                if ($existingUnits > 0) {
+                    continue;
+                }
 
                 for ($floor = 1; $floor <= $floors; $floor++) {
                     for ($unit = 1; $unit <= $unitsPerFloor; $unit++) {
@@ -60,8 +71,8 @@ class CondominiumSetupController extends Controller
                             'type' => 'apartment',
                             'number' => $unitNumber,
                             'floor' => $floor,
-                            'area_sqm' => 70, // Default area, can be edited later
-                            'status' => 'vacant'
+                            'area_sqm' => 70,
+                            'status' => 'vacant',
                         ]);
                     }
                 }

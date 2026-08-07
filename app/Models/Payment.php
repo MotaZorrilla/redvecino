@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
 
 class Payment extends Model
 {
@@ -24,6 +25,17 @@ class Payment extends Model
         return [
             'payment_date' => 'date',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $payment) {
+            if ($payment->payment_date) {
+                $parsed = Carbon::parse($payment->payment_date);
+                $payment->created_at = $parsed;
+                $payment->updated_at = $parsed;
+            }
+        });
     }
 
     public function user()

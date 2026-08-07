@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Budget;
 use App\Models\CommonExpensePeriod;
 use App\Models\CommonExpenseReceipt;
 use App\Models\Condominium;
-use App\Models\CondoExpense;
 use App\Models\Property;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -49,19 +49,20 @@ class CommonExpensePeriodController extends Controller
         $reserveFundPct = floatval($data['reserve_fund_pct'] ?? 5.00);
         $dueDate = $data['due_date'] ?? now()->addDays(20)->toDateString();
 
-        // Obtener o calcular los egresos totales del período
-        // Sumamos los egresos de la tabla `condo_expenses` correspondientes al mes del período
-        $periodStart = "{$periodStr}-01";
-        $periodEnd = date('Y-m-t', strtotime($periodStart));
+        // El motor exige un presupuesto aprobado por asamblea para el período antes de emitir boletas.
+        $budget = Budget::where('condominium_id', $condominium->id)
+            ->where('period', $periodStr)
+            ->approved()
+            ->first();
 
-        $totalExpenses = CondoExpense::where('condominium_id', $condominium->id)
-            ->whereBetween('date', [$periodStart, $periodEnd])
-            ->sum('amount');
-
-        // Fallback si aún no hay egresos registrados en la BD para el período de prueba: utilizar $5.922.800
-        if ($totalExpenses <= 0) {
-            $totalExpenses = 5922800.00;
+        if (!$budget) {
+            return response()->json([
+                'message' => "Presupuesto no aprobado para el período {$periodStr}. Apruebe un presupuesto en asamblea antes de emitir."
+            ], 422);
         }
+
+        // totalExpenses = monto del presupuesto aprobado (fuente única, sin fallback hardcodeado)
+        $totalExpenses = floatval($budget->amount);
 
         $properties = Property::where('condominium_id', $condominium->id)->get();
         if ($properties->isEmpty()) {
@@ -83,6 +84,15 @@ class CommonExpensePeriodController extends Controller
         $moraRate = $condominium->late_interest_rate !== null
             ? floatval($condominium->late_interest_rate) / 100.0
             : 0.015;
+
+        // PRE-CARGA: Obtener todos los receipts pendientes del período anterior en UNA sola query
+        // para evitar N+1 dentro del bucle foreach
+        $previousReceipts = CommonExpenseReceipt::where('condominium_id', $condominium->id)
+            ->where('status', 'pending')
+            ->whereHas('period', fn($q) => $q->where('period', '!=', $periodStr))
+            ->orderBy('id', 'desc')
+            ->get()
+            ->groupBy('property_id');
 
         DB::beginTransaction();
         try {
@@ -118,13 +128,9 @@ class CommonExpensePeriodController extends Controller
                 // Cargas individuales por medidor (si aplica, ej: $2.981 CGE Torre 1)
                 $individualConsumption = 0.00;
 
-                // Buscar saldo moroso anterior pendiente si existe
-                $previousReceipt = CommonExpenseReceipt::where('condominium_id', $condominium->id)
-                    ->where('property_id', $property->id)
-                    ->where('status', 'pending')
-                    ->where('period_id', '!=', $periodRecord->id)
-                    ->orderBy('id', 'desc')
-                    ->first();
+                // Buscar saldo moroso anterior pendiente desde la pre-carga (evita N+1)
+                $previousReceiptCollection = $previousReceipts->get($property->id);
+                $previousReceipt = $previousReceiptCollection ? $previousReceiptCollection->first() : null;
 
                 $previousBalance = $previousReceipt ? floatval($previousReceipt->total_amount) : 0.00;
                 $interestAmount = $previousBalance > 0 ? round($previousBalance * $moraRate, 2) : 0.00; // mora del condominio
@@ -175,10 +181,24 @@ class CommonExpensePeriodController extends Controller
      */
     public function getReceipts(Request $request, $periodId)
     {
-        $period = CommonExpensePeriod::with(['receipts.property', 'condominium'])->findOrFail($periodId);
+        $period = CommonExpensePeriod::with('condominium')->findOrFail($periodId);
+
+        $perPage = $request->query('per_page', 15);
+        $propertyId = $request->query('property_id');
+
+        $query = CommonExpenseReceipt::where('period_id', $periodId)
+            ->with('property')
+            ->orderBy('id');
+
+        if ($propertyId) {
+            $query->where('property_id', $propertyId);
+        }
+
+        $receipts = $query->paginate($perPage);
+
         return response()->json([
             'period' => $period,
-            'receipts' => $period->receipts,
+            'receipts' => $receipts,
         ]);
     }
 

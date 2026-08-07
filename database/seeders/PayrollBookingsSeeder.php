@@ -26,6 +26,7 @@ class PayrollBookingsSeeder extends Seeder
 
     private function seedRealPayroll(): void
     {
+        $anchorYear = config('demo.anchor_year');
         $afp = Afp::first() ?? Afp::create(['name' => 'Habitat', 'commission_rate' => 10.00]);
         $calculator = new PayrollCalculator();
 
@@ -87,11 +88,13 @@ class PayrollBookingsSeeder extends Seeder
                 array_merge($member['profile'], ['user_id' => $user->id])
             );
 
-            // Liquidación real por período de prueba
-            foreach (['2026-06', '2026-07'] as $period) {
+            // Liquidación real por período de prueba (anchorYear - 1: junio y julio)
+            $payrollYear = config('demo.anchor_year') - 1;
+            foreach (['06', '07'] as $month) {
+                $period = $payrollYear . '-' . $month;
                 $components = $calculator->calculate($employee);
                 $components['sueldo_liquido'] = $member['target'];
-                $components['liquidation_number'] = 'LIQ-' . str_replace('-', '', $period) . '-' . str_pad((string) $employee->id, 3, '0', STR_PAD_LEFT);
+                $components['liquidation_number'] = 'LIQ-' . $payrollYear . $month . '-' . str_pad((string) $employee->id, 3, '0', STR_PAD_LEFT);
 
                 Liquidation::updateOrCreate(
                     ['employee_profile_id' => $employee->id, 'period' => $period],
@@ -101,7 +104,7 @@ class PayrollBookingsSeeder extends Seeder
                         'payment_method' => 'Transferencia Electrónica',
                         'bank_name' => 'Banco Estado',
                         'account_type' => 'Cuenta RUT',
-                        'account_number' => (string) rand(10000000, 99999999),
+                        'account_number' => str_pad((string) ($employee->id * 12345), 8, '0', STR_PAD_LEFT),
                         'observations' => "Liquidación de prueba {$period} — nómina real generada por seeder determinista.",
                     ])
                 );
@@ -111,6 +114,7 @@ class PayrollBookingsSeeder extends Seeder
 
     private function seedAmenityBookings(): void
     {
+        $anchorYear = config('demo.anchor_year');
         $condo = Condominium::first();
         if (!$condo) {
             return;
@@ -126,12 +130,13 @@ class PayrollBookingsSeeder extends Seeder
             return;
         }
 
+        $bookingYear = config('demo.anchor_year') - 1;
         $bookings = [
             [
-                'area' => 'Sala de Eventos', 'date' => '2026-06-29', 'slot' => '20:30 - 23:40', 'status' => 'Realizado',
+                'area' => 'Sala de Eventos', 'date' => $bookingYear . '-06-29', 'slot' => '20:30 - 23:40', 'status' => 'Realizado',
             ],
             [
-                'area' => 'Piscina', 'date' => '2026-06-30', 'slot' => '10:00 - 11:00', 'status' => 'Pendiente',
+                'area' => 'Piscina', 'date' => $bookingYear . '-06-30', 'slot' => '10:00 - 11:00', 'status' => 'Pendiente',
             ],
         ];
 

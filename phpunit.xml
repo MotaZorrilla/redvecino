@@ -15,6 +15,9 @@
         <testsuite name="Arch">
             <directory suffix="Pest.php">tests/Arch</directory>
         </testsuite>
+        <testsuite name="Seeders">
+            <directory suffix="Pest.php">tests/Seeders</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>

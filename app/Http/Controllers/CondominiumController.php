@@ -23,7 +23,9 @@ class CondominiumController extends Controller
             'region' => 'sometimes|string|max:255',
             'postal_code' => 'sometimes|string|max:20',
             'status' => 'sometimes|string|max:50',
-            'logo' => 'nullable|image|max:2048' // for file upload
+            'logo' => 'nullable|image|max:2048', // for file upload
+            'due_day' => 'sometimes|integer|min:1|max:31',
+            'late_interest_rate' => 'sometimes|numeric|min:0|max:100',
         ]);
 
         if ($request->hasFile('logo')) {

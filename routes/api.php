@@ -20,6 +20,7 @@ use App\Http\Controllers\RoadmapFeaturesController;
 use App\Http\Controllers\CondominiumController;
 use App\Http\Controllers\CondominiumSetupController;
 use App\Http\Controllers\Api\CommonExpensePeriodController;
+use App\Http\Controllers\Api\BudgetController;
 use App\Http\Controllers\UnitProfileController;
 use App\Http\Controllers\SupplyOrderController;
 use Illuminate\Support\Facades\Route;
@@ -182,6 +183,14 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::post('/command', [TiCommandController::class, 'execute']);
         Route::get('/roles-permissions', [TiPermissionController::class, 'index']);
         Route::post('/roles-permissions/toggle', [TiPermissionController::class, 'toggle']);
+    });
+
+    // Presupuestos (Budget): crear borrador (admin/TI) y aprobar en asamblea (comité)
+    Route::middleware('can:configure system')->group(function () {
+        Route::post('/budgets', [BudgetController::class, 'store']);
+    });
+    Route::middleware('can:approve expenses')->group(function () {
+        Route::patch('/budgets/{id}/approve', [BudgetController::class, 'approve']);
     });
 
     // 8. Roadmap Features

@@ -192,22 +192,26 @@ describe('RedVecinoLayout — Selector de Condominio', () => {
         { id: 2, name: 'Condominio Los Pinos' },
     ];
 
-    it('Admin: muestra el selector de condominio cuando hay condos', () => {
+    it('Admin: al hacer click en "Cambiar" abre el modal selector de condominios', () => {
         renderLayout({ role: 'admin', condosList });
-        expect(screen.getByRole('combobox')).toBeTruthy();
+        fireEvent.click(screen.getByText('Cambiar'));
+        expect(screen.getByText('Seleccionar Condominio Activo')).toBeTruthy();
+        expect(screen.getByText(/Los Pinos/)).toBeTruthy();
     });
 
-    it('TI: NO muestra el selector de condominio (no aplica para este rol)', () => {
+    it('TI: NO muestra la tarjeta del selector de condominio (no aplica para este rol)', () => {
         renderLayout({ role: 'ti', condosList });
-        expect(screen.queryByRole('combobox')).toBeNull();
+        expect(screen.queryByText('Cambiar')).toBeNull();
     });
 
-    it('Admin: selector de condominio llama a setAdminCondoId al cambiar', () => {
+    it('Admin: seleccionar un condominio en el modal llama a setAdminCondoId con su id', () => {
         const setAdminCondoId = vi.fn();
         renderLayout({ role: 'admin', condosList, setAdminCondoId });
-        const select = screen.getByRole('combobox');
-        fireEvent.change(select, { target: { value: '2' } });
-        expect(setAdminCondoId).toHaveBeenCalled();
+        // Abre el modal haciendo click en "Cambiar"
+        fireEvent.click(screen.getByText('Cambiar'));
+        // Dentro del modal selecciona el segundo condominio
+        fireEvent.click(screen.getByText(/Los Pinos/));
+        expect(setAdminCondoId).toHaveBeenCalledWith(2);
     });
 });
 

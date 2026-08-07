@@ -2,6 +2,7 @@
 
 use App\Models\CommonExpensePeriod;
 use App\Models\CommonExpenseReceipt;
+use App\Models\Budget;
 use App\Models\Condominium;
 use App\Models\CondoExpense;
 use App\Models\Property;
@@ -102,6 +103,16 @@ describe('Fase 2: Motor Contable de Gastos Comunes y Emisión Masiva por Períod
             'description' => 'Personal de Conserjería',
         ]);
 
+        // Presupuesto aprobado por asamblea requerido para emitir boletas
+        Budget::create([
+            'condominium_id' => $this->condo->id,
+            'period' => '2026-08',
+            'amount' => 5000000,
+            'status' => 'approved',
+            'approved_by' => $this->admin->id,
+            'approved_at' => now(),
+        ]);
+
         $response = $this->actingAs($this->admin)->postJson('/api/common-expense-periods/generate', [
             'condominium_id' => $this->condo->id,
             'period' => '2026-08',
@@ -137,7 +148,17 @@ describe('Fase 2: Motor Contable de Gastos Comunes y Emisión Masiva por Períod
         expect(floatval($receiptP3->total_amount))->toEqual(1050000.00);
     });
 
-    it('aplica el fallback de gastos cuando no se han cargado egresos del período sin lanzar errores', function () {
+    it('exige un presupuesto aprobado y usa su monto cuando no hay egresos cargados', function () {
+        // Presupuesto aprobado como fuente única del período
+        Budget::create([
+            'condominium_id' => $this->condo->id,
+            'period' => '2026-09',
+            'amount' => 3200000,
+            'status' => 'approved',
+            'approved_by' => $this->admin->id,
+            'approved_at' => now(),
+        ]);
+
         $response = $this->actingAs($this->admin)->postJson('/api/common-expense-periods/generate', [
             'condominium_id' => $this->condo->id,
             'period' => '2026-09',
@@ -149,7 +170,7 @@ describe('Fase 2: Motor Contable de Gastos Comunes y Emisión Masiva por Períod
             ->first();
 
         expect($periodRecord)->not->toBeNull();
-        expect(floatval($periodRecord->total_expenses))->toBeGreaterThan(0);
+        expect(floatval($periodRecord->total_expenses))->toEqual(3200000.00);
     });
 
     it('permite cerrar y auditar definitivamente un período contable mensual', function () {

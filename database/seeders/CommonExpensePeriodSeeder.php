@@ -16,49 +16,51 @@ class CommonExpensePeriodSeeder extends Seeder
 {
     public function run(): void
     {
+        $anchorYear = config('demo.anchor_year');
         $condos = Condominium::all();
         if ($condos->isEmpty()) return;
 
         $methods = ['transferencia', 'tarjeta_debito', 'webpay', 'tarjeta_credito', 'efectivo'];
 
         foreach ($condos as $condo) {
-            // 1. Create or get Period 2026-06
+            $anchorYear = config('demo.anchor_year');
+            // 1. Create or get Period (anchorYear - 1) - 06
             $periodJun = CommonExpense::firstOrCreate([
                 'condominium_id' => $condo->id,
-                'period' => '2026-06',
+                'period' => ($anchorYear - 1) . '-06',
             ], [
                 'amount' => 4500000,
-                'due_date' => '2026-06-10',
-                'description' => 'Gasto común mes de Junio 2026',
+                'due_date' => ($anchorYear - 1) . '-06-10',
+                'description' => "Gasto común mes de Junio " . ($anchorYear - 1),
                 'status' => 'published',
             ]);
 
-            // 2. Create or get Period 2026-07
+            // 2. Create or get Period (anchorYear - 1) - 07
             $periodJul = CommonExpense::firstOrCreate([
                 'condominium_id' => $condo->id,
-                'period' => '2026-07',
+                'period' => ($anchorYear - 1) . '-07',
             ], [
                 'amount' => 4800000,
-                'due_date' => '2026-07-10',
-                'description' => 'Gasto común mes de Julio 2026',
+                'due_date' => ($anchorYear - 1) . '-07-10',
+                'description' => "Gasto común mes de Julio " . ($anchorYear - 1),
                 'status' => 'published',
             ]);
 
-            // 3. Create or get Period 2026-08 (Current)
+            // 3. Create or get Period anchorYear - 08 (Current)
             $periodAug = CommonExpense::firstOrCreate([
                 'condominium_id' => $condo->id,
-                'period' => '2026-08',
+                'period' => $anchorYear . '-08',
             ], [
                 'amount' => 5200000,
-                'due_date' => '2026-08-10',
-                'description' => 'Gasto común mes de Agosto 2026',
+                'due_date' => $anchorYear . '-08-10',
+                'description' => "Gasto común mes de Agosto $anchorYear",
                 'status' => 'published',
             ]);
 
             // Get properties for this condo
             $properties = Property::where('condominium_id', $condo->id)->get();
 
-            // Seed payments with DIVERSE STATUSES for Period 2026-07 and 2026-08
+            // Seed payments with DIVERSE STATUSES for Period (anchorYear - 1)-07 and anchorYear-08
             foreach ($properties->take(12) as $index => $property) {
                 $ownerProfile = OwnerProfile::where('property_id', $property->id)->first();
                 $userId = $ownerProfile ? $ownerProfile->user_id : User::role('Propietario')->inRandomOrder()->first()?->id;
@@ -67,8 +69,8 @@ class CommonExpensePeriodSeeder extends Seeder
                 $aliquotJul = round(4800000 * (($ownerProfile->ownership_percentage ?? 4.5) / 100.0), 0);
                 $aliquotAug = round(5200000 * (($ownerProfile->ownership_percentage ?? 4.5) / 100.0), 0);
 
-                // Payment for July 2026 (Mostly approved)
-                $payJulDate = date('Y-m-d', strtotime("2026-07-" . sprintf("%02d", 5 + ($index % 20))));
+                // Payment for July (anchorYear - 1) (Mostly approved)
+                $payJulDate = ($anchorYear - 1) . '-07-' . sprintf("%02d", 5 + ($index % 20));
                 $statusJul = ($index === 11) ? 'pending' : 'approved';
                 
                 $payJul = Payment::firstOrCreate([
@@ -79,8 +81,10 @@ class CommonExpensePeriodSeeder extends Seeder
                     'amount' => $aliquotJul,
                     'payment_date' => $payJulDate,
                     'payment_method' => $methods[$index % count($methods)],
-                    'reference' => 'TXN-202607-' . str_pad($property->id * 17 + $index, 5, '0', STR_PAD_LEFT),
+                    'reference' => 'TXN-' . ($anchorYear - 1) . '07-' . str_pad($property->id * 17 + $index, 5, '0', STR_PAD_LEFT),
                     'status' => $statusJul,
+                    'created_at' => \Illuminate\Support\Carbon::parse($payJulDate),
+                    'updated_at' => \Illuminate\Support\Carbon::parse($payJulDate),
                 ]);
 
                 // Create corresponding CondoIncome for July ONLY if approved
@@ -91,15 +95,15 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'gastos_comunes',
                     ], [
                         'condominium_id' => $condo->id,
-                        'subcategory' => 'Pago Gasto Común - 2026-07',
+                        'subcategory' => 'Pago Gasto Común - ' . ($anchorYear - 1) . '-07',
                         'amount' => $aliquotJul,
                         'description' => 'Recaudación Gasto Común Depto ' . $property->number . ' (Ref: ' . $payJul->reference . ')',
                         'user_id' => $userId,
                     ]);
                 }
 
-                // Payments for August 2026 (DIVERSE STATUSES: Approved, Pending, Failed)
-                $payAugDate = date('Y-m-d', strtotime("2026-08-" . sprintf("%02d", 1 + ($index % 5))));
+                // Payments for August anchorYear (DIVERSE STATUSES: Approved, Pending, Failed)
+                $payAugDate = $anchorYear . '-08-' . sprintf("%02d", 1 + ($index % 5));
                 
                 // Status distribution:
                 // 0..4: approved
@@ -121,11 +125,13 @@ class CommonExpensePeriodSeeder extends Seeder
                     'amount' => $aliquotAug,
                     'payment_date' => $payAugDate,
                     'payment_method' => $methods[($index + 1) % count($methods)],
-                    'reference' => 'TXN-202608-' . str_pad($property->id * 23 + $index, 5, '0', STR_PAD_LEFT),
+                    'reference' => 'TXN-' . $anchorYear . '08-' . str_pad($property->id * 23 + $index, 5, '0', STR_PAD_LEFT),
                     'status' => $statusAug,
+                    'created_at' => \Illuminate\Support\Carbon::parse($payAugDate),
+                    'updated_at' => \Illuminate\Support\Carbon::parse($payAugDate),
                 ]);
 
-                // Sync approved payments with CondoIncome for August 2026
+                // Sync approved payments with CondoIncome for August anchorYear
                 if ($statusAug === 'approved') {
                     CondoIncome::firstOrCreate([
                         'property_id' => $property->id,
@@ -133,7 +139,7 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'gastos_comunes',
                     ], [
                         'condominium_id' => $condo->id,
-                        'subcategory' => 'Pago Gasto Común - 2026-08',
+                        'subcategory' => 'Pago Gasto Común - ' . $anchorYear . '-08',
                         'amount' => $aliquotAug,
                         'description' => 'Recaudación Gasto Común Depto ' . $property->number . ' (Ref: ' . $payAug->reference . ')',
                         'user_id' => $userId,
@@ -153,7 +159,7 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'personal',
                         'subcategory' => 'Conserjes',
                         'amount' => 1850000,
-                        'date' => '2026-08-01',
+                        'date' => $anchorYear . '-08-01',
                         'description' => 'Pago de remuneraciones y cotizaciones previsionales turnos de conserjería',
                         'distributable_method' => 'prorated',
                         'property_id' => null,
@@ -163,7 +169,7 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'servicios_basicos',
                         'subcategory' => 'Electricidad',
                         'amount' => 620000,
-                        'date' => '2026-08-02',
+                        'date' => $anchorYear . '-08-02',
                         'description' => 'Factura Enel N° 849204 - Consumo espacios comunes y salas de bombas',
                         'distributable_method' => 'prorated',
                         'property_id' => null,
@@ -173,7 +179,7 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'mantencion',
                         'subcategory' => 'Ascensores',
                         'amount' => 410000,
-                        'date' => '2026-08-03',
+                        'date' => $anchorYear . '-08-03',
                         'description' => 'Contrato mensual mantención preventiva ascensores Schindler',
                         'distributable_method' => 'prorated',
                         'property_id' => null,
@@ -183,7 +189,7 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'seguridad',
                         'subcategory' => 'CCTV',
                         'amount' => 280000,
-                        'date' => '2026-08-03',
+                        'date' => $anchorYear . '-08-03',
                         'description' => 'Monitoreo de cámaras de seguridad 24/7 y servicio de alarma perimetral',
                         'distributable_method' => 'prorated',
                         'property_id' => null,
@@ -193,7 +199,7 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'limpieza',
                         'subcategory' => 'Productos de limpieza',
                         'amount' => 95000,
-                        'date' => '2026-08-04',
+                        'date' => $anchorYear . '-08-04',
                         'description' => 'Compra de insumos químicos de aseo, desinfectantes y sanitización de pasillos',
                         'distributable_method' => 'prorated',
                         'property_id' => null,
@@ -203,7 +209,7 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'reparacion',
                         'subcategory' => 'Iluminación',
                         'amount' => 140000,
-                        'date' => '2026-08-04',
+                        'date' => $anchorYear . '-08-04',
                         'description' => 'Reemplazo de focos LED en estacionamientos subterráneos y reparación cañería Depto ' . $prop1->number,
                         'distributable_method' => 'unit_specific',
                         'property_id' => $prop1->id,
@@ -213,7 +219,7 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'seguros',
                         'subcategory' => 'Incendio',
                         'amount' => 320000,
-                        'date' => '2026-08-05',
+                        'date' => $anchorYear . '-08-05',
                         'description' => 'Prima mensual póliza colectiva de seguro contra incendio y sismos edificio',
                         'distributable_method' => 'prorated',
                         'property_id' => null,
@@ -223,7 +229,7 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'administracion',
                         'subcategory' => 'Software',
                         'amount' => 450000,
-                        'date' => '2026-08-05',
+                        'date' => $anchorYear . '-08-05',
                         'description' => 'Honorarios de administración externa y licencia plataforma RedVecino & MiVecino',
                         'distributable_method' => 'prorated',
                         'property_id' => null,
@@ -233,7 +239,7 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'fondo_reserva',
                         'subcategory' => 'Emergencias',
                         'amount' => 245000,
-                        'date' => '2026-08-06',
+                        'date' => $anchorYear . '-08-06',
                         'description' => 'Aporte legal al Fondo de Reserva (5% sobre la recaudación base del período)',
                         'distributable_method' => 'prorated',
                         'property_id' => null,
@@ -243,7 +249,7 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'otro',
                         'subcategory' => 'Gastos Bancarios',
                         'amount' => 35000,
-                        'date' => '2026-08-06',
+                        'date' => $anchorYear . '-08-06',
                         'description' => 'Comisiones por transferencias interbancarias y manutención cuenta corriente',
                         'distributable_method' => 'prorated',
                         'property_id' => null,
@@ -272,7 +278,7 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'arriendo_espacios',
                         'subcategory' => 'Quinchos',
                         'amount' => 25000,
-                        'date' => '2026-08-04',
+                        'date' => $anchorYear . '-08-04',
                         'description' => 'Reserva y uso de Quincho N°1 por evento familiar Depto ' . $prop1->number,
                         'distributable_method' => 'unit_specific',
                         'property_id' => $prop1->id,
@@ -282,7 +288,7 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'arriendo_espacios',
                         'subcategory' => 'Salón de eventos',
                         'amount' => 45000,
-                        'date' => '2026-08-03',
+                        'date' => $anchorYear . '-08-03',
                         'description' => 'Arriendo Sala Multiuso para cumpleaños de residente Depto ' . $prop2->number,
                         'distributable_method' => 'unit_specific',
                         'property_id' => $prop2->id,
@@ -292,7 +298,7 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'multas',
                         'subcategory' => 'Ruidos molestos',
                         'amount' => 35000,
-                        'date' => '2026-08-02',
+                        'date' => $anchorYear . '-08-02',
                         'description' => 'Cobro de sanción por música alta fuera de horario permitido en Depto ' . $prop1->number,
                         'distributable_method' => 'unit_specific',
                         'property_id' => $prop1->id,
@@ -302,7 +308,7 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'multas',
                         'subcategory' => 'Estacionamientos indebidos',
                         'amount' => 45000,
-                        'date' => '2026-08-01',
+                        'date' => $anchorYear . '-08-01',
                         'description' => 'Sanción por ocupar estacionamiento de visitas sin pase en Depto ' . $prop2->number,
                         'distributable_method' => 'unit_specific',
                         'property_id' => $prop2->id,
@@ -312,7 +318,7 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'multas',
                         'subcategory' => 'Problemas con mascotas',
                         'amount' => 25000,
-                        'date' => '2026-08-05',
+                        'date' => $anchorYear . '-08-05',
                         'description' => 'Multa por tránsito de mascota sin arnés en espacios comunes Depto ' . $prop1->number,
                         'distributable_method' => 'unit_specific',
                         'property_id' => $prop1->id,
@@ -322,7 +328,7 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'intereses_mora',
                         'subcategory' => 'Gastos Comunes',
                         'amount' => 12500,
-                        'date' => '2026-08-04',
+                        'date' => $anchorYear . '-08-04',
                         'description' => 'Interés acumulado por mora de 15 días en aviso de cobro',
                         'distributable_method' => 'unit_specific',
                         'property_id' => $prop1->id,
@@ -332,7 +338,7 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'cuotas_extraordinarias',
                         'subcategory' => 'Emergencias',
                         'amount' => 190000,
-                        'date' => '2026-08-03',
+                        'date' => $anchorYear . '-08-03',
                         'description' => 'Cuota extraordinaria para reparación urgente de bomba de agua subterránea',
                         'distributable_method' => 'prorated',
                         'property_id' => null,
@@ -342,7 +348,7 @@ class CommonExpensePeriodSeeder extends Seeder
                         'category' => 'publicidad_convenio',
                         'subcategory' => 'Convenios con empresas',
                         'amount' => 85000,
-                        'date' => '2026-08-02',
+                        'date' => $anchorYear . '-08-02',
                         'description' => 'Convenio mensual con empresa de máquinas expendedoras de café',
                         'distributable_method' => 'prorated',
                         'property_id' => null,
