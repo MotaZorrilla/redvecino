@@ -113,17 +113,16 @@ class CommonExpensePeriodController extends Controller
 
             $generatedReceipts = [];
 
-            foreach ($properties as $property) {
-                $areaSqm = floatval($property->area_sqm) ?: 70.0;
+            $calculator = app(\App\Services\CommonExpenseCalculator::class);
 
-                // Alícuota: asignada por el resolver centralizado (coeficiente -> ownership -> area -> 0.0100)
+            foreach ($properties as $property) {
                 $alicuotaPct = \App\Services\UnitCoefficientResolver::resolve($property);
 
                 // Fórmulas de prorrateo contables
                 $baseAmount = round($totalExpenses * $alicuotaPct, 2);
                 $reserveFundAmount = round(($totalExpenses * ($reserveFundPct / 100)) * $alicuotaPct, 2);
 
-                // Cargas individuales por medidor (si aplica, ej: $2.981 CGE Torre 1)
+                // Cargas individuales por medidor
                 $individualConsumption = 0.00;
 
                 // Buscar saldo moroso anterior pendiente desde la pre-carga (evita N+1)
@@ -131,7 +130,7 @@ class CommonExpensePeriodController extends Controller
                 $previousReceipt = $previousReceiptCollection ? $previousReceiptCollection->first() : null;
 
                 $previousBalance = $previousReceipt ? floatval($previousReceipt->total_amount) : 0.00;
-                $interestAmount = $previousBalance > 0 ? round($previousBalance * $moraRate, 2) : 0.00; // mora del condominio
+                $interestAmount = $previousBalance > 0 ? round($previousBalance * $moraRate, 2) : 0.00; // mora del condominio (ej. 1.5% sin redondear a entero)
 
                 $totalAmount = $baseAmount + $reserveFundAmount + $individualConsumption + $previousBalance + $interestAmount;
 

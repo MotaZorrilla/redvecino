@@ -535,7 +535,10 @@ class DatabaseSeeder extends Seeder
                     $method = 'transferencia';
                     $ref = null;
 
-                    if ($period === '2026-03' || $period === '2026-04') {
+                    $pastPeriod1 = ($anchorYear - 1) . '-03';
+                    $pastPeriod2 = ($anchorYear - 1) . '-04';
+
+                    if ($period === $pastPeriod1 || $period === $pastPeriod2) {
                         // Historically 95% paid. For others, it's overdue (still pending)
                         $isPaid = fake()->boolean(95);
                         

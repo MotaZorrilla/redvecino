@@ -18,10 +18,12 @@ class BudgetSeeder extends Seeder
         $condos = Condominium::all();
         if ($condos->isEmpty()) return;
 
+        $anchorYear = config('demo.anchor_year', date('Y'));
+
         $periods = [
-            '2026-06' => 4500000,
-            '2026-07' => 4800000,
-            '2026-08' => 5200000,
+            $anchorYear . '-06' => 4500000,
+            $anchorYear . '-07' => 4800000,
+            $anchorYear . '-08' => 5200000,
         ];
 
         foreach ($condos as $condo) {

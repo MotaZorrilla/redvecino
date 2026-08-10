@@ -116,20 +116,6 @@ final class CommonExpenseCalculator
 
     private function getApportionmentCoefficient(Property $property): float
     {
-        if ($property->coefficient !== null) {
-            return $property->coefficient;
-        }
-
-        $ownerProfile = $property->owners()->first();
-        if ($ownerProfile && $ownerProfile->ownership_percentage > 0) {
-            return $ownerProfile->ownership_percentage / 100.0;
-        }
-
-        $totalArea = Property::where('condominium_id', $property->condominium_id)->sum('area_sqm');
-        if ($totalArea > 0 && $property->area_sqm > 0) {
-            return floatval($property->area_sqm) / floatval($totalArea);
-        }
-
         return \App\Services\UnitCoefficientResolver::resolve($property);
     }
 }
