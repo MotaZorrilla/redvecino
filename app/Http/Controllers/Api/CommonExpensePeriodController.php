@@ -50,9 +50,9 @@ class CommonExpensePeriodController extends Controller
         $dueDate = $data['due_date'] ?? now()->addDays(20)->toDateString();
 
         // El motor exige un presupuesto aprobado por asamblea para el período antes de emitir boletas.
-        $budget = Budget::where('condominium_id', $condominium->id)
+        $budget = \App\Models\Budget::where('condominium_id', $condominium->id)
             ->where('period', $periodStr)
-            ->approved()
+            ->where('status', 'approved')
             ->first();
 
         if (!$budget) {
@@ -64,7 +64,9 @@ class CommonExpensePeriodController extends Controller
         // totalExpenses = monto del presupuesto aprobado (fuente única, sin fallback hardcodeado)
         $totalExpenses = floatval($budget->amount);
 
-        $properties = Property::where('condominium_id', $condominium->id)->get();
+        $properties = Property::where('condominium_id', $condominium->id)
+            ->with(['owners'])
+            ->get();
         if ($properties->isEmpty()) {
             return response()->json([
                 'message' => 'No hay propiedades registradas en este condominio para generar el cobro masivo.'
@@ -116,23 +118,29 @@ class CommonExpensePeriodController extends Controller
             $calculator = app(\App\Services\CommonExpenseCalculator::class);
 
             foreach ($properties as $property) {
-                $alicuotaPct = \App\Services\UnitCoefficientResolver::resolve($property);
-
-                // Fórmulas de prorrateo contables
-                $baseAmount = round($totalExpenses * $alicuotaPct, 2);
-                $reserveFundAmount = round(($totalExpenses * ($reserveFundPct / 100)) * $alicuotaPct, 2);
-
-                // Cargas individuales por medidor
-                $individualConsumption = 0.00;
-
                 // Buscar saldo moroso anterior pendiente desde la pre-carga (evita N+1)
                 $previousReceiptCollection = $previousReceipts->get($property->id);
                 $previousReceipt = $previousReceiptCollection ? $previousReceiptCollection->first() : null;
 
                 $previousBalance = $previousReceipt ? floatval($previousReceipt->total_amount) : 0.00;
-                $interestAmount = $previousBalance > 0 ? round($previousBalance * $moraRate, 2) : 0.00; // mora del condominio (ej. 1.5% sin redondear a entero)
+                $daysOverdue = $previousBalance > 0 ? 15 : 0; // Umbral de mora activo si hay saldo anterior
 
-                $totalAmount = $baseAmount + $reserveFundAmount + $individualConsumption + $previousBalance + $interestAmount;
+                // Delegación real al servicio canónico CommonExpenseCalculator
+                $calc = $calculator->calculateForUnit(
+                    $property,
+                    $periodStr,
+                    $previousBalance,
+                    $daysOverdue,
+                    $reserveFundPct,
+                    $totalExpenses
+                );
+
+                $alicuotaPct = $calc['detalles']['coeficiente_prorrateo'];
+                $baseAmount = $calc['subtotal_gastos_comunes'];
+                $reserveFundAmount = $calc['fondo_reserva'];
+                $individualConsumption = $calc['multas_individuales'];
+                $interestAmount = $calc['interes_mora'];
+                $totalAmount = $calc['total_a_pagar'];
 
                 $receipt = CommonExpenseReceipt::updateOrCreate(
                     [

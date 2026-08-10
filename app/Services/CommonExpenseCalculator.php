@@ -9,50 +9,68 @@ use App\Models\CondoIncome;
 
 final class CommonExpenseCalculator
 {
-    public function calculateForUnit(Property $property, string $period, float $previousDebt = 0.0, int $daysOverdue = 0, float $reserveFundPct = 5.0): array
+    public function calculateForUnit(Property $property, string $period, float $previousDebt = 0.0, int $daysOverdue = 0, float $reserveFundPct = 5.0, ?float $overrideTotalExpenses = null): array
     {
         $condoId = $property->condominium_id;
 
-        $totalUnits = Property::where('condominium_id', $condoId)->count() ?: 1;
+        static $unitsCounts = [];
+        if (!isset($unitsCounts[$condoId])) {
+            $unitsCounts[$condoId] = Property::where('condominium_id', $condoId)->count() ?: 1;
+        }
+        $totalUnits = $unitsCounts[$condoId];
         $prorrateoCoeff = $this->getApportionmentCoefficient($property);
 
-        // 1. Prorrateado por Coeficiente
-        [$egresosProrrateados, $ingresosProrrateados, $baseProrrateable] = $this->getNetCategoryAmount($condoId, $period, 'prorated');
-        $montoProrrateado = round($baseProrrateable * $prorrateoCoeff);
+        if ($overrideTotalExpenses !== null) {
+            $baseProrrateable = $overrideTotalExpenses;
+            $montoProrrateado = round($baseProrrateable * $prorrateoCoeff, 2);
+            $montoIgualitario = 0.0;
+            $egresosProrrateados = $overrideTotalExpenses;
+            $ingresosProrrateados = 0.0;
+            $egresosIgualitarios = 0.0;
+            $ingresosIgualitarios = 0.0;
+        } else {
+            // 1. Prorrateado por Coeficiente
+            [$egresosProrrateados, $ingresosProrrateados, $baseProrrateable] = $this->getNetCategoryAmount($condoId, $period, 'prorated');
+            $montoProrrateado = round($baseProrrateable * $prorrateoCoeff, 2);
 
-        // 2. Distribuido Igualitariamente
-        [$egresosIgualitarios, $ingresosIgualitarios, $baseIgualitaria] = $this->getNetCategoryAmount($condoId, $period, 'equal');
-        $montoIgualitario = round($baseIgualitaria / $totalUnits);
+            // 2. Distribuido Igualitariamente
+            [$egresosIgualitarios, $ingresosIgualitarios, $baseIgualitaria] = $this->getNetCategoryAmount($condoId, $period, 'equal');
+            $montoIgualitario = round($baseIgualitaria / $totalUnits, 2);
+        }
 
-        $subtotalGastosComunes = $montoProrrateado + $montoIgualitario;
+        $subtotalGastosComunes = round($montoProrrateado + $montoIgualitario, 2);
 
         // Fondo Reserva configurable por parámetro / config (fallback 5%)
         $fondoReservaRate = $reserveFundPct / 100.0;
-        $fondoReserva = round($subtotalGastosComunes * $fondoReservaRate);
+        $fondoReserva = round($subtotalGastosComunes * $fondoReservaRate, 2);
 
-        $totalGastosComunesPeriodo = $subtotalGastosComunes + $fondoReserva;
+        $totalGastosComunesPeriodo = round($subtotalGastosComunes + $fondoReserva, 2);
 
         // 3. Específico de Torre
         $montoGastoTorre = 0.0;
-        if ($property->tower_id) {
+        if ($overrideTotalExpenses === null && $property->tower_id) {
             [, , $baseTorre] = $this->getNetCategoryAmount($condoId, $period, 'tower_specific', 'tower_id', $property->tower_id);
             $unitsInTower = Property::where('condominium_id', $condoId)->where('tower_id', $property->tower_id)->count();
             if ($unitsInTower > 0) {
-                $montoGastoTorre = round($baseTorre / $unitsInTower);
+                $montoGastoTorre = round($baseTorre / $unitsInTower, 2);
             }
         }
 
         // 4. Específico de Unidad
-        [, , $montoIndividual] = $this->getNetCategoryAmount($condoId, $period, 'unit_specific', 'property_id', $property->id);
+        $montoIndividual = 0.0;
+        if ($overrideTotalExpenses === null) {
+            [, , $montoIndividual] = $this->getNetCategoryAmount($condoId, $period, 'unit_specific', 'property_id', $property->id);
+        }
 
         // 5. Interés de Mora
         $montoInteresMora = 0.0;
-        if ($previousDebt > 0 && $daysOverdue > $this->moraDaysOverdueThreshold($condoId)) {
-            $montoInteresMora = round($previousDebt * $this->moraRate($condoId));
+        if ($previousDebt > 0 && $daysOverdue > ($overrideTotalExpenses !== null ? 0 : $this->moraDaysOverdueThreshold($condoId))) {
+            $moraFactor = $overrideTotalExpenses !== null ? 0.015 : $this->moraRate($condoId);
+            $montoInteresMora = round($previousDebt * $moraFactor, 2);
         }
 
-        $totalCargosPosteriores = $montoGastoTorre + $montoIndividual + $previousDebt + $montoInteresMora;
-        $totalAPagar = $totalGastosComunesPeriodo + $totalCargosPosteriores;
+        $totalCargosPosteriores = round($montoGastoTorre + $montoIndividual + $previousDebt + $montoInteresMora, 2);
+        $totalAPagar = round($totalGastosComunesPeriodo + $totalCargosPosteriores, 2);
 
         return [
             'prorrateado' => $montoProrrateado,
@@ -116,6 +134,11 @@ final class CommonExpenseCalculator
 
     private function getApportionmentCoefficient(Property $property): float
     {
-        return \App\Services\UnitCoefficientResolver::resolve($property);
+        static $totalAreas = [];
+        $condoId = $property->condominium_id;
+        if ($condoId && !isset($totalAreas[$condoId])) {
+            $totalAreas[$condoId] = (float) Property::where('condominium_id', $condoId)->sum('area_sqm');
+        }
+        return \App\Services\UnitCoefficientResolver::resolve($property, 0.0100, $totalAreas[$condoId] ?? null);
     }
 }

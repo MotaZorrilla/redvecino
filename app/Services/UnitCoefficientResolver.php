@@ -18,9 +18,9 @@ final class UnitCoefficientResolver
      * @param float $defaultFallback Coeficiente o porcentaje por defecto en caso de no estar definido (Default: 0.0100 -> 1%)
      * @return float
      */
-    public static function resolve($property, float $defaultFallback = 0.0100): float
+    public static function resolve($property, float $defaultFallback = 0.0100, ?float $totalAreaCondo = null): float
     {
-        if (isset($property->coefficient) && !is_null($property->coefficient) && (float)$property->coefficient > 0) {
+        if (isset($property->coefficient) && !is_null($property->coefficient)) {
             return (float) $property->coefficient;
         }
 
@@ -34,7 +34,7 @@ final class UnitCoefficientResolver
         }
 
         if (isset($property->area_sqm) && !is_null($property->area_sqm) && (float)$property->area_sqm > 0 && isset($property->condominium_id)) {
-            $totalArea = Property::where('condominium_id', $property->condominium_id)->sum('area_sqm');
+            $totalArea = $totalAreaCondo ?? Property::where('condominium_id', $property->condominium_id)->sum('area_sqm');
             if ($totalArea > 0) {
                 return (float)$property->area_sqm / (float)$totalArea;
             }

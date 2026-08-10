@@ -102,10 +102,10 @@ class CommonExpensePeriodPerformanceTest extends TestCase
         // El N+1 del previous_balance DEBE estar eliminado (antes era 30+ queries extra)
 
         $propertyCount = $properties->count();
-        // 5 base + 1 por propiedad (updateOrCreate) + pequeño margen por whereHas/grupos
-        $expectedMaxQueries = 5 + $propertyCount + 6;
+        // 8 base (auth/middleware/presupuesto/with) + 1 por propiedad (updateOrCreate) + margen
+        $expectedMaxQueries = 8 + $propertyCount + 6;
         $this->assertLessThanOrEqual($expectedMaxQueries, $queryCount,
-            "Se ejecutaron {$queryCount} queries SELECT. Esperado ≤ {$expectedMaxQueries} (5 base + {$propertyCount} updateOrCreate + margen). El bucle foreach NO debería hacer query extra por propiedad para previous_balance.");
+            "Se ejecutaron {$queryCount} queries SELECT. Esperado ≤ {$expectedMaxQueries} (8 base + {$propertyCount} updateOrCreate + margen). El bucle foreach NO debería hacer query extra por propiedad para previous_balance.");
     }
 
     /** @test */
