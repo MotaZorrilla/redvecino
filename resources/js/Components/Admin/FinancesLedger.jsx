@@ -4,6 +4,7 @@ import { SimpleTable, StatusBadge } from '@/Components/DashboardShared';
 import UnitDetailModal360 from '@/Components/Admin/UnitDetailModal360';
 import CommonExpenseGenerator from '@/Components/Admin/CommonExpenseGenerator';
 import AmenitiesBookingPanel from '@/Components/Admin/AmenitiesBookingPanel';
+import FinancialTrendsChart from '@/Components/Charts/FinancialTrendsChart';
 
 export default function FinancesLedger({
     adminCondoId,
@@ -443,6 +444,12 @@ export default function FinancesLedger({
                             </div>
                         </div>
                     </div>
+
+                    {/* Gráfico Modular SVG de Tendencias Financieras */}
+                    <FinancialTrendsChart 
+                        incomes={filteredIncomes} 
+                        expenses={filteredExpenses} 
+                    />
 
                     {/* Toolbar de Filtros Interactivos Recaudación */}
                     <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 text-left">

@@ -156,6 +156,8 @@ export default function Dashboard() {
 
     useEffect(() => {
         if (incomesList && incomesList.length > 0) {
+            const todayStr = new Date().toISOString().substring(0, 10);
+
             const dbResolvedFines = incomesList
                 .filter(inc => inc.category === 'multas')
                 .map(inc => ({
@@ -164,15 +166,15 @@ export default function Dashboard() {
                     amount: Number(inc.amount),
                     reason: inc.description || inc.subcategory || 'Multa por reglamento',
                     status: 'resolved',
-                    date: inc.date ? inc.date.substring(0, 10) : '2026-08-25',
+                    date: inc.date ? inc.date.substring(0, 10) : todayStr,
                     condominium_id: adminCondoId
                 }));
 
             const pendingAndAnnulledFines = [
-                { id: 9001, property_id: propertiesList[0]?.id || 1, amount: 45000, reason: 'Ruidos molestos después de las 02:00 AM (música alta)', status: 'pending', date: '2026-08-26', condominium_id: adminCondoId },
-                { id: 9002, property_id: propertiesList[1]?.id || 2, amount: 65000, reason: 'Uso de piscina comunitaria sin reserva previa', status: 'pending', date: '2026-08-25', condominium_id: adminCondoId },
-                { id: 9003, property_id: propertiesList[2]?.id || 3, amount: 35000, reason: 'Depósito de escombros y cajas en pasillo de evacuación', status: 'annulled', date: '2026-08-20', condominium_id: adminCondoId },
-                { id: 9004, property_id: propertiesList[3]?.id || 4, amount: 30000, reason: 'Sacar basura fuera del horario estipulado en el reglamento', status: 'pending', date: '2026-08-26', condominium_id: adminCondoId }
+                { id: 9001, property_id: propertiesList[0]?.id || 1, amount: 45000, reason: 'Ruidos molestos después de las 02:00 AM (música alta)', status: 'pending', date: todayStr, condominium_id: adminCondoId },
+                { id: 9002, property_id: propertiesList[1]?.id || 2, amount: 65000, reason: 'Uso de piscina comunitaria sin reserva previa', status: 'pending', date: todayStr, condominium_id: adminCondoId },
+                { id: 9003, property_id: propertiesList[2]?.id || 3, amount: 35000, reason: 'Depósito de escombros y cajas en pasillo de evacuación', status: 'annulled', date: todayStr, condominium_id: adminCondoId },
+                { id: 9004, property_id: propertiesList[3]?.id || 4, amount: 30000, reason: 'Sacar basura fuera del horario estipulado en el reglamento', status: 'pending', date: todayStr, condominium_id: adminCondoId }
             ];
 
             setFinesList([...dbResolvedFines, ...pendingAndAnnulledFines]);
