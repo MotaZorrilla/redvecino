@@ -194,10 +194,11 @@ class UserManagementTest extends TestCase
     {
         $admin = $this->getUserByRole('Administrador');
 
+        $uniqueRut = '19.' . rand(100, 999) . '.' . rand(100, 999) . '-K';
         $payload = [
             'name' => 'John Doe',
             'email' => 'johndoe@example.com',
-            'rut' => '12.345.678-9',
+            'rut' => $uniqueRut,
             'phone' => '+56912345678',
             'password' => 'securePassword123',
             'status' => 'active',
@@ -211,7 +212,7 @@ class UserManagementTest extends TestCase
         
         $this->assertDatabaseHas('users', [
             'email' => 'johndoe@example.com',
-            'rut' => '12.345.678-9',
+            'rut' => $uniqueRut,
             'status' => 'active',
         ]);
 

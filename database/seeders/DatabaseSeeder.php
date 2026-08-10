@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
 
             // 5. Financial Engines (Common Expense Periods, Incomes, Expenses, Receipts, Payments)
             FinancialEngineSeeder::class,
+            CommonExpensePeriodReceiptSeeder::class,
 
             // 6. Infractions, Fines & Overdue Interest
             FineAndMoraSeeder::class,

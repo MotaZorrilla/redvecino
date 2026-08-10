@@ -183,6 +183,6 @@ El repositorio exige el cumplimiento estricto de pruebas automatizadas:
 
 ---
 **Fecha de creación:** Mayo 2026  
-**Última actualización:** 10 de Agosto de 2026 (Auditoría de Reestructuración & Documentación Unificada v11.3)  
-**Versión:** 11.3 (Unified Architecture, Visual Grid 1:1, Full Test Suite 100% Green)  
+**Última actualización:** 10 de Agosto de 2026 (Enriquecimiento Contable Masivo v12.0 & Documentación Unificada)  
+**Versión:** 12.0 (Unified Architecture, Visual Grid 1:1, 1.176 Incomes & 960 Expenses Seeded, Full Test Suite 100% Green)  
 **Estado:** Documento Oficial Activo.

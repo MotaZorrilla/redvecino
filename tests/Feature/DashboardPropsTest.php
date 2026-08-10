@@ -80,11 +80,11 @@ class DashboardPropsTest extends TestCase
         $response->assertStatus(200);
         $response->assertInertia(
             fn (AssertableInertia $page) => $page
-                ->has('allCondominiums', 3)
+                ->has('allCondominiums', 6)
         );
 
         // Cross-check against the database
-        $this->assertDatabaseCount('condominiums', 3);
+        $this->assertDatabaseCount('condominiums', 6);
     }
 
     /**

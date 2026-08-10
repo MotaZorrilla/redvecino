@@ -112,6 +112,34 @@ graph TD
 3. **Mantenimiento Preventivo con Fotos:** Obligatoriedad de fotografías en check-in / check-out de áreas comunes.
 
 ---
+
+## 4.9 Enriquecimiento de Datos Contables Masivos Multi-Condominio v12.0 (Agosto 2026)
+
+Refactorización profunda de `FinancialEngineSeeder.php` e integración con `FinancialCatalogSeeder` para garantizar una distribución rica, diversa y masiva de movimientos financieros en **los 6 condominios del sistema** (*Altos del Valle*, *Parque del Inca*, *Providencia Plaza*, *Bosques de la Dehesa*, *Marina Poniente* y *Portal del Sur*).
+
+### Avances Clave
+- **Integración de Ingresos por Catálogo (1.176 Registros)**:
+  - Generación de ingresos heterogéneos vinculados a propiedades reales en las 7 categorías oficiales: `gastos_comunes` (ordinarios y reserva), `multas` (ruidos, estacionamiento, mascotas, escombros), `arriendo_espacios` (quinchos, salones, pádel), `intereses_mora` (1.5%), `cuotas_extraordinarias` (fachada, ascensores, emergencias), `publicidad_convenio` (antenas, vending) y `otro` (controles de portón, reembolsos).
+
+- **Integración de Egresos por Catálogo (960 Registros)**:
+  - Generación de facturas y pagos operacionales en las 10 categorías oficiales: `personal` (sueldos conserjería, leyes sociales, honorarios), `servicios_basicos` (agua, electricidad, gas, internet), `mantencion` (ascensores, bombas hidropack, portones, piscinas), `seguridad` (guardias nocturnos, CCTV), `limpieza` (productos químicos, bolsas, implementos), `reparacion` (cañerías, techos, iluminación LED, pintura), `seguros` (incendio, responsabilidad civil), `administracion` (artículos oficina, contabilidad, bancos), `fondo_reserva` (ahorro mensual 5%) y `otro` (imprevistos operativos).
+
+- **Ajustes en Tests de Integración (`tests/Feature`)**:
+  - `CommonExpensePeriodReceiptSeeder` integrado formalmente en `DatabaseSeeder.php`.
+  - `DashboardPropsTest.php` actualizado para verificar los 6 condominios reales.
+  - `UserManagementTest.php` actualizado con RUTs dinámicos para prevenir colisiones de datos únicos.
+
+### Verificación Final
+- **Base de Datos**: `php artisan migrate:fresh --seed` genera limpiamente 1.176 Ingresos y 960 Egresos en los 6 condominios.
+- **Backend Tests**: Suite de pruebas Pest -> **100% Pasados en verde (0 errores)**.
+- **Frontend Build**: `npm run build` -> Compilación exitosa en 4.79s.
+
+---
+**Última actualización:** 10 de Agosto de 2026 (Enriquecimiento Contable Masivo v12.0 + Suite Pest 100% Verde + Build Frontend)
+**Versión:** 12.0 (1.176 Ingresos, 960 Egresos, 6 Condominios 100% Poblados en Todas las Categorías)
+**Estado:** Entorno local 100% determinista. Suite de pruebas backend y frontend en verde.
+---
+
 **Última actualización:** 10 de Agosto de 2026 (Bitácora Consolidada & Documentación Reestructurada v11.3)  
 **Versión:** 11.3 (Modular Domain Seeders, 6 Condos, 240 Props, Malla Visual 1:1, 660+ Tests Passed)  
 **Estado:** Bitácora Activa y Conservada.
