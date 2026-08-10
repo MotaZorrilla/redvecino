@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import api from '@/bootstrap';
 import Modal from '@/Components/Modal';
 
@@ -28,61 +28,78 @@ export default function PropertyStructureBuilder({
         return found ? found.name : 'Condominio Principal';
     }, [allCondominiums, selectedCondoId, activeCondoId]);
 
-    // Configuración de Torres y Unidades sincronizada con el estado maestro o mock inicial
-    const [towers, setTowers] = useState([
-        {
-            id: 1,
-            name: 'Torre A',
-            floors: 10,
-            units_per_floor: 4,
-            has_water_meter: true,
-            has_electricity_meter: true,
-            units: Array.from({ length: 40 }, (_, i) => {
-                const floor = Math.floor(i / 4) + 1;
-                const numInFloor = (i % 4) + 1;
-                const unitNum = `${floor}${numInFloor.toString().padStart(2, '0')}`;
+    // Configuración de Torres y Unidades sincronizada dinámicamente con las propiedades reales de la base de datos
+    const [towers, setTowers] = useState([]);
+
+    useEffect(() => {
+        const targetId = selectedCondoId || activeCondoId;
+        const condoProperties = propertiesList.filter(p => String(p.condominium_id) === String(targetId));
+
+        if (condoProperties.length > 0) {
+            const blockGroup = {};
+            condoProperties.forEach(p => {
+                const bName = p.block || 'Torre A';
+                if (!blockGroup[bName]) blockGroup[bName] = [];
+                blockGroup[bName].push({
+                    id: p.id,
+                    number: p.number,
+                    block: bName,
+                    floor: p.floor || 1,
+                    area_sqm: p.area_sqm || 70,
+                    type: p.type || 'apartment',
+                    status: p.status || 'vacant',
+                    parkings: p.parkings || [`E-${p.number}`],
+                    storages: p.storages || [`B-${p.number}`],
+                    owners: p.owners || [],
+                    residents: p.residents || []
+                });
+            });
+
+            const derivedTowers = Object.keys(blockGroup).map((bName, idx) => {
+                const units = blockGroup[bName];
+                const maxFloor = Math.max(...units.map(u => u.floor), 1);
                 return {
-                    id: `ta-${floor}-${numInFloor}`,
-                    number: unitNum,
-                    block: 'Torre A',
-                    floor: floor,
-                    area_sqm: floor === 10 ? 95 : 70, // PH en piso 10
-                    type: floor === 10 ? 'penthouse' : 'apartment',
-                    status: 'vacant',
-                    parkings: [`E-${floor}${numInFloor}-A`, `E-${floor}${numInFloor}-B`], // Múltiples estacionamientos
-                    storages: [`B-${floor}${numInFloor}`], // Múltiples bodegas
-                    owners: ['Carlos Mendoza (RUT: 12.345.678-9)'],
-                    residents: ['Familia Mendoza']
+                    id: idx + 1,
+                    name: bName,
+                    floors: maxFloor,
+                    units_per_floor: Math.ceil(units.length / maxFloor) || 4,
+                    has_water_meter: true,
+                    has_electricity_meter: true,
+                    units: units
                 };
-            })
-        },
-        {
-            id: 2,
-            name: 'Torre B',
-            floors: 10,
-            units_per_floor: 4,
-            has_water_meter: true,
-            has_electricity_meter: false,
-            units: Array.from({ length: 40 }, (_, i) => {
-                const floor = Math.floor(i / 4) + 1;
-                const numInFloor = (i % 4) + 1;
-                const unitNum = `${floor}${numInFloor.toString().padStart(2, '0')}`;
-                return {
-                    id: `tb-${floor}-${numInFloor}`,
-                    number: unitNum,
-                    block: 'Torre B',
-                    floor: floor,
-                    area_sqm: 70,
-                    type: 'apartment',
-                    status: 'vacant',
-                    parkings: [`E-B${floor}${numInFloor}`],
-                    storages: [`B-B${floor}${numInFloor}`],
-                    owners: ['María Silva (RUT: 15.678.901-2)'],
-                    residents: ['María Silva']
-                };
-            })
+            });
+            setTowers(derivedTowers);
+        } else {
+            setTowers([
+                {
+                    id: 1,
+                    name: 'Torre A',
+                    floors: 10,
+                    units_per_floor: 4,
+                    has_water_meter: true,
+                    has_electricity_meter: true,
+                    units: Array.from({ length: 40 }, (_, i) => {
+                        const floor = Math.floor(i / 4) + 1;
+                        const numInFloor = (i % 4) + 1;
+                        const unitNum = `${floor}${numInFloor.toString().padStart(2, '0')}`;
+                        return {
+                            id: `ta-${floor}-${numInFloor}`,
+                            number: unitNum,
+                            block: 'Torre A',
+                            floor: floor,
+                            area_sqm: floor === 10 ? 95 : 70,
+                            type: floor === 10 ? 'penthouse' : 'apartment',
+                            status: 'vacant',
+                            parkings: [`E-${floor}${numInFloor}-A`],
+                            storages: [`B-${floor}${numInFloor}`],
+                            owners: ['Carlos Mendoza (RUT: 12.345.678-9)'],
+                            residents: ['Familia Mendoza']
+                        };
+                    })
+                }
+            ]);
         }
-    ]);
+    }, [propertiesList, selectedCondoId, activeCondoId]);
 
     // Estadísticas globales de $m^2$ y Alícuotas
     const totalAreaSqm = useMemo(() => {

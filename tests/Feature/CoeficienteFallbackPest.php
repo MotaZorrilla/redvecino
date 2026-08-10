@@ -19,8 +19,8 @@ beforeEach(function () {
     $this->condo = Condominium::firstOrFail();
     $this->calculator = new CommonExpenseCalculator();
 
-    // Remove seeded properties so our test properties are the only ones
-    Property::where('condominium_id', $this->condo->id)->delete();
+    // Remove all properties from database so test properties are isolated
+    Property::query()->delete();
     // Remove seeded expenses/incomes from this period to avoid interference
     CondoExpense::where('condominium_id', $this->condo->id)->where('date', 'like', '2026-07%')->delete();
     CondoIncome::where('condominium_id', $this->condo->id)->where('date', 'like', '2026-07%')->delete();

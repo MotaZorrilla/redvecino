@@ -32,11 +32,15 @@ export default function DashboardOverview({
 
     // Consolidated list of recent payments/incomes for table
     const recentPaymentsDisplay = adminFilteredPayments.length > 0
-        ? adminFilteredPayments.slice(0, 5)
+        ? adminFilteredPayments.slice(0, 5).map(p => ({
+            ...p,
+            propertyNumber: p.property?.number || (typeof p.property_id === 'number' ? `Depto ${p.property_id}` : p.property_id),
+            userName: p.user?.name || (p.property?.owners && p.property.owners[0]) || p.description || 'Vecino / Propietario'
+        }))
         : incomesList.slice(0, 5).map(inc => ({
             id: inc.id,
-            property_id: inc.property_id || inc.property?.number || 'G-101',
-            user: inc.user || { name: inc.description || 'Residente' },
+            propertyNumber: inc.property?.number || (inc.property_id ? `Depto ${inc.property_id}` : 'General'),
+            userName: inc.user?.name || inc.description || 'Recaudación Gasto Común',
             amount: inc.amount,
             payment_date: inc.date,
             status: 'approved'
@@ -203,17 +207,27 @@ export default function DashboardOverview({
                         headers={['Propiedad', 'Vecino / Detalle', 'Monto', 'Fecha', 'Estado']}
                         rows={recentPaymentsDisplay.map((p, idx) => ({
                             cells: [
-                                <span className="font-mono font-black text-indigo-400" key={`prop-${p.id || idx}`}>
-                                    #{typeof p.property_id === 'number' ? `Depto ${p.property_id}` : p.property_id}
-                                </span>,
-                                <span className="text-xs font-semibold text-white" key={`user-${p.id || idx}`}>
-                                    {p.user?.name || p.description || 'Propietario'}
-                                </span>,
-                                <span className="font-extrabold text-emerald-400" key={`amt-${p.id || idx}`}>
+                                <button
+                                    key={`btn-prop-${p.id || idx}`}
+                                    onClick={() => setAdminActiveTab('payments')}
+                                    className="font-mono font-black text-indigo-600 dark:text-indigo-400 hover:underline text-left block"
+                                    title="Ver en Libro Diario de Finanzas"
+                                >
+                                    {p.propertyNumber}
+                                </button>,
+                                <button
+                                    key={`btn-user-${p.id || idx}`}
+                                    onClick={() => setAdminActiveTab('payments')}
+                                    className="text-xs font-semibold text-slate-800 dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400 text-left block truncate max-w-[150px]"
+                                    title="Ver detalle del pago en Finanzas"
+                                >
+                                    {p.userName}
+                                </button>,
+                                <span className="font-extrabold text-emerald-600 dark:text-emerald-400" key={`amt-${p.id || idx}`}>
                                     ${Number(p.amount).toLocaleString()}
                                 </span>,
-                                <span className="text-xs text-slate-400" key={`date-${p.id || idx}`}>
-                                    {p.payment_date ? new Date(p.payment_date).toLocaleDateString('es-CL') : '04/08/2026'}
+                                <span className="text-xs text-slate-500 dark:text-slate-400" key={`date-${p.id || idx}`}>
+                                    {p.payment_date ? new Date(p.payment_date).toLocaleDateString('es-CL') : 'Al día'}
                                 </span>,
                                 <StatusBadge key={`status-${p.id || idx}`} status={p.status || 'approved'} type="payment" />
                             ]

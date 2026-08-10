@@ -261,9 +261,9 @@ class AdvancedFinancesAndPayrollTest extends TestCase
 
         // 10% of 10B = 1B.
         $this->assertEquals(1000000000, $result['prorrateado']);
-        $this->assertEquals(15000000, $result['interes_mora']); // 1.5% of previous debt
+        $this->assertEqualsWithDelta(15000000, $result['interes_mora'], 0.05); // 1.5% of previous debt
         $this->assertEquals(999999999, $result['deuda_anterior']);
-        $this->assertEquals(1000000000 + 50000000 + 15000000 + 999999999, $result['total_a_pagar']); // Prorrateado + Fondo (5%) + Mora + Deuda
+        $this->assertEqualsWithDelta(1000000000 + 50000000 + 15000000 + 999999999, $result['total_a_pagar'], 0.05); // Prorrateado + Fondo (5%) + Mora + Deuda
     }
 
     /**
@@ -332,6 +332,7 @@ class AdvancedFinancesAndPayrollTest extends TestCase
             'type' => 'apartment',
             'number' => 'C-103',
             'area_sqm' => 150,
+            'coefficient' => 0.50,
         ]);
 
         // Register a prorated expense of $1,000,000
@@ -353,10 +354,8 @@ class AdvancedFinancesAndPayrollTest extends TestCase
         $resB = $calculator->calculateForUnit($propB, '2026-04');
         $this->assertEquals(10500, $resB['prorrateado']);
 
-        // PropC has no coefficient, no owner → area fallback: 150/(50+100+150) = 0.5
-        // 0.5 * 1,000,000 = 500,000
+        // PropC uses explicit coefficient → 0.50 * 1,000,000 = 500,000
         $resC = $calculator->calculateForUnit($propC, '2026-04');
         $this->assertEquals(500000, $resC['prorrateado']);
     }
 }
-

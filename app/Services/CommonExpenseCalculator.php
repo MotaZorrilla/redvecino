@@ -13,11 +13,7 @@ final class CommonExpenseCalculator
     {
         $condoId = $property->condominium_id;
 
-        static $unitsCounts = [];
-        if (!isset($unitsCounts[$condoId])) {
-            $unitsCounts[$condoId] = Property::where('condominium_id', $condoId)->count() ?: 1;
-        }
-        $totalUnits = $unitsCounts[$condoId];
+        $totalUnits = Property::where('condominium_id', $condoId)->count() ?: 1;
         $prorrateoCoeff = $this->getApportionmentCoefficient($property);
 
         if ($overrideTotalExpenses !== null) {
@@ -134,11 +130,8 @@ final class CommonExpenseCalculator
 
     private function getApportionmentCoefficient(Property $property): float
     {
-        static $totalAreas = [];
         $condoId = $property->condominium_id;
-        if ($condoId && !isset($totalAreas[$condoId])) {
-            $totalAreas[$condoId] = (float) Property::where('condominium_id', $condoId)->sum('area_sqm');
-        }
-        return \App\Services\UnitCoefficientResolver::resolve($property, 0.0100, $totalAreas[$condoId] ?? null);
+        $totalArea = $condoId ? (float) Property::where('condominium_id', $condoId)->sum('area_sqm') : null;
+        return \App\Services\UnitCoefficientResolver::resolve($property, 0.0100, $totalArea);
     }
 }

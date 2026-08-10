@@ -30,7 +30,7 @@ describe('PersonWizard API', function () {
         $response = $this->actingAs($this->admin)->postJson('/api/person-wizard', [
             'nombres' => 'Carlos',
             'apellidos' => 'Vergara Soto',
-            'rut' => '12.345.678-9',
+            'rut' => '19.876.543-2',
             'email' => 'carlos.vergara@mail.cl',
             'telefono' => '912345678',
             'hasAccess' => true,
@@ -48,7 +48,7 @@ describe('PersonWizard API', function () {
         expect($response->json('user.email'))->toBe('carlos.vergara@mail.cl');
         expect($response->json('user.roles'))->toBe(['resident']);
 
-        $user = User::where('rut', '12.345.678-9')->first();
+        $user = User::where('rut', '19.876.543-2')->first();
         expect($user)->not->toBeNull();
         expect($user->hasRole('resident'))->toBeTrue();
 

@@ -223,7 +223,13 @@ export default function PropertiesList({
 
             {/* VISTA FICHA 2: MALLA ARQUITECTÓNICA VISUAL */}
             {subTab === 'visual_builder' && (
-                <PropertyStructureBuilder activeCondoId={adminCondoId} condosList={condosList} allCondominiums={allCondominiums} />
+                <PropertyStructureBuilder 
+                    activeCondoId={adminCondoId} 
+                    condosList={condosList} 
+                    allCondominiums={allCondominiums}
+                    propertiesList={adminFilteredProperties.length > 0 ? adminFilteredProperties : propertiesList}
+                    setPropertiesList={setPropertiesList}
+                />
             )}
 
             {/* VISTA FICHA 1: REGISTRO DE UNIDADES (MALLA VISUAL POR TORRES O TABLA CONTABLE) */}
