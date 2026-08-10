@@ -18,6 +18,7 @@ import { RoleTransitionLoader } from '@/Components/DashboardShared';
 import { useCondoFinances } from '@/hooks/useCondoFinances';
 import { useFinancialCatalog } from '@/hooks/useFinancialCatalog';
 import { useFinanceMutations } from '@/hooks/useFinanceMutations';
+import { ROLES } from '@/utils/constants';
 
 export default function Dashboard() {
     const { 
@@ -54,7 +55,7 @@ export default function Dashboard() {
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
     const [isMobileDevOpsSidebarOpen, setIsMobileDevOpsSidebarOpen] = useState(false);
 
-    const canViewFinances = user?.roles?.some(r => ['admin', 'administrador', 'committee', 'comité'].includes(r.toLowerCase()));
+    const canViewFinances = user?.roles?.some(r => [ROLES.ADMIN, 'administrador', ROLES.COMITE, 'comité'].includes(r.toLowerCase()));
 
     const { data: catalogData } = useFinancialCatalog(canViewFinances);
     const financialCatalog = catalogData || { incomes: {}, expenses: {} };

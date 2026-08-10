@@ -25,7 +25,7 @@ use App\Http\Controllers\UnitProfileController;
 use App\Http\Controllers\SupplyOrderController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/login-pin', [RoadmapFeaturesController::class, 'loginPin']);
+Route::post('/login-pin', [\App\Http\Controllers\PinLoginController::class, 'loginPin']);
 
 Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
     Route::get('/user', fn(Request $r) => $r->user());
@@ -193,14 +193,15 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::patch('/budgets/{id}/approve', [BudgetController::class, 'approve']);
     });
 
-    // 8. Roadmap Features
-    Route::get('/bookings', [RoadmapFeaturesController::class, 'listBookings']);
-    Route::post('/bookings', [RoadmapFeaturesController::class, 'storeBooking']);
-    Route::post('/qr-invitations', [RoadmapFeaturesController::class, 'storeQrInvitation']);
-    Route::post('/qr-invitations/verify', [RoadmapFeaturesController::class, 'verifyQrInvitation']);
-    Route::post('/package-custodies', [RoadmapFeaturesController::class, 'storePackageCustody']);
-    Route::put('/package-custodies/{id}/deliver', [RoadmapFeaturesController::class, 'deliverPackageCustody']);
-    Route::post('/quorum-calculation', [RoadmapFeaturesController::class, 'calculateQuorum']);
-    Route::post('/funds/transfer', [RoadmapFeaturesController::class, 'transferFunds']);
+    // 8. Modularized Feature Endpoints
+    Route::get('/bookings', [\App\Http\Controllers\Api\BookingController::class, 'index']);
+    Route::post('/bookings', [\App\Http\Controllers\Api\BookingController::class, 'store']);
+    Route::put('/bookings/{booking}', [\App\Http\Controllers\Api\BookingController::class, 'update']);
+    Route::post('/qr-invitations', [\App\Http\Controllers\Api\QrInvitationController::class, 'store']);
+    Route::post('/qr-invitations/verify', [\App\Http\Controllers\Api\QrInvitationController::class, 'verify']);
+    Route::post('/package-custodies', [\App\Http\Controllers\Api\PackageCustodyController::class, 'store']);
+    Route::put('/package-custodies/{id}/deliver', [\App\Http\Controllers\Api\PackageCustodyController::class, 'deliver']);
+    Route::post('/quorum-calculation', [\App\Http\Controllers\Api\AssemblyQuorumController::class, 'calculate']);
+    Route::post('/funds/transfer', [\App\Http\Controllers\Api\FundTransferController::class, 'transfer']);
 });
 

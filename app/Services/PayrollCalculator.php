@@ -30,18 +30,20 @@ final class PayrollCalculator
         
         $totalNoImponibles = round($asignacionColacion + $asignacionMovilizacion + $asignacionVestuario);
 
-        // 3. Previsional Deductions
-        $saludFonasa = round($totalImponibles * 0.07); // 7.00% Fonasa
+        // 3. Previsional Deductions (usando configuración centralizada editables/overridables)
+        $fonasaPct = config('finances.hr.fonasa_pct', 0.07);
+        $saludFonasa = round($totalImponibles * $fonasaPct); // 7.00% Fonasa
 
         // Get AFP rate
         $afp = $employee->afp;
-        $afpRate = $afp ? floatval($afp->commission_rate) : 10.00;
+        $afpRate = $afp ? floatval($afp->commission_rate) : (config('finances.hr.afp_pct', 0.10) * 100.0);
         $afpMonto = round($totalImponibles * ($afpRate / 100.0));
 
         // Seguro de Cesantía (AFC): 0.60% for employee in indefinite contract
         $seguroCesantia = 0.0;
         if (strtolower($employee->contract_type) === 'indefinido') {
-            $seguroCesantia = round($totalImponibles * 0.006);
+            $uiPct = config('finances.hr.unemployment_insurance_pct', 0.006);
+            $seguroCesantia = round($totalImponibles * $uiPct);
         }
 
         $totalPrevisionales = round($saludFonasa + $afpMonto + $seguroCesantia);

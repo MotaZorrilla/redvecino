@@ -30,7 +30,10 @@ export default function CommonExpenseGenerator({ adminCondoId = 1, activeCondoNa
         try {
             const res = await api.get(`/api/common-expense-periods/${periodId}/receipts`);
             if (res.data && res.data.receipts) {
-                setReceiptsList(res.data.receipts);
+                const list = Array.isArray(res.data.receipts)
+                    ? res.data.receipts
+                    : (res.data.receipts.data || []);
+                setReceiptsList(list);
             }
         } catch (error) {
             console.error('Error cargando recibos del período:', error);
@@ -54,12 +57,15 @@ export default function CommonExpenseGenerator({ adminCondoId = 1, activeCondoNa
 
             if (res.data && res.data.period) {
                 setPeriodData(res.data.period);
-                setReceiptsList(res.data.period.receipts || []);
+                const list = Array.isArray(res.data.period.receipts)
+                    ? res.data.period.receipts
+                    : (res.data.period.receipts?.data || []);
+                setReceiptsList(list);
                 alert(res.data.message || '¡Cobro masivo generado exitosamente!');
             }
         } catch (error) {
-            console.error('Error en generación masiva:', error);
-            alert(error.response?.data?.message || 'Error al generar el cobro masivo.');
+            console.error('Error en emisión masiva:', error);
+            alert(error.response?.data?.message || 'Error al emitir los cobros masivos.');
         } finally {
             setIsGenerating(false);
         }
@@ -84,9 +90,10 @@ export default function CommonExpenseGenerator({ adminCondoId = 1, activeCondoNa
     };
 
     // Estadísticas del Período
+    const safeReceipts = Array.isArray(receiptsList) ? receiptsList : [];
     const totalExpensesAmount = periodData ? Number(periodData.total_expenses) : 5922800;
     const reserveFundTotalAmount = totalExpensesAmount * (Number(reserveFundPct) / 100);
-    const totalBilledAmount = receiptsList.reduce((acc, r) => acc + Number(r.total_amount || 0), 0);
+    const totalBilledAmount = safeReceipts.reduce((acc, r) => acc + Number(r.total_amount || 0), 0);
 
     return (
         <div className="space-y-6 font-outfit text-left text-slate-800 dark:text-slate-100 animate-fade-in">

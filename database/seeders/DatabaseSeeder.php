@@ -634,7 +634,7 @@ class DatabaseSeeder extends Seeder
                 'reason' => 'Ruidos molestos y ruidos de construcción fuera del horario autorizado de mudanzas (Sábado por la tarde).',
                 'amount' => 45000.00,
                 'issued_date' => ($anchorYear - 1) . '-05-10',
-                'due_date' => '2026-05-25',
+                'due_date' => ($anchorYear - 1) . '-05-25',
                 'status' => 'pending',
             ]);
         }

@@ -101,9 +101,7 @@ class CommonExpenseController extends Controller
 
         foreach ($properties as $property) {
             $areaSqm = floatval($property->area_sqm) ?: 70.0;
-            $alicuotaPct = $property->coefficient !== null
-                ? floatval($property->coefficient)
-                : $areaSqm / $totalAreaSqm;
+            $alicuotaPct = \App\Services\UnitCoefficientResolver::resolve($property);
 
             $baseAmount = round($data['total_amount'] * $alicuotaPct, 2);
 

@@ -116,10 +116,8 @@ class CommonExpensePeriodController extends Controller
             foreach ($properties as $property) {
                 $areaSqm = floatval($property->area_sqm) ?: 70.0;
 
-                // Alícuota: prioriza el coeficiente declarado (alícuota por modelo); fallback por superficie.
-                $alicuotaPct = $property->coefficient !== null
-                    ? floatval($property->coefficient)
-                    : $areaSqm / $totalAreaSqm;
+                // Alícuota: asignada por el resolver centralizado (coeficiente -> ownership -> area -> 0.0100)
+                $alicuotaPct = \App\Services\UnitCoefficientResolver::resolve($property);
 
                 // Fórmulas de prorrateo contables
                 $baseAmount = round($totalExpenses * $alicuotaPct, 2);

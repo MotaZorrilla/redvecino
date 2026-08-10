@@ -132,6 +132,12 @@ class TiCommandController extends Controller
 
     private function dbMigrate()
     {
+        if (app()->environment('production')) {
+            return response()->json([
+                'output' => "[SEGURIDAD TI] Comando 'db:migrate' bloqueado en entorno de producción por políticas de seguridad."
+            ], 403);
+        }
+
         Artisan::call('migrate', ['--force' => true]);
         $output = Artisan::output();
         return response()->json([
@@ -141,6 +147,12 @@ class TiCommandController extends Controller
 
     private function dbSeed()
     {
+        if (app()->environment('production')) {
+            return response()->json([
+                'output' => "[SEGURIDAD TI] Comando 'db:seed' bloqueado en entorno de producción por políticas de seguridad."
+            ], 403);
+        }
+
         Artisan::call('db:seed', ['--force' => true]);
         $output = Artisan::output();
         return response()->json([

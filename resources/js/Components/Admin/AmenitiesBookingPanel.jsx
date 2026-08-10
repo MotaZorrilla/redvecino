@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Modal from '@/Components/Modal';
 import { useBookings, mapBookingToPanel } from '@/hooks/useBookings';
 
@@ -79,20 +79,80 @@ export default function AmenitiesBookingPanel({ adminCondoId = 1 }) {
         return b.amenity_name.toLowerCase().includes(selectedAmenityFilter.toLowerCase());
     });
 
-    // Días del calendario mensual (Agosto 2026)
-    const calendarDays = [
-        { day: 27, inMonth: false }, { day: 28, inMonth: false }, { day: 29, inMonth: false }, { day: 30, inMonth: false }, { day: 31, inMonth: false },
-        { day: 1, inMonth: true }, { day: 2, inMonth: true }, { day: 3, inMonth: true }, { day: 4, inMonth: true }, { day: 5, inMonth: true }, { day: 6, inMonth: true },
-        { day: 7, inMonth: true, isToday: true }, { day: 8, inMonth: true }, { day: 9, inMonth: true }, { day: 10, inMonth: true }, { day: 11, inMonth: true }, { day: 12, inMonth: true }, { day: 13, inMonth: true },
-        { day: 14, inMonth: true }, { day: 15, inMonth: true, hasBooking: true }, { day: 16, inMonth: true }, { day: 17, inMonth: true }, { day: 18, inMonth: true }, { day: 19, inMonth: true }, { day: 20, inMonth: true },
-        { day: 21, inMonth: true }, { day: 22, inMonth: true }, { day: 23, inMonth: true }, { day: 24, inMonth: true }, { day: 25, inMonth: true }, { day: 26, inMonth: true }, { day: 27, inMonth: true },
-        { day: 28, inMonth: true }, { day: 29, inMonth: true, hasBooking: true }, { day: 30, inMonth: true, hasBooking: true }, { day: 31, inMonth: true },
-        { day: 1, inMonth: false }, { day: 2, inMonth: false }, { day: 3, inMonth: false }, { day: 4, inMonth: false }, { day: 5, inMonth: false }, { day: 6, inMonth: false }
+    // Estado de navegación del calendario (Año / Mes)
+    const [currentYear, setCurrentYear] = useState(2026);
+    const [currentMonth, setCurrentMonth] = useState(7); // 0-indexed: 7 = Agosto
+
+    const monthNames = [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
     ];
+
+    const handlePrevMonth = () => {
+        if (currentMonth === 0) {
+            setCurrentMonth(11);
+            setCurrentYear(prev => prev - 1);
+        } else {
+            setCurrentMonth(prev => prev - 1);
+        }
+    };
+
+    const handleNextMonth = () => {
+        if (currentMonth === 11) {
+            setCurrentMonth(0);
+            setCurrentYear(prev => prev + 1);
+        } else {
+            setCurrentMonth(prev => prev + 1);
+        }
+    };
+
+    // Generar días dinámicos del calendario según currentYear y currentMonth
+    const dynamicCalendarDays = useMemo(() => {
+        const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+        const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
+
+        // Ajustar primer día a Lunes = 0 (JSgetDay: Dom=0, Lun=1 ... Sáb=6)
+        let startingDayOfWeek = firstDayOfMonth.getDay() - 1;
+        if (startingDayOfWeek === -1) startingDayOfWeek = 6;
+
+        const totalDays = lastDayOfMonth.getDate();
+        const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
+
+        const today = new Date();
+        const isCurrentMonthToday = today.getFullYear() === currentYear && today.getMonth() === currentMonth;
+
+        const days = [];
+
+        // Días del mes anterior
+        for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+            days.push({ day: prevMonthLastDay - i, inMonth: false });
+        }
+
+        // Días del mes actual
+        for (let d = 1; d <= totalDays; d++) {
+            const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            const hasBooking = bookings.some(b => b.date === dateStr && (selectedAmenityFilter === 'all' || b.amenity_name.toLowerCase().includes(selectedAmenityFilter.toLowerCase())));
+            days.push({
+                day: d,
+                inMonth: true,
+                isToday: isCurrentMonthToday && today.getDate() === d,
+                hasBooking,
+                dateStr
+            });
+        }
+
+        // Días del mes siguiente para completar la cuadrícula (múltiplo de 7)
+        const remaining = (7 - (days.length % 7)) % 7;
+        for (let j = 1; j <= remaining; j++) {
+            days.push({ day: j, inMonth: false });
+        }
+
+        return days;
+    }, [currentYear, currentMonth, bookings, selectedAmenityFilter]);
 
     return (
         <div className="space-y-6 font-outfit text-left text-slate-800 dark:text-slate-100 animate-fade-in w-full">
-            {/* Header Módulo Arriendos de Áreas Comunes */}
+            {/* Header Módulo Arriendo de Áreas Comunes */}
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <span className="text-[10px] font-black uppercase bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full tracking-wider">
@@ -124,13 +184,41 @@ export default function AmenitiesBookingPanel({ adminCondoId = 1 }) {
                 </div>
             </div>
 
-            {/* SECCIÓN CALENDARIO MENSUAL (AGOSTO 2026) */}
+            {/* SECCIÓN CALENDARIO MENSUAL DINÁMICO CON NAVEGACIÓN */}
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-xs space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
-                    <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                        <span>🗓️</span>
-                        <span>Agosto 2026</span>
-                    </h3>
+                    <div className="flex items-center gap-3">
+                        <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                            <span>🗓️</span>
+                            <span>{monthNames[currentMonth]} {currentYear}</span>
+                        </h3>
+                        <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl">
+                            <button
+                                onClick={handlePrevMonth}
+                                title="Mes Anterior"
+                                className="px-2.5 py-1 text-xs font-black bg-white dark:bg-slate-900 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700"
+                            >
+                                ◀
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setCurrentMonth(new Date().getMonth());
+                                    setCurrentYear(new Date().getFullYear());
+                                }}
+                                title="Ir al mes actual"
+                                className="px-2 py-1 text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 hover:underline"
+                            >
+                                Hoy
+                            </button>
+                            <button
+                                onClick={handleNextMonth}
+                                title="Mes Siguiente"
+                                className="px-2.5 py-1 text-xs font-black bg-white dark:bg-slate-900 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700"
+                            >
+                                ▶
+                            </button>
+                        </div>
+                    </div>
 
                     {/* Filtro por Área Común */}
                     <div className="flex items-center gap-2">
@@ -156,7 +244,7 @@ export default function AmenitiesBookingPanel({ adminCondoId = 1 }) {
                         </div>
                     ))}
 
-                    {calendarDays.map((cd, idx) => (
+                    {dynamicCalendarDays.map((cd, idx) => (
                         <div
                             key={idx}
                             className={`min-h-[50px] p-2 rounded-xl border transition-all flex flex-col justify-between items-center text-xs ${
@@ -171,7 +259,6 @@ export default function AmenitiesBookingPanel({ adminCondoId = 1 }) {
                         >
                             <span>{cd.day}</span>
                             {cd.isToday && <span className="text-[9px] uppercase font-black tracking-wider">Hoy</span>}
-                            {cd.hasBooking && !cd.isToday && <span className="text-[8px] bg-amber-500 text-white px-1 rounded-full font-extrabold">Reserva</span>}
                         </div>
                     ))}
                 </div>
@@ -245,14 +332,33 @@ export default function AmenitiesBookingPanel({ adminCondoId = 1 }) {
                         <div>
                             <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1">Área Común *</label>
                             <select
-                                value={newBooking.amenity_name}
-                                onChange={(e) => setNewBooking({ ...newBooking, amenity_name: e.target.value })}
-                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 font-bold text-slate-900 dark:text-white"
+                                value={['Sala Eventos', 'Piscina', 'Quincho'].includes(newBooking.amenity_name) ? newBooking.amenity_name : 'Otro'}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    const defaultAmounts = { 'Sala Eventos': 25000, 'Piscina': 5000, 'Quincho': 15000 };
+                                    if (val === 'Otro') {
+                                        setNewBooking({ ...newBooking, amenity_name: '', amount: 0 });
+                                    } else {
+                                        setNewBooking({ ...newBooking, amenity_name: val, amount: defaultAmounts[val] ?? newBooking.amount });
+                                    }
+                                }}
+                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 font-bold text-slate-900 dark:text-white mb-2"
                             >
-                                <option value="Sala Eventos">Sala Eventos ($25.000)</option>
-                                <option value="Piscina">Piscina ($5.000)</option>
-                                <option value="Quincho">Quincho ($15.000)</option>
+                                <option value="Quincho">🍖 Quincho ($15.000 sugerido)</option>
+                                <option value="Piscina">🏊 Piscina ($5.000 sugerido)</option>
+                                <option value="Sala Eventos">🎉 Sala Eventos ($25.000 sugerido)</option>
+                                <option value="Otro">✏️ Personalizado (Escribir nombre y monto a mano)</option>
                             </select>
+                            {!['Sala Eventos', 'Piscina', 'Quincho'].includes(newBooking.amenity_name) && (
+                                <input
+                                    type="text"
+                                    required
+                                    placeholder="Escriba el nombre del área (ej: Quincho VIP, Multicancha...)"
+                                    value={newBooking.amenity_name}
+                                    onChange={(e) => setNewBooking({ ...newBooking, amenity_name: e.target.value })}
+                                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 font-bold text-slate-900 dark:text-white"
+                                />
+                            )}
                         </div>
 
                         <div>

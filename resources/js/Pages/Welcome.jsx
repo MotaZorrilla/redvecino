@@ -3,6 +3,8 @@ import { Head, Link } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { toast } from '@/utils/notify';
 import ToastContainer from '@/Components/Toast';
+import BrandAssetsGallery from '@/Components/Welcome/BrandAssetsGallery';
+import CommonExpensesCalculator from '@/Components/Welcome/CommonExpensesCalculator';
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
     // Symmetrical Theme Hook for persistent Light/Dark synchronization

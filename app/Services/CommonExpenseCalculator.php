@@ -9,93 +9,49 @@ use App\Models\CondoIncome;
 
 final class CommonExpenseCalculator
 {
-    public function calculateForUnit(Property $property, string $period, float $previousDebt = 0.0, int $daysOverdue = 0): array
+    public function calculateForUnit(Property $property, string $period, float $previousDebt = 0.0, int $daysOverdue = 0, float $reserveFundPct = 5.0): array
     {
         $condoId = $property->condominium_id;
 
-        $totalUnits = Property::where('condominium_id', $condoId)->count();
-        if ($totalUnits === 0) {
-            $totalUnits = 1;
-        }
-
+        $totalUnits = Property::where('condominium_id', $condoId)->count() ?: 1;
         $prorrateoCoeff = $this->getApportionmentCoefficient($property);
 
-        $egresosProrrateados = CondoExpense::where('condominium_id', $condoId)
-            ->where('date', 'like', "$period%")
-            ->where('distributable_method', 'prorated')
-            ->sum('amount');
-
-        $ingresosProrrateados = CondoIncome::where('condominium_id', $condoId)
-            ->where('date', 'like', "$period%")
-            ->where('distributable_method', 'prorated')
-            ->sum('amount');
-
-        $baseProrrateable = max(0, $egresosProrrateados - $ingresosProrrateados);
+        // 1. Prorrateado por Coeficiente
+        [$egresosProrrateados, $ingresosProrrateados, $baseProrrateable] = $this->getNetCategoryAmount($condoId, $period, 'prorated');
         $montoProrrateado = round($baseProrrateable * $prorrateoCoeff);
 
-        $egresosIgualitarios = CondoExpense::where('condominium_id', $condoId)
-            ->where('date', 'like', "$period%")
-            ->where('distributable_method', 'equal')
-            ->sum('amount');
-
-        $ingresosIgualitarios = CondoIncome::where('condominium_id', $condoId)
-            ->where('date', 'like', "$period%")
-            ->where('distributable_method', 'equal')
-            ->sum('amount');
-
-        $baseIgualitaria = max(0, $egresosIgualitarios - $ingresosIgualitarios);
+        // 2. Distribuido Igualitariamente
+        [$egresosIgualitarios, $ingresosIgualitarios, $baseIgualitaria] = $this->getNetCategoryAmount($condoId, $period, 'equal');
         $montoIgualitario = round($baseIgualitaria / $totalUnits);
 
         $subtotalGastosComunes = $montoProrrateado + $montoIgualitario;
 
-        $fondoReserva = round($subtotalGastosComunes * 0.05);
+        // Fondo Reserva configurable por parámetro / config (fallback 5%)
+        $fondoReservaRate = $reserveFundPct / 100.0;
+        $fondoReserva = round($subtotalGastosComunes * $fondoReservaRate);
 
         $totalGastosComunesPeriodo = $subtotalGastosComunes + $fondoReserva;
 
+        // 3. Específico de Torre
         $montoGastoTorre = 0.0;
         if ($property->tower_id) {
-            $egresosTorre = CondoExpense::where('condominium_id', $condoId)
-                ->where('date', 'like', "$period%")
-                ->where('distributable_method', 'tower_specific')
-                ->where('tower_id', $property->tower_id)
-                ->sum('amount');
-
-            $ingresosTorre = CondoIncome::where('condominium_id', $condoId)
-                ->where('date', 'like', "$period%")
-                ->where('distributable_method', 'tower_specific')
-                ->where('tower_id', $property->tower_id)
-                ->sum('amount');
-
-            $baseTorre = max(0, $egresosTorre - $ingresosTorre);
-            $unitsInTower = Property::where('condominium_id', $condoId)
-                ->where('tower_id', $property->tower_id)
-                ->count();
+            [, , $baseTorre] = $this->getNetCategoryAmount($condoId, $period, 'tower_specific', 'tower_id', $property->tower_id);
+            $unitsInTower = Property::where('condominium_id', $condoId)->where('tower_id', $property->tower_id)->count();
             if ($unitsInTower > 0) {
                 $montoGastoTorre = round($baseTorre / $unitsInTower);
             }
         }
 
-        $egresosIndividuales = CondoExpense::where('condominium_id', $condoId)
-            ->where('date', 'like', "$period%")
-            ->where('distributable_method', 'unit_specific')
-            ->where('property_id', $property->id)
-            ->sum('amount');
+        // 4. Específico de Unidad
+        [, , $montoIndividual] = $this->getNetCategoryAmount($condoId, $period, 'unit_specific', 'property_id', $property->id);
 
-        $ingresosIndividuales = CondoIncome::where('condominium_id', $condoId)
-            ->where('date', 'like', "$period%")
-            ->where('distributable_method', 'unit_specific')
-            ->where('property_id', $property->id)
-            ->sum('amount');
-
-        $montoIndividual = max(0, $egresosIndividuales - $ingresosIndividuales);
-
+        // 5. Interés de Mora
         $montoInteresMora = 0.0;
         if ($previousDebt > 0 && $daysOverdue > $this->moraDaysOverdueThreshold($condoId)) {
             $montoInteresMora = round($previousDebt * $this->moraRate($condoId));
         }
 
         $totalCargosPosteriores = $montoGastoTorre + $montoIndividual + $previousDebt + $montoInteresMora;
-
         $totalAPagar = $totalGastosComunesPeriodo + $totalCargosPosteriores;
 
         return [
@@ -118,6 +74,28 @@ final class CommonExpenseCalculator
                 'total_ingresos_igualitarios' => $ingresosIgualitarios,
             ]
         ];
+    }
+
+    private function getNetCategoryAmount(int $condoId, string $period, string $method, ?string $extraColumn = null, $extraValue = null): array
+    {
+        $expQuery = CondoExpense::where('condominium_id', $condoId)
+            ->where('date', 'like', "$period%")
+            ->where('distributable_method', $method);
+
+        $incQuery = CondoIncome::where('condominium_id', $condoId)
+            ->where('date', 'like', "$period%")
+            ->where('distributable_method', $method);
+
+        if ($extraColumn && $extraValue) {
+            $expQuery->where($extraColumn, $extraValue);
+            $incQuery->where($extraColumn, $extraValue);
+        }
+
+        $egresos = $expQuery->sum('amount');
+        $ingresos = $incQuery->sum('amount');
+        $neto = max(0, $egresos - $ingresos);
+
+        return [(float)$egresos, (float)$ingresos, (float)$neto];
     }
 
     private function moraRate(int $condoId): float
@@ -152,6 +130,6 @@ final class CommonExpenseCalculator
             return floatval($property->area_sqm) / floatval($totalArea);
         }
 
-        return 0.0100;
+        return \App\Services\UnitCoefficientResolver::resolve($property);
     }
 }

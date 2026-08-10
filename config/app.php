@@ -84,6 +84,8 @@ return [
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'es_CL'),
 
+    'anchor_year' => (int) env('DEMO_ANCHOR_YEAR', (int) date('Y')),
+
     /*
     |--------------------------------------------------------------------------
     | Encryption Key

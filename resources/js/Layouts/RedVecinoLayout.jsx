@@ -57,7 +57,7 @@ export default function RedVecinoLayout({
     const activeCondo = condosList.find(c => String(c.id) === String(adminCondoId)) || condosList[0] || { name: 'Condominio Alameda' };
 
     // Configuración de Acentos Cromáticos por Rol
-    const themeStyles = {
+    const THEME_CONFIG = {
         ti: {
             color: 'cyan',
             text: 'text-cyan-600 dark:text-cyan-400',
@@ -90,7 +90,9 @@ export default function RedVecinoLayout({
             gradient: 'from-orange-500 to-orange-700',
             panelText: 'CONSOLA OPERATIVA'
         }
-    }[role.toLowerCase()] || themeStyles.admin;
+    };
+
+    const themeStyles = THEME_CONFIG[role.toLowerCase()] || THEME_CONFIG.admin;
 
     // Configuración de Pestañas según el Rol
     const getTabsByRole = () => {
