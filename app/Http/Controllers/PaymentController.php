@@ -69,8 +69,30 @@ class PaymentController extends Controller
             'user' => $user,
             'property_id' => $propertyId,
             'payments' => $payments,
+            'total_paid' => $payments->sum('amount'),
             'fines' => $fines,
             'expenses' => $expenses
         ]);
+    }
+
+    public function reconcile(int $id)
+    {
+        $user = auth()->user();
+        if (!$user || !($user->hasRole('Administrador') || $user->hasRole('Comité') || $user->can('approve expenses'))) {
+            abort(403, 'No tienes permiso para conciliar pagos.');
+        }
+
+        $payment = Payment::findOrFail($id);
+        $payment->update([
+            'status' => 'completed',
+        ]);
+
+        if ($payment->common_expense_id) {
+            \App\Models\CommonExpense::where('id', $payment->common_expense_id)->update([
+                'status' => 'paid',
+            ]);
+        }
+
+        return response()->json($payment);
     }
 }

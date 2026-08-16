@@ -65,6 +65,6 @@ class FineController extends Controller
         $fine = Fine::findOrFail($id);
         $fine->delete();
 
-        return response()->json(null, 204);
+        return response()->json(['message' => 'Multa eliminada correctamente.'], 200);
     }
 }

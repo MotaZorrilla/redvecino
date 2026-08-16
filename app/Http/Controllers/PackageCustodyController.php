@@ -61,12 +61,12 @@ class PackageCustodyController extends Controller
         $package = PackageCustody::findOrFail($id);
 
         $data = $request->validate([
-            'signature' => 'nullable|string',
+            'signature' => 'required|string',
         ]);
 
         $package->update([
             'status' => 'delivered',
-            'signature' => $data['signature'] ?? null,
+            'signature' => $data['signature'],
             'delivered_at' => now(),
         ]);
 
