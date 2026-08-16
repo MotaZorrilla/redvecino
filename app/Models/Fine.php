@@ -16,6 +16,7 @@ class Fine extends Model
         'issued_date',
         'due_date',
         'status',
+        'evidence_paths',
     ];
 
     protected function casts(): array
@@ -23,6 +24,7 @@ class Fine extends Model
         return [
             'issued_date' => 'date',
             'due_date' => 'date',
+            'evidence_paths' => 'array',
         ];
     }
 

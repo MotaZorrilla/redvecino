@@ -89,6 +89,29 @@ export default function DashboardOverview({
                 </div>
             )}
 
+            {/* Alerta Operativa: Pedidos de Insumos Pendientes */}
+            <div 
+                onClick={() => setAdminActiveTab('employees')}
+                className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 cursor-pointer hover:bg-amber-100/70 dark:hover:bg-amber-950/60 transition-all group"
+            >
+                <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl shrink-0">
+                        📦
+                    </div>
+                    <div>
+                        <h4 className="text-xs font-black text-amber-900 dark:text-amber-200 uppercase tracking-wider">
+                            Solicitudes de Insumos Pendientes
+                        </h4>
+                        <p className="text-xs text-amber-700 dark:text-amber-300/90 font-medium">
+                            El personal de conserjería y mantención ha solicitado materiales que requieren aprobación de compra.
+                        </p>
+                    </div>
+                </div>
+                <span className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs rounded-xl shadow-xs shrink-0 group-hover:scale-105 transition-all">
+                    Revisar Carrito de Insumos →
+                </span>
+            </div>
+
             {/* KPI Cards Grid (Prototipo v2 Oficial) */}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {/* KPI 1: Recaudación Mensual */}

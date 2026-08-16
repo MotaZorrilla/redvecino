@@ -62,4 +62,14 @@ class Property extends Model
     {
         return $this->hasMany(Fine::class);
     }
+
+    public function unitProfile()
+    {
+        return $this->hasOne(UnitProfile::class);
+    }
+
+    public function pets()
+    {
+        return $this->hasMany(UnitPet::class);
+    }
 }

@@ -18,12 +18,15 @@ class Payment extends Model
         'payment_method',
         'reference',
         'status',
+        'waive_late_fee',
+        'waive_reason',
     ];
 
     protected function casts(): array
     {
         return [
             'payment_date' => 'date',
+            'waive_late_fee' => 'boolean',
         ];
     }
 

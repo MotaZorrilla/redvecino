@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Modal from '@/Components/Modal';
+import AmonestacionesTab from '@/Components/Admin/AmonestacionesTab';
 
 export default function EmployeesList({ adminCondoId = 1 }) {
     const [employees, setEmployees] = useState([
@@ -47,6 +48,8 @@ export default function EmployeesList({ adminCondoId = 1 }) {
 
     // Estado del Pedido de Materiales e Insumos
     const [invoiceNumber, setInvoiceNumber] = useState('');
+    const [purchaseAmount, setPurchaseAmount] = useState('45000');
+    const [selectedSupplyIds, setSelectedSupplyIds] = useState([1, 2, 3, 4, 5]);
     const [supplyStatus, setSupplyStatus] = useState('en_compra'); // 'en_compra' | 'comprado'
     const [supplySuccessMsg, setSupplySuccessMsg] = useState('');
 
@@ -160,6 +163,17 @@ export default function EmployeesList({ adminCondoId = 1 }) {
                     }`}
                 >
                     <span>📄 Liquidaciones de Sueldo</span>
+                </button>
+
+                <button
+                    onClick={() => setSubTab('sanctions')}
+                    className={`px-5 py-3 font-bold text-xs uppercase tracking-wider transition-all border-b-2 whitespace-nowrap flex items-center gap-2 ${
+                        subTab === 'sanctions'
+                            ? 'border-rose-600 text-rose-600 dark:text-rose-400 font-black'
+                            : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400'
+                    }`}
+                >
+                    <span>⚠️ Amonestaciones</span>
                 </button>
             </div>
 
@@ -281,17 +295,73 @@ export default function EmployeesList({ adminCondoId = 1 }) {
                             </span>
                         </div>
 
+                        {/* Acciones de Selección y Aprobación en Lote */}
+                        <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
+                            <div className="flex items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if (selectedSupplyIds.length === suppliesList.length) {
+                                            setSelectedSupplyIds([]);
+                                        } else {
+                                            setSelectedSupplyIds(suppliesList.map(s => s.id));
+                                        }
+                                    }}
+                                    className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+                                >
+                                    {selectedSupplyIds.length === suppliesList.length ? 'Desmarcar Todos' : 'Seleccionar Todos'}
+                                </button>
+                                <span className="text-xs text-slate-400">({selectedSupplyIds.length} seleccionados)</span>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (selectedSupplyIds.length === 0) {
+                                        alert('Seleccione al menos un insumo para aprobar.');
+                                        return;
+                                    }
+                                    setSupplyStatus('en_compra');
+                                    setSupplySuccessMsg(`¡${selectedSupplyIds.length} insumos aprobados para compra!`);
+                                    setTimeout(() => setSupplySuccessMsg(''), 4000);
+                                }}
+                                className="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl shadow-xs transition-all"
+                            >
+                                🛒 Aprobar Seleccionados para Compra
+                            </button>
+                        </div>
+
                         {/* Listado de Artículos Solicitados */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                             {suppliesList.map(item => (
-                                <div key={item.id} className="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-1">
+                                <div
+                                    key={item.id}
+                                    onClick={() => {
+                                        setSelectedSupplyIds(prev =>
+                                            prev.includes(item.id) ? prev.filter(i => i !== item.id) : [...prev, item.id]
+                                        );
+                                    }}
+                                    className={`p-3.5 rounded-xl border shadow-2xs space-y-1 cursor-pointer transition-all ${
+                                        selectedSupplyIds.includes(item.id)
+                                            ? 'bg-amber-50/60 dark:bg-amber-950/30 border-amber-400 dark:border-amber-600 ring-1 ring-amber-400'
+                                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'
+                                    }`}
+                                >
                                     <div className="flex justify-between items-start">
-                                        <span className="font-black text-slate-900 dark:text-white text-xs">
-                                            {item.name} <span className="text-indigo-600 dark:text-indigo-400">(x{item.qty})</span>
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedSupplyIds.includes(item.id)}
+                                                onChange={() => {}}
+                                                className="rounded text-amber-600 focus:ring-amber-500"
+                                            />
+                                            <span className="font-black text-slate-900 dark:text-white text-xs">
+                                                {item.name} <span className="text-indigo-600 dark:text-indigo-400">(x{item.qty})</span>
+                                            </span>
+                                        </div>
                                         <span className="text-[9px] font-mono text-slate-400">{item.date}</span>
                                     </div>
-                                    <div className="flex justify-between items-center text-[10px]">
+                                    <div className="flex justify-between items-center text-[10px] pl-6">
                                         <span className="text-slate-500 font-bold uppercase">Categoría: {item.category}</span>
                                         <span className="text-amber-600 font-mono font-bold">{item.status}</span>
                                     </div>
@@ -301,17 +371,31 @@ export default function EmployeesList({ adminCondoId = 1 }) {
 
                         {/* Formulario Registrar Compra de Materiales */}
                         <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-end justify-between gap-3 pt-4">
-                            <div className="w-full md:w-auto flex-1">
-                                <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1">
-                                    Registrar Compra de Materiales: N° Factura o Boleta
-                                </label>
-                                <input
-                                    type="text"
-                                    placeholder="Ej: F-987452"
-                                    value={invoiceNumber}
-                                    onChange={(e) => setInvoiceNumber(e.target.value)}
-                                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 font-mono font-bold text-slate-900 dark:text-white text-xs"
-                                />
+                            <div className="w-full md:w-auto flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1">
+                                        N° Factura o Boleta *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Ej: F-987452"
+                                        value={invoiceNumber}
+                                        onChange={(e) => setInvoiceNumber(e.target.value)}
+                                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 font-mono font-bold text-slate-900 dark:text-white text-xs"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1">
+                                        Monto Total Facturado ($ CLP)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        placeholder="45000"
+                                        value={purchaseAmount}
+                                        onChange={(e) => setPurchaseAmount(e.target.value)}
+                                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 font-mono font-bold text-slate-900 dark:text-white text-xs"
+                                    />
+                                </div>
                             </div>
 
                             <button
@@ -320,7 +404,7 @@ export default function EmployeesList({ adminCondoId = 1 }) {
                                 className="w-full md:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 whitespace-nowrap"
                             >
                                 <span>✅</span>
-                                <span>Marcar Comprado</span>
+                                <span>Registrar Compra & Imputar a Egresos</span>
                             </button>
                         </div>
                     </div>
@@ -364,6 +448,11 @@ export default function EmployeesList({ adminCondoId = 1 }) {
                         ))}
                     </div>
                 </div>
+            )}
+
+            {/* VISTA 4: AMONESTACIONES DE COLABORADORES */}
+            {subTab === 'sanctions' && (
+                <AmonestacionesTab adminCondoId={adminCondoId} employees={employees} />
             )}
 
             {/* MODAL INGRESO DE PERSONAL */}

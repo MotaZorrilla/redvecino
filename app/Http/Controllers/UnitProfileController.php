@@ -37,14 +37,20 @@ class UnitProfileController extends Controller
         $data = $request->validate([
             'parking_spot' => 'nullable|string|max:255',
             'license_plate' => 'nullable|string|max:10',
+            'parking_spots' => 'nullable|array',
+            'parking_spots.*.spot' => 'required_with:parking_spots|string|max:50',
+            'parking_spots.*.plate' => 'nullable|string|max:20',
+            'storage_units' => 'nullable|array',
             'observation' => 'nullable|string',
-            'members' => 'nullable|array',
+            'members' => 'nullable|array|max:3',
             'members.*.first_name' => 'required_with:members|string|max:255',
             'members.*.last_name' => 'required_with:members|string|max:255',
             'members.*.rut' => 'required_with:members|string|max:12',
             'members.*.birth_date' => 'required_with:members|date',
             'members.*.is_owner' => 'sometimes|boolean',
             'members.*.lives_in_unit' => 'sometimes|boolean',
+        ], [
+            'members.max' => 'Una unidad no puede tener más de 3 residentes autorizados registrados.',
         ]);
 
         $profile = UnitProfile::updateOrCreate(
@@ -52,6 +58,8 @@ class UnitProfileController extends Controller
             [
                 'parking_spot' => $data['parking_spot'] ?? null,
                 'license_plate' => $data['license_plate'] ?? null,
+                'parking_spots' => $data['parking_spots'] ?? null,
+                'storage_units' => $data['storage_units'] ?? null,
                 'observation' => $data['observation'] ?? null,
             ]
         );

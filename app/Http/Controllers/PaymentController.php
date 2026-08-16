@@ -30,6 +30,8 @@ class PaymentController extends Controller
             'payment_date' => 'required|date',
             'payment_method' => 'required|string|in:cash,transfer,card,check',
             'reference' => 'nullable|string',
+            'waive_late_fee' => 'nullable|boolean',
+            'waive_reason' => 'nullable|string|max:255',
         ]);
 
         $user = auth()->user();

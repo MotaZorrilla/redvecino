@@ -39,6 +39,7 @@ class HandleInertiaRequests extends Middleware
                     'roles' => $request->user()->getRoleNames(),
                 ] : null,
             ],
+            'app_version' => env('APP_VERSION', 'v0.0.15-dev'),
         ];
     }
 }

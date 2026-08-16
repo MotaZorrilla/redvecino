@@ -218,6 +218,19 @@ export default function UnitDetailModal360({
                         <span>🛠️</span>
                         <span>Tickets ({unitTickets.length})</span>
                     </button>
+
+                    <button
+                        type="button"
+                        onClick={() => setActiveTab('pets')}
+                        className={`px-3 py-1.5 text-xs font-black rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
+                            activeTab === 'pets'
+                                ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-white shadow-xs border border-indigo-500/20'
+                                : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                    >
+                        <span>🐾</span>
+                        <span>Mascotas & Chip</span>
+                    </button>
                 </div>
 
                 {/* TAB 1: COPROPIETARIO & RESIDENTES (CAMPOS EDITABLES) */}
@@ -279,9 +292,18 @@ export default function UnitDetailModal360({
 
                         {/* Ocupantes / Residentes */}
                         <div className="space-y-2">
-                            <h5 className="text-xs font-black uppercase text-slate-400 tracking-wider">
-                                Residentes u Ocupantes Vinculados ({unitUsers.length})
-                            </h5>
+                            <div className="flex items-center justify-between">
+                                <h5 className="text-xs font-black uppercase text-slate-400 tracking-wider">
+                                    Residentes u Ocupantes Vinculados ({unitUsers.length})
+                                </h5>
+                                <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full ${
+                                    unitUsers.length > 3
+                                        ? 'bg-rose-500/15 text-rose-600 border border-rose-500/30'
+                                        : 'bg-emerald-500/15 text-emerald-600 border border-emerald-500/30'
+                                }`}>
+                                    {unitUsers.length > 3 ? '⚠️ Excede Máx. 3 Residentes' : `✅ ${unitUsers.length}/3 Residentes Autorizados`}
+                                </span>
+                            </div>
                             <div className="space-y-2">
                                 {unitUsers.map((user, idx) => (
                                     <div key={user.id || idx} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 text-xs">
@@ -494,6 +516,51 @@ export default function UnitDetailModal360({
                                 ))}
                             </div>
                         )}
+                    </div>
+                )}
+
+                {/* TAB 6: MASCOTAS Y REGISTRO SANITARIO */}
+                {activeTab === 'pets' && (
+                    <div className="space-y-4 animate-fade-in text-left">
+                        <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-md border border-indigo-500/20">
+                                🐾 Ley de Tenencia Responsable de Mascotas (Chile)
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-mono">
+                                Microchip de 15 dígitos & Registro Sanitario
+                            </span>
+                        </div>
+
+                        <div className="space-y-3">
+                            <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center text-xl">
+                                        🐕
+                                    </span>
+                                    <div>
+                                        <h4 className="text-sm font-black text-slate-900 dark:text-white">
+                                            Toby (Golden Retriever)
+                                        </h4>
+                                        <p className="text-[11px] font-mono text-slate-500">
+                                            N° Chip: <span className="font-bold text-slate-800 dark:text-slate-200">941000025874123</span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 px-2.5 py-1 rounded-full">
+                                        ✅ Vacunas al Día
+                                    </span>
+                                    <button
+                                        type="button"
+                                        onClick={() => alert('Visualizando carnet sanitario oficial de vacunas.')}
+                                        className="px-3 py-1 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-bold text-xs rounded-lg hover:underline"
+                                    >
+                                        📄 Ver Carnet
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
 

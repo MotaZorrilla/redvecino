@@ -15,6 +15,8 @@ class PackageCustody extends Model
         'recipient_name',
         'carrier',
         'tracking_number',
+        'photo_path',
+        'notes',
         'status',
         'signature',
         'delivered_at',

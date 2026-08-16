@@ -1,145 +1,41 @@
-# 📜 Bitácora de Desarrollo e Historial del Proyecto (HISTORY) - RedVecino & MiVecino
+# 📜 Historial de Versiones y Changelog — RedVecino & MiVecino
 
-> [!NOTE]
-> Este documento registra la cronología detallada del proyecto **condominio-pro** (RedVecino & MiVecino), los hitos de ingeniería completados, la trazabilidad de auditorías y los resultados de calidad de software (QA). Garantiza el principio de conservación de memoria histórica e integración acumulativa.
-
----
-
-## 📑 Índice de Navegación Rápida
-1. [Consulta y Diagnóstico del Panel de Expertos](#-1-consulta-y-diagnóstico-del-panel-de-expertos)
-2. [Lista de Tareas y Estado de Ejecución (TODO)](#-2-lista-de-tareas-y-estado-de-ejecución-todo)
-3. [Registro de Cambios Cronológico (Walkthrough Fases 1 a 3)](#-3-registro-de-cambios-cronológico-walkthrough-fases-1-a-3)
-4. [Refactorizaciones Backend, Motores Contables y TDD (Fases 4.1 a 4.7)](#-4-refactorizaciones-backend-motores-contables-y-tdd-fases-41-a-47)
-5. [Refactorización Modular de Seeders y Sincronización Malla 1:1 (Fase 4.8)](#-5-refactorización-modular-de-seeders-y-sincronización-malla-11-fase-48)
-6. [Hojas de Ruta Pendientes y Planificación Estratégica](#-6-hojas-de-ruta-pendientes-y-planificación-estratégica)
+Todas las modificaciones notables y evoluciones de este proyecto se documentan formalmente en este archivo siguiendo la especificación [SemVer (Semantic Versioning)](https://semver.org/) y el formato de [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
 
 ---
 
-## 🧠 1. Consulta y Diagnóstico del Panel de Expertos
+## [0.0.15-dev] — 2026-08-16
 
-```mermaid
-graph TD
-    A[Suite de Gestión de Condominios] --> B[RedVecino - Web / Admin / Landing]
-    A --> C[MiVecino - Mobile App / Residentes]
-    
-    subgraph Roles de Expertos
-    D[Experto en Sitios Web] --> B
-    E[Experto en Apps Móviles] --> C
-    F[Experto en Gestión Inmobiliaria] --> A
-    end
-```
+### 🚀 Novedades y Funcionalidades (Fases 1, 2 y 3 del Plan Maestro)
 
-### 1.1 Especialista Senior en Sitios Web y Plataformas SaaS (Web Expert)
-- **Landing Page de RedVecino:** Imagen corporativa robusta en **Azul Marino Profundo** (`#0F2557`) y **Teal/Turquesa** (`#00A896`).
-- **Panel Administrativo (Dashboard Web):** Enfoque *Data-First*. Visualización de recaudación mensual, embudo de tickets y estado de ocupación.
-- **UX Web:** Navegación lateral colapsable, tablas ordenables y modo oscuro nativo.
+#### 👥 Recursos Humanos, Colaboradores & Asistencia
+- **Amonestaciones Laborales Formale (`EmployeeSanctions`):** Registro de sanciones a colaboradores con motivo, descripción, hora y respaldo en PDF/imagen (firmado) conforme a exigencias de la Inspección del Trabajo.
+- **Reloj Control y Asistencia Móvil (`EmployeeAttendance`):** Marcación de entrada y salida con captura de IP, hora y estado de turno.
+- **Solicitud de Insumos & Carrito de Aprobación en Lote (`SupplyOrders`):** Flujo de solicitud desde la vista móvil con alerta destacada en el panel de administración, aprobación masiva y deducción automática como gasto contable en `condo_expenses`.
 
-### 1.2 Especialista Senior en Experiencia Móvil (Mobile App Expert)
-- **Alineación UI/UX Móvil (MiVecino):** Tono cercano con **Verde Césped** (`#72B043`) y **Naranja** (`#EC7A08`).
-- **Layout Móvil:** Cuadrícula táctil de 6 iconos (**Comunicados, Reservas, Pagos, Incidencias, Documentos, Comunidad**) y barra de navegación inferior fija.
+#### 🏢 Unidades, Residentes y Tenencia Responsable (Ley 21.442)
+- **Estacionamientos y Bodegas Múltiples:** Soporte dinámico de 1 o más puestos de estacionamiento, patentes asociadas y bodegas anexas por departamento.
+- **Límite Estricto de 3 Residentes Autorizados:** Validación de un máximo de 3 integrantes por unidad para evitar saturación y mantener la seguridad en conserjería.
+- **Registro Sanitario de Mascotas (Ley Cholito):** Módulo de registro para perros, gatos y otras mascotas con N° de Microchip oficial de 15 dígitos y carnet de vacunas adjunto.
+- **Supermodal 360° de Propiedades:** Navegación por botones bajo demanda (Copropietario, Residentes, Física & Alícuota, Gastos Comunes, Multas, Tickets y Mascotas).
 
-### 1.3 Especialista Senior en Administración de Condominios (Domain Expert)
-- **Transparencia Financiera:** Desglose detallado de ítems contables y comprobantes.
-- **Trazabilidad de Incidencias:** Asignación a colaboradores, notas de reparación y notificaciones en tiempo real.
+#### 🏊 Áreas Comunes, Checklists y Garantías
+- **Protocolo de Inspección Check-In y Check-Out (`FacilityChecklist`):** Evaluación de inventario de quinchos y salas multiuso (mobiliario, parrillas, iluminación, aseo).
+- **Gestión y Retención de Garantías:** Liberación o cobro automático de costos de reparación imputados al residente en caso de daños con respaldo fotográfico.
 
----
+#### 📦 Conserjería & Encomiendas
+- **Módulo Desacoplado de Paquetería (`PackageCustody`):** Registro de paquetes por transportista (Chilexpress, Starken, Blue Express, MercadoLibre) con captura fotográfica y confirmación de entrega con firma digital.
 
-## 🛠️ 2. Lista de Tareas y Estado de Ejecución (TODO)
+#### 💼 Herramientas Comerciales
+- **Cuenta Demo Comercial (`demo@redvecino.cl`):** Usuario preconfigurado para presentaciones de venta y demostraciones en vivo de René Ambiado con 2 condominios realistas cargados.
 
-### 2.1 Identidad Visual y Layouts (Completado)
-- [x] Fusionar repositorio en `condominio-pro`.
-- [x] Configurar tipografía corporativa `Montserrat` en Blade.
-- [x] Implementar pantalla transicional de carga de roles (`RoleTransitionLoader`).
-- [x] Integrar logotipos reales de marca `/images/Logo Redvecino.png` y `/images/Mi Vecino.png`.
-
-### 2.2 Portal Residencial MiVecino (Completado)
-- [x] Marco físico interactivo tipo smartphone responsive.
-- [x] Barra inferior para pulgares (Inicio, Comunidad, +, Chat, Perfil).
-- [x] Módulo de Pagos con simulación QR y reducción de deuda a $0.
-- [x] Módulo de Incidencias con carga de fotos e historial de seguimiento.
-- [x] Módulo de Reservas de amenidades con horario y estado.
+#### 🎨 Identidad & UI
+- **Identificador de Versión en Sidebar:** Badge discreto en el pie del sidebar con indicador de estado operativo en tiempo real (`v0.0.15-dev · Build 2026.08`).
 
 ---
 
-## 📅 3. Registro de Cambios Cronológico (Walkthrough Fases 1 a 3)
-
-### 3.1 Integración de Integración de Auditoría zAux
-- Análisis de la reunión operativa 27/05/2026 y adaptación de casos de uso IA (IA Voice-Tickets, Actas de Asamblea con quórum doble ponderado).
-
-### 3.2 Rediseño de la Estación del Administrador
-- Migración a Sidebar lateral izquierda premium en `slate-950` con ancho maximizado.
-- KPI cards vinculadas con eventos `onClick` para navegación fluida.
-- Soporte para impersonación dinámica de usuario TI con reconmutación inmediata de vistas.
-
----
-
-## 🏗️ 4. Refactorizaciones Backend, Motores Contables y TDD (Fases 4.1 a 4.7)
-
-### 4.1 Refactor F0 → F6 (Agosto 2026)
-- **Backend Adicional:** Entidades `unit_profiles`, `unit_members`, `supply_orders` y endpoints `/condominiums/{id}/finance`.
-- **Mora Parametrizable:** Integración de `late_interest_rate` y `due_day` en `CommonExpenseCalculator`.
-- **Estructura de Alícuotas:** Coeficientes por modelo (Depto `0.045`, Estacionamiento `0.010`, Bodega `0.010`).
-- **Nómina y Liquidaciones:** Integración de liquidaciones de sueldo reales con AFP Habitat, Fonasa 7% y Seguro de Cesantía.
-- **Transaccionales Demo:** Boletas de cobro 2026-07/08 y tickets operacionales vinculados.
-
----
-
-## 🏢 5. Refactorización Modular de Seeders y Sincronización Malla 1:1 (Fase 4.8)
-
-> [!IMPORTANT]
-> **Plan Maestro de Seeders Domain-Driven (`database/seeders`):**
-> Se refactorizó la base de datos completa creando un entorno de datos real y masivo entrelazado sin código espagueti.
-
-### Resumen de Datos Generados
-- **6 Condominios:** 1 Principal (*Altos del Valle*) + 5 Secundarios (*Parque del Inca, Providencia Plaza, Bosques de la Dehesa, Marina Poniente, Portal del Sur*).
-- **240 Propiedades:** Departamentos, estacionamientos y bodegas asignadas.
-- **214 Usuarios y Perfiles Spatie:** Administradores, Comités, Colaboradores, Propietarios y Residentes.
-- **720 Pagos y Transacciones:** Historial de boletas y recaudaciones.
-- **108 Tickets de Soporte Operativo:** Autocreación de categorías e incidencias vinculadas.
-- **72 Reservas:** Quinchos, piscinas y canchas activas.
-
-### Sincronización Malla Arquitectónica Visual
-- Arreglo de importación de `useEffect` en `PropertyStructureBuilder.jsx`.
-- Renderización dinámica en tiempo real de las 60+ unidades por condominio en la Malla Visual alineada 1:1 con el Registro de Unidades.
-- Celdas interactivas en la tabla de **Últimos Pagos Registrados** con redirección directa a la vista de Finanzas.
-
----
-
-## 🔮 6. Hojas de Ruta Pendientes y Planificación Estratégica
-
-1. **Fusión Total de Tablas Financieras Legado:** Migrar completamente las consultas de `CommonExpense` a la arquitectura unificada `CommonExpensePeriod` y `CommonExpenseReceipt`.
-2. **Consola Web de Emergencia TI:** Comandos interactivos adicionales en consola.
-3. **Mantenimiento Preventivo con Fotos:** Obligatoriedad de fotografías en check-in / check-out de áreas comunes.
-
----
-
-## 4.9 Enriquecimiento de Datos Contables Masivos Multi-Condominio v12.0 (Agosto 2026)
-
-Refactorización profunda de `FinancialEngineSeeder.php` e integración con `FinancialCatalogSeeder` para garantizar una distribución rica, diversa y masiva de movimientos financieros en **los 6 condominios del sistema** (*Altos del Valle*, *Parque del Inca*, *Providencia Plaza*, *Bosques de la Dehesa*, *Marina Poniente* y *Portal del Sur*).
-
-### Avances Clave
-- **Integración de Ingresos por Catálogo (1.176 Registros)**:
-  - Generación de ingresos heterogéneos vinculados a propiedades reales en las 7 categorías oficiales: `gastos_comunes` (ordinarios y reserva), `multas` (ruidos, estacionamiento, mascotas, escombros), `arriendo_espacios` (quinchos, salones, pádel), `intereses_mora` (1.5%), `cuotas_extraordinarias` (fachada, ascensores, emergencias), `publicidad_convenio` (antenas, vending) y `otro` (controles de portón, reembolsos).
-
-- **Integración de Egresos por Catálogo (960 Registros)**:
-  - Generación de facturas y pagos operacionales en las 10 categorías oficiales: `personal` (sueldos conserjería, leyes sociales, honorarios), `servicios_basicos` (agua, electricidad, gas, internet), `mantencion` (ascensores, bombas hidropack, portones, piscinas), `seguridad` (guardias nocturnos, CCTV), `limpieza` (productos químicos, bolsas, implementos), `reparacion` (cañerías, techos, iluminación LED, pintura), `seguros` (incendio, responsabilidad civil), `administracion` (artículos oficina, contabilidad, bancos), `fondo_reserva` (ahorro mensual 5%) y `otro` (imprevistos operativos).
-
-- **Ajustes en Tests de Integración (`tests/Feature`)**:
-  - `CommonExpensePeriodReceiptSeeder` integrado formalmente en `DatabaseSeeder.php`.
-  - `DashboardPropsTest.php` actualizado para verificar los 6 condominios reales.
-  - `UserManagementTest.php` actualizado con RUTs dinámicos para prevenir colisiones de datos únicos.
-
-### Verificación Final
-- **Base de Datos**: `php artisan migrate:fresh --seed` genera limpiamente 1.176 Ingresos y 960 Egresos en los 6 condominios.
-- **Backend Tests**: Suite de pruebas Pest -> **100% Pasados en verde (0 errores)**.
-- **Frontend Build**: `npm run build` -> Compilación exitosa en 4.79s.
-
----
-**Última actualización:** 10 de Agosto de 2026 (Enriquecimiento Contable Masivo v12.0 + Suite Pest 100% Verde + Build Frontend)
-**Versión:** 12.0 (1.176 Ingresos, 960 Egresos, 6 Condominios 100% Poblados en Todas las Categorías)
-**Estado:** Entorno local 100% determinista. Suite de pruebas backend y frontend en verde.
----
-
-**Última actualización:** 10 de Agosto de 2026 (Bitácora Consolidada & Documentación Reestructurada v11.3)  
-**Versión:** 11.3 (Modular Domain Seeders, 6 Condos, 240 Props, Malla Visual 1:1, 660+ Tests Passed)  
-**Estado:** Bitácora Activa y Conservada.
+## [0.0.10-alpha] — 2026-08-05
+- **Motor Financiero:** Emisión y cálculo de gastos comunes por coeficiente de alícuota.
+- **Matriz RBAC de 6 Roles:** Administrador, Propietario, Residente, Comité, Colaborador y TI con Spatie Permission.
+- **Libro Diario Contable:** Ingresos y egresos con conciliación bancaria.
+- **Gestión de Incidencias:** Ciclo de vida de tickets de soporte e incidencias edilicias.

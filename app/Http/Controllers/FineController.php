@@ -26,9 +26,29 @@ class FineController extends Controller
             'amount' => 'required|numeric',
             'issued_date' => 'required|date',
             'due_date' => 'required|date',
+            'evidences' => 'nullable|array|max:3',
+            'evidences.*' => 'file|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-        return Fine::create($data);
+        $evidencePaths = [];
+        if ($request->hasFile('evidences')) {
+            foreach ($request->file('evidences') as $file) {
+                $evidencePaths[] = $file->store('fines', 'public');
+            }
+        }
+
+        $fine = Fine::create([
+            'user_id' => $data['user_id'],
+            'property_id' => $data['property_id'],
+            'reason' => $data['reason'],
+            'amount' => $data['amount'],
+            'issued_date' => $data['issued_date'],
+            'due_date' => $data['due_date'],
+            'status' => 'pending',
+            'evidence_paths' => !empty($evidencePaths) ? $evidencePaths : null,
+        ]);
+
+        return response()->json($fine->load(['user', 'property']), 201);
     }
 
     public function update(Request $request, $id)

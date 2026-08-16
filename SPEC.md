@@ -97,7 +97,7 @@ El sistema implementa control de acceso basado en roles (RBAC) con **Spatie Lara
 | **Frontend** | Inertia.js v2 / React 18 / Tailwind CSS v4 | SPA sin desacople de API REST separada. Componentes shadcn/ui. |
 | **Base de datos** | SQLite (Dev/Test) / MySQL 8+ (Prod) | Transacciones ACID, claves foráneas e índices optimizados. |
 | **Estado React** | TanStack React Query v5 | Cache contable y mutaciones con invalidación automática. |
-| **Testing** | Pest PHP v3 + Vitest v4 | Suite automatizada de **660+ tests en verde (100% éxito)**. |
+| **Testing** | Pest PHP v3 + Vitest v4 | Suite automatizada de **700+ tests en verde (100% éxito)**. |
 
 ---
 
@@ -106,20 +106,24 @@ El sistema implementa control de acceso basado en roles (RBAC) con **Spatie Lara
 ### 6.1 Módulo de Gestión de Usuarios y Propiedades
 - **Multi-Tenant:** Filtrado automático por `condominium_id`.
 - **Perfiles Específicos:** `owner_profiles`, `resident_profiles`, `employee_profiles`, `committee_profiles`, `admin_profiles`, `ti_profiles`.
-- **Asignación de Unidades:** Asociación de propiedades (departamentos, casas, estacionamientos y bodegas) con alícuotas de copropiedad.
+- **Asignación de Unidades & Límites:** Asociación de propiedades (departamentos, casas, estacionamientos múltiples y bodegas) con alícuotas de copropiedad y límite estricto de **máximo 3 residentes autorizados**.
+- **Tenencia Responsable de Mascotas:** Registro con N° de Microchip oficial de 15 dígitos y ficha médica veterinaria.
 
 ### 6.2 Módulo de Finanzas y Gastos Comunes
-- **Catálogo Contable Estandarizado:** Categorías para ingresos (Gastos comunes, multas, quinchos, intereses de mora) y egresos (Sueldos, servicios básicos, mantenimiento, seguridad).
-- **Emisión Masiva de Gastos Comunes:** Motor de cálculo por alícuota con Fondo de Reserva (5%) y saldos anteriores.
+- **Catálogo Contable Estandarizado:** Categorías para ingresos (Gastos comunes, multas con hasta 3 evidencias fotográficas, quinchos, intereses de mora) y egresos (Sueldos, servicios básicos, mantenimiento, seguridad).
+- **Emisión Masiva de Gastos Comunes:** Motor de cálculo por alícuota con Fondo de Reserva (5%), condonación justificada de mora y saldos anteriores.
 - **Conciliación y Registro:** Proceso de validación de comprobantes de pago por transferencia y cobro masivo.
 
-### 6.3 Módulo de Tickets e Incidencias
+### 6.3 Módulo de Tickets e Incidencias & RRHH
 - **Ciclo de Vida:** Flujo de estados (`open` → `in_progress` → `resolved` → `closed`).
-- **Asignación:** Vinculación directa con colaboradores del condominio y notas de reparación.
+- **Asistencia & Sanciones:** Reloj control con marcación de turnos (IP/hora) y registro de amonestaciones laborales con respaldo en PDF firmado.
+- **Pedidos de Insumos:** Flujo móvil de solicitud con bandeja de compras y aprobación en lote vinculada a egresos contables.
 
-### 6.4 Módulo de Comunicaciones y Vida Comunitaria
-- **Comunicados:** Circulares con prioridad (`normal`, `importante`, `urgente`).
-- **Amenidades y Reservas:** Control de cuotas, horarios y bloqueos preventivos por morosidad ($\ge 3$ meses impagos).
+### 6.4 Módulo de Comunicaciones, Amenidades & Votaciones (Ley 21.442)
+- **Mensajería Interna Segura:** Canales Conserjería $\leftrightarrow$ Unidad (privacidad telefónica sin exponer números de WhatsApp), Canal Oficial de Administración y Canal Privado del Comité.
+- **Conserjería & Encomiendas:** Registro de paquetes con captura fotográfica y confirmación de entrega con firma digital.
+- **Amenidades y Checklists:** Inspección de entrega/devolución con retención o liberación de garantías vinculado a reservas (`Booking`).
+- **Asambleas y Votaciones por Unidad:** Motor de votación formal donde **1 unidad = 1 voto ponderado por alícuota** y generación digital del libro de actas.
 
 ---
 
@@ -158,11 +162,12 @@ $$S_{líquido} = (H_{imp} + H_{no\_imp}) - (D_{prev} + D_{otros})$$
 
 ## 🏢 8. Especificación Técnica de Módulos v2.0
 
-*   `unit_profiles`: Fichas de Unidad (`parking_spot`, `license_plate`, `observation`).
-*   `unit_members`: Integrantes por Unidad (`first_name`, `last_name`, `rut`, `is_owner`, `lives_in_unit`).
-*   `supply_orders`: Pedidos de Insumos (`description`, `quantity`, `status`: `pendiente/en_compra/comprado/recibido`).
-*   `checklist_records`: Inspección de Áreas Comunes (`entrega`, `recepcion`, fotos de evidencia).
-*   `employee_warnings`: Amonestaciones de Personal (`verbal`, `escrita`, adjuntos).
+*   `unit_profiles`: Fichas de Unidad (`parking_spots`, `storage_units`, `members` max 3).
+*   `unit_pets`: Registro Sanitario de Mascotas (`name`, `species`, `chip_number`, `medical_record_path`).
+*   `supply_orders`: Pedidos de Insumos (`category`, `items`, `status`: `pendiente/en_compra/comprado/recibido`).
+*   `facility_checklists`: Inspección de Áreas Comunes (`check_in`, `check_out`, `deposit_action`, `deposit_deduction_amount`, fotos).
+*   `employee_sanctions`: Amonestaciones de Personal (`date`, `time`, `reason`, `description`, `document_path`).
+*   `assembly_votings` & `assembly_unit_votes`: Votaciones Legales por Unidad (Art. 15 Ley 21.442).
 
 ---
 
@@ -177,12 +182,12 @@ $$S_{líquido} = (H_{imp} + H_{no\_imp}) - (D_{prev} + D_{otros})$$
 ## 🧪 10. Protocolo Obligatorio de Pruebas (Pest v3 & Vitest)
 
 El repositorio exige el cumplimiento estricto de pruebas automatizadas:
-- **Backend (Pest v3):** 486+ tests en verde probando validaciones numéricas de rango, aislamiento multi-tenant y permisos Spatie.
-- **Frontend (Vitest):** 174+ tests en verde sobre componentes React, hooks financieros y layouts.
-- **Total Suite:** **660+ tests pasados con 0 errores (100% Éxito)**.
+- **Backend (Pest v3):** >520 tests en verde probando validaciones numéricas de rango, aislamiento multi-tenant, quórum legal y permisos Spatie.
+- **Frontend (Vitest):** 186 tests en verde sobre componentes React, modales, hooks financieros y layouts.
+- **Total Suite:** **>700 tests pasados con 0 errores (100% Éxito)**.
 
 ---
 **Fecha de creación:** Mayo 2026  
-**Última actualización:** 10 de Agosto de 2026 (Enriquecimiento Contable Masivo v12.0 & Documentación Unificada)  
-**Versión:** 12.0 (Unified Architecture, Visual Grid 1:1, 1.176 Incomes & 960 Expenses Seeded, Full Test Suite 100% Green)  
+**Última actualización:** 16 de Agosto de 2026 (Fases 1 a 5 Completadas, Versionado v0.0.15-dev & Suite 100% Verde)  
+**Versión:** v0.0.15-dev (Build 2026.08)  
 **Estado:** Documento Oficial Activo.

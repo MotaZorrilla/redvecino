@@ -22,6 +22,7 @@ class EmployeeProfile extends Model
         'account_type',
         'account_number',
         'payment_method',
+        'allow_supplies',
     ];
 
     protected function casts(): array
@@ -29,6 +30,7 @@ class EmployeeProfile extends Model
         return [
             'salary' => 'decimal:2',
             'hire_date' => 'date',
+            'allow_supplies' => 'boolean',
         ];
     }
 
@@ -51,4 +53,15 @@ class EmployeeProfile extends Model
     {
         return $this->hasMany(Liquidation::class);
     }
+
+    public function sanctions()
+    {
+        return $this->hasMany(EmployeeSanction::class);
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(EmployeeAttendance::class);
+    }
 }
+

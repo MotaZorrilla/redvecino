@@ -13,8 +13,18 @@ class UnitProfile extends Model
         'property_id',
         'parking_spot',
         'license_plate',
+        'parking_spots',
+        'storage_units',
         'observation',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'parking_spots' => 'array',
+            'storage_units' => 'array',
+        ];
+    }
 
     public function property()
     {

@@ -87,7 +87,7 @@ El sistema implementa un control de acceso basado en roles (RBAC) gestionado a t
 ### 5.2 Filosofía de Calidad y Pruebas (Agente QA)
 *   **Prioridad de Integración:** Se exige el desarrollo de Feature/Integration Tests (usando Pest PHP) para validar las reglas de negocio (ej. importes de cobros numéricos mayores a cero, consistencia en subcategorías contables y aislamiento multi-tenant).
 *   **No Mocks Innecesarios:** Probar contra bases de datos en memoria hidratadas con datos realistas mediante seeders deterministas.
-*   **Suite total:** **486 tests backend** (Pest v3 + PHPUnit) + **174 tests frontend** (Vitest + React Testing Library) = **660 tests, 0 failures (100% Verde).**
+*   **Suite total:** **486 tests backend** (Pest v3 + PHPUnit) + **178 tests frontend** (Vitest + React Testing Library) = **664 tests, 0 failures (100% Verde).**
 *   **arch() tests:** 9 tests estructurales (naming, herencia, Services final, prohibición de debug calls).
 *   **Cobertura de controladores API:** 24/24 controladores cubiertos con tests de integración.
 
@@ -121,15 +121,50 @@ Con base en la auditoría comparativa de la propuesta v2 (`zAux/Redvecino idea v
    * Panel de administración de colaboradores: creación de contratos (3 meses → indefinido), liquidaciones de remuneración (AFP, Fonasa 7%, AFC 0.6%) y registro de amonestaciones.
 6. **Módulo 6 — Pedido de Insumos y Materiales (Prioridad P2 - Medio):** [✅ COMPLETADO al 100%]
    * Flujo de solicitud desde el colaborador hacia el administrador con estados (pendiente, en_compra, comprado) y registro por N° de Factura/Boleta.
-7. **Módulo 7 — Checklist de Entrega y Recepción de Áreas Comunes (Prioridad P2 - Medio):**
-   * Control de check-in / check-out para reservas de amenidades (estado OK/dañado y soporte de fotografías).
-8. **Módulo 8 — Landing / Selector Visual de Portales (Prioridad P3 - Bajo):**
-   * Pantalla inicial interactiva para previsualización directa por rol.
-9. **Módulo 9 — Onboarding Guiado de Primera Entrada (Prioridad P3 - Bajo):**
-   * Asistente de configuración inicial del condominio y categorías contables.
+7. **Módulo 7 — Checklist de Entrega y Recepción de Áreas Comunes (Prioridad P2 - Medio):** [✅ COMPLETADO al 100%]
+   * Control de check-in / check-out para reservas de amenidades (estado OK/dañado, retención/cobro de garantía y evidencia fotográfica).
+8. **Módulo 8 — Asambleas y Votaciones por Unidad (Prioridad P2 - Medio):** [✅ COMPLETADO al 100%]
+   * Motor de votación formal (1 unidad = 1 voto ponderado por alícuota), cálculo de quórum legal (Ley 21.442) y libro digital de actas.
+9. **Módulo 9 — Mensajería Interna Segura (Prioridad P2 - Medio):** [✅ COMPLETADO al 100%]
+   * Canales de comunicación interna (Conserjería $\leftrightarrow$ Unidad sin exponer números telefónicos, Canal Oficial de Administración y Canal Privado del Comité).
 
 ### 7.2 Garantía de Calidad y Pruebas Obligatorias por Módulo (Pest v3)
 De acuerdo con las reglas de desarrollo del repositorio (`AGENTS.md`):
 * **Cero código sin pruebas:** Cada nuevo endpoint, controlador o regla de negocio implementada debe contar con su correspondiente suite de pruebas de integración escrita en sintaxis **Pest v3** (`describe()`, `it()`, `dataset()`) con el sufijo `*Pest.php`.
 * **Criterios de Aceptación:** Se deben evaluar Happy Paths, Unhappy Paths (entradas nulas, montos negativos, accesos no autorizados RBAC) y validaciones de bordes (ej. alícuotas que deben sumar exactamente 100.0000%).
+
+---
+
+## 🏛️ 8. Directrices y Decisiones Clave de Negocio (Reunión Fundacional - René Ambiado)
+
+Acuerdos funcionales y normativos fijados con el Product Owner (René Ambiado):
+
+### 8.1 Modelo de Unidades y Usuarios
+* **El Voto Pertenece a la Unidad:** En asambleas y votaciones, vota la unidad (1 voto por departamento/casa), ya sea a través del propietario o de un delegado acreditado.
+* **Titular Obligado y Límite de Residentes:** El propietario es el usuario principal registrado en la unidad. Se permite un máximo de hasta **3 residentes/arrendatarios autorizados** adicionales para evitar sobrecarga del sistema.
+* **Ficha de Propiedad Bajo Demanda:** Carga de datos modular mediante botones/acordeones interactivos ("Supermodal") para mantener la interfaz ligera y sin sobrecarga visual.
+* **Estacionamientos, Patentes y Bodegas:** Asignación de 1 o más estacionamientos vinculando la patente del vehículo para control de acceso, además de la opción de anexar bodegas/maleteros.
+* **Mascotas (Ley de Tenencia Responsable - Chile):** Registro opcional/obligatorio del N° de Chip y ficha veterinaria en el perfil de la unidad.
+
+### 8.2 Separación Estricta: Tickets vs Encomiendas vs Chat
+* **Incidencias / Tickets Edilicios:** Exclusivos para reportar daños estructurales (ej. cerámicas rotas, filtraciones) o reclamos formales de convivencia.
+  - *Ciclo:* Recibido (`open`) $\to$ Al responder el admin (`in_progress`) $\to$ Resolución y cierre (`resolved` / `closed`).
+  - *Evidencia:* Soporte de 2 a 3 fotografías por ticket.
+* **Avisos de Encomiendas (Conserjería):** No generan tickets; se gestionan como notificaciones rápidas con foto enviadas directamente a la unidad desde la web/móvil de conserjería.
+* **Ecosistema de Mensajería Interna (Sustituto de WhatsApp):**
+  - **Canal Masivo:** Administración / Conserjería $\to$ Toda la comunidad (unidireccional).
+  - **Chat Directo:** Conserjería $\leftrightarrow$ Unidad/Residente protegiendo la privacidad (sin mostrar números de teléfono personales).
+  - **Chat Exclusivo del Comité:** Canal interno para deliberaciones de los miembros del comité.
+  - **Auditoría Central:** Registro histórico accesible por la administración para fines legales.
+
+### 8.3 Operaciones y Recursos Humanos
+* **Solicitudes de Insumos:** El colaborador solicita materiales $\to$ Notificación destacada en el Dashboard del Administrador $\to$ El admin procesa la compra vinculándola al egreso correspondiente con N° de Factura/Boleta.
+* **Gestión Laboral:** Sueldo base registrado en la ficha del colaborador; bonos, descuentos e imposiciones calculados en el generador de liquidaciones. Registro formal de amonestaciones (fecha, hora, motivo) y control de asistencia (entrada/salida).
+
+### 8.4 Finanzas, Mora y Ley de Copropiedad (Ley 21.442)
+* **Regla de Cálculo de Mora:** El interés de mora (ej. 2% mensual) se aplica estrictamente sobre el **saldo insoluto vencido del mes anterior**, no sobre el mes corriente antes de su fecha de vencimiento.
+* **Potestad de Condonación:** El Administrador dispone de la facultad en el sistema de condonar o ajustar el cobro de mora en casos justificados.
+* **Alerta de Corte de Suministro:** A los 3 meses continuos de morosidad, el sistema habilita la notificación y procedimiento legal de corte de suministro eléctrico/servicios.
+* **Arriendos de Áreas Comunes:** El precio sugerido proviene de la configuración del condominio; el administrador puede ajustarlo y, al cancelarse, se asienta automáticamente como ingreso contable.
+
 

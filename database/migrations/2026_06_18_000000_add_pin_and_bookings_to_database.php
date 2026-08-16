@@ -47,6 +47,8 @@ return new class extends Migration
             $table->string('recipient_name');
             $table->string('carrier')->nullable();
             $table->string('tracking_number')->nullable();
+            $table->string('photo_path')->nullable();
+            $table->text('notes')->nullable();
             $table->string('status')->default('custody');
             $table->text('signature')->nullable();
             $table->timestamp('delivered_at')->nullable();

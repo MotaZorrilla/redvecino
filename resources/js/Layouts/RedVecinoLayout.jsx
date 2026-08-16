@@ -250,8 +250,8 @@ export default function RedVecinoLayout({
                     </nav>
                 </div>
 
-                {/* Perfil del Administrador Clickeable */}
-                <div className="p-4">
+                {/* Perfil del Administrador Clickeable y Badge de Versión */}
+                <div className="p-4 space-y-2">
                     <button
                         type="button"
                         onClick={() => setShowUserProfileModal(true)}
@@ -273,6 +273,18 @@ export default function RedVecinoLayout({
                             </div>
                         )}
                     </button>
+
+                    {!sidebarCollapsed && (
+                        <div className="pt-1.5 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between px-1 text-[10px] font-mono text-slate-400 dark:text-slate-500">
+                            <span className="flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                <span>v0.0.15-dev</span>
+                            </span>
+                            <span className="text-[9px] font-sans font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-md">
+                                Build 2026.08
+                            </span>
+                        </div>
+                    )}
                 </div>
             </aside>
 

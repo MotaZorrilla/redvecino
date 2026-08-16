@@ -7,10 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Message extends Model
 {
     protected $fillable = [
+        'condominium_id',
+        'property_id',
+        'channel_type',
         'sender_id',
         'receiver_id',
         'subject',
         'content',
+        'attachment_path',
         'is_read',
         'read_at',
     ];
@@ -21,6 +25,16 @@ class Message extends Model
             'is_read' => 'boolean',
             'read_at' => 'datetime',
         ];
+    }
+
+    public function condominium()
+    {
+        return $this->belongsTo(Condominium::class);
+    }
+
+    public function property()
+    {
+        return $this->belongsTo(Property::class);
     }
 
     public function sender()

@@ -23,6 +23,11 @@ use App\Http\Controllers\Api\CommonExpensePeriodController;
 use App\Http\Controllers\Api\BudgetController;
 use App\Http\Controllers\UnitProfileController;
 use App\Http\Controllers\SupplyOrderController;
+use App\Http\Controllers\EmployeeSanctionController;
+use App\Http\Controllers\EmployeeAttendanceController;
+use App\Http\Controllers\UnitPetController;
+use App\Http\Controllers\FacilityChecklistController;
+use App\Http\Controllers\PackageCustodyController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login-pin', [\App\Http\Controllers\PinLoginController::class, 'loginPin']);
@@ -45,9 +50,20 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::post('/person-wizard', [PersonWizardController::class, 'store']);
     });
 
-    // Facilities
+    // Facilities & Checklists
     Route::get('/facilities', [FacilityController::class, 'index']);
     Route::get('/facilities/{facility}', [FacilityController::class, 'show']);
+    Route::get('/facility-checklists', [FacilityChecklistController::class, 'index']);
+    Route::get('/facility-checklists/{id}', [FacilityChecklistController::class, 'show']);
+    Route::post('/facility-checklists', [FacilityChecklistController::class, 'store']);
+    Route::delete('/facility-checklists/{id}', [FacilityChecklistController::class, 'destroy']);
+
+    // Conserjería: Encomiendas & Paquetería
+    Route::get('/package-custodies', [PackageCustodyController::class, 'index']);
+    Route::get('/package-custodies/{id}', [PackageCustodyController::class, 'show']);
+    Route::post('/package-custodies', [PackageCustodyController::class, 'store']);
+    Route::put('/package-custodies/{id}/deliver', [PackageCustodyController::class, 'deliver']);
+    Route::delete('/package-custodies/{id}', [PackageCustodyController::class, 'destroy']);
     Route::middleware('can:manage users')->group(function () {
         Route::post('/facilities', [FacilityController::class, 'store']);
         Route::put('/facilities/{facility}', [FacilityController::class, 'update']);
@@ -62,7 +78,19 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::post('/hr/liquidations', [HRController::class, 'saveLiquidation']);
         Route::put('/hr/liquidations/{id}', [HRController::class, 'updateLiquidation']);
         Route::delete('/hr/liquidations/{id}', [HRController::class, 'deleteLiquidation']);
+
+        // Amonestaciones de Colaboradores
+        Route::get('/employee-sanctions', [EmployeeSanctionController::class, 'index']);
+        Route::get('/employee-sanctions/{id}', [EmployeeSanctionController::class, 'show']);
+        Route::post('/employee-sanctions', [EmployeeSanctionController::class, 'store']);
+        Route::delete('/employee-sanctions/{id}', [EmployeeSanctionController::class, 'destroy']);
     });
+
+    // Reloj Control y Asistencia de Colaboradores (Accesible por Colaborador & Admin)
+    Route::get('/employee-attendances/today-status', [EmployeeAttendanceController::class, 'todayStatus']);
+    Route::post('/employee-attendances/check-in', [EmployeeAttendanceController::class, 'checkIn']);
+    Route::post('/employee-attendances/{id}/check-out', [EmployeeAttendanceController::class, 'checkOut']);
+    Route::get('/employee-attendances', [EmployeeAttendanceController::class, 'index']);
     Route::get('/properties', [PropertyController::class, 'index']);
     Route::get('/properties/{id}', [PropertyController::class, 'show']);
     Route::middleware('can:configure system')->group(function () {
@@ -85,12 +113,19 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
     Route::middleware('can:manage users')->group(function () {
         Route::get('/unit-profiles/{propertyId}', [UnitProfileController::class, 'show']);
         Route::post('/unit-profiles/{propertyId}', [UnitProfileController::class, 'upsert']);
+
+        // Registro de Mascotas (Tenencia Responsable)
+        Route::get('/unit-pets', [UnitPetController::class, 'index']);
+        Route::get('/unit-pets/{id}', [UnitPetController::class, 'show']);
+        Route::post('/unit-pets', [UnitPetController::class, 'store']);
+        Route::delete('/unit-pets/{id}', [UnitPetController::class, 'destroy']);
     });
 
     // Pedidos de Materiales e Insumos
     Route::get('/supply-orders', [SupplyOrderController::class, 'index']);
     Route::post('/supply-orders', [SupplyOrderController::class, 'store']);
     Route::middleware('can:approve expenses')->group(function () {
+        Route::post('/supply-orders/bulk-approve', [SupplyOrderController::class, 'bulkApprove']);
         Route::put('/supply-orders/{id}/approve', [SupplyOrderController::class, 'approve']);
         Route::put('/supply-orders/{id}/mark-purchased', [SupplyOrderController::class, 'markPurchased']);
         Route::put('/supply-orders/{id}/mark-received', [SupplyOrderController::class, 'markReceived']);
@@ -199,9 +234,14 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
     Route::put('/bookings/{booking}', [\App\Http\Controllers\Api\BookingController::class, 'update']);
     Route::post('/qr-invitations', [\App\Http\Controllers\Api\QrInvitationController::class, 'store']);
     Route::post('/qr-invitations/verify', [\App\Http\Controllers\Api\QrInvitationController::class, 'verify']);
-    Route::post('/package-custodies', [\App\Http\Controllers\Api\PackageCustodyController::class, 'store']);
-    Route::put('/package-custodies/{id}/deliver', [\App\Http\Controllers\Api\PackageCustodyController::class, 'deliver']);
     Route::post('/quorum-calculation', [\App\Http\Controllers\Api\AssemblyQuorumController::class, 'calculate']);
     Route::post('/funds/transfer', [\App\Http\Controllers\Api\FundTransferController::class, 'transfer']);
+
+    // 9. Votaciones Formales de Asamblea por Unidad (Ley 21.442)
+    Route::get('/assembly-votings', [\App\Http\Controllers\AssemblyVotingController::class, 'index']);
+    Route::get('/assembly-votings/{id}', [\App\Http\Controllers\AssemblyVotingController::class, 'show']);
+    Route::post('/assembly-votings', [\App\Http\Controllers\AssemblyVotingController::class, 'store']);
+    Route::post('/assembly-votings/{id}/vote', [\App\Http\Controllers\AssemblyVotingController::class, 'castVote']);
+    Route::put('/assembly-votings/{id}/close', [\App\Http\Controllers\AssemblyVotingController::class, 'close']);
 });
 

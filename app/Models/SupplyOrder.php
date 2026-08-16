@@ -15,8 +15,11 @@ class SupplyOrder extends Model
         'description',
         'quantity',
         'unit',
+        'category',
+        'notes',
         'status',
         'purchase_document',
+        'condo_expense_id',
     ];
 
     public function condominium()
@@ -27,5 +30,10 @@ class SupplyOrder extends Model
     public function employeeProfile()
     {
         return $this->belongsTo(EmployeeProfile::class);
+    }
+
+    public function condoExpense()
+    {
+        return $this->belongsTo(CondoExpense::class, 'condo_expense_id');
     }
 }

@@ -2,46 +2,76 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\MessageRequest;
 use App\Models\Message;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MessageController extends Controller
 {
-    public function index()
+    public function index(Request $request): JsonResponse
     {
-        $userId = request()->user()->id;
-        return Message::where('sender_id', $userId)
-            ->orWhere('receiver_id', $userId)
-            ->with(['sender', 'receiver'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        $userId = $request->user()->id;
+        $condoId = $request->query('condominium_id');
+        $channelType = $request->query('channel_type');
+        $propertyId = $request->query('property_id');
+
+        $messages = Message::with(['sender', 'receiver', 'property'])
+            ->when($condoId, fn ($q) => $q->where('condominium_id', $condoId))
+            ->when($channelType, fn ($q) => $q->where('channel_type', $channelType))
+            ->when($propertyId, fn ($q) => $q->where('property_id', $propertyId))
+            ->when(!$channelType || $channelType === 'directo', function ($q) use ($userId) {
+                $q->where(function ($sub) use ($userId) {
+                    $sub->where('sender_id', $userId)
+                        ->orWhere('receiver_id', $userId);
+                });
+            })
+            ->latest()
+            ->paginate(30);
+
+        return response()->json($messages);
     }
 
-    public function store(Request $request)
+    public function show(int $id): JsonResponse
     {
-        $data = $request->validate([
-            'receiver_id' => 'required|exists:users,id',
-            'subject' => 'required|string|max:255',
-            'content' => 'required|string',
+        $message = Message::with(['sender', 'receiver', 'property'])->findOrFail($id);
+        return response()->json($message);
+    }
+
+    public function store(MessageRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+        $attachmentPath = null;
+
+        $file = $request->file('attachment') ?? $request->attachment ?? ($data['attachment'] ?? null);
+        if ($file instanceof \Illuminate\Http\UploadedFile) {
+            $attachmentPath = $file->store('messages', 'public');
+        }
+
+        $message = Message::create([
+            'condominium_id' => $data['condominium_id'],
+            'property_id' => $data['property_id'] ?? null,
+            'channel_type' => $data['channel_type'],
+            'sender_id' => $request->user()->id,
+            'receiver_id' => $data['receiver_id'] ?? null,
+            'subject' => $data['subject'] ?? 'Mensaje de Comunidad',
+            'content' => $data['content'],
+            'attachment_path' => $attachmentPath,
+            'is_read' => false,
         ]);
 
-        $data['sender_id'] = $request->user()->id;
-
-        return Message::create($data)->load(['sender', 'receiver']);
+        return response()->json($message->load(['sender', 'receiver', 'property']), 201);
     }
 
-    public function markAsRead($id)
+    public function markAsRead(Request $request, int $id): JsonResponse
     {
         $message = Message::findOrFail($id);
-        
-        if ($message->receiver_id !== auth()->id()) {
-            abort(403, 'No puedes marcar como leido un mensaje dirigido a otro usuario.');
-        }
 
         $message->update([
             'is_read' => true,
             'read_at' => now(),
         ]);
-        return $message;
+
+        return response()->json($message);
     }
 }

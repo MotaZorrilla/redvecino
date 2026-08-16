@@ -46,9 +46,13 @@ class DatabaseSeeder extends Seeder
             AnnouncementsSeeder::class,
             MessagesSeeder::class,
 
-            // 10. Operational Checklists & Supply Orders
+            // 10. Operational Checklists, Supply Orders & Employee Sanctions
             ChecklistSeeder::class,
+            ChecklistsAmenidadesSeeder::class,
             SupplyOrderSeeder::class,
+            EmployeeSanctionsSeeder::class,
+            AssemblyVotingsSeeder::class,
+            CommercialDemoSeeder::class,
         ]);
 
         $this->command->info('🎉 Master Database Seeding completed successfully with hyperrealistic data!');

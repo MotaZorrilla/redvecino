@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Modal from '@/Components/Modal';
 import { useBookings, mapBookingToPanel } from '@/hooks/useBookings';
+import AmenityChecklistModal from '@/Components/Admin/AmenityChecklistModal';
 
 export default function AmenitiesBookingPanel({ adminCondoId = 1 }) {
     const { data: realBookings = [] } = useBookings(true);
@@ -29,6 +30,7 @@ export default function AmenitiesBookingPanel({ adminCondoId = 1 }) {
 
     const [selectedAmenityFilter, setSelectedAmenityFilter] = useState('all');
     const [showNewBookingModal, setShowNewBookingModal] = useState(false);
+    const [checklistBooking, setChecklistBooking] = useState(null);
 
     // Merge reservas reales desde /api/bookings (fuente de verdad cuando existen).
     useEffect(() => {
@@ -306,16 +308,27 @@ export default function AmenitiesBookingPanel({ adminCondoId = 1 }) {
                                         </span>
                                     </td>
                                     <td className="py-3 px-4 text-right font-sans">
-                                        {b.status === 'Realizado' ? (
-                                            <span className="text-[10px] text-slate-400 font-normal">Realizado</span>
-                                        ) : (
+                                        <div className="flex items-center justify-end gap-1.5">
                                             <button
-                                                onClick={() => handleMarkRealized(b.id)}
-                                                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black rounded-lg shadow-sm transition-all whitespace-nowrap"
+                                                type="button"
+                                                onClick={() => setChecklistBooking(b)}
+                                                className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 text-[11px] font-bold rounded-lg border border-indigo-200 dark:border-indigo-800 transition-all flex items-center gap-1"
+                                                title="Protocolo de Inspección Check-in / Check-out"
                                             >
-                                                Marcar Realizado
+                                                <span>📋</span>
+                                                <span>Inspección</span>
                                             </button>
-                                        )}
+                                            {b.status === 'Realizado' ? (
+                                                <span className="text-[10px] text-slate-400 font-normal">Realizado</span>
+                                            ) : (
+                                                <button
+                                                    onClick={() => handleMarkRealized(b.id)}
+                                                    className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black rounded-lg shadow-sm transition-all whitespace-nowrap"
+                                                >
+                                                    Marcar Realizado
+                                                </button>
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -425,6 +438,16 @@ export default function AmenitiesBookingPanel({ adminCondoId = 1 }) {
                     </div>
                 </form>
             </Modal>
+
+            {/* MODAL CHECKLIST DE INSPECCIÓN Y ENTREGAS */}
+            <AmenityChecklistModal
+                isOpen={!!checklistBooking}
+                onClose={() => setChecklistBooking(null)}
+                booking={checklistBooking}
+                onSaved={(checklist) => {
+                    alert('Inspección y checklist registrados exitosamente.');
+                }}
+            />
         </div>
     );
 }

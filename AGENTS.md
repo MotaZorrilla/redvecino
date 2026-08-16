@@ -73,7 +73,7 @@ Seeders del demo (deterministas e idempotentes, registrados en `DatabaseSeeder::
 
 ## 📊 Estado Actual de la Suite de Pruebas (Verificado en Verde)
 - **Backend (PHP / Laravel / Pest v3):** 486 passed (2534 assertions) con `php artisan test`.
-- **Frontend (React / Vitest):** 174 passed con `npm run test:frontend`.
+- **Frontend (React / Vitest):** 178 passed con `npm run test:frontend`.
 - **Verificación obligatoria:** Todo cambio debe mantener la suite 100% en verde antes de cada commit.
 
 ---
@@ -96,3 +96,118 @@ Si eres un agente de IA trabajando en este proyecto, **debes seguir estas reglas
 9.  **Float vs Int en Pest:** Usar `->toEqual()` (igualdad suelta `==`) para valores decimales y `->toBe()` (identidad estricta `===`) para int/string/bool. `80000.0 !== 80000` en PHP.
 10. **Datasets en Pest:** No usar closures que llamen `app()` o servicios — se evalúan en carga de clase antes del bootstrap. Preferir bucles inline dentro del test.
 11. **Campos Obligatorios:** `payment_method` es requerido en `Payment::create()`. `created_by` es requerido en tickets y announcements.
+
+---
+
+## 🔄 4. Flujo de Trabajo y Sincronización con Repositorio de Prototipos (`redvecino_beta`)
+
+Para la colaboración con el dueño del proyecto que itera rápidamente en un repositorio separado con asistencia de IA:
+
+* **Repositorio de Referencia/Prototipo:** `https://github.com/ambiado/redvecino_beta.git`
+* **Ubicación Local Recomendada:** Fuera de este repositorio (ej. `C:\xampp\htdocs\redvecino_beta`) para evitar anidación de repositorios Git, conflictos en el staging o colisiones de dependencias.
+* **Modelo Conceptual:** El repositorio `redvecino_beta` actúa como una **especificación funcional viva / mockup interactivo**, mientras que este repositorio (`redvecino`) es la **implementación de producción** (arquitectura robusta, multi-inquilino, RBAC y cobertura total de tests).
+
+### Ciclo de Portado e Integración:
+1. **Pull en el Prototipo:** Actualizar la copia local de `redvecino_beta` (`git pull`).
+2. **Análisis de Requerimientos:** Identificar las nuevas pantallas, campos o flujos de usuario ideados por el dueño.
+3. **Implementación Robusta:** Trasladar la UI y lógica a los componentes React/Inertia y controladores de Laravel en `redvecino`, aplicando validaciones, RBAC y multi-tenancy.
+4. **Protección TDD:** Escribir los tests de integración correspondientes en sintaxis Pest (`tests/Feature/*Pest.php`).
+5. **Verificación Estricta:** Ejecutar y validar que la suite completa pase al 100%:
+   ```bash
+   php artisan test
+   npm run test:frontend
+   ```
+
+---
+
+## 🏗️ 5. Estándares de Arquitectura Limpia, No Monolítica y Plan Maestro TODO
+
+Para mantener la máxima mantenibilidad y evitar la degradación del código:
+
+### 5.1 Principios de Código No Monolítico y Cero Código Espagueti
+1. **Backend en Capas Estrictas:**
+   - **Controladores Delgados (*Skinny Controllers*):** Máximo 80-100 líneas. Solo orquestan la petición, delegan en FormRequests y devuelven respuestas Inertia/JSON.
+   - **Validación Aislada:** Cero validaciones `$request->validate([...])` inline en controladores; usar siempre **FormRequests dedicados** (`app/Http/Requests/*`).
+   - **Lógica de Negocio en Servicios:** Cálculos complejos (mora, quórums, liquidaciones, aprobaciones masivas) residen en clases `app/Services/*`.
+   - **Aislamiento Multi-Condominio Automático:** Toda consulta a base de datos debe pasar por scopes locales o filtrar explícitamente por `condominium_id`.
+2. **Frontend Modular y Atómico (React 18 + Inertia):**
+   - **Cero Componentes Monolíticos:** Dividir vistas extensas en subcomponentes atómicos (`Components/*`, `Modals/*`, `Hooks/*`).
+   - **Lógica Extraída en Custom Hooks:** Manejo de formularios, llamadas API y estados complejos encapsulados en `resources/js/Hooks/*`.
+   - **Estilo de Marca Estricto:** **RedVecino** (`#0F2557` Azul Marino, `#00A896` Teal) para web administrativa; **MiVecino** (`#72B043` Verde Césped, `#EC7A08` Naranja) para web-app móvil. Tipografía `Montserrat`.
+3. **Seeders Modulares y Deterministas:**
+   - Cada nuevo módulo **debe** contar con su propio seeder (`database/seeders/*Seeder.php`), idempotente, determinista y registrado en `DatabaseSeeder::run()`.
+4. **Desarrollo Guiado por Pruebas (TDD):**
+   - Nuevos endpoints acompañados de tests `tests/Feature/*Pest.php` probando caminos felices y *unhappy paths* (montos negativos, inyecciones, violaciones RBAC).
+   - Componentes frontend acompañados de tests unitarios `resources/js/**/*.test.{js,jsx}` en Vitest.
+
+---
+
+### 📋 5.2 Lista Maestra de Tareas (Master TODO)
+
+#### 🚀 FASE 1: Operaciones de RRHH, Amonestaciones y Pedidos de Insumos (Prioridad P0)
+- [x] **1.1 Amonestaciones de Colaboradores (Backend):**
+  - [x] Migración `colaborador_amonestaciones` / `employee_sanctions`.
+  - [x] Modelo `EmployeeSanction` con relaciones y storage seguro.
+  - [x] `EmployeeSanctionRequest` con validaciones de tipo de archivo y fechas.
+  - [x] `EmployeeSanctionController` (CRUD con RBAC).
+  - [x] Suite de pruebas Pest: `tests/Feature/EmployeeSanctionsPest.php`.
+- [x] **1.2 Amonestaciones de Colaboradores (Frontend):**
+  - [x] Subcomponente integrado dentro de la ficha de colaboradores.
+  - [x] Modal de registro con subida de archivo y visor de adjuntos.
+- [x] **1.3 Pedidos de Insumos y Aprobación Masiva (Backend):**
+  - [x] Migración `supply_orders` (`condominium_id`, `category`, `items`, `status`, `expense_id`).
+  - [x] `SupplyOrderRequest` y `SupplyOrderController` con endpoints de cambio de estado y aprobación masiva.
+  - [x] Integración transaccional con el catálogo de `expenses`.
+  - [x] Suite de pruebas Pest: `tests/Feature/PedidosInsumosEstadosPest.php`.
+- [x] **1.4 Pedidos de Insumos (Frontend):**
+  - [x] Formulario de solicitud de insumos en la vista móvil de colaboradores.
+  - [x] Bandeja de aprobación de compras tipo carrito en el panel de administrador.
+- [x] **1.5 Seeders Fase 1:**
+  - [x] Crear `EmployeeSanctionsSeeder.php`, `SupplyOrderSeeder.php` y `CommercialDemoSeeder.php` integrados en `DatabaseSeeder.php`.
+
+#### 🏢 FASE 2: Gestión de Unidades, Residentes y Tenencia Responsable (Prioridad P1)
+- [x] **2.1 Estacionamientos y Patentes Dinámicas:**
+  - [x] Soporte de asignación múltiple de estacionamientos y patentes por unidad.
+  - [x] Validación y gestión dinámica en `UnitDetailModal360.jsx`.
+  - [x] Suite Pest: `tests/Feature/EstacionamientosYResidentesLimitePest.php`.
+- [x] **2.2 Límite de Residentes por Unidad:**
+  - [x] Regla de validación estricta de **máximo 3 residentes autorizados** en `UnitProfileController`.
+  - [x] Suite Pest: `tests/Feature/EstacionamientosYResidentesLimitePest.php`.
+- [x] **2.3 Mascotas y Registro Sanitario (Ley de Copropiedad):**
+  - [x] Migración `unit_pets` con microchip oficial de 15 dígitos y ficha médica.
+  - [x] Visualización en la ficha de propiedad bajo demanda (*Supermodal 360°*).
+  - [x] Suite Pest: `tests/Feature/MascotasRegistroSanitarioPest.php`.
+
+#### 🏊 FASE 3: Checklist de Amenidades y Entrega de Áreas Comunes (Prioridad P1)
+- [x] **3.1 Checklist de Inspección (Backend):**
+  - [x] Migración `facility_checklists` con items status, fotos y control de garantías.
+  - [x] `FacilityChecklistController` con endpoints de Check-in y Check-out vinculado a reservas (`Booking`).
+  - [x] Suite Pest: `tests/Feature/ChecklistAmenidadesPest.php`.
+- [x] **3.2 Checklist de Inspección (Frontend):**
+  - [x] Modal interactivo `AmenityChecklistModal.jsx` con switches de estado (OK/Dañado) y carga de evidencia fotográfica.
+  - [x] Test frontend en Vitest: `AmenityChecklistModal.test.jsx`.
+- [x] **3.3 Seeders Fase 3:**
+  - [x] Crear `ChecklistsAmenidadesSeeder.php`.
+
+#### 💬 FASE 4: Ecosistema de Comunicación y Encomiendas (Prioridad P2)
+- [x] **4.1 Desacople de Encomiendas:**
+  - [x] Módulo dedicado de encomiendas de conserjería (`PackageCustody`) con captura fotográfica y firma digital.
+  - [x] Suite Pest: `tests/Feature/EncomiendasConserjeriaPest.php`.
+- [x] **4.2 Mensajería Interna (Alternativa a WhatsApp):**
+  - [x] Chat directo Conserjería $\leftrightarrow$ Unidad con privacidad de teléfonos.
+  - [x] Canal oficial de Administración y canal privado del Comité.
+  - [x] Suite Pest: `tests/Feature/MensajeriaInternaSeguraPest.php`.
+
+#### 🗳️ FASE 5: Asambleas y Votaciones por Unidad (Prioridad P2)
+- [x] **5.1 Votaciones Formales (Ley 21.442):**
+  - [x] Motor de votación por Unidad (1 voto por departamento con alícuota proporcional).
+  - [x] Registro y visualización en `MeetingsMinutes.jsx` con cálculo de quórum legal.
+  - [x] Seeder determinista: `AssemblyVotingsSeeder.php`.
+  - [x] Suite Pest: `tests/Feature/AsambleasVotacionesLegalesPest.php`.
+
+#### 💎 FASE 6: Pulido UX, Perfil Admin y Auditorías de Calidad (Prioridad P3)
+- [ ] **6.1 Perfil de Administrador:**
+  - [ ] Subida de avatar y actualización de datos de contacto del administrador.
+- [ ] **6.2 Auditoría de Calidad Completa:**
+  - [ ] Auditoría de Rendimiento, Seguridad, SEO/Accesibilidad y Buenas Prácticas Laravel.
+  - [ ] Verificación final de suite 100% en verde (>700 tests combinados).
