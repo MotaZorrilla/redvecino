@@ -16,7 +16,6 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TiCommandController;
 use App\Http\Controllers\TiPermissionController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\RoadmapFeaturesController;
 use App\Http\Controllers\CondominiumController;
 use App\Http\Controllers\CondominiumSetupController;
 use App\Http\Controllers\Api\CommonExpensePeriodController;
@@ -34,6 +33,8 @@ Route::post('/login-pin', [\App\Http\Controllers\PinLoginController::class, 'log
 
 Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
     Route::get('/user', fn(Request $r) => $r->user());
+    Route::post('/profile', [\App\Http\Controllers\ProfileController::class, 'update']);
+    Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update']);
 
     // 1. Users Management
     Route::middleware('can:manage users')->group(function () {

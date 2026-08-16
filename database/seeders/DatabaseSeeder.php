@@ -51,6 +51,7 @@ class DatabaseSeeder extends Seeder
             ChecklistsAmenidadesSeeder::class,
             SupplyOrderSeeder::class,
             EmployeeSanctionsSeeder::class,
+            PackageCustodySeeder::class,
             AssemblyVotingsSeeder::class,
             CommercialDemoSeeder::class,
         ]);

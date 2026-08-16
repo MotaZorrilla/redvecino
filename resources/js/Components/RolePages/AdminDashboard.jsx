@@ -10,6 +10,9 @@ import SettingsPanel from '@/Components/Admin/SettingsPanel';
 import PersonWizard from '@/Components/Admin/PersonWizard';
 import CondoProfilePanel from '@/Components/Admin/CondoProfilePanel';
 import EmployeesList from '@/Components/Admin/EmployeesList';
+import AmenitiesBookingPanel from '@/Components/Admin/AmenitiesBookingPanel';
+import PackageDelivery from '@/Components/Colaborador/PackageDelivery';
+import MeetingsMinutes from '@/Components/Comite/MeetingsMinutes';
 
 export default function AdminDashboard({
     user, condosList, adminCondoId, setAdminCondoId, adminActiveTab, setAdminActiveTab, allCondominiums,
@@ -216,6 +219,15 @@ export default function AdminDashboard({
             )}
             {adminActiveTab === 'employees' && (
                 <EmployeesList adminCondoId={adminCondoId} />
+            )}
+            {adminActiveTab === 'amenities' && (
+                <AmenitiesBookingPanel adminCondoId={adminCondoId} />
+            )}
+            {adminActiveTab === 'packages' && (
+                <PackageDelivery packages={[]} adminCondoId={adminCondoId} />
+            )}
+            {adminActiveTab === 'actas' && (
+                <MeetingsMinutes adminCondoId={adminCondoId} />
             )}
             {adminActiveTab === 'condo_profile' && (
                 <CondoProfilePanel

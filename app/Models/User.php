@@ -19,6 +19,7 @@ class User extends Authenticatable
         'name',
         'rut',
         'email',
+        'avatar_path',
         'phone',
         'password',
         'pin',

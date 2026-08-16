@@ -4,7 +4,7 @@ import {
     Monitor, Shield, Users, Building2, Bug, 
     LayoutDashboard, Wrench, CircleDollarSign, Scale, 
     PanelLeftClose, PanelLeft, Sun, Moon, LogOut,
-    MessageSquare, FileText
+    MessageSquare, FileText, Sparkles, Package
 } from 'lucide-react';
 import Modal from '@/Components/Modal';
 
@@ -37,17 +37,42 @@ export default function RedVecinoLayout({
     const [isSavingProfile, setIsSavingProfile] = useState(false);
     const [profileSuccessMsg, setProfileSuccessMsg] = useState('');
 
-    const handleProfileSubmit = (e) => {
+    const [avatarFile, setAvatarFile] = useState(null);
+    const [avatarPreview, setAvatarPreview] = useState(user?.avatar_path ? `/storage/${user.avatar_path}` : null);
+
+    const handleAvatarChange = (e) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setAvatarFile(file);
+            setAvatarPreview(URL.createObjectURL(file));
+        }
+    };
+
+    const handleProfileSubmit = async (e) => {
         e.preventDefault();
         setIsSavingProfile(true);
-        setTimeout(() => {
+        try {
+            const formData = new FormData();
+            formData.append('name', profileForm.name);
+            formData.append('email', profileForm.email);
+            if (profileForm.rut) formData.append('rut', profileForm.rut);
+            if (profileForm.phone) formData.append('phone', profileForm.phone);
+            if (avatarFile) formData.append('avatar', avatarFile);
+
+            await axios.post('/api/profile', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
             setIsSavingProfile(false);
-            setProfileSuccessMsg('¡Perfil actualizado con éxito!');
+            setProfileSuccessMsg('¡Perfil y foto actualizados con éxito!');
             setTimeout(() => {
                 setProfileSuccessMsg('');
                 setShowUserProfileModal(false);
             }, 1200);
-        }, 600);
+        } catch (err) {
+            setIsSavingProfile(false);
+            setProfileSuccessMsg('Error al actualizar perfil');
+        }
     };
 
     const SIDEBAR_W = sidebarCollapsed ? 'w-16' : 'w-64';
@@ -115,7 +140,10 @@ export default function RedVecinoLayout({
                     { id: 'employees', icon: Users, label: 'Colaboradores', desc: 'Personal y RRHH' },
                     { id: 'payments', icon: CircleDollarSign, label: 'Finanzas', desc: 'Libro diario, recaudación y egresos' },
                     { id: 'fines', icon: Scale, label: 'Multas', desc: 'Infracciones y cargos' },
-                    { id: 'condo_profile', icon: Building2, label: 'Perfil Condominio', desc: 'Datos, alícuotas y amenidades' },
+                    { id: 'amenities', icon: Sparkles, label: 'Espacios Comunes', desc: 'Amenidades, reservas y checklists' },
+                    { id: 'packages', icon: Package, label: 'Encomiendas', desc: 'Recepción y firmas de entrega' },
+                    { id: 'actas', icon: FileText, label: 'Actas & Votaciones', desc: 'Asambleas y Ley 21.442' },
+                    { id: 'condo_profile', icon: Building2, label: 'Perfil Condominio', desc: 'Datos, alícuotas y estructura' },
                 ];
             case 'comite':
                 return [
@@ -474,6 +502,28 @@ export default function RedVecinoLayout({
                     )}
 
                     <div className="space-y-4 text-xs">
+                        {/* Avatar Picker & Preview */}
+                        <div className="flex items-center gap-4 p-3 bg-slate-50 dark:bg-slate-950/60 rounded-2xl border border-slate-200 dark:border-slate-800">
+                            <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center overflow-hidden flex-shrink-0">
+                                {avatarPreview ? (
+                                    <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
+                                ) : (
+                                    <span className="text-base font-black text-indigo-600 dark:text-indigo-400">
+                                        {profileForm.name.slice(0, 2).toUpperCase()}
+                                    </span>
+                                )}
+                            </div>
+                            <div className="flex-1">
+                                <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1">Foto / Avatar de Perfil</label>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleAvatarChange}
+                                    className="w-full text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-950 dark:file:text-indigo-400 cursor-pointer"
+                                />
+                            </div>
+                        </div>
+
                         <div>
                             <label className="block text-[10px] font-extrabold uppercase text-slate-400 mb-1">Nombre Completo del Administrador</label>
                             <input 
