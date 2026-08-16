@@ -179,15 +179,39 @@ $$S_{líquido} = (H_{imp} + H_{no\_imp}) - (D_{prev} + D_{otros})$$
 
 ---
 
-## 🧪 10. Protocolo Obligatorio de Pruebas (Pest v3 & Vitest)
+## 🏗️ 11. Arquitectura "Skinny Code" (Clean Architecture)
+
+Para garantizar la máxima mantenibilidad y evitar la degradación técnica del código:
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        ARQUITECTURA MODULAR "SKINNY CODE"                              │
+├────────────────────────┬───────────────────────────────┬───────────────────────────────┤
+│  1. SKINNY BACKEND     │     2. SKINNY RESOURCES       │      3. SKINNY DATABASE       │
+│  (Controllers < 100L)  │     (Componentes < 120L)      │      (Modelos & Seeders)      │
+├────────────────────────┼───────────────────────────────┼───────────────────────────────┤
+│ • FormRequests aislados│ • Custom Hooks para lógica    │ • Micro-migraciones atómicas  │
+│ • Services para cálculo│ • Componentes de UI "Puros"   │ • Traits para scopes y casts  │
+│ • Skinny Controllers   │ • Sub-modales desacoplados    │ • Seeders modulares < 60L     │
+└────────────────────────┴───────────────────────────────┴───────────────────────────────┘
+```
+
+* **Skinny Controllers (<100 líneas):** Controladores delgados que delegan validaciones en FormRequests dedicados (`ExpenseRequest`, `FineRequest`, `PaymentRequest`, `FacilityRequest`, `MessageRequest`, `AssemblyVotingRequest`, `EmployeeSanctionRequest`, `SupplyOrderRequest`) y lógica compleja en Servicios.
+* **Skinny Resources (<120 líneas):** Componentes atómicos desacoplados (`CondoGeneralTab`, `CondoUnitTypesTab`, `CondoCommonAreasTab`, `CondoStaffRolesTab`, `CondoLateFeeTab`, `AdminProfileModal`, `CondoSelectorModal`, `AdminMessagesPanel`).
+* **Skinny Database:** Migraciones atómicas y micro-seeders deterministas registrados en `DatabaseSeeder::run()`.
+
+---
+
+## 🧪 12. Protocolo Obligatorio de Pruebas (Pest v3 & Vitest)
 
 El repositorio exige el cumplimiento estricto de pruebas automatizadas:
-- **Backend (Pest v3):** >520 tests en verde probando validaciones numéricas de rango, aislamiento multi-tenant, quórum legal y permisos Spatie.
+- **Backend (Pest v3):** >525 tests en verde probando validaciones numéricas de rango, aislamiento multi-tenant, quórum legal y permisos Spatie.
 - **Frontend (Vitest):** 186 tests en verde sobre componentes React, modales, hooks financieros y layouts.
-- **Total Suite:** **>700 tests pasados con 0 errores (100% Éxito)**.
+- **Total Suite:** **>710 tests pasados con 0 errores (100% Éxito)**.
+- **Build de Producción:** Compilación exitosa con Vite (`npm run build`).
 
 ---
 **Fecha de creación:** Mayo 2026  
-**Última actualización:** 16 de Agosto de 2026 (Fases 1 a 5 Completadas, Versionado v0.0.15-dev & Suite 100% Verde)  
-**Versión:** v0.0.15-dev (Build 2026.08)  
+**Última actualización:** 16 de Agosto de 2026 (Fases 1 a 6 Completadas, Arquitectura Skinny & Release v0.1.0-RC1)  
+**Versión:** v0.1.0-RC1 (Build 2026.08)  
 **Estado:** Documento Oficial Activo.

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ExpenseRequest;
 use App\Models\CommonExpense;
 use Illuminate\Http\Request;
 
@@ -29,19 +30,9 @@ class ExpenseController extends Controller
         return $query->findOrFail($id);
     }
 
-    public function store(Request $request)
+    public function store(ExpenseRequest $request)
     {
-        $data = $request->validate([
-            'condominium_id' => 'required|exists:condominiums,id',
-            'period' => 'required|string',
-            'amount' => 'required|numeric',
-            'description' => 'nullable|string',
-            'due_date' => 'required|date',
-            'items' => 'nullable|array',
-            'items.*.category' => 'required_with:items|string',
-            'items.*.description' => 'nullable|string',
-            'items.*.amount' => 'required_with:items|numeric',
-        ]);
+        $data = $request->validated();
 
         $expense = CommonExpense::create($data);
 
@@ -54,22 +45,11 @@ class ExpenseController extends Controller
         return $expense->load('items');
     }
 
-    public function update(Request $request, $id)
+    public function update(ExpenseRequest $request, $id)
     {
-        $data = $request->validate([
-            'condominium_id' => 'required|exists:condominiums,id',
-            'period' => 'sometimes|string',
-            'amount' => 'sometimes|numeric',
-            'description' => 'nullable|string',
-            'due_date' => 'sometimes|date',
-            'status' => 'sometimes|string',
-            'items' => 'nullable|array',
-            'items.*.category' => 'required_with:items|string',
-            'items.*.description' => 'nullable|string',
-            'items.*.amount' => 'required_with:items|numeric',
-        ]);
+        $data = $request->validated();
 
-        $expense = CommonExpense::where('condominium_id', $data['condominium_id'])->findOrFail($id);
+        $expense = CommonExpense::findOrFail($id);
         $expense->update($data);
 
         if ($request->items) {
@@ -82,12 +62,12 @@ class ExpenseController extends Controller
         return $expense->load('items');
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
-        $request->validate(['condominium_id' => 'required|exists:condominiums,id']);
-        $expense = CommonExpense::where('condominium_id', $request->condominium_id)->findOrFail($id);
+        $expense = CommonExpense::findOrFail($id);
+        $expense->items()->delete();
         $expense->delete();
 
-        return response()->json(['message' => 'Gasto común eliminado correctamente.']);
+        return response()->json(null, 204);
     }
 }

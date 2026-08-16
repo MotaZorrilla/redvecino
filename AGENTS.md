@@ -205,9 +205,14 @@ Para mantener la máxima mantenibilidad y evitar la degradación del código:
   - [x] Seeder determinista: `AssemblyVotingsSeeder.php`.
   - [x] Suite Pest: `tests/Feature/AsambleasVotacionesLegalesPest.php`.
 
-#### 💎 FASE 6: Pulido UX, Perfil Admin y Auditorías de Calidad (Prioridad P3)
-- [ ] **6.1 Perfil de Administrador:**
-  - [ ] Subida de avatar y actualización de datos de contacto del administrador.
-- [ ] **6.2 Auditoría de Calidad Completa:**
-  - [ ] Auditoría de Rendimiento, Seguridad, SEO/Accesibilidad y Buenas Prácticas Laravel.
-  - [ ] Verificación final de suite 100% en verde (>700 tests combinados).
+#### 💎 FASE 6: Pulido UX, Perfil Admin, Arquitectura Skinny y Auditorías de Calidad (Prioridad P3)
+- [x] **6.1 Perfil de Administrador:**
+  - [x] Subida de avatar (`avatar_path`) y actualización de datos de contacto del administrador en modal desacoplado.
+  - [x] Suite Pest: `tests/Feature/AdminProfileAvatarPest.php`.
+- [x] **6.2 Arquitectura "Skinny Code" & Refactorización Modular:**
+  - [x] Descomposición de componentes monolíticos (`CondoProfilePanel.jsx`, `RedVecinoLayout.jsx`) en subcomponentes atómicos (`CondoGeneralTab`, `CondoUnitTypesTab`, `CondoCommonAreasTab`, `CondoStaffRolesTab`, `CondoLateFeeTab`, `AdminProfileModal`, `CondoSelectorModal`).
+  - [x] 100% Skinny Controllers delegando en FormRequests (`ExpenseRequest`, `FineRequest`, `PaymentRequest`, `FacilityRequest`, `MessageRequest`, `AssemblyVotingRequest`, `EmployeeSanctionRequest`, `SupplyOrderRequest`).
+- [x] **6.3 Auditoría de Calidad Completa en 6 Niveles:**
+  - [x] Auditoría de Rendimiento, Seguridad, SEO/Accesibilidad, Buenas Prácticas Laravel, Calidad de Código y Frontend/UX.
+  - [x] Verificación final de suite 100% en verde (**>710 tests combinados**: >525 Pest v3 en backend + 186 Vitest en frontend).
+  - [x] Certificación formal de versión `v0.1.0-RC1 (Build 2026.08)`.

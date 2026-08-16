@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\FineRequest;
 use App\Models\Fine;
-use Illuminate\Http\Request;
 
 class FineController extends Controller
 {
@@ -17,18 +17,9 @@ class FineController extends Controller
         return Fine::with(['user', 'property'])->findOrFail($id);
     }
 
-    public function store(Request $request)
+    public function store(FineRequest $request)
     {
-        $data = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'property_id' => 'required|exists:properties,id',
-            'reason' => 'required|string',
-            'amount' => 'required|numeric',
-            'issued_date' => 'required|date',
-            'due_date' => 'required|date',
-            'evidences' => 'nullable|array|max:3',
-            'evidences.*' => 'file|mimes:jpg,jpeg,png,webp|max:5120',
-        ]);
+        $data = $request->validated();
 
         $evidencePaths = [];
         if ($request->hasFile('evidences')) {
@@ -51,23 +42,22 @@ class FineController extends Controller
         return response()->json($fine->load(['user', 'property']), 201);
     }
 
-    public function update(Request $request, $id)
+    public function update(FineRequest $request, $id)
     {
         $fine = Fine::findOrFail($id);
+        $data = $request->validated();
 
-        $data = $request->validate([
-            'user_id' => 'sometimes|exists:users,id',
-            'property_id' => 'sometimes|exists:properties,id',
-            'reason' => 'sometimes|string',
-            'amount' => 'sometimes|numeric',
-            'status' => 'sometimes|string',
-            'issued_date' => 'sometimes|date',
-            'due_date' => 'sometimes|date',
-        ]);
+        if ($request->hasFile('evidences')) {
+            $evidencePaths = $fine->evidence_paths ?? [];
+            foreach ($request->file('evidences') as $file) {
+                $evidencePaths[] = $file->store('fines', 'public');
+            }
+            $data['evidence_paths'] = array_slice($evidencePaths, 0, 3);
+        }
 
         $fine->update($data);
 
-        return $fine;
+        return response()->json($fine->load(['user', 'property']));
     }
 
     public function destroy($id)
@@ -75,6 +65,6 @@ class FineController extends Controller
         $fine = Fine::findOrFail($id);
         $fine->delete();
 
-        return response()->json(['message' => 'Multa eliminada correctamente.']);
+        return response()->json(null, 204);
     }
 }

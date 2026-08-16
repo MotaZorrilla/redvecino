@@ -4,17 +4,22 @@ Plataforma SaaS full-stack para la administración inteligente, financiera, oper
 
 ---
 
-## 📌 Estado Actual del Proyecto (`v0.0.15-dev` · Build 2026.08)
+## 📌 Estado Actual del Proyecto (`v0.1.0-RC1` · Build 2026.08)
+- **Certificación de Versión:** Release Candidate `v0.1.0-RC1` con el 100% del Plan Maestro completado (Fases 1 a 6).
 - **Arquitectura Backend:** Laravel 11 con autenticación multi-rol (RBAC de 6 roles: Superadmin, Administrador, Comité, Conserje, Copropietario, Residente/Inquilino).
-- **Arquitectura Frontend:** React 18 + Inertia.js + Tailwind CSS, con diseño diferenciado entre portal web administrativo (**RedVecino**) y vista móvil optimizada (**MiVecino**).
+- **Arquitectura Frontend:** React 18 + Inertia.js + Tailwind CSS, bajo la estrategia de Dos Llaves (**RedVecino** para administración web y **MiVecino** para residentes móviles).
+- **Filosofía "Skinny Code" (Resources & Database):**
+  - **Skinny Controllers (<100L):** Controladores delgados que delegan validaciones en FormRequests dedicados y lógica en Servicios.
+  - **Skinny Resources (<120L):** Componentes atómicos desacoplados (`CondoGeneralTab`, `CondoUnitTypesTab`, `CondoCommonAreasTab`, `CondoStaffRolesTab`, `CondoLateFeeTab`, `AdminProfileModal`, `CondoSelectorModal`).
+  - **Skinny Database:** Migraciones atómicas y seeders deterministas modulares registrados en `DatabaseSeeder`.
 - **Malla de Seguridad y Calidad (QA 100% Verde):**
-  - **Backend (Pest v3 / PHPUnit):** **>520 tests pasando al 100%** (`php artisan test`).
+  - **Backend (Pest v3 / PHPUnit):** **>525 tests pasando al 100%** (`php artisan test`).
   - **Frontend (Vitest / Testing Library):** **186 tests pasando al 100%** en 25 suites (`npm run test:frontend`).
-  - Aislamiento multi-condominio verificado, validaciones financieras estrictas, cálculo de quórum legal (Ley 21.442) y control de votaciones por unidad.
+  - **Build de Producción:** Compilación exitosa con Vite (`npm run build`).
 
 ---
 
-## 🔄 Resumen de Módulos Implementados (Fases 1 a 5)
+## 🔄 Resumen de Módulos Implementados (Fases 1 a 6)
 
 1. **Recursos Humanos & Colaboradores (Fase 1):**
    - Amonestaciones laborales formales con respaldo en PDF/imagen.
@@ -26,7 +31,7 @@ Plataforma SaaS full-stack para la administración inteligente, financiera, oper
 2. **Unidades, Residentes y Mascotas (Fase 2):**
    - Estacionamientos y bodegas múltiples con asignación dinámica de patentes vehiculares.
    - Límite legal y de seguridad de máximo 3 residentes autorizados por unidad.
-   - Registro Sanitario de Mascotas (Ley Cholito) con N° de Microchip oficial de 15 dígitos y ficha médica adjunta.
+   - Registro Sanitario de Mascotas (Ley Cholito) con N° de Microchip oficial de 15 dígitos y carnet de vacunas adjunto.
    - *Supermodal 360°* de propiedades con navegación por tabs bajo demanda.
 
 3. **Amenidades, Checklists y Garantías (Fase 3):**
@@ -39,22 +44,24 @@ Plataforma SaaS full-stack para la administración inteligente, financiera, oper
 
 5. **Asambleas y Votaciones por Unidad (Fase 5 - Ley 21.442):**
    - Motor de votación con **1 voto por departamento ponderado por coeficiente de alícuota legal**.
-   - Conteo en tiempo real, cálculo de quórum y libro digital de actas de asamblea.
+   - Conteo en tiempo real, cálculo de quórum legal y libro digital de actas de asamblea con generación PDF.
 
-6. **Sistema de Versionado:**
-   - Changelog SemVer registrado en [`HISTORY.md`](./HISTORY.md).
-   - Badge de versión visible y discreto en el sidebar administrativo (`v0.0.15-dev`).
+6. **Pulido UX, Perfil Admin, Arquitectura Skinny y Auditorías (Fase 6):**
+   - Perfil de Administrador con carga y almacenamiento de Avatar (`avatar_path`) y edición de datos de contacto.
+   - Auditoría de Calidad en 6 niveles aprobada: Frontend/UX, Calidad de Código, SEO/Accesibilidad, Buenas Prácticas Laravel, Seguridad y Rendimiento.
+   - Estandarización de arquitectura modular "Skinny" en todas las capas del sistema.
 
 ---
 
 ## 🎯 Decisiones Clave Recientes
-1. **Privacidad Telefónica:** La comunicación interna entre conserjería y residentes se asocia a la Unidad (ej. *"Depto 501"*) sin revelar números de WhatsApp o celulares particulares.
-2. **Votaciones por Unidad:** Conforme al Art. 15 de la Ley 21.442, el voto lo emite la propiedad, impidiendo duplicidad de votos entre múltiples residentes de la misma unidad y ponderando por el porcentaje de alícuota.
-3. **Limpieza de Código Legacy:** Se unificaron las rutas de paquetería y mensajería eliminando controladores provisionales antiguos.
+1. **Adopción de "Skinny Resources & Skinny Database":** Se modularizaron los componentes extensos (`CondoProfilePanel.jsx` de 820 líneas y `RedVecinoLayout.jsx` de 600 líneas) en subcomponentes atómicos de menos de 100-120 líneas.
+2. **Cero Controladores Monolíticos:** Todos los endpoints operan con FormRequests dedicados (`ExpenseRequest`, `FineRequest`, `PaymentRequest`, `FacilityRequest`, `MessageRequest`, `AssemblyVotingRequest`, `EmployeeSanctionRequest`, `SupplyOrderRequest`).
+3. **Privacidad Telefónica & Votaciones por Unidad:** Estricta confidencialidad de datos personales en el módulo de mensajería y cumplimiento cabal del Art. 15 de la Ley 21.442 en votaciones de asamblea.
 
 ---
 
 ## 🚀 Próximo Paso Inmediato
-- **Fase 6 (Pulido UX, Perfil Admin y Auditorías de Calidad):**
-  1. Implementar la subida y visualización del Avatar del Administrador en el modal de perfil.
-  2. Ejecutar la auditoría de 6 niveles (Frontend/UX, Calidad de Código, SEO/Accesibilidad, Laravel Best Practices, Seguridad y Rendimiento).
+- **Despliegue a Staging / Producción:**
+  1. Configuración de variables de entorno productivas (`.env.production`).
+  2. Ejecución de migraciones y seeders de arranque en el servidor final.
+  3. Pruebas de aceptación de usuario (UAT) y presentaciones comerciales con la cuenta demo.

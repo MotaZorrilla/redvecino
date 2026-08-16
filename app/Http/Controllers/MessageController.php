@@ -49,9 +49,9 @@ class MessageController extends Controller
         }
 
         $message = Message::create([
-            'condominium_id' => $data['condominium_id'],
+            'condominium_id' => $data['condominium_id'] ?? 1,
             'property_id' => $data['property_id'] ?? null,
-            'channel_type' => $data['channel_type'],
+            'channel_type' => $data['channel_type'] ?? 'directo',
             'sender_id' => $request->user()->id,
             'receiver_id' => $data['receiver_id'] ?? null,
             'subject' => $data['subject'] ?? 'Mensaje de Comunidad',
@@ -66,6 +66,16 @@ class MessageController extends Controller
     public function markAsRead(Request $request, int $id): JsonResponse
     {
         $message = Message::findOrFail($id);
+        $user = $request->user();
+
+        if ($user) {
+            if ($message->sender_id === $user->id && $message->receiver_id !== $user->id) {
+                abort(403, 'El remitente no puede marcar como leído su propio mensaje.');
+            }
+            if ($message->receiver_id && $message->receiver_id !== $user->id && !$user->hasRole('Administrador')) {
+                abort(403, 'No tienes permiso para marcar este mensaje como leído.');
+            }
+        }
 
         $message->update([
             'is_read' => true,

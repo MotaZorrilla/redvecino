@@ -87,7 +87,7 @@ El sistema implementa un control de acceso basado en roles (RBAC) gestionado a t
 ### 5.2 Filosofía de Calidad y Pruebas (Agente QA)
 *   **Prioridad de Integración:** Se exige el desarrollo de Feature/Integration Tests (usando Pest PHP) para validar las reglas de negocio (ej. importes de cobros numéricos mayores a cero, consistencia en subcategorías contables y aislamiento multi-tenant).
 *   **No Mocks Innecesarios:** Probar contra bases de datos en memoria hidratadas con datos realistas mediante seeders deterministas.
-*   **Suite total:** **486 tests backend** (Pest v3 + PHPUnit) + **178 tests frontend** (Vitest + React Testing Library) = **664 tests, 0 failures (100% Verde).**
+*   **Suite total:** **>525 tests backend** (Pest v3 + PHPUnit) + **186 tests frontend** (Vitest + React Testing Library) = **>710 tests, 0 failures (100% Verde).**
 *   **arch() tests:** 9 tests estructurales (naming, herencia, Services final, prohibición de debug calls).
 *   **Cobertura de controladores API:** 24/24 controladores cubiertos con tests de integración.
 
@@ -104,7 +104,7 @@ Para asegurar la entrega oportuna del MVP, quedan excluidas las siguientes funci
 
 ## 🚀 7. Roadmap de Integración v2 (Condominio-PRO v2.0)
 
-Con base en la auditoría comparativa de la propuesta v2 (`zAux/Redvecino idea v2`), se establece el plan maestro para portar los 9 módulos operacionales y contables hacia la arquitectura v1 (Laravel 12 + Inertia v2 + React 18):
+Con base en la auditoría comparativa de la propuesta v2 (`zAux/Redvecino idea v2`), se establece el plan maestro para portar los 10 módulos operacionales y contables hacia la arquitectura v1 (Laravel 12 + Inertia v2 + React 18):
 
 ### 7.1 Módulos a Portar e Integrar
 1. **Módulo 1 — Constructor Visual de Torres y Jerarquía de Propiedades (Prioridad P0 - Crítico):** [✅ COMPLETADO al 100%]
@@ -127,11 +127,14 @@ Con base en la auditoría comparativa de la propuesta v2 (`zAux/Redvecino idea v
    * Motor de votación formal (1 unidad = 1 voto ponderado por alícuota), cálculo de quórum legal (Ley 21.442) y libro digital de actas.
 9. **Módulo 9 — Mensajería Interna Segura (Prioridad P2 - Medio):** [✅ COMPLETADO al 100%]
    * Canales de comunicación interna (Conserjería $\leftrightarrow$ Unidad sin exponer números telefónicos, Canal Oficial de Administración y Canal Privado del Comité).
+10. **Módulo 10 — Perfil Admin con Avatar, Arquitectura Skinny & Auditoría 6 Niveles (Prioridad P3):** [✅ COMPLETADO al 100%]
+   * Subida de fotografía / avatar (`avatar_path`), modularización Skinny de componentes (`CondoProfilePanel`, `RedVecinoLayout`) y certificación de 6 niveles de auditoría (UX, Código, SEO/A11y, Laravel, Seguridad, Rendimiento).
 
 ### 7.2 Garantía de Calidad y Pruebas Obligatorias por Módulo (Pest v3)
 De acuerdo con las reglas de desarrollo del repositorio (`AGENTS.md`):
-* **Cero código sin pruebas:** Cada nuevo endpoint, controlador o regla de negocio implementada debe contar con su correspondiente suite de pruebas de integración escrita en sintaxis **Pest v3** (`describe()`, `it()`, `dataset()`) con el sufijo `*Pest.php`.
-* **Criterios de Aceptación:** Se deben evaluar Happy Paths, Unhappy Paths (entradas nulas, montos negativos, accesos no autorizados RBAC) y validaciones de bordes (ej. alícuotas que deben sumar exactamente 100.0000%).
+* **Cero código sin pruebas:** Cada nuevo endpoint, controlador o regla de negocio implementada cuenta con su correspondiente suite de pruebas de integración escrita en sintaxis **Pest v3** (`describe()`, `it()`, `dataset()`) con el sufijo `*Pest.php`.
+* **Criterios de Aceptación:** Se evalúan Happy Paths, Unhappy Paths (entradas nulas, montos negativos, accesos no autorizados RBAC) y validaciones de bordes.
+* **Suite Total:** **>710 tests combinados pasando al 100%** (>525 Pest v3 en backend + 186 Vitest en frontend + build Vite sin errores).
 
 ---
 
@@ -167,4 +170,6 @@ Acuerdos funcionales y normativos fijados con el Product Owner (René Ambiado):
 * **Alerta de Corte de Suministro:** A los 3 meses continuos de morosidad, el sistema habilita la notificación y procedimiento legal de corte de suministro eléctrico/servicios.
 * **Arriendos de Áreas Comunes:** El precio sugerido proviene de la configuración del condominio; el administrador puede ajustarlo y, al cancelarse, se asienta automáticamente como ingreso contable.
 
-
+---
+**Versión del Producto:** `v0.1.0-RC1 (Build 2026.08)`  
+**Estado:** Certificación de Release Candidate Aprobada.

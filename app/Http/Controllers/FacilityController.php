@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\FacilityRequest;
 use App\Models\Facility;
 use Illuminate\Http\Request;
 
@@ -14,16 +15,9 @@ class FacilityController extends Controller
         return response()->json(Facility::where('condominium_id', $request->condominium_id)->get());
     }
 
-    public function store(Request $request)
+    public function store(FacilityRequest $request)
     {
-        $validated = $request->validate([
-            'condominium_id' => 'required|exists:condominiums,id',
-            'name' => 'required|string|max:255',
-            'type' => 'required|string|in:quincho,salon_eventos,cancha,piscina,gimnasio,otro',
-            'capacity' => 'nullable|integer|min:0',
-            'fee' => 'nullable|numeric|min:0',
-        ]);
-
+        $validated = $request->validated();
         $facility = Facility::create($validated);
 
         return response()->json($facility, 201);
@@ -34,16 +28,9 @@ class FacilityController extends Controller
         return response()->json($facility);
     }
 
-    public function update(Request $request, Facility $facility)
+    public function update(FacilityRequest $request, Facility $facility)
     {
-        $validated = $request->validate([
-            'condominium_id' => 'sometimes|exists:condominiums,id',
-            'name' => 'sometimes|string|max:255',
-            'type' => 'sometimes|string|in:quincho,salon_eventos,cancha,piscina,gimnasio,otro',
-            'capacity' => 'nullable|integer|min:0',
-            'fee' => 'nullable|numeric|min:0',
-        ]);
-
+        $validated = $request->validated();
         $facility->update($validated);
 
         return response()->json($facility);

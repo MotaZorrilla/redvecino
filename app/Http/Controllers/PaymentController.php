@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PaymentRequest;
 use App\Models\Payment;
 use App\Models\User;
-use Illuminate\Http\Request;
+use App\Models\ResidentProfile;
+use App\Models\OwnerProfile;
 
 class PaymentController extends Controller
 {
@@ -20,19 +22,9 @@ class PaymentController extends Controller
             ->paginate(20);
     }
 
-    public function store(Request $request)
+    public function store(PaymentRequest $request)
     {
-        $data = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'property_id' => 'required|exists:properties,id',
-            'common_expense_id' => 'required|exists:common_expenses,id',
-            'amount' => 'required|numeric|min:1',
-            'payment_date' => 'required|date',
-            'payment_method' => 'required|string|in:cash,transfer,card,check',
-            'reference' => 'nullable|string',
-            'waive_late_fee' => 'nullable|boolean',
-            'waive_reason' => 'nullable|string|max:255',
-        ]);
+        $data = $request->validated();
 
         $user = auth()->user();
         if ($user && !($user->can('approve expenses') || $user->can('view logs'))) {
@@ -40,8 +32,8 @@ class PaymentController extends Controller
                 abort(403, 'No puedes registrar pagos en nombre de otro usuario.');
             }
 
-            $isResident = \App\Models\ResidentProfile::where('user_id', $user->id)->where('property_id', $data['property_id'])->exists();
-            $isOwner = \App\Models\OwnerProfile::where('user_id', $user->id)->where('property_id', $data['property_id'])->exists();
+            $isResident = ResidentProfile::where('user_id', $user->id)->where('property_id', $data['property_id'])->exists();
+            $isOwner = OwnerProfile::where('user_id', $user->id)->where('property_id', $data['property_id'])->exists();
 
             if (!$isResident && !$isOwner) {
                 abort(403, 'No tienes asociacion con esta propiedad para realizar pagos.');
@@ -58,26 +50,27 @@ class PaymentController extends Controller
             abort(403, 'No tienes permiso para ver el estado de cuenta de otro usuario.');
         }
 
-        $user = User::findOrFail($userId);
-        $payments = Payment::where('user_id', $userId)->get();
-        $totalPaid = $payments->where('status', 'completed')->sum('amount');
+        $user = User::with(['roles', 'ownerProfile.property', 'residentProfile.property'])->findOrFail($userId);
 
-        return [
+        $propertyId = $user->ownerProfile?->property_id ?? $user->residentProfile?->property_id;
+
+        $payments = Payment::where('user_id', $userId)
+            ->with('commonExpense')
+            ->orderBy('payment_date', 'desc')
+            ->get();
+
+        $fines = \App\Models\Fine::where('user_id', $userId)
+            ->orderBy('issued_date', 'desc')
+            ->get();
+
+        $expenses = $propertyId ? \App\Models\CommonExpense::where('condominium_id', $user->ownerProfile?->property?->condominium_id ?? $user->residentProfile?->property?->condominium_id)->get() : [];
+
+        return response()->json([
             'user' => $user,
+            'property_id' => $propertyId,
             'payments' => $payments,
-            'total_paid' => $totalPaid,
-        ];
-    }
-
-    public function reconcile($id)
-    {
-        $payment = Payment::findOrFail($id);
-        $payment->update(['status' => 'completed']);
-
-        if ($payment->commonExpense) {
-            $payment->commonExpense->update(['status' => 'paid']);
-        }
-
-        return $payment;
+            'fines' => $fines,
+            'expenses' => $expenses
+        ]);
     }
 }

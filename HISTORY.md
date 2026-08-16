@@ -4,6 +4,32 @@ Todas las modificaciones notables y evoluciones de este proyecto se documentan f
 
 ---
 
+## [0.1.0-RC1] — 2026-08-16
+
+### 🚀 Novedades y Certificación de Release (Fases 4, 5 y 6 del Plan Maestro)
+
+#### 🏛️ Asambleas y Votaciones por Unidad (Ley 21.442)
+- **Motor de Votación por Unidad:** Implementación estricta de **1 unidad = 1 voto ponderado por alícuota** (Art. 15 Ley 21.442) con índice de unicidad relacional `[assembly_voting_id, property_id]`.
+- **Cálculo de Quórum Legal en Tiempo Real:** Determinación de mayorías absolutas y relativas con barras de porcentaje ponderadas y bloqueo automático al cierre.
+- **Libro Digital de Actas:** Historial de deliberaciones con generación y descarga de actas formales en PDF.
+
+#### 💬 Mensajería Interna Segura (Alternativa a WhatsApp)
+- **Canales Internos Protegidos:** Comunicación directa Conserjería $\leftrightarrow$ Unidad protegiendo la privacidad de los teléfonos celulares, Canal Oficial de Administración y Canal Privado del Comité.
+- **Evidencias y Adjuntos:** Soporte para fotografías y documentos adjuntos en conversaciones.
+
+#### 👤 Perfil de Administrador con Avatar & Limpieza de Legacy
+- **Carga de Avatar y Perfil:** Subida y persistencia de fotografías de perfil con storage público seguro, previsualización reactiva y edición de datos de contacto.
+- **Retiro Quirúrgico de Legacy:** Eliminación de `RoadmapFeaturesController.php` y `Api/PackageCustodyController.php`.
+- **FormRequests Dedicados (100% Skinny Controllers):** `ExpenseRequest`, `FineRequest`, `PaymentRequest`, `FacilityRequest`, `MessageRequest`, `AssemblyVotingRequest`, `EmployeeSanctionRequest`, `SupplyOrderRequest`.
+
+#### 🏗️ Arquitectura "Skinny Resources & Skinny Database"
+- **Modularización de Componentes:** Descomposición de componentes monolíticos (`CondoProfilePanel.jsx` y `RedVecinoLayout.jsx`) en subcomponentes atómicos (`CondoGeneralTab`, `CondoUnitTypesTab`, `CondoCommonAreasTab`, `CondoStaffRolesTab`, `CondoLateFeeTab`, `AdminProfileModal`, `CondoSelectorModal`).
+
+#### 🧪 Aseguramiento de Calidad
+- **Suite Automatizada 100% en Verde:** Más de **710 tests combinados** (>525 tests Pest v3 en backend y 186 tests Vitest en frontend) pasando sin fallas.
+
+---
+
 ## [0.0.15-dev] — 2026-08-16
 
 ### 🚀 Novedades y Funcionalidades (Fases 1, 2 y 3 del Plan Maestro)

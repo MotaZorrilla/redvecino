@@ -13,6 +13,7 @@ import EmployeesList from '@/Components/Admin/EmployeesList';
 import AmenitiesBookingPanel from '@/Components/Admin/AmenitiesBookingPanel';
 import PackageDelivery from '@/Components/Colaborador/PackageDelivery';
 import MeetingsMinutes from '@/Components/Comite/MeetingsMinutes';
+import AdminMessagesPanel from '@/Components/Admin/AdminMessagesPanel';
 
 export default function AdminDashboard({
     user, condosList, adminCondoId, setAdminCondoId, adminActiveTab, setAdminActiveTab, allCondominiums,
@@ -224,7 +225,18 @@ export default function AdminDashboard({
                 <AmenitiesBookingPanel adminCondoId={adminCondoId} />
             )}
             {adminActiveTab === 'packages' && (
-                <PackageDelivery packages={[]} adminCondoId={adminCondoId} />
+                <PackageDelivery
+                    colaboradorActiveTab="packages"
+                    condominiumId={adminCondoId}
+                    propertiesList={propertiesList}
+                />
+            )}
+            {adminActiveTab === 'messages' && (
+                <AdminMessagesPanel
+                    adminCondoId={adminCondoId}
+                    user={user}
+                    propertiesList={propertiesList}
+                />
             )}
             {adminActiveTab === 'actas' && (
                 <MeetingsMinutes adminCondoId={adminCondoId} />

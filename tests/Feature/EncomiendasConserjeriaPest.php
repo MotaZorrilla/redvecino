@@ -43,19 +43,19 @@ describe('Módulo de Encomiendas de Conserjería (Front Desk) API', function () 
         $response = $this->post('/api/package-custodies', [
             'condominium_id' => 1,
             'property_id' => $property->id,
-            'recipient_name' => 'Diego Alarcón',
+            'recipient_name' => 'Diego Alarcón Test',
             'carrier' => 'Chilexpress',
-            'tracking_number' => 'CHX-99887766',
+            'tracking_number' => 'CHX-UNIQUE-998877',
             'notes' => 'Caja mediana sellada en conserjería.',
             'photo' => $packagePhoto,
         ], ['Accept' => 'application/json']);
 
         $response->assertStatus(201)
-            ->assertJsonPath('recipient_name', 'Diego Alarcón')
+            ->assertJsonPath('recipient_name', 'Diego Alarcón Test')
             ->assertJsonPath('carrier', 'Chilexpress')
             ->assertJsonPath('status', 'custody');
 
-        $package = PackageCustody::where('tracking_number', 'CHX-99887766')->first();
+        $package = PackageCustody::where('tracking_number', 'CHX-UNIQUE-998877')->first();
         expect($package)->not->toBeNull()
             ->and($package->photo_path)->not->toBeNull();
 
@@ -89,7 +89,7 @@ describe('Módulo de Encomiendas de Conserjería (Front Desk) API', function () 
 
     it('lists packages filtered by property and deletes record with photo', function () {
         $colaborador = User::whereHas('roles', fn ($q) => $q->where('name', 'Colaborador'))->first();
-        $property = Property::first();
+        $isolatedProperty = Property::factory()->create(['condominium_id' => 1]);
         Sanctum::actingAs($colaborador);
 
         $fakePhoto = UploadedFile::fake()->image('encomienda_starken.jpg');
@@ -97,14 +97,14 @@ describe('Módulo de Encomiendas de Conserjería (Front Desk) API', function () 
 
         $package = PackageCustody::create([
             'condominium_id' => 1,
-            'property_id' => $property->id,
+            'property_id' => $isolatedProperty->id,
             'recipient_name' => 'Juan Pérez',
             'carrier' => 'Starken',
             'status' => 'custody',
             'photo_path' => $storedPath,
         ]);
 
-        $responseList = $this->getJson("/api/package-custodies?condominium_id=1&property_id={$property->id}");
+        $responseList = $this->getJson("/api/package-custodies?condominium_id=1&property_id={$isolatedProperty->id}");
         $responseList->assertStatus(200)
             ->assertJsonCount(1);
 

@@ -14,9 +14,9 @@ class MessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'condominium_id' => 'required|exists:condominiums,id',
+            'condominium_id' => 'required_without:receiver_id|exists:condominiums,id',
             'property_id' => 'nullable|exists:properties,id',
-            'channel_type' => 'required|string|in:conserjeria_unidad,comite_privado,administracion_oficial,directo',
+            'channel_type' => 'required_without:receiver_id|string|in:conserjeria_unidad,comite_privado,administracion_oficial,directo',
             'receiver_id' => 'nullable|exists:users,id',
             'subject' => 'nullable|string|max:255',
             'content' => 'required|string',
@@ -27,8 +27,8 @@ class MessageRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'condominium_id.required' => 'El condominio es obligatorio.',
-            'channel_type.required' => 'El tipo de canal es obligatorio.',
+            'condominium_id.required_without' => 'El condominio es obligatorio.',
+            'channel_type.required_without' => 'El tipo de canal es obligatorio.',
             'content.required' => 'El mensaje no puede estar vacío.',
         ];
     }
